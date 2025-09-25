@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Card from '../Card.svelte';
+	import Toast from '../Toast.svelte';
 	import { AlertTriangle, RefreshCw, Ban } from 'lucide-svelte';
 
 	// 목 데이터
@@ -11,17 +12,47 @@
 	];
 
 	let retryStates: Record<number, 'idle' | 'loading' | 'success' | 'error'> = {};
+	let cooldowns: Record<number, number> = {};
+	let toastMessage = '';
+	let toastType: 'success' | 'error' | 'info' = 'info';
+	let showToast = false;
 
 	async function retryFailure(id: number) {
+		// 쿨다운 체크 (15초)
+		if (cooldowns[id] && Date.now() < cooldowns[id]) {
+			const remaining = Math.ceil((cooldowns[id] - Date.now()) / 1000);
+			toastMessage = `재시도 가능까지 ${remaining}초 남았습니다`;
+			toastType = 'info';
+			showToast = true;
+			return;
+		}
+
 		retryStates[id] = 'loading';
 		
 		try {
-			// API 호출 시뮬레이션
-			await new Promise(resolve => setTimeout(resolve, 1000));
+			// API 호출
+			const response = await fetch('/api/failures/retry', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ id: id.toString() })
+			});
 			
-			// 성공/실패 랜덤 시뮬레이션
-			const success = Math.random() > 0.3;
-			retryStates[id] = success ? 'success' : 'error';
+			const result = await response.json();
+			
+			if (result.ok) {
+				retryStates[id] = result.data.status === 'ok' ? 'success' : 'error';
+				toastMessage = result.data.status === 'ok' ? '재시도 성공' : '재시도 실패';
+				toastType = result.data.status === 'ok' ? 'success' : 'error';
+			} else {
+				retryStates[id] = 'error';
+				toastMessage = result.error.message || '재시도 실패';
+				toastType = 'error';
+			}
+			
+			showToast = true;
+			
+			// 쿨다운 설정 (15초)
+			cooldowns[id] = Date.now() + 15000;
 			
 			// 2초 후 idle로 복귀
 			setTimeout(() => {
@@ -29,6 +60,13 @@
 			}, 2000);
 		} catch (error) {
 			retryStates[id] = 'error';
+			toastMessage = '네트워크 오류가 발생했습니다';
+			toastType = 'error';
+			showToast = true;
+			
+			// 쿨다운 설정
+			cooldowns[id] = Date.now() + 15000;
+			
 			setTimeout(() => {
 				retryStates[id] = 'idle';
 			}, 2000);
@@ -89,3 +127,11 @@
 		<a href="/failures/analysis" class="text-xs text-brand-pink hover:text-hover-cyan">원인</a>
 	</div>
 </Card>
+
+<!-- 토스트 알림 -->
+<Toast 
+	message={toastMessage} 
+	type={toastType} 
+	visible={showToast}
+	on:close={() => showToast = false}
+/>

@@ -1,14 +1,30 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import Card from '../Card.svelte';
+	import Skeleton from '../Skeleton.svelte';
 	import { CheckCircle, Clock, AlertCircle } from 'lucide-svelte';
+	import type { Task } from '$lib/types/api';
 
-	// 목 데이터
-	const tasks = [
-		{ id: 1, title: '앨범 아트워크 검토', priority: true, due: '오늘' },
-		{ id: 2, title: '트랙 메타데이터 수정', priority: false, due: '내일' },
-		{ id: 3, title: '발매 일정 확인', priority: true, due: '3일 후' },
-		{ id: 4, title: '수익 정산 검토', priority: false, due: '1주일 후' }
-	];
+	let tasks: Task[] = [];
+	let loading = true;
+	let error = '';
+
+	onMount(async () => {
+		try {
+			const response = await fetch('/api/tasks?limit=4');
+			const result = await response.json();
+			
+			if (result.ok) {
+				tasks = result.data;
+			} else {
+				error = result.error.message;
+			}
+		} catch (err) {
+			error = '데이터를 불러오는데 실패했습니다';
+		} finally {
+			loading = false;
+		}
+	});
 </script>
 
 <Card title="할 일 · 멘션" tooltip="내가 해야 할 업무와 호출 멘션 요약" href="/tasks">
@@ -30,17 +46,23 @@
 
 	<!-- 할 일 목록 -->
 	<div class="space-y-2">
-		{#each tasks.slice(0, 4) as task}
-			<div class="flex items-center gap-2 text-sm">
-				{#if task.priority}
-					<span class="md:hidden inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-danger-fg text-black">
-						우선
-					</span>
-				{/if}
-				<span class="text-text-base flex-1">{task.title}</span>
-				<span class="text-text-muted text-xs">{task.due}</span>
-			</div>
-		{/each}
+		{#if loading}
+			<Skeleton lines={4} height="h-4" />
+		{:else if error}
+			<div class="text-danger-fg text-sm">{error}</div>
+		{:else}
+			{#each tasks.slice(0, 4) as task}
+				<div class="flex items-center gap-2 text-sm">
+					{#if task.priority}
+						<span class="md:hidden inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-danger-fg text-black">
+							우선
+						</span>
+					{/if}
+					<span class="text-text-base flex-1">{task.title}</span>
+					<span class="text-text-muted text-xs">{task.due}</span>
+				</div>
+			{/each}
+		{/if}
 	</div>
 
 	<!-- 전환 버튼 -->
