@@ -1,0 +1,21 @@
+name = "sugar-rush-admin"
+compatibility_date = "2024-11-20"
+
+[env.staging]
+name = "sugar-rush-admin-staging"
+
+[env.production]
+name = "sugar-rush-admin-production"
+
+# D1 데이터베이스 설정 (향후 구현)
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "sugar_rush"
+# database_id = "REPLACE_WITH_YOUR_D1_ID"
+
+# 환경별 설정
+[env.staging.vars]
+ENVIRONMENT = "staging"
+
+[env.production.vars]
+ENVIRONMENT = "production"

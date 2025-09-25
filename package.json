@@ -2,6 +2,18 @@
   "name": "sugar-rush",
   "private": true,
   "packageManager": "pnpm@9.12.0",
+  "scripts": {
+    "dev": "pnpm --filter @sugar/admin dev",
+    "build": "pnpm --filter @sugar/admin build",
+    "preview": "pnpm --filter @sugar/admin preview",
+    "check": "pnpm --filter @sugar/admin check",
+    "check:watch": "pnpm --filter @sugar/admin check:watch",
+    "lint": "pnpm --filter @sugar/admin lint",
+    "test": "pnpm --filter @sugar/admin test",
+    "deploy:stg": "wrangler deploy --env=staging",
+    "deploy:prod": "wrangler deploy --env=production",
+    "forbidden-word-check": "grep -r -i 'AI' --include='*.svelte' --include='*.ts' --include='*.js' --include='*.html' --include='*.md' --exclude-dir=node_modules --exclude-dir=.git --exclude-dir=.svelte-kit src/ packages/admin/src/ && exit 1 || echo 'No forbidden AI word found'"
+  },
   "pnpm": {
     "onlyBuiltDependencies": [
       "esbuild"

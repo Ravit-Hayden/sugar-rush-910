@@ -1,0 +1,166 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  # 금칙어 게이트: 공개 자산에서 "AI" 문자열 검사
+  forbidden-word-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Check for forbidden "AI" word in public assets
+        run: |
+          echo "🔍 Checking for forbidden 'AI' word in public assets..."
+          
+          # 공개 자산에서 "AI" 문자열 검사 (대소문자 구분 없음)
+          if grep -r -i "AI" --include="*.svelte" --include="*.ts" --include="*.js" --include="*.html" --include="*.md" --exclude-dir=node_modules --exclude-dir=.git --exclude-dir=.svelte-kit src/ packages/admin/src/; then
+            echo "❌ Forbidden word 'AI' found in public assets!"
+            echo "Please remove or replace 'AI' strings from UI components, documentation, and notifications."
+            echo "Only internal code/DB schema can use 'ai_type' etc."
+            exit 1
+          else
+            echo "✅ No forbidden 'AI' word found in public assets"
+          fi
+
+  # 타입 체크 및 린트
+  typecheck-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.12.0
+          
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        
+      - name: Type check
+        run: pnpm --filter @sugar/admin check
+        
+      - name: Build
+        run: pnpm --filter @sugar/admin build
+
+  # 테스트 실행
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.12.0
+          
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        
+      - name: Run tests
+        run: pnpm --filter @sugar/admin test
+
+  # D1 마이그레이션 dry-run (향후 구현)
+  d1-migration-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.12.0
+          
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        
+      - name: D1 Migration Dry Run
+        run: |
+          echo "📋 D1 Migration dry-run check"
+          echo "TODO: Implement D1 migration validation"
+          echo "✅ Migration check passed (placeholder)"
+
+  # 스테이징 배포 (develop 브랜치)
+  deploy-staging:
+    if: github.ref == 'refs/heads/develop'
+    needs: [forbidden-word-check, typecheck-lint, test, d1-migration-check]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.12.0
+          
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        
+      - name: Build
+        run: pnpm --filter @sugar/admin build
+        
+      - name: Deploy to Staging
+        run: |
+          echo "🚀 Deploying to staging environment"
+          echo "TODO: Implement wrangler deploy --env=staging"
+          echo "✅ Staging deployment completed (placeholder)"
+
+  # 프로덕션 배포 (태그 시)
+  deploy-production:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: [forbidden-word-check, typecheck-lint, test, d1-migration-check]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.12.0
+          
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        
+      - name: Build
+        run: pnpm --filter @sugar/admin build
+        
+      - name: Deploy to Production
+        run: |
+          echo "🚀 Deploying to production environment"
+          echo "TODO: Implement wrangler deploy --env=production"
+          echo "✅ Production deployment completed (placeholder)"
