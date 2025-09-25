@@ -1,0 +1,10 @@
+# Cursor Rules — Sugar Rush 910
+- Stack: SvelteKit + Tailwind CSS v4 + pnpm workspaces + Pretendard. Icons: lucide-svelte (다운로드 SVG, 텍스트 X, 16px, 컨테이너 24×24).
+- 레이아웃: Header 56px 고정, Sidebar 240px 토글, Main 12-col grid. 카드 h-72, KPI만 h-80. Right panel 없음.
+- 반응형: <md 1열, md~<lg 2열, ≥lg 3열. 카드당 최대 4행, "더보기" 링크.
+- 테마 토글: Lucide **Eclipse** 아이콘 1개. 클릭 시 dark/light 전환. `localStorage('sr_theme')` 사용. 첫 페인트 전 스니펫으로 FOUC 방지.
+- 색상/브랜드: 문서의 변수 토큰과 금칙(브랜드색은 로고/악센트 전용, 앨범 대표색 금지) 준수.
+- 금칙어: 공개 UI/문서/알림에 "AI" 문자열 금지. 내부 코드/DB에서만 `ai_type` 허용. CI 게이트로 차단.
+- 접근성: WCAG 2.2 AA 대비(≥4.5:1), 포커스 링 ≥1.5px, aria-label/aria-live 적용.
+- 카드 셋과 링크, API 계약, D1 스키마/라우트, 에러 포맷(ApiErr) 등은 동봉 README의 Appendix A~G를 **정식 계약**으로 따른다.
+

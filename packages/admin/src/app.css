@@ -1,0 +1,54 @@
+@import 'tailwindcss';
+
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css');
+
+:root {
+  --brand-pink: #FF3DAE;
+  --hover-cyan: #17E1BC;
+  --danger-fg: #FF6B6B;
+  --warn-fg: #fffa00;
+  --ok-fg: #00ddff;
+  --tag-album: #FF3DAE;
+  --tag-track: #68b1ff;
+  --tag-deadline: #7ea59e;
+  --user-el: #A6FF00;
+  --user-ot: #FF835C;
+}
+
+[data-theme="dark"] {
+  --text-base: #888888;
+  --text-strong: #B6B6B6;
+  --text-muted: #6F6F6F;
+  --bg: #000000;
+  --surface-2: #121212;
+  --surface-1: #1A1A1A;
+  --border-subtle: #252528;
+}
+
+[data-theme="light"] {
+  --text-base: #D9CCBC;
+  --text-strong: #C5b5A9;
+  --text-muted: #A59686;
+  --bg: #F7F3E9;
+  --surface-2: #F3EBDD;
+  --surface-1: #FFF8EF;
+  --border-subtle: #D9CCBC;
+}
+
+body {
+  font-family: 'Pretendard Variable', system-ui, sans-serif;
+  background-color: var(--bg);
+  color: var(--text-base);
+}
+
+.btn-retry {
+  @apply inline-flex items-center justify-center h-[18px] px-2 rounded-full text-[11px] font-semibold leading-none;
+  background: var(--brand-pink); 
+  color: #FEFDF6;
+  border: none;
+}
+
+.btn-retry:hover {
+  background: var(--hover-cyan);
+  color: #000;
+}
