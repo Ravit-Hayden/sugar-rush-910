@@ -1,0 +1,160 @@
+@import 'tailwindcss';
+
+/* Pretendard 폰트 설정 */
+.font-pretendard {
+  font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+}
+
+/* 브랜드 & 상태 색상 변수 */
+:root {
+  --brand-pink: #FF3DAE;
+  --hover-cyan: #17E1BC;
+  --danger-fg: #FF6B6B;
+  --warn-fg: #fffa00;
+  --ok-fg: #00ddff;
+  --tag-album: #FF3DAE;
+  --tag-track: #68b1ff;
+  --tag-deadline: #7ea59e;
+  --user-el: #A6FF00;
+  --user-ot: #FF835C;
+  
+  /* 다크 모드 색상 변수 (기본값) */
+  --text-base: #888888;
+  --text-strong: #B6B6B6;
+  --text-muted: #6F6F6F;
+  --bg: #000000;
+  --surface-2: #121212;
+  --surface-1: #1A1A1A;
+  --border-subtle: #252528;
+}
+
+/* 라이트 모드 색상 변수 */
+[data-theme="light"] {
+  --text-base: #D9CCBC;
+  --text-strong: #C5b5A9;
+  --text-muted: #A59686;
+  --bg: #F7F3E9;
+  --surface-2: #F3EBDD;
+  --surface-1: #FFF8EF;
+  --border-subtle: #D9CCBC;
+}
+
+/* 멤버 컬러 토큰 */
+[data-user="el"] {
+  --user-color: #CFCFD4; /* 다크 모드 */
+}
+[data-user="el"][data-theme="light"] {
+  --user-color: #333434; /* 라이트 모드 */
+}
+[data-user="ot"] {
+  --user-color: #FEFDF6; /* 다크 모드 */
+}
+[data-user="ot"][data-theme="light"] {
+  --user-color: #D7CBBF; /* 라이트 모드 */
+}
+
+/* 버튼 스타일 */
+.btn-retry {
+  @apply inline-flex items-center justify-center h-[18px] px-2 rounded-full text-[11px] font-semibold leading-none;
+  background: var(--brand-pink);
+  color: #FEFDF6;
+  border: none;
+}
+.btn-retry:hover {
+  background: var(--hover-cyan);
+  color: #000;
+}
+
+/* 기본 스타일 */
+body {
+  background-color: var(--bg);
+  color: var(--text-base);
+}
+
+/* Tailwind CSS 클래스 오버라이드 */
+.bg-bg { background-color: var(--bg); }
+.bg-surface-1 { background-color: var(--surface-1); }
+.bg-surface-2 { background-color: var(--surface-2); }
+.bg-brand-pink { background-color: var(--brand-pink); }
+.bg-hover-cyan { background-color: var(--hover-cyan); }
+.text-text-base { color: var(--text-base); }
+.text-text-strong { color: var(--text-strong); }
+.text-text-muted { color: var(--text-muted); }
+.text-white { color: #FFFFFF; }
+.border-border-subtle { border-color: var(--border-subtle); }
+.text-brand-pink { color: var(--brand-pink); }
+.text-hover-cyan { color: var(--hover-cyan); }
+.text-danger-fg { color: var(--danger-fg); }
+.text-warn-fg { color: var(--warn-fg); }
+.text-ok-fg { color: var(--ok-fg); }
+.focus\:border-brand-pink:focus { border-color: var(--brand-pink); }
+.focus\:ring-0:focus { --tw-ring-width: 0px; --tw-ring-offset-width: 0px; }
+.hover\:border-hover-cyan:hover { border-color: var(--hover-cyan); }
+.border-\[1px\] { border-width: 1px; }
+.focus\:border-\[1px\]:focus { border-width: 1px !important; }
+
+/* 포커스 링 스타일 - 사이드바 메뉴, input, 버튼은 제외 */
+*:focus:not(a):not(input):not(button) {
+  outline: 2px solid var(--brand-pink);
+  outline-offset: 2px;
+}
+
+/* input 요소 포커스 스타일 */
+input:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  border-color: var(--brand-pink) !important;
+}
+
+/* 스크롤바 스타일 */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--surface-2);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-subtle);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* 사이드바 메뉴 호버 효과 */
+.sidebar-menu-item:hover:not(.active) {
+  background-color: var(--hover-cyan) !important;
+  color: #000000 !important;
+}
+
+.sidebar-menu-item:hover:not(.active) .lucide-icon {
+  color: #000000 !important;
+}
+
+.sidebar-menu-item.active {
+  background-color: var(--brand-pink) !important;
+  color: #FFFFFF !important;
+}
+
+.sidebar-menu-item.active .lucide-icon {
+  color: #FFFFFF !important;
+}
+
+/* 더 강력한 호버 효과를 위한 추가 CSS */
+aside nav ul li a.sidebar-menu-item:hover:not(.active) {
+  background-color: var(--hover-cyan) !important;
+  color: #000000 !important;
+}
+
+aside nav ul li a.sidebar-menu-item:hover:not(.active) .lucide-icon {
+  color: #000000 !important;
+}
+
+aside nav ul li a.sidebar-menu-item.active {
+  background-color: var(--brand-pink) !important;
+  color: #FFFFFF !important;
+}
+
+aside nav ul li a.sidebar-menu-item.active .lucide-icon {
+  color: #FFFFFF !important;
+}

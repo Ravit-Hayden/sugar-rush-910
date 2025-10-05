@@ -1,0 +1,7 @@
+name = "sugar-rush-admin"
+compatibility_date = "2024-11-20"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "sugar_rush"
+database_id = "7c38a14a-7ff9-4320-be32-d0f1d703b3b1"

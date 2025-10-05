@@ -1,0 +1,12 @@
+{
+  "name": "sugar-rush-910",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm -C packages/admin dev",
+    "build": "pnpm -C packages/admin build",
+    "preview": "pnpm -C packages/admin preview",
+    "cf:dev": "wrangler dev",
+    "cf:deploy:stg": "wrangler deploy --env=staging",
+    "cf:deploy:prod": "wrangler deploy --env=production"
+  }
+}
