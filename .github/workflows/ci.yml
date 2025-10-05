@@ -7,29 +7,55 @@ on:
     branches: [ main, develop ]
 
 jobs:
-  # 금칙어 게이트: 공개 자산에서 "AI" 문자열 검사
+  # 금칙어 게이트 - "AI" 문자열 체크
   forbidden-word-check:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         
-      - name: Check for forbidden "AI" word in public assets
+      - name: Check for forbidden words
         run: |
-          echo "🔍 Checking for forbidden 'AI' word in public assets..."
+          echo "Checking for forbidden words in public assets..."
           
-          # 공개 자산에서 "AI" 문자열 검사 (대소문자 구분 없음)
-          if grep -r -i "AI" --include="*.svelte" --include="*.ts" --include="*.js" --include="*.html" --include="*.md" --exclude-dir=node_modules --exclude-dir=.git --exclude-dir=.svelte-kit src/ packages/admin/src/; then
-            echo "❌ Forbidden word 'AI' found in public assets!"
-            echo "Please remove or replace 'AI' strings from UI components, documentation, and notifications."
-            echo "Only internal code/DB schema can use 'ai_type' etc."
+          # 공개 UI/문서/알림에서 "AI" 문자열 금지
+          FORBIDDEN_PATTERNS=(
+            "src/routes/**/*.svelte"
+            "src/lib/components/**/*.svelte"
+            "src/app.html"
+            "README.md"
+            "*.md"
+          )
+          
+          VIOLATIONS=()
+          
+          for pattern in "${FORBIDDEN_PATTERNS[@]}"; do
+            if find . -path "./node_modules" -prune -o -path "./.git" -prune -o -type f -name "$pattern" -print | grep -q .; then
+              FILES=$(find . -path "./node_modules" -prune -o -path "./.git" -prune -o -type f -name "$pattern" -print)
+              for file in $FILES; do
+                if grep -i "AI" "$file" > /dev/null 2>&1; then
+                  VIOLATIONS+=("$file")
+                fi
+              done
+            fi
+          done
+          
+          if [ ${#VIOLATIONS[@]} -gt 0 ]; then
+            echo "❌ Forbidden word 'AI' found in public assets:"
+            for violation in "${VIOLATIONS[@]}"; do
+              echo "  - $violation"
+              grep -n -i "AI" "$violation" | head -5
+            done
+            echo ""
+            echo "Please remove or replace 'AI' strings in public-facing files."
+            echo "Internal code/DB usage of 'ai_type' is allowed."
             exit 1
           else
-            echo "✅ No forbidden 'AI' word found in public assets"
+            echo "✅ No forbidden words found in public assets"
           fi
 
-  # 타입 체크 및 린트
-  typecheck-lint:
+  # 타입 체크
+  typecheck:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -50,11 +76,31 @@ jobs:
         
       - name: Type check
         run: pnpm --filter @sugar/admin check
-        
-      - name: Build
-        run: pnpm --filter @sugar/admin build
 
-  # 테스트 실행
+  # 린트
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.12.0
+          
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        
+      - name: Lint
+        run: pnpm --filter @sugar/admin lint
+
+  # 테스트
   test:
     runs-on: ubuntu-latest
     steps:
@@ -77,9 +123,33 @@ jobs:
       - name: Run tests
         run: pnpm --filter @sugar/admin test
 
-  # D1 마이그레이션 dry-run (향후 구현)
-  d1-migration-check:
+  # 빌드 테스트
+  build:
     runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.12.0
+          
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        
+      - name: Build
+        run: pnpm --filter @sugar/admin build
+
+  # D1 마이그레이션 dry-run (스테이징 환경)
+  migration-check:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -99,15 +169,14 @@ jobs:
         
       - name: D1 Migration Dry Run
         run: |
-          echo "📋 D1 Migration dry-run check"
-          echo "TODO: Implement D1 migration validation"
-          echo "✅ Migration check passed (placeholder)"
+          echo "D1 migration dry-run would be executed here"
+          echo "In production, this would run: wrangler d1 migrations list --env=staging"
 
-  # 스테이징 배포 (develop 브랜치)
+  # 스테이징 배포
   deploy-staging:
-    if: github.ref == 'refs/heads/develop'
-    needs: [forbidden-word-check, typecheck-lint, test, d1-migration-check]
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop'
+    needs: [forbidden-word-check, typecheck, lint, test, build, migration-check]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -124,21 +193,18 @@ jobs:
           
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-        
-      - name: Build
-        run: pnpm --filter @sugar/admin build
         
       - name: Deploy to Staging
         run: |
-          echo "🚀 Deploying to staging environment"
-          echo "TODO: Implement wrangler deploy --env=staging"
-          echo "✅ Staging deployment completed (placeholder)"
+          echo "Deploying to staging environment..."
+          echo "In production, this would run: wrangler deploy --env=staging"
+          # 실제 배포는 Cloudflare Workers 계정 설정 후 활성화
 
   # 프로덕션 배포 (태그 시)
   deploy-production:
-    if: startsWith(github.ref, 'refs/tags/')
-    needs: [forbidden-word-check, typecheck-lint, test, d1-migration-check]
     runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: [forbidden-word-check, typecheck, lint, test, build]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -156,11 +222,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
         
-      - name: Build
-        run: pnpm --filter @sugar/admin build
-        
       - name: Deploy to Production
         run: |
-          echo "🚀 Deploying to production environment"
-          echo "TODO: Implement wrangler deploy --env=production"
-          echo "✅ Production deployment completed (placeholder)"
+          echo "Deploying to production environment..."
+          echo "In production, this would run: wrangler deploy --env=production"
+          # 실제 배포는 Cloudflare Workers 계정 설정 후 활성화

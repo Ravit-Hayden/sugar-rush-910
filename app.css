@@ -1,0 +1,176 @@
+@import 'tailwindcss';
+
+/* Pretendard 폰트 설정 */
+.font-pretendard {
+  font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+}
+
+/* 브랜드 & 상태 색상 변수 */
+:root {
+  --brand-pink: #FF3DAE;
+  --hover-cyan: #17E1BC;
+  --danger-fg: #FF6B6B;
+  --warn-fg: #fffa00;
+  --ok-fg: #00ddff;
+  --tag-album: #FF3DAE;
+  --tag-track: #68b1ff;
+  --tag-deadline: #7ea59e;
+  --user-el: #A6FF00;
+  --user-ot: #FF835C;
+  
+  /* 다크 모드 색상 변수 (기본값) */
+  --text-base: #888888;
+  --text-strong: #B6B6B6;
+  --text-muted: #6F6F6F;
+  --bg: #000000;
+  --surface-2: #121212;
+  --surface-1: #1A1A1A;
+  --border-subtle: #252528;
+}
+
+/* 라이트 모드 색상 변수 */
+[data-theme="light"] {
+  --text-base: #D9CCBC;
+  --text-strong: #C5b5A9;
+  --text-muted: #A59686;
+  --bg: #F7F3E9;
+  --surface-2: #F3EBDD;
+  --surface-1: #FFF8EF;
+  --border-subtle: #D9CCBC;
+}
+
+/* 멤버 컬러 토큰 */
+[data-user="el"] {
+  --user-color: #CFCFD4; /* 다크 모드 */
+}
+[data-user="el"][data-theme="light"] {
+  --user-color: #333434; /* 라이트 모드 */
+}
+[data-user="ot"] {
+  --user-color: #FEFDF6; /* 다크 모드 */
+}
+[data-user="ot"][data-theme="light"] {
+  --user-color: #D7CBBF; /* 라이트 모드 */
+}
+
+/* 버튼 스타일 */
+.btn-retry {
+  @apply inline-flex items-center justify-center h-[18px] px-2 rounded-full text-[11px] font-semibold leading-none;
+  background: var(--brand-pink);
+  color: #FEFDF6;
+  border: none;
+}
+.btn-retry:hover {
+  background: var(--hover-cyan);
+  color: #000;
+}
+
+/* 기본 스타일 */
+body {
+  background-color: var(--bg);
+  color: var(--text-base);
+}
+
+/* Tailwind CSS 클래스 오버라이드 */
+.bg-bg { background-color: var(--bg); }
+.bg-surface-1 { background-color: var(--surface-1); }
+.bg-surface-2 { background-color: var(--surface-2); }
+.bg-brand-pink { background-color: var(--brand-pink); }
+.bg-hover-cyan { background-color: var(--hover-cyan); }
+.text-text-base { color: var(--text-base); }
+.text-text-strong { color: var(--text-strong); }
+.text-text-muted { color: var(--text-muted); }
+.text-white { color: #FFFFFF; }
+.border-border-subtle { border-color: var(--border-subtle); }
+.text-brand-pink { color: var(--brand-pink); }
+.text-hover-cyan { color: var(--hover-cyan); }
+.text-danger-fg { color: var(--danger-fg); }
+.text-warn-fg { color: var(--warn-fg); }
+.text-ok-fg { color: var(--ok-fg); }
+.focus\:border-brand-pink:focus { border-color: var(--brand-pink); }
+.focus\:ring-0:focus { --tw-ring-width: 0px; --tw-ring-offset-width: 0px; }
+.hover\:border-hover-cyan:hover { border-color: var(--hover-cyan); }
+.border-\[1px\] { border-width: 1px; }
+.focus\:border-\[1px\]:focus { border-width: 1px !important; }
+
+/* 포커스 링 스타일 - 사이드바 메뉴와 input은 제외 */
+*:focus:not(a):not(input) {
+  outline: 2px solid var(--brand-pink);
+  outline-offset: 2px;
+}
+
+/* input 요소 포커스 스타일 */
+input:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  border-color: var(--brand-pink) !important;
+}
+
+/* 스크롤바 스타일 */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--surface-2);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-subtle);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* 안전 패치: 메인 컨텐츠 영역 시각적 여백 24px 보장 */
+.main-content-area {
+  /* 기본 레이아웃 값 유지 */
+  padding-top: 6rem; /* pt-24 = 96px */
+  padding-bottom: 0.375rem;
+  transition: all 300ms ease-in-out;
+  background-color: var(--bg);
+  min-height: calc(100vh - 80px);
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+  margin-left: 0;
+
+  /* 좌우 여백 기본 24px로 고정 (브레이크포인트와 무관) */
+  padding-inline: 24px;
+
+  /* 스크롤 정책: X는 숨기고 Y는 컨테이너 자체에 생성 */
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  /* 우측 스크롤바 폭 8px을 '예약'해서 레이아웃 흔들림 방지 */
+  scrollbar-gutter: stable; /* both-edges 금지 */
+}
+
+/* 거터를 예약하면 우측은 '패딩 16 + 거터 8 = 시각 24'가 되도록 우측 패딩만 16으로 조정
+   - 지원 브라우저(크롬/엣지/파폭)에서만 적용됨
+   - 미지원 환경에서는 padding-right: 24px 그대로 → 시각 24px 확보
+*/
+@supports (scrollbar-gutter: stable) {
+  .main-content-area {
+    padding-inline-end: 16px; /* right padding = 16px */
+  }
+}
+
+/* 좌측 사이드바 폭에 따른 메인 영역 가로 계산 (기존 클래스 유지) */
+.main-content-area.sidebar-collapsed {
+  margin-left: 72px;
+  width: calc(100% - 72px);
+}
+
+.main-content-area.sidebar-expanded {
+  margin-left: 250px;
+  width: calc(100% - 250px);
+}
+
+/* 태블릿 이하에서 사이드바가 숨겨질 때 */
+@media (max-width: 767px) {
+  .main-content-area.sidebar-collapsed,
+  .main-content-area.sidebar-expanded {
+    margin-left: 0;
+    width: 100%;
+  }
+}
