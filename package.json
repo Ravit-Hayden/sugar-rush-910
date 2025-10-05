@@ -1,22 +1,49 @@
 {
-  "name": "sugar-rush",
+  "name": "@sugar/admin",
+  "version": "0.0.0",
   "private": true,
-  "packageManager": "pnpm@9.12.0",
+  "type": "module",
   "scripts": {
-    "dev": "pnpm --filter @sugar/admin dev",
-    "build": "pnpm --filter @sugar/admin build",
-    "preview": "pnpm --filter @sugar/admin preview",
-    "check": "pnpm --filter @sugar/admin check",
-    "check:watch": "pnpm --filter @sugar/admin check:watch",
-    "lint": "pnpm --filter @sugar/admin lint",
-    "test": "pnpm --filter @sugar/admin test",
-    "deploy:stg": "wrangler deploy --env=staging",
-    "deploy:prod": "wrangler deploy --env=production",
-    "forbidden-word-check": "grep -r -i 'AI' --include='*.svelte' --include='*.ts' --include='*.js' --include='*.html' --include='*.md' --exclude-dir=node_modules --exclude-dir=.git --exclude-dir=.svelte-kit src/ packages/admin/src/ && exit 1 || echo 'No forbidden AI word found'"
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "svelte-kit preview",
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",
+    "lint": "eslint .",
+    "test": "vitest"
   },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild"
-    ]
+  "devDependencies": {
+    "@cloudflare/workers-types": "4.20250924.0",
+    "@eslint/compat": "1.4.0",
+    "@eslint/js": "9.36.0",
+    "@libsql/client": "0.14.0",
+    "@sveltejs/adapter-cloudflare": "7.2.3",
+    "@sveltejs/kit": "2.43.4",
+    "@sveltejs/vite-plugin-svelte": "6.2.1",
+    "@tailwindcss/vite": "4.1.13",
+    "@types/node": "22.18.6",
+    "@vitest/browser": "3.2.4",
+    "drizzle-kit": "0.30.6",
+    "drizzle-orm": "0.40.1",
+    "eslint": "9.36.0",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-svelte": "3.12.4",
+    "globals": "16.4.0",
+    "playwright": "1.55.1",
+    "prettier": "3.6.2",
+    "prettier-plugin-svelte": "3.4.0",
+    "prettier-plugin-tailwindcss": "0.6.14",
+    "svelte": "5.39.6",
+    "svelte-check": "4.3.2",
+    "tailwindcss": "4.1.13",
+    "typescript": "5.9.2",
+    "typescript-eslint": "8.44.1",
+    "vite": "7.1.7",
+    "vitest": "3.2.4",
+    "vitest-browser-svelte": "0.1.0",
+    "wrangler": "4.40.0"
+  },
+  "dependencies": {
+    "lucide-svelte": "^0.544.0"
   }
 }
