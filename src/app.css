@@ -151,6 +151,12 @@ html {
   }
 }
 
+/* 헤더와 메인 영역 통일된 패딩 체계 */
+header {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
 /* 사이드바 상태에 따른 마진 조정 */
 .main-content-area.sidebar-collapsed {
   margin-left: 72px;
@@ -265,7 +271,7 @@ input:focus {
     width: 100%;
   }
   
-  /* 모바일에서 헤더 패딩과 메인 콘텐츠 패딩 일치 */
+  /* 모바일에서 헤더와 메인 콘텐츠 패딩 일치 */
   header {
     padding-left: 1rem !important; /* 16px - 메인 콘텐츠와 동일 */
     padding-right: 1rem !important; /* 16px - 메인 콘텐츠와 동일 */
