@@ -4,10 +4,10 @@
 	let { title, tooltip, children, class: className = '' } = $props();
 </script>
 
-<div class="h-72 bg-surface-2 border border-border-subtle rounded-lg p-4 {className}">
+<div class="h-80 min-w-0 flex flex-col bg-surface-2 border border-border-subtle rounded-lg p-4 overflow-y-auto {className}">
 	<!-- 카드 헤더 -->
-	<div class="flex items-center justify-between mb-4">
-		<h3 class="text-lg font-semibold text-text-strong">{title}</h3>
+	<div class="flex items-center justify-between mb-3 flex-shrink-0">
+		<h3 class="text-lg font-bold text-text-strong">{title}</h3>
 		{#if tooltip}
 			<button
 				class="inline-flex items-center justify-center w-4 h-4 rounded-full hover:bg-surface-1 transition-colors"
@@ -20,7 +20,7 @@
 	</div>
 
 	<!-- 카드 내용 -->
-	<div class="h-[calc(100%-3rem)]">
+	<div class="flex-1 min-h-0">
 		{@render children?.()}
 	</div>
 </div>
