@@ -178,7 +178,7 @@
 	}
 </script>
 
-<header class="h-20 px-6 fixed top-0 left-0 right-0 z-[60] bg-bg transition-all duration-300" style="margin-left: {sidebarWidth}px;">
+<header class="h-20 fixed top-0 left-0 right-0 z-[60] bg-bg transition-all duration-300" style="margin-left: {sidebarWidth}px; padding-left: 16px; padding-right: 16px;">
 	<div class="flex h-full items-center justify-between">
 		<!-- 왼쪽 섹션: 페이지 제목 (반응형 숨김/표시) -->
 		<div class="flex items-center gap-4">

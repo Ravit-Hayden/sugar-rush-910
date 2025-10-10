@@ -1,6 +1,14 @@
 @import 'tailwindcss';
 
 /* Pretendard 폰트 설정 */
+@font-face {
+  font-family: 'Pretendard Variable';
+  src: url('/fonts/PretendardVariable.woff2') format('woff2');
+  font-weight: 45 920;
+  font-style: normal;
+  font-display: swap;
+}
+
 .font-pretendard {
   font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
 }
@@ -92,6 +100,7 @@ body {
   overflow-x: hidden; /* 가로 스크롤바 방지 */
   margin: 0;
   padding: 0;
+  font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
 }
 
 /* 전체 페이지 가로 스크롤바 방지 */
@@ -106,21 +115,40 @@ html {
   overflow-x: hidden;
 }
 
-:root{--sbw:0px}
+/* 전체 페이지 가로 스크롤바 방지 */
+html {
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
 
 /* 통일된 메인 영역 스타일 */
 .main-content-area {
   padding-top: 5rem; /* pt-20 (80px) */
   padding-bottom: 0.375rem; /* pb-1.5 (6px) */
-  padding-left: 24px;
-  padding-right: clamp(0px, calc(24px - var(--sbw, 0px)), 24px);
+  padding-left: 16px; /* gutter(8px) + padding(16px) = 24px 가시적 여백 */
+  padding-right: 16px; /* gutter(8px) + padding(16px) = 24px 가시적 여백 */
   transition: all 300ms ease-in-out;
   overflow-x: hidden;
+  overflow-y: auto; /* 스크롤 생성 */
   background-color: var(--bg);
   min-height: calc(100vh - 80px);
   width: 100%;
-  scrollbar-gutter: stable;
+  scrollbar-gutter: stable both-edges; /* 양쪽에 균등하게 gutter 공간 확보 */
   box-sizing: border-box;
+}
+
+/* 파이어폭스 전용 - 스크롤바 오버레이 방식이므로 원래 패딩 유지 */
+@-moz-document url-prefix() {
+  .main-content-area {
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+  }
+  
+  header {
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+  }
 }
 
 /* 사이드바 상태에 따른 마진 조정 */
@@ -185,10 +213,10 @@ input:focus {
   border-color: var(--brand-pink) !important;
 }
 
-/* 스크롤바 스타일 - README 표준 적용 */
+/* 스크롤바 스타일 - README 표준 적용 (8px 고정) */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 8px !important; /* scrollbar-gutter와 일치하도록 고정 */
+  height: 8px !important;
 }
 ::-webkit-scrollbar-track {
   background: var(--bg);
@@ -239,8 +267,16 @@ input:focus {
   
   /* 모바일에서 헤더 패딩과 메인 콘텐츠 패딩 일치 */
   header {
-    padding-left: 1.5rem !important; /* 24px - 메인 콘텐츠와 동일 */
-    padding-right: 1.5rem !important; /* 24px - 메인 콘텐츠와 동일 */
+    padding-left: 1rem !important; /* 16px - 메인 콘텐츠와 동일 */
+    padding-right: 1rem !important; /* 16px - 메인 콘텐츠와 동일 */
+  }
+  
+  /* 모바일에서도 파이어폭스는 원래 패딩 유지 */
+  @-moz-document url-prefix() {
+    header {
+      padding-left: 1.5rem !important; /* 24px - 파이어폭스 전용 */
+      padding-right: 1.5rem !important; /* 24px - 파이어폭스 전용 */
+    }
   }
   
   /* 모바일에서 오른쪽 섹션은 좌측 정렬 */
