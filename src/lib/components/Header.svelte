@@ -252,7 +252,7 @@
 					/>
 					<!-- 새로운 알림 표시 점 -->
 					<span 
-						class="absolute top-2 right-2 w-1 h-1 rounded-full transition-colors" 
+						class="absolute top-1.5 right-1.5 w-1 h-1 rounded-full transition-colors" 
 						style="background-color: {notificationClicked ? 'var(--brand-pink)' : notificationHovered ? 'var(--hover-cyan)' : 'var(--brand-pink)'};"
 					></span>
 				</button>
