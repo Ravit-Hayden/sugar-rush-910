@@ -138,11 +138,16 @@ html {
   box-sizing: border-box;
 }
 
-/* 헤더와 메인 영역 통일된 패딩 체계 */
-header,
+/* 메인 영역 패딩 체계 */
 .main-content-area {
   padding-left: 16px;
   padding-right: 16px;
+}
+
+/* 헤더 강제 패딩 - gutter 없으므로 24px로 메인과 시각적 일치 */
+header {
+  padding-left: 24px;
+  padding-right: 24px;
 }
 
 /* 파이어폭스 전용 - 스크롤바 오버레이 방식이므로 원래 패딩 유지 */
@@ -268,11 +273,16 @@ input:focus {
     width: 100%;
   }
   
-  /* 모바일에서 헤더와 메인 콘텐츠 패딩 일치 */
-  header,
+  /* 모바일에서 메인 콘텐츠 패딩 */
   .main-content-area {
-    padding-left: 1rem !important; /* 16px - 메인 콘텐츠와 동일 */
-    padding-right: 1rem !important; /* 16px - 메인 콘텐츠와 동일 */
+    padding-left: 1rem !important; /* 16px */
+    padding-right: 1rem !important; /* 16px */
+  }
+  
+  /* 모바일에서 헤더 강제 패딩 - gutter 없으므로 24px로 메인과 시각적 일치 */
+  header {
+    padding-left: 1.5rem !important; /* 24px */
+    padding-right: 1.5rem !important; /* 24px */
   }
   
   /* 모바일에서도 파이어폭스는 원래 패딩 유지 */
