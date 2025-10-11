@@ -10,7 +10,7 @@
 	const releaseCount = kpi.find(k => k.name === '신규 앨범')?.points?.slice(-1)[0]?.y || 8;
 </script>
 
-<Card title="KPI 요약 그래프" tooltip="수익 및 성과 지표" class="h-80 lg:h-[360px]">
+<Card title="KPI 요약 그래프" tooltip="수익 및 성과 지표" class="h-80 lg:h-[600px]">
 	{#if loading}
 		<Skeleton lines={6} />
 	{:else}
@@ -59,7 +59,7 @@
 			<div class="flex-1 bg-surface-1 rounded p-4 flex items-center justify-center min-h-0">
 				<div class="w-full h-full flex flex-col items-center justify-center">
 					<!-- 간단한 막대 차트 시뮬레이션 -->
-					<div class="w-full flex items-end justify-center gap-1 mb-3" style="height: min(160px, 100%);">
+					<div class="w-full flex items-end justify-center gap-1 mb-3" style="height: min(300px, 100%);">
 						<div class="bg-brand-pink rounded-t" style="height: 60%; width: 16px;"></div>
 						<div class="bg-hover-cyan rounded-t" style="height: 80%; width: 16px;"></div>
 						<div class="bg-brand-pink rounded-t" style="height: 45%; width: 16px;"></div>
