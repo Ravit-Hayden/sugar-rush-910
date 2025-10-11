@@ -60,7 +60,7 @@
 		</div>
 
 		<!-- 하단 액션 그룹 -->
-		<div class="mt-auto flex flex-row justify-end gap-x-2 mb-4">
+		<div class="mt-auto flex flex-row justify-end gap-x-2 mb-2">
 			<a href="/status" class="text-brand-pink font-semibold text-sm px-4 py-1 rounded transition-colors hover:bg-hover-cyan">
 				자세히 보기
 			</a>

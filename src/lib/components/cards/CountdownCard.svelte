@@ -17,7 +17,7 @@
 		<Skeleton lines={4} />
 	{:else}
 		<!-- 미니 통계 -->
-		<div class="grid grid-cols-3 gap-2 mb-4">
+		<div class="grid grid-cols-3 gap-2 mb-2">
 		{#each miniStats as stat (stat.label)}
 			<div class="h-8 bg-surface-1 rounded flex items-center justify-center">
 				<span class="text-[11px] text-text-muted truncate">{stat.label}: {stat.value}</span>
@@ -40,7 +40,7 @@
 		</div>
 
 		<!-- 하단 액션 그룹 -->
-		<div class="mt-auto flex flex-row justify-end gap-x-2 mb-4">
+		<div class="mt-auto flex flex-row justify-end gap-x-2 mb-2">
 			<a href="/releases" class="text-[10px] px-2 py-1 flex items-center justify-center rounded-md bg-brand-pink hover:bg-hover-cyan text-white font-semibold h-[18px] min-w-[38px]">
 				<Calendar size={12} class="mr-1" />
 				<span>발매 관리</span>
