@@ -10,7 +10,7 @@
 	const releaseCount = kpi.find(k => k.name === '신규 앨범')?.points?.slice(-1)[0]?.y || 8;
 </script>
 
-<Card title="KPI 요약 그래프" tooltip="수익 및 성과 지표" class="h-80 lg:h-[160px]">
+<Card title="KPI 요약 그래프" tooltip="수익 및 성과 지표" class="h-80 lg:h-[320px]">
 	{#if loading}
 		<Skeleton lines={6} />
 	{:else}
@@ -32,6 +32,26 @@
 					</div>
 					<div class="text-lg font-bold text-text-strong">{releaseCount}</div>
 					<div class="text-xs text-ok-fg">+2건</div>
+				</div>
+			</div>
+
+			<!-- 추가 KPI 정보 (3열일 때만 표시) -->
+			<div class="hidden lg:grid grid-cols-2 gap-4 mb-4">
+				<div class="bg-surface-1 rounded p-3">
+					<div class="flex items-center gap-2 mb-2">
+						<TrendingUp size={16} class="text-brand-pink" />
+						<span class="text-sm font-medium text-text-strong">월간 목표</span>
+					</div>
+					<div class="text-lg font-bold text-text-strong">₩10,000,000</div>
+					<div class="text-xs text-ok-fg">85% 달성</div>
+				</div>
+				<div class="bg-surface-1 rounded p-3">
+					<div class="flex items-center gap-2 mb-2">
+						<BarChart3 size={16} class="text-hover-cyan" />
+						<span class="text-sm font-medium text-text-strong">평균 수익</span>
+					</div>
+					<div class="text-lg font-bold text-text-strong">₩306,250</div>
+					<div class="text-xs text-ok-fg">일평균</div>
 				</div>
 			</div>
 
