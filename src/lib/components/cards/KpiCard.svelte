@@ -10,13 +10,13 @@
 	const releaseCount = kpi.find(k => k.name === '신규 앨범')?.points?.slice(-1)[0]?.y || 8;
 </script>
 
-<Card title="KPI 요약 그래프" tooltip="수익 및 성과 지표" class="h-96">
+<Card title="KPI 요약 그래프" tooltip="수익 및 성과 지표" class="h-[120px] lg:h-[160px]">
 	{#if loading}
 		<Skeleton lines={6} />
 	{:else}
 		<div class="h-full flex flex-col">
 			<!-- KPI 요약 -->
-			<div class="grid grid-cols-2 gap-4 mb-4">
+			<div class="grid grid-cols-2 gap-4 mb-3">
 				<div class="bg-surface-1 rounded p-3">
 					<div class="flex items-center gap-2 mb-2">
 						<TrendingUp size={16} class="text-ok-fg" />
@@ -41,6 +41,13 @@
 					<BarChart3 size={48} class="text-text-muted mx-auto mb-2" />
 					<p class="text-text-muted">차트 데이터 로딩 중...</p>
 				</div>
+			</div>
+
+			<!-- 하단 액션 그룹 -->
+			<div class="mt-auto flex flex-row justify-end gap-x-2 mb-2">
+				<a href="/kpi" class="text-brand-pink font-semibold text-sm px-4 py-1 rounded transition-colors hover:bg-hover-cyan">
+					자세히 보기
+				</a>
 			</div>
 		</div>
 	{/if}

@@ -112,22 +112,40 @@
 			<p class="text-text-muted">전체 시스템 현황과 주요 지표를 확인하세요.</p>
 		</div>
 		
-		<div class="grid grid-cols-3 gap-8">
+		<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 			<!-- 카드들 -->
-			<TasksCard {tasks} />
-			<CountdownCard {deadlines} />
-			<FailuresCard {failures} />
-			<StatusCard {status} />
-			<ChangesCard {changes} />
-			<FeedbackCard {feedback} />
-			<ReleasesCard {releases} />
-			<ActionsCard />
-			<LogsCard {logs} />
-		</div>
-		
-		<!-- KPI (풀폭) -->
-		<div class="mt-10">
-			<KpiCard {kpi} />
+			<div class="col-span-1">
+				<TasksCard {tasks} />
+			</div>
+			<div class="col-span-1">
+				<CountdownCard {deadlines} />
+			</div>
+			<div class="col-span-1">
+				<FailuresCard {failures} />
+			</div>
+			<div class="col-span-1">
+				<StatusCard {status} />
+			</div>
+			<div class="col-span-1">
+				<ChangesCard {changes} />
+			</div>
+			<div class="col-span-1">
+				<FeedbackCard {feedback} />
+			</div>
+			<div class="col-span-1">
+				<ReleasesCard {releases} />
+			</div>
+			<div class="col-span-1">
+				<ActionsCard />
+			</div>
+			<div class="col-span-1">
+				<LogsCard {logs} />
+			</div>
+
+			<!-- KPI (반응형 확장) -->
+			<div class="col-span-1 sm:col-span-2 lg:col-span-3">
+				<KpiCard {kpi} />
+			</div>
 		</div>
 	</div>
 {/if}
