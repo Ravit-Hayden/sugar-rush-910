@@ -90,24 +90,11 @@
 </script>
 
 <Card title="실패 태스크(재시도)" tooltip="실패 작업 복구 또는 원인 분석 전환">
-	{#snippet actions()}
-		<a href="/runbook" class="text-[10px] px-2 py-1 flex items-center justify-center rounded-md bg-brand-pink hover:bg-hover-cyan text-white font-semibold h-[18px] min-w-[38px]">
-			<RotateCcw size={12} class="mr-1" />
-			<span>재시도</span>
-		</a>
-		<a href="/failures" class="text-[10px] px-2 py-1 flex items-center justify-center rounded-md bg-brand-pink hover:bg-hover-cyan text-white font-semibold h-[18px] min-w-[38px]">
-			<AlertTriangle size={12} class="mr-1" />
-			<span>원인</span>
-		</a>
-		<a href="/failures" class="text-brand-pink font-semibold text-sm px-4 py-1 rounded transition-colors hover:bg-hover-cyan">
-			자세히 보기
-		</a>
-	{/snippet}
 	{#if loading}
 		<Skeleton lines={4} />
 	{:else}
 		<!-- 미니 통계 -->
-		<div class="grid grid-cols-3 gap-2 mb-2">
+		<div class="grid grid-cols-3 gap-2 mb-3">
 		{#each miniStats as stat (stat.label)}
 			<div class="h-8 bg-surface-1 rounded flex items-center justify-center">
 				<span class="text-[11px] text-text-muted truncate">{stat.label}: {stat.value}</span>
@@ -116,7 +103,7 @@
 		</div>
 
 		<!-- 실패 목록 -->
-		<div class="space-y-2">
+		<div class="space-y-2 mb-3">
 		{#each failures.slice(0, 3) as failure (failure.id)}
 			<div class="flex items-center justify-between p-2 bg-surface-1 rounded">
 				<div class="flex items-center gap-2 min-w-0 flex-1">
@@ -141,6 +128,21 @@
 				{/if}
 			</div>
 		{/each}
+		</div>
+
+		<!-- 하단 액션 그룹 -->
+		<div class="mt-auto flex flex-row justify-end gap-x-2 mb-2">
+			<a href="/runbook" class="text-[10px] px-2 py-1 flex items-center justify-center rounded-md bg-brand-pink hover:bg-hover-cyan text-white font-semibold h-[18px] min-w-[38px]">
+				<RotateCcw size={12} class="mr-1" />
+				<span>재시도</span>
+			</a>
+			<a href="/failures" class="text-[10px] px-2 py-1 flex items-center justify-center rounded-md bg-brand-pink hover:bg-hover-cyan text-white font-semibold h-[18px] min-w-[38px]">
+				<AlertTriangle size={12} class="mr-1" />
+				<span>원인</span>
+			</a>
+			<a href="/failures" class="text-brand-pink font-semibold text-sm px-4 py-1 rounded transition-colors hover:bg-hover-cyan">
+				자세히 보기
+			</a>
 		</div>
 	{/if}
 </Card>

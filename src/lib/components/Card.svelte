@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Info } from 'lucide-svelte';
 
-	let { title, tooltip, children, class: className = '', actions } = $props();
+	let { title, tooltip, children, class: className = '' } = $props();
 </script>
 
 <div class="h-80 min-w-0 flex flex-col bg-surface-2 border border-border-subtle rounded-lg p-4 overflow-hidden {className}">
@@ -24,17 +24,6 @@
 	<!-- 카드 내용 -->
 	<div class="flex-1 min-h-0">
 		{@render children?.()}
-	</div>
-
-	<!-- 하단 액션 그룹 (강제 적용) -->
-	<div class="mt-auto flex flex-row justify-end gap-x-2 mb-2">
-		{#if actions}
-			{@render actions()}
-		{:else}
-			<a href="/" class="text-brand-pink font-semibold text-sm px-4 py-1 rounded transition-colors hover:bg-hover-cyan">
-				자세히 보기
-			</a>
-		{/if}
 	</div>
 </div>
 
