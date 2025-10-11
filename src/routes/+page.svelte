@@ -123,6 +123,10 @@
 			<ReleasesCard {releases} />
 			<ActionsCard />
 			<LogsCard {logs} />
+		</div>
+		
+		<!-- KPI (풀폭) -->
+		<div class="mt-6">
 			<KpiCard {kpi} />
 		</div>
 	</div>
