@@ -40,8 +40,8 @@
 			{/each}
 		</div>
 
-		<!-- 전환 버튼 -->
-		<div class="flex justify-end gap-2">
+		<!-- 하단 액션 그룹 -->
+		<div class="flex flex-row justify-end gap-x-2 mt-3">
 			<a href="/tasks/new" class="btn-retry text-[10px] px-2 py-1">
 				<Plus size={12} class="mr-1" />
 				새 태스크
@@ -49,6 +49,9 @@
 			<a href="/mentions" class="btn-retry text-[10px] px-2 py-1">
 				<MessageSquare size={12} class="mr-1" />
 				멘션
+			</a>
+			<a href="/tasks" class="text-[10px] px-2 py-1 text-text-muted hover:text-text-strong transition-colors">
+				자세히 보기
 			</a>
 		</div>
 	{/if}

@@ -42,7 +42,7 @@
 	{#if loading}
 		<Skeleton lines={4} />
 	{:else}
-		<div class="space-y-2">
+		<div class="space-y-2 mb-4">
 			{#each status.slice(0, 4) as item (item.key)}
 				{@const IconComponent = getStatusIcon(item.value)}
 				<div class="flex items-center justify-between p-2 bg-surface-1 rounded">
@@ -56,6 +56,13 @@
 					<span class="text-xs text-text-muted">{item.value}</span>
 				</div>
 			{/each}
+		</div>
+
+		<!-- 하단 액션 그룹 -->
+		<div class="flex flex-row justify-end gap-x-2 mt-3">
+			<a href="/status" class="text-[10px] px-2 py-1 text-text-muted hover:text-text-strong transition-colors">
+				자세히 보기
+			</a>
 		</div>
 	{/if}
 </Card>

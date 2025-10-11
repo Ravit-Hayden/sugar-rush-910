@@ -39,8 +39,8 @@
 		{/each}
 		</div>
 
-		<!-- 전환 버튼 -->
-		<div class="flex justify-end gap-2">
+		<!-- 하단 액션 그룹 -->
+		<div class="flex flex-row justify-end gap-x-2 mt-3">
 			<a href="/releases" class="btn-retry text-[10px] px-2 py-1">
 				<Calendar size={12} class="mr-1" />
 				발매 관리
@@ -48,6 +48,9 @@
 			<a href="/calendar/new" class="btn-retry text-[10px] px-2 py-1">
 				<Plus size={12} class="mr-1" />
 				일정 추가
+			</a>
+			<a href="/calendar" class="text-[10px] px-2 py-1 text-text-muted hover:text-text-strong transition-colors">
+				자세히 보기
 			</a>
 		</div>
 	{/if}

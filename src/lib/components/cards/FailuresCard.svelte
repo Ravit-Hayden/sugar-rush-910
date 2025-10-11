@@ -130,8 +130,8 @@
 		{/each}
 		</div>
 
-		<!-- 전환 버튼 -->
-		<div class="flex justify-end gap-2">
+		<!-- 하단 액션 그룹 -->
+		<div class="flex flex-row justify-end gap-x-2 mt-3">
 			<a href="/runbook" class="btn-retry text-[10px] px-2 py-1">
 				<RotateCcw size={12} class="mr-1" />
 				재시도
@@ -139,6 +139,9 @@
 			<a href="/failures" class="btn-retry text-[10px] px-2 py-1">
 				<AlertTriangle size={12} class="mr-1" />
 				원인
+			</a>
+			<a href="/failures" class="text-[10px] px-2 py-1 text-text-muted hover:text-text-strong transition-colors">
+				자세히 보기
 			</a>
 		</div>
 	{/if}
