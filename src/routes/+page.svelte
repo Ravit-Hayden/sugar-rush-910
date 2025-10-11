@@ -112,7 +112,7 @@
 			<p class="text-text-muted">전체 시스템 현황과 주요 지표를 확인하세요.</p>
 		</div>
 		
-		<div class="grid grid-cols-3 gap-6">
+		<div class="grid grid-cols-3 gap-8">
 			<!-- 카드들 -->
 			<TasksCard {tasks} />
 			<CountdownCard {deadlines} />
@@ -126,7 +126,7 @@
 		</div>
 		
 		<!-- KPI (풀폭) -->
-		<div class="mt-6">
+		<div class="mt-10">
 			<KpiCard {kpi} />
 		</div>
 	</div>

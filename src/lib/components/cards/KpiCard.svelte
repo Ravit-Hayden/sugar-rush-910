@@ -10,7 +10,7 @@
 	const releaseCount = kpi.find(k => k.name === '신규 앨범')?.points?.slice(-1)[0]?.y || 8;
 </script>
 
-<Card title="KPI 요약 그래프" tooltip="수익 및 성과 지표" class="h-80">
+<Card title="KPI 요약 그래프" tooltip="수익 및 성과 지표" class="h-96">
 	{#if loading}
 		<Skeleton lines={6} />
 	{:else}
