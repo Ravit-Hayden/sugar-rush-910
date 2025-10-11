@@ -31,7 +31,7 @@
 				<div class="flex items-center justify-between p-2 bg-surface-1 rounded">
 					<div class="flex items-center gap-2">
 						<input type="checkbox" class="rounded" />
-						<span class="text-sm text-text-base">{task.title}</span>
+						<span class="text-sm text-text-base truncate">{task.title}</span>
 						{#if task.priority}
 							<span class="text-[10px] px-1 py-0.5 rounded text-white" style="background-color: var(--danger-fg);">우선</span>
 						{/if}
@@ -42,16 +42,13 @@
 
 		<!-- 하단 액션 그룹 -->
 		<div class="flex flex-row justify-end gap-x-2 mt-3">
-			<a href="/tasks/new" class="btn-retry text-[10px] px-2 py-1">
+			<a href="/tasks/new" class="btn-retry text-[10px] px-2 py-1 flex items-center justify-center rounded-full bg-brand-pink hover:bg-hover-cyan text-white font-semibold">
 				<Plus size={12} class="mr-1" />
-				새 태스크
+				<span>새 태스크</span>
 			</a>
-			<a href="/mentions" class="btn-retry text-[10px] px-2 py-1">
+			<a href="/mentions" class="btn-retry text-[10px] px-2 py-1 flex items-center justify-center rounded-full bg-brand-pink hover:bg-hover-cyan text-white font-semibold">
 				<MessageSquare size={12} class="mr-1" />
-				멘션
-			</a>
-			<a href="/tasks" class="text-[10px] px-2 py-1 text-text-muted hover:text-text-strong transition-colors">
-				자세히 보기
+				<span>멘션</span>
 			</a>
 		</div>
 	{/if}

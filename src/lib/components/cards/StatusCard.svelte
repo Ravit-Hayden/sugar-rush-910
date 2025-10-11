@@ -58,11 +58,5 @@
 			{/each}
 		</div>
 
-		<!-- 하단 액션 그룹 -->
-		<div class="flex flex-row justify-end gap-x-2 mt-3">
-			<a href="/status" class="text-[10px] px-2 py-1 text-text-muted hover:text-text-strong transition-colors">
-				자세히 보기
-			</a>
-		</div>
 	{/if}
 </Card>
