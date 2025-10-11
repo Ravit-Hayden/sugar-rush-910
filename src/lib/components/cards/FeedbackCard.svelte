@@ -6,7 +6,7 @@
 	let { feedback = [], loading = false } = $props();
 </script>
 
-<Card title="피드백" tooltip="코멘트/리뷰">
+<Card title="피드백" tooltip="코멘트/리뷰" class="h-80">
 	{#if loading}
 		<Skeleton lines={4} />
 	{:else}

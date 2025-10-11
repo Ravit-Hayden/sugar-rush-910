@@ -12,7 +12,7 @@
 	];
 </script>
 
-<Card title="카운트다운(일정)" tooltip="예약 발매·마감 임박 일정 요약">
+<Card title="카운트다운(일정)" tooltip="예약 발매·마감 임박 일정 요약" class="h-80">
 	{#if loading}
 		<Skeleton lines={4} />
 	{:else}

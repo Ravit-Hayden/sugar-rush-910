@@ -12,7 +12,7 @@
 	];
 </script>
 
-<Card title="할 일 · 멘션" tooltip="내가 해야 할 업무와 호출 멘션 요약">
+<Card title="할 일 · 멘션" tooltip="내가 해야 할 업무와 호출 멘션 요약" class="h-80">
 	{#if loading}
 		<Skeleton lines={4} />
 	{:else}

@@ -6,7 +6,7 @@
 	let { logs = [], loading = false } = $props();
 </script>
 
-<Card title="시스템 로그" tooltip="운영 이벤트">
+<Card title="시스템 로그" tooltip="운영 이벤트" class="h-80">
 	{#if loading}
 		<Skeleton lines={4} />
 	{:else}

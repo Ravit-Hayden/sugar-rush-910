@@ -89,7 +89,7 @@
 	}
 </script>
 
-<Card title="실패 태스크(재시도)" tooltip="실패 작업 복구 또는 원인 분석 전환">
+<Card title="실패 태스크(재시도)" tooltip="실패 작업 복구 또는 원인 분석 전환" class="h-80">
 	{#if loading}
 		<Skeleton lines={4} />
 	{:else}

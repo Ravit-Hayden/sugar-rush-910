@@ -38,7 +38,7 @@
 	}
 </script>
 
-<Card title="시스템 상태" tooltip="운영 스냅샷">
+<Card title="시스템 상태" tooltip="운영 스냅샷" class="h-80">
 	{#if loading}
 		<Skeleton lines={4} />
 	{:else}

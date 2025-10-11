@@ -6,7 +6,7 @@
 	let { releases = [], loading = false } = $props();
 </script>
 
-<Card title="오늘 발매 일정" tooltip="당일 중심 일정">
+<Card title="오늘 발매 일정" tooltip="당일 중심 일정" class="h-80">
 	{#if loading}
 		<Skeleton lines={4} />
 	{:else}

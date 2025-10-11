@@ -12,7 +12,7 @@
 	];
 </script>
 
-<Card title="최근 변경" tooltip="편집·배포·정책 변경 요약">
+<Card title="최근 변경" tooltip="편집·배포·정책 변경 요약" class="h-80">
 	{#if loading}
 		<Skeleton lines={4} />
 	{:else}

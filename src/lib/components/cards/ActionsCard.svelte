@@ -15,7 +15,7 @@
 	const displayActions = actions.length > 0 ? actions : defaultActions;
 </script>
 
-<Card title="빠른 액션" tooltip="새 앨범/트랙/업로드/정산">
+<Card title="빠른 액션" tooltip="새 앨범/트랙/업로드/정산" class="h-80">
 	{#if loading}
 		<Skeleton lines={4} />
 	{:else}

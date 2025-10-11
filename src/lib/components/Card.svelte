@@ -4,7 +4,7 @@
 	let { title, tooltip, children, class: className = '' } = $props();
 </script>
 
-<div class="h-80 min-w-0 flex flex-col bg-surface-2 border border-border-subtle rounded-lg p-4 overflow-hidden {className}">
+<div class="min-w-0 flex flex-col bg-surface-2 border border-border-subtle rounded-lg p-4 overflow-hidden {className}">
 	<!-- 카드 헤더 -->
 	<div class="mb-2 flex-shrink-0">
 		<div class="flex items-center justify-between">
