@@ -142,8 +142,8 @@
 				<LogsCard {logs} />
 			</div>
 
-			<!-- KPI (반응형 확장) -->
-			<div class="col-span-1 sm:col-span-2 lg:col-span-3">
+			<!-- KPI (반응형 위치/크기 조절) -->
+			<div class="col-span-1 sm:col-span-1 lg:col-span-3">
 				<KpiCard {kpi} />
 			</div>
 		</div>
