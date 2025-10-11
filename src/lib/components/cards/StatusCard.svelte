@@ -42,21 +42,28 @@
 	{#if loading}
 		<Skeleton lines={4} />
 	{:else}
-		<div class="space-y-2 mb-4">
-			{#each status.slice(0, 4) as item (item.key)}
+		<div class="space-y-2">
+			{#each status.slice(0, 3) as item (item.key)}
 				{@const IconComponent = getStatusIcon(item.value)}
 				<div class="flex items-center justify-between p-2 bg-surface-1 rounded">
-					<div class="flex items-center gap-2">
+					<div class="flex items-center gap-2 min-w-0 flex-1">
 						<IconComponent
 							size={14}
 							style="color: {getStatusColor(item.value)}"
+							class="flex-shrink-0"
 						/>
-						<span class="text-sm text-text-base">{item.key}</span>
+						<span class="text-sm text-text-base truncate">{item.key}</span>
 					</div>
-					<span class="text-xs text-text-muted">{item.value}</span>
+					<span class="text-xs text-text-muted flex-shrink-0">{item.value}</span>
 				</div>
 			{/each}
 		</div>
 
+		<!-- 하단 액션 그룹 -->
+		<div class="mt-auto flex flex-row justify-end gap-x-2 mb-4">
+			<a href="/status" class="text-brand-pink font-semibold text-sm px-4 py-1 rounded transition-colors hover:bg-hover-cyan">
+				자세히 보기
+			</a>
+		</div>
 	{/if}
 </Card>

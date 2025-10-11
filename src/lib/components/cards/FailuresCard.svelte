@@ -103,27 +103,27 @@
 		</div>
 
 		<!-- 실패 목록 -->
-		<div class="space-y-2 mb-4">
-		{#each failures.slice(0, 4) as failure (failure.id)}
+		<div class="space-y-2">
+		{#each failures.slice(0, 3) as failure (failure.id)}
 			<div class="flex items-center justify-between p-2 bg-surface-1 rounded">
-				<div class="flex items-center gap-2">
-					<AlertTriangle size={14} class="text-danger-fg" />
-					<span class="text-sm text-text-base">{failure.text}</span>
+				<div class="flex items-center gap-2 min-w-0 flex-1">
+					<AlertTriangle size={14} class="text-danger-fg flex-shrink-0" />
+					<span class="text-sm text-text-base truncate">{failure.text}</span>
 				</div>
 				{#if failure.retryable}
 					<button
 						onclick={() => retryFailure(failure.id)}
-						class={getButtonClass(getRetryState(failure.id))}
+						class="text-[10px] px-2 py-1 flex items-center justify-center rounded-md bg-brand-pink hover:bg-hover-cyan text-white font-semibold h-[18px] min-w-[38px] flex-shrink-0"
 						disabled={getRetryState(failure.id) === 'loading' || isOnCooldown(failure.id)}
 						aria-label="재시도"
 						aria-live="polite"
 					>
 						{#if getRetryState(failure.id) === 'loading'}
-							<RotateCcw size={12} class="animate-spin" />
+							<RotateCcw size={12} class="animate-spin mr-1" />
 						{:else}
-							<RotateCcw size={12} />
+							<RotateCcw size={12} class="mr-1" />
 						{/if}
-						<span class="ml-1">{getButtonText(getRetryState(failure.id))}</span>
+						<span>{getButtonText(getRetryState(failure.id))}</span>
 					</button>
 				{/if}
 			</div>
@@ -131,14 +131,17 @@
 		</div>
 
 		<!-- 하단 액션 그룹 -->
-		<div class="flex flex-row justify-end gap-x-2 mt-3">
-			<a href="/runbook" class="btn-retry text-[10px] px-2 py-1 flex items-center justify-center rounded-full bg-brand-pink hover:bg-hover-cyan text-white font-semibold">
+		<div class="mt-auto flex flex-row justify-end gap-x-2 mb-4">
+			<a href="/runbook" class="text-[10px] px-2 py-1 flex items-center justify-center rounded-md bg-brand-pink hover:bg-hover-cyan text-white font-semibold h-[18px] min-w-[38px]">
 				<RotateCcw size={12} class="mr-1" />
 				<span>재시도</span>
 			</a>
-			<a href="/failures" class="btn-retry text-[10px] px-2 py-1 flex items-center justify-center rounded-full bg-brand-pink hover:bg-hover-cyan text-white font-semibold">
+			<a href="/failures" class="text-[10px] px-2 py-1 flex items-center justify-center rounded-md bg-brand-pink hover:bg-hover-cyan text-white font-semibold h-[18px] min-w-[38px]">
 				<AlertTriangle size={12} class="mr-1" />
 				<span>원인</span>
+			</a>
+			<a href="/failures" class="text-brand-pink font-semibold text-sm px-4 py-1 rounded transition-colors hover:bg-hover-cyan">
+				자세히 보기
 			</a>
 		</div>
 	{/if}
