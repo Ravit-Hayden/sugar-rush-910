@@ -39,6 +39,11 @@
 </script>
 
 <Card title="시스템 상태" tooltip="운영 스냅샷">
+	{#snippet actions()}
+		<a href="/status" class="text-brand-pink font-semibold text-sm px-4 py-1 rounded transition-colors hover:bg-hover-cyan">
+			자세히 보기
+		</a>
+	{/snippet}
 	{#if loading}
 		<Skeleton lines={4} />
 	{:else}
@@ -57,13 +62,6 @@
 					<span class="text-xs text-text-muted flex-shrink-0">{item.value}</span>
 				</div>
 			{/each}
-		</div>
-
-		<!-- 하단 액션 그룹 -->
-		<div class="mt-auto flex flex-row justify-end gap-x-2 mb-2">
-			<a href="/status" class="text-brand-pink font-semibold text-sm px-4 py-1 rounded transition-colors hover:bg-hover-cyan">
-				자세히 보기
-			</a>
 		</div>
 	{/if}
 </Card>
