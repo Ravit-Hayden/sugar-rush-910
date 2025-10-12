@@ -20,7 +20,7 @@
 	];
 </script>
 
-<div class="h-[380px] flex flex-col justify-between p-5 rounded-lg bg-surface-2 border border-border-subtle overflow-hidden pt-[24px]">
+<div class="h-[396px] flex flex-col justify-between p-5 rounded-lg bg-surface-2 border border-border-subtle overflow-hidden pt-[24px]">
 	<div>
 		<!-- 상단 타이틀영역 -->
 		<div class="flex items-center justify-between mb-4">
@@ -33,7 +33,7 @@
 		<!-- 중간 요약 영역 -->
 		<div class="grid grid-cols-3 gap-2 mb-3">
 			{#each miniStats as stat (stat.label)}
-				<div class="h-12 bg-surface-1 rounded flex items-center justify-center px-2">
+				<div class="h-8 bg-surface-1 rounded flex items-center justify-center px-2">
 					<span class="text-xs text-text-muted truncate">{stat.label}: {stat.value}</span>
 				</div>
 			{/each}
@@ -45,10 +45,10 @@
 				<Skeleton lines={2} />
 			{:else}
 				{#each displayDeadlines.slice(0, 4) as deadline (deadline.id)}
-				<a
-					href="/calendar/{deadline.id}"
-					class="flex items-center gap-2 p-3 bg-surface-1 rounded hover:bg-surface-2 transition-colors h-11"
-				>
+					<a
+						href="/calendar/{deadline.id}"
+						class="flex items-center gap-2 p-3 bg-surface-1 rounded hover:bg-surface-2 transition-colors h-full"
+					>
 						<span class="text-sm text-text-base text-center flex-1">{deadline.label}</span>
 						<span class="text-[10px] px-2 py-0.5 rounded text-white flex-shrink-0" style="background-color: var(--tag-deadline);">
 							D-{deadline.days}
@@ -57,7 +57,7 @@
 				{/each}
 				{#if displayDeadlines.length < 4}
 					{#each Array.from({length: 4 - displayDeadlines.length}) as _, i}
-						<div class="p-3 bg-surface-1 rounded h-11 opacity-0 pointer-events-none">&nbsp;</div>
+						<div class="p-3 bg-surface-1 rounded h-full opacity-0 pointer-events-none">&nbsp;</div>
 					{/each}
 				{/if}
 			{/if}

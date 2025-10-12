@@ -14,7 +14,7 @@
 	const displayActions = actions.length > 0 ? actions : defaultActions;
 </script>
 
-<div class="h-[380px] flex flex-col justify-between p-5 rounded-lg bg-surface-2 border border-border-subtle overflow-hidden pt-[24px]">
+<div class="h-[396px] flex flex-col justify-between p-5 rounded-lg bg-surface-2 border border-border-subtle overflow-hidden pt-[24px]">
 	<div>
 		<!-- 상단 타이틀영역 -->
 		<div class="flex items-center justify-between mb-4">
@@ -26,13 +26,13 @@
 
 		<!-- 중간 요약 영역 -->
 		<div class="grid grid-cols-3 gap-2 mb-3">
-			<div class="h-12 bg-surface-1 rounded flex items-center justify-center px-2">
+			<div class="h-8 bg-surface-1 rounded flex items-center justify-center px-2">
 				<span class="text-xs text-text-muted truncate">앨범: 4</span>
 			</div>
-			<div class="h-12 bg-surface-1 rounded flex items-center justify-center px-2">
+			<div class="h-8 bg-surface-1 rounded flex items-center justify-center px-2">
 				<span class="text-xs text-text-muted truncate">트랙: 12</span>
 			</div>
-			<div class="h-12 bg-surface-1 rounded flex items-center justify-center px-2">
+			<div class="h-8 bg-surface-1 rounded flex items-center justify-center px-2">
 				<span class="text-xs text-text-muted truncate">업로드: 8</span>
 			</div>
 		</div>
@@ -46,7 +46,7 @@
 					{@const IconComponent = action.icon}
 					<a
 						href={action.href}
-						class="flex items-center gap-2 p-3 bg-surface-1 rounded hover:bg-surface-2 transition-colors h-11"
+						class="flex items-center gap-2 p-3 bg-surface-1 rounded hover:bg-surface-2 transition-colors h-full"
 					>
 						<IconComponent size={16} class="text-text-base flex-shrink-0" />
 						<span class="text-sm text-text-base text-center flex-1">{action.label}</span>
@@ -54,7 +54,7 @@
 				{/each}
 				{#if displayActions.length < 4}
 					{#each Array.from({length: 4 - displayActions.length}) as _, i}
-						<div class="p-3 bg-surface-1 rounded h-11 opacity-0 pointer-events-none">&nbsp;</div>
+						<div class="p-3 bg-surface-1 rounded h-full opacity-0 pointer-events-none">&nbsp;</div>
 					{/each}
 				{/if}
 			{/if}

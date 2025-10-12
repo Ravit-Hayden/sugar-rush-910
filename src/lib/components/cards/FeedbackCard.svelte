@@ -14,7 +14,7 @@
 	const displayFeedback = feedback.length > 0 ? feedback : defaultFeedback;
 </script>
 
-<div class="h-[380px] flex flex-col justify-between p-5 rounded-lg bg-surface-2 border border-border-subtle overflow-hidden pt-[24px]">
+<div class="h-[396px] flex flex-col justify-between p-5 rounded-lg bg-surface-2 border border-border-subtle overflow-hidden pt-[24px]">
 	<div>
 		<!-- 상단 타이틀영역 -->
 		<div class="flex items-center justify-between mb-4">
@@ -26,13 +26,13 @@
 
 		<!-- 중간 요약 영역 -->
 		<div class="grid grid-cols-3 gap-2 mb-3">
-			<div class="h-12 bg-surface-1 rounded flex items-center justify-center px-2">
+			<div class="h-8 bg-surface-1 rounded flex items-center justify-center px-2">
 				<span class="text-xs text-text-muted truncate">오늘: 2</span>
 			</div>
-			<div class="h-12 bg-surface-1 rounded flex items-center justify-center px-2">
+			<div class="h-8 bg-surface-1 rounded flex items-center justify-center px-2">
 				<span class="text-xs text-text-muted truncate">이번주: 8</span>
 			</div>
-			<div class="h-12 bg-surface-1 rounded flex items-center justify-center px-2">
+			<div class="h-8 bg-surface-1 rounded flex items-center justify-center px-2">
 				<span class="text-xs text-text-muted truncate">이번달: 24</span>
 			</div>
 		</div>
@@ -43,10 +43,10 @@
 				<Skeleton lines={2} />
 			{:else}
 				{#each displayFeedback.slice(0, 4) as item (item.id)}
-				<a
-					href="/feedback/{item.id}"
-					class="flex items-center gap-2 p-3 bg-surface-1 rounded hover:bg-surface-2 transition-colors h-11"
-				>
+					<a
+						href="/feedback/{item.id}"
+						class="flex items-center gap-2 p-3 bg-surface-1 rounded hover:bg-surface-2 transition-colors h-full"
+					>
 						<MessageSquare size={16} class="text-text-base flex-shrink-0" />
 						<span class="text-sm text-text-base text-center flex-1">{item.text}</span>
 						<span class="text-xs text-text-muted flex-shrink-0">{item.from}</span>
@@ -54,7 +54,7 @@
 				{/each}
 				{#if displayFeedback.length < 4}
 					{#each Array.from({length: 4 - displayFeedback.length}) as _, i}
-						<div class="p-3 bg-surface-1 rounded h-11 opacity-0 pointer-events-none">&nbsp;</div>
+						<div class="p-3 bg-surface-1 rounded h-full opacity-0 pointer-events-none">&nbsp;</div>
 					{/each}
 				{/if}
 			{/if}

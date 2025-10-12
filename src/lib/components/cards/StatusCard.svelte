@@ -46,7 +46,7 @@
 	}
 </script>
 
-<div class="h-[380px] flex flex-col justify-between p-5 rounded-lg bg-surface-2 border border-border-subtle overflow-hidden pt-[24px]">
+<div class="h-[396px] flex flex-col justify-between p-5 rounded-lg bg-surface-2 border border-border-subtle overflow-hidden pt-[24px]">
 	<div>
 		<!-- 상단 타이틀영역 -->
 		<div class="flex items-center justify-between mb-4">
@@ -58,13 +58,13 @@
 
 		<!-- 중간 요약 영역 -->
 		<div class="grid grid-cols-3 gap-2 mb-3">
-			<div class="h-12 bg-surface-1 rounded flex items-center justify-center px-2">
+			<div class="h-8 bg-surface-1 rounded flex items-center justify-center px-2">
 				<span class="text-xs text-text-muted truncate">정상: 3</span>
 			</div>
-			<div class="h-12 bg-surface-1 rounded flex items-center justify-center px-2">
+			<div class="h-8 bg-surface-1 rounded flex items-center justify-center px-2">
 				<span class="text-xs text-text-muted truncate">경고: 1</span>
 			</div>
-			<div class="h-12 bg-surface-1 rounded flex items-center justify-center px-2">
+			<div class="h-8 bg-surface-1 rounded flex items-center justify-center px-2">
 				<span class="text-xs text-text-muted truncate">오류: 0</span>
 			</div>
 		</div>
@@ -76,10 +76,10 @@
 			{:else}
 				{#each displayStatus.slice(0, 4) as item, i (item.key)}
 					{@const IconComponent = getStatusIcon(item.value)}
-				<a
-					href="/status/{item.key}"
-					class="flex items-center gap-2 p-3 bg-surface-1 rounded hover:bg-surface-2 transition-colors h-11"
-				>
+					<a
+						href="/status/{item.key}"
+						class="flex items-center gap-2 p-3 bg-surface-1 rounded hover:bg-surface-2 transition-colors h-full"
+					>
 						<IconComponent
 							size={16}
 							style="color: {getStatusColor(item.value)}"
@@ -91,7 +91,7 @@
 				{/each}
 				{#if displayStatus.length < 4}
 					{#each Array.from({length: 4 - displayStatus.length}) as _, i}
-						<div class="p-3 bg-surface-1 rounded h-11 opacity-0 pointer-events-none">&nbsp;</div>
+						<div class="p-3 bg-surface-1 rounded h-full opacity-0 pointer-events-none">&nbsp;</div>
 					{/each}
 				{/if}
 			{/if}
