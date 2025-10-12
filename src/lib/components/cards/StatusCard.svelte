@@ -58,13 +58,13 @@
 
 		<!-- 중간 요약 영역 -->
 		<div class="grid grid-cols-3 gap-2 mb-3">
-			<div class="h-8 bg-surface-1 rounded flex items-center justify-center px-2">
+			<div class="h-12 bg-surface-1 rounded flex items-center justify-center px-2">
 				<span class="text-xs text-text-muted truncate">정상: 3</span>
 			</div>
-			<div class="h-8 bg-surface-1 rounded flex items-center justify-center px-2">
+			<div class="h-12 bg-surface-1 rounded flex items-center justify-center px-2">
 				<span class="text-xs text-text-muted truncate">경고: 1</span>
 			</div>
-			<div class="h-8 bg-surface-1 rounded flex items-center justify-center px-2">
+			<div class="h-12 bg-surface-1 rounded flex items-center justify-center px-2">
 				<span class="text-xs text-text-muted truncate">오류: 0</span>
 			</div>
 		</div>

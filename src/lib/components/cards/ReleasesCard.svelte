@@ -26,13 +26,13 @@
 
 		<!-- 중간 요약 영역 -->
 		<div class="grid grid-cols-3 gap-2 mb-3">
-			<div class="h-8 bg-surface-1 rounded flex items-center justify-center px-2">
+			<div class="h-12 bg-surface-1 rounded flex items-center justify-center px-2">
 				<span class="text-xs text-text-muted truncate">오늘: 2</span>
 			</div>
-			<div class="h-8 bg-surface-1 rounded flex items-center justify-center px-2">
+			<div class="h-12 bg-surface-1 rounded flex items-center justify-center px-2">
 				<span class="text-xs text-text-muted truncate">이번주: 5</span>
 			</div>
-			<div class="h-8 bg-surface-1 rounded flex items-center justify-center px-2">
+			<div class="h-12 bg-surface-1 rounded flex items-center justify-center px-2">
 				<span class="text-xs text-text-muted truncate">이번달: 12</span>
 			</div>
 		</div>

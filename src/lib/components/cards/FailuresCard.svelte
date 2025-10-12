@@ -110,7 +110,7 @@
 		<!-- 중간 요약 영역 -->
 		<div class="grid grid-cols-3 gap-2 mb-3">
 			{#each miniStats as stat (stat.label)}
-				<div class="h-8 bg-surface-1 rounded flex items-center justify-center px-2">
+				<div class="h-12 bg-surface-1 rounded flex items-center justify-center px-2">
 					<span class="text-xs text-text-muted truncate">{stat.label}: {stat.value}</span>
 				</div>
 			{/each}
