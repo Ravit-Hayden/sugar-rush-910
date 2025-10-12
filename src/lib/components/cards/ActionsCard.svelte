@@ -1,7 +1,6 @@
 <script lang="ts">
-	import Card from '../Card.svelte';
 	import Skeleton from '../Skeleton.svelte';
-	import { Plus, Upload, DollarSign } from 'lucide-svelte';
+	import { Plus, Upload, DollarSign, Info } from 'lucide-svelte';
 
 	let { actions = [], loading = false } = $props();
 
@@ -15,21 +14,55 @@
 	const displayActions = actions.length > 0 ? actions : defaultActions;
 </script>
 
-<Card title="빠른 액션" tooltip="새 앨범/트랙/업로드/정산" class="h-80">
-	{#if loading}
-		<Skeleton lines={4} />
-	{:else}
-		<div class="grid grid-cols-2 gap-2">
-		{#each displayActions.slice(0, 4) as action (action.label)}
-			{@const IconComponent = action.icon}
-			<a
-				href={action.href}
-				class="flex items-center gap-2 p-3 bg-surface-1 rounded hover:bg-surface-2 transition-colors"
-			>
-				<IconComponent size={16} class="text-text-base" />
-				<span class="text-sm text-text-base">{action.label}</span>
-			</a>
-		{/each}
+<div class="h-[380px] flex flex-col justify-between p-5 rounded-lg bg-surface-2 border border-border-subtle overflow-hidden pt-[24px]">
+	<div>
+		<!-- 상단 타이틀영역 -->
+		<div class="flex items-center justify-between mb-4">
+			<h3 class="text-lg font-bold text-text-strong truncate">빠른 액션</h3>
+			<button class="inline-flex items-center justify-center w-5 h-5 rounded-full hover:bg-surface-1 transition-colors ml-2" aria-label="정보" title="새 앨범/트랙/업로드/정산">
+				<Info size={12} class="text-text-muted" />
+			</button>
 		</div>
-	{/if}
-</Card>
+
+		<!-- 중간 요약 영역 -->
+		<div class="grid grid-cols-3 gap-2 mb-3">
+			<div class="h-8 bg-surface-1 rounded flex items-center justify-center px-2">
+				<span class="text-xs text-text-muted truncate">앨범: 4</span>
+			</div>
+			<div class="h-8 bg-surface-1 rounded flex items-center justify-center px-2">
+				<span class="text-xs text-text-muted truncate">트랙: 12</span>
+			</div>
+			<div class="h-8 bg-surface-1 rounded flex items-center justify-center px-2">
+				<span class="text-xs text-text-muted truncate">업로드: 8</span>
+			</div>
+		</div>
+
+		<!-- 메인 목록/컨텐츠: 줄/행 개수 무조건 동일, 남는 줄은 placeholder -->
+		<div class="grid grid-rows-4 gap-3">
+			{#if loading}
+				<Skeleton lines={2} />
+			{:else}
+				{#each displayActions.slice(0, 4) as action (action.label)}
+					{@const IconComponent = action.icon}
+					<a
+						href={action.href}
+						class="flex items-center gap-2 p-3 bg-surface-1 rounded hover:bg-surface-2 transition-colors h-full"
+					>
+						<IconComponent size={16} class="text-text-base flex-shrink-0" />
+						<span class="text-sm text-text-base text-center flex-1">{action.label}</span>
+					</a>
+				{/each}
+				{#if displayActions.length < 4}
+					{#each Array.from({length: 4 - displayActions.length}) as _, i}
+						<div class="p-3 bg-surface-1 rounded h-full opacity-0 pointer-events-none">&nbsp;</div>
+					{/each}
+				{/if}
+			{/if}
+		</div>
+	</div>
+
+	<!-- 하단 액션 -->
+	<a href="/actions" class="self-end text-brand-pink font-semibold text-sm px-4 py-1 rounded transition-colors hover:bg-hover-cyan mt-3">
+		자세히 보기
+	</a>
+</div>
