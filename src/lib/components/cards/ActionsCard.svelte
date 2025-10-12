@@ -46,7 +46,7 @@
 					{@const IconComponent = action.icon}
 					<a
 						href={action.href}
-						class="flex items-center gap-2 p-3 bg-surface-1 rounded hover:bg-surface-2 transition-colors h-full"
+						class="flex items-center gap-2 p-3 bg-surface-1 rounded hover:bg-surface-2 transition-colors h-11"
 					>
 						<IconComponent size={16} class="text-text-base flex-shrink-0" />
 						<span class="text-sm text-text-base text-center flex-1">{action.label}</span>
@@ -54,7 +54,7 @@
 				{/each}
 				{#if displayActions.length < 4}
 					{#each Array.from({length: 4 - displayActions.length}) as _, i}
-						<div class="p-3 bg-surface-1 rounded h-full opacity-0 pointer-events-none">&nbsp;</div>
+						<div class="p-3 bg-surface-1 rounded h-11 opacity-0 pointer-events-none">&nbsp;</div>
 					{/each}
 				{/if}
 			{/if}

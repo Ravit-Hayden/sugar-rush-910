@@ -76,10 +76,10 @@
 			{:else}
 				{#each displayStatus.slice(0, 4) as item, i (item.key)}
 					{@const IconComponent = getStatusIcon(item.value)}
-					<a
-						href="/status/{item.key}"
-						class="flex items-center gap-2 p-3 bg-surface-1 rounded hover:bg-surface-2 transition-colors h-full"
-					>
+				<a
+					href="/status/{item.key}"
+					class="flex items-center gap-2 p-3 bg-surface-1 rounded hover:bg-surface-2 transition-colors h-11"
+				>
 						<IconComponent
 							size={16}
 							style="color: {getStatusColor(item.value)}"
@@ -91,7 +91,7 @@
 				{/each}
 				{#if displayStatus.length < 4}
 					{#each Array.from({length: 4 - displayStatus.length}) as _, i}
-						<div class="p-3 bg-surface-1 rounded h-full opacity-0 pointer-events-none">&nbsp;</div>
+						<div class="p-3 bg-surface-1 rounded h-11 opacity-0 pointer-events-none">&nbsp;</div>
 					{/each}
 				{/if}
 			{/if}

@@ -43,10 +43,10 @@
 				<Skeleton lines={2} />
 			{:else}
 				{#each displayReleases.slice(0, 4) as release (release.id)}
-					<a
-						href="/releases/{release.id}"
-						class="flex items-center gap-2 p-3 bg-surface-1 rounded hover:bg-surface-2 transition-colors h-full"
-					>
+				<a
+					href="/releases/{release.id}"
+					class="flex items-center gap-2 p-3 bg-surface-1 rounded hover:bg-surface-2 transition-colors h-11"
+				>
 						<Calendar size={16} class="text-text-base flex-shrink-0" />
 						<span class="text-sm text-text-base text-center flex-1">{release.title}</span>
 						<span class="text-xs text-text-muted flex-shrink-0 truncate">{release.when}</span>
@@ -54,7 +54,7 @@
 				{/each}
 				{#if displayReleases.length < 4}
 					{#each Array.from({length: 4 - displayReleases.length}) as _, i}
-						<div class="p-3 bg-surface-1 rounded h-full opacity-0 pointer-events-none">&nbsp;</div>
+						<div class="p-3 bg-surface-1 rounded h-11 opacity-0 pointer-events-none">&nbsp;</div>
 					{/each}
 				{/if}
 			{/if}

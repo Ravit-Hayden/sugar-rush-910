@@ -45,10 +45,10 @@
 				<Skeleton lines={2} />
 			{:else}
 				{#each displayChanges.slice(0, 4) as change, i (change.id)}
-					<a
-						href="/changes/{change.id}"
-						class="flex items-center gap-2 p-3 bg-surface-1 rounded hover:bg-surface-2 transition-colors h-full"
-					>
+				<a
+					href="/changes/{change.id}"
+					class="flex items-center gap-2 p-3 bg-surface-1 rounded hover:bg-surface-2 transition-colors h-11"
+				>
 						<span class="text-sm text-text-base text-center flex-1">{change.text}</span>
 						{#if change.recent}
 							<span class="text-[10px] px-2 py-0.5 rounded text-white flex-shrink-0" style="background-color: var(--ok-fg);">최근</span>
@@ -58,7 +58,7 @@
 				{/each}
 				{#if displayChanges.length < 4}
 					{#each Array.from({length: 4 - displayChanges.length}) as _, i}
-						<div class="p-3 bg-surface-1 rounded h-full opacity-0 pointer-events-none">&nbsp;</div>
+						<div class="p-3 bg-surface-1 rounded h-11 opacity-0 pointer-events-none">&nbsp;</div>
 					{/each}
 				{/if}
 			{/if}

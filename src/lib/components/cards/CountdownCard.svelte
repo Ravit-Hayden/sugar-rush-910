@@ -45,10 +45,10 @@
 				<Skeleton lines={2} />
 			{:else}
 				{#each displayDeadlines.slice(0, 4) as deadline (deadline.id)}
-					<a
-						href="/calendar/{deadline.id}"
-						class="flex items-center gap-2 p-3 bg-surface-1 rounded hover:bg-surface-2 transition-colors h-full"
-					>
+				<a
+					href="/calendar/{deadline.id}"
+					class="flex items-center gap-2 p-3 bg-surface-1 rounded hover:bg-surface-2 transition-colors h-11"
+				>
 						<span class="text-sm text-text-base text-center flex-1">{deadline.label}</span>
 						<span class="text-[10px] px-2 py-0.5 rounded text-white flex-shrink-0" style="background-color: var(--tag-deadline);">
 							D-{deadline.days}
@@ -57,7 +57,7 @@
 				{/each}
 				{#if displayDeadlines.length < 4}
 					{#each Array.from({length: 4 - displayDeadlines.length}) as _, i}
-						<div class="p-3 bg-surface-1 rounded h-full opacity-0 pointer-events-none">&nbsp;</div>
+						<div class="p-3 bg-surface-1 rounded h-11 opacity-0 pointer-events-none">&nbsp;</div>
 					{/each}
 				{/if}
 			{/if}

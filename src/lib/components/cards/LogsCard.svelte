@@ -43,10 +43,10 @@
 				<Skeleton lines={2} />
 			{:else}
 				{#each displayLogs.slice(0, 4) as log (log.id)}
-					<a
-						href="/logs/{log.id}"
-						class="flex items-center gap-2 p-3 bg-surface-1 rounded hover:bg-surface-2 transition-colors h-full"
-					>
+				<a
+					href="/logs/{log.id}"
+					class="flex items-center gap-2 p-3 bg-surface-1 rounded hover:bg-surface-2 transition-colors h-11"
+				>
 						<FileText size={16} class="text-text-base flex-shrink-0" />
 						<span class="text-sm text-text-base text-center flex-1">{log.text}</span>
 						<span class="text-xs text-text-muted flex-shrink-0">{log.time}</span>
@@ -54,7 +54,7 @@
 				{/each}
 				{#if displayLogs.length < 4}
 					{#each Array.from({length: 4 - displayLogs.length}) as _, i}
-						<div class="p-3 bg-surface-1 rounded h-full opacity-0 pointer-events-none">&nbsp;</div>
+						<div class="p-3 bg-surface-1 rounded h-11 opacity-0 pointer-events-none">&nbsp;</div>
 					{/each}
 				{/if}
 			{/if}

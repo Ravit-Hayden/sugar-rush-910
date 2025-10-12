@@ -45,10 +45,10 @@
 				<Skeleton lines={2} />
 			{:else}
 				{#each displayTasks.slice(0, 4) as task, i (task.id)}
-					<a
-						href="/tasks/{task.id}"
-						class="flex items-center gap-2 p-3 bg-surface-1 rounded hover:bg-surface-2 transition-colors h-full"
-					>
+				<a
+					href="/tasks/{task.id}"
+					class="flex items-center gap-2 p-3 bg-surface-1 rounded hover:bg-surface-2 transition-colors h-11"
+				>
 						<input type="checkbox" class="rounded flex-shrink-0" />
 						<span class="text-sm text-text-base text-center flex-1">{task.title}</span>
 						{#if task.priority}
@@ -58,7 +58,7 @@
 				{/each}
 				{#if displayTasks.length < 4}
 					{#each Array.from({length: 4 - displayTasks.length}) as _, i}
-						<div class="p-3 bg-surface-1 rounded h-full opacity-0 pointer-events-none">&nbsp;</div>
+						<div class="p-3 bg-surface-1 rounded h-11 opacity-0 pointer-events-none">&nbsp;</div>
 					{/each}
 				{/if}
 			{/if}

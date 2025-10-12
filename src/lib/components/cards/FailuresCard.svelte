@@ -122,10 +122,10 @@
 				<Skeleton lines={2} />
 			{:else}
 				{#each displayFailures.slice(0, 4) as failure (failure.id)}
-					<a
-						href="/failures/{failure.id}"
-						class="flex items-center gap-2 p-3 bg-surface-1 rounded hover:bg-surface-2 transition-colors h-full"
-					>
+				<a
+					href="/failures/{failure.id}"
+					class="flex items-center gap-2 p-3 bg-surface-1 rounded hover:bg-surface-2 transition-colors h-11"
+				>
 						<AlertTriangle size={16} class="text-danger-fg flex-shrink-0" />
 						<span class="text-sm text-text-base text-center flex-1">{failure.text}</span>
 						{#if failure.retryable}
@@ -148,7 +148,7 @@
 				{/each}
 				{#if displayFailures.length < 4}
 					{#each Array.from({length: 4 - displayFailures.length}) as _, i}
-						<div class="p-3 bg-surface-1 rounded h-full opacity-0 pointer-events-none">&nbsp;</div>
+						<div class="p-3 bg-surface-1 rounded h-11 opacity-0 pointer-events-none">&nbsp;</div>
 					{/each}
 				{/if}
 			{/if}
