@@ -78,20 +78,27 @@
 					{@const IconComponent = getStatusIcon(item.value)}
 					<a
 						href="/status/{item.key}"
-						class="flex items-center gap-2 p-3 bg-surface-1 rounded hover:bg-surface-2 transition-colors h-full"
+						class="flex items-center h-12 px-4 bg-surface-1 rounded hover:bg-surface-2 transition-colors"
 					>
-						<IconComponent
-							size={16}
-							style="color: {getStatusColor(item.value)}"
-							class="flex-shrink-0"
-						/>
-						<span class="text-sm text-text-base text-center flex-1">{item.key}</span>
-						<span class="text-xs text-text-muted flex-shrink-0">{item.value}</span>
+						<!-- 좌측 아이콘 -->
+						<span class="flex-shrink-0 w-5 h-5 flex items-center justify-center mr-3">
+							<IconComponent
+								size={16}
+								style="color: {getStatusColor(item.value)}"
+								class="flex-shrink-0"
+							/>
+						</span>
+						<!-- 중간 텍스트 (좌측정렬) -->
+						<span class="flex-1 text-sm text-text-base truncate text-left">{item.key}</span>
+						<!-- 우측 상태/버튼 -->
+						<span class="flex-shrink-0 flex items-center gap-x-2">
+							<span class="text-xs text-text-muted">{item.value}</span>
+						</span>
 					</a>
 				{/each}
 				{#if displayStatus.length < 4}
 					{#each Array.from({length: 4 - displayStatus.length}) as _, i}
-						<div class="p-3 bg-surface-1 rounded h-full opacity-0 pointer-events-none">&nbsp;</div>
+						<div class="h-12 px-4 bg-surface-1 rounded opacity-0 pointer-events-none">&nbsp;</div>
 					{/each}
 				{/if}
 			{/if}

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Skeleton from '../Skeleton.svelte';
-	import { Info } from 'lucide-svelte';
+	import { Info, FileText } from 'lucide-svelte';
 
 	let { changes = [], loading = false } = $props();
 
@@ -47,18 +47,26 @@
 				{#each displayChanges.slice(0, 4) as change, i (change.id)}
 					<a
 						href="/changes/{change.id}"
-						class="flex items-center gap-2 p-3 bg-surface-1 rounded hover:bg-surface-2 transition-colors h-full"
+						class="flex items-center h-12 px-4 bg-surface-1 rounded hover:bg-surface-2 transition-colors"
 					>
-						<span class="text-sm text-text-base text-center flex-1">{change.text}</span>
-						{#if change.recent}
-							<span class="text-[10px] px-2 py-0.5 rounded text-white flex-shrink-0" style="background-color: var(--ok-fg);">최근</span>
-						{/if}
-						<span class="text-xs text-text-muted flex-shrink-0 truncate">{change.time}</span>
+						<!-- 좌측 아이콘 -->
+						<span class="flex-shrink-0 w-5 h-5 flex items-center justify-center mr-3">
+							<FileText size={16} class="text-text-base flex-shrink-0" />
+						</span>
+						<!-- 중간 텍스트 (좌측정렬) -->
+						<span class="flex-1 text-sm text-text-base truncate text-left">{change.text}</span>
+						<!-- 우측 상태/버튼 -->
+						<span class="flex-shrink-0 flex items-center gap-x-2">
+							{#if change.recent}
+								<span class="text-[10px] px-2 py-0.5 rounded text-white" style="background-color: var(--ok-fg);">최근</span>
+							{/if}
+							<span class="text-xs text-text-muted truncate">{change.time}</span>
+						</span>
 					</a>
 				{/each}
 				{#if displayChanges.length < 4}
 					{#each Array.from({length: 4 - displayChanges.length}) as _, i}
-						<div class="p-3 bg-surface-1 rounded h-full opacity-0 pointer-events-none">&nbsp;</div>
+						<div class="h-12 px-4 bg-surface-1 rounded opacity-0 pointer-events-none">&nbsp;</div>
 					{/each}
 				{/if}
 			{/if}

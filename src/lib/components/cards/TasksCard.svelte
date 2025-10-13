@@ -47,18 +47,25 @@
 				{#each displayTasks.slice(0, 4) as task, i (task.id)}
 					<a
 						href="/tasks/{task.id}"
-						class="flex items-center gap-2 p-3 bg-surface-1 rounded hover:bg-surface-2 transition-colors h-full"
+						class="flex items-center h-12 px-4 bg-surface-1 rounded hover:bg-surface-2 transition-colors"
 					>
-						<input type="checkbox" class="rounded flex-shrink-0" />
-						<span class="text-sm text-text-base text-center flex-1">{task.title}</span>
-						{#if task.priority}
-							<span class="text-[10px] px-2 py-0.5 rounded text-white flex-shrink-0" style="background-color: var(--danger-fg);">우선</span>
-						{/if}
+						<!-- 좌측 아이콘 -->
+						<span class="flex-shrink-0 w-5 h-5 flex items-center justify-center mr-3">
+							<input type="checkbox" class="rounded" />
+						</span>
+						<!-- 중간 텍스트 (좌측정렬) -->
+						<span class="flex-1 text-sm text-text-base truncate text-left">{task.title}</span>
+						<!-- 우측 상태/버튼 -->
+						<span class="flex-shrink-0 flex items-center gap-x-2">
+							{#if task.priority}
+								<span class="text-[10px] px-2 py-0.5 rounded text-white" style="background-color: var(--danger-fg);">우선</span>
+							{/if}
+						</span>
 					</a>
 				{/each}
 				{#if displayTasks.length < 4}
 					{#each Array.from({length: 4 - displayTasks.length}) as _, i}
-						<div class="p-3 bg-surface-1 rounded h-full opacity-0 pointer-events-none">&nbsp;</div>
+						<div class="h-12 px-4 bg-surface-1 rounded opacity-0 pointer-events-none">&nbsp;</div>
 					{/each}
 				{/if}
 			{/if}

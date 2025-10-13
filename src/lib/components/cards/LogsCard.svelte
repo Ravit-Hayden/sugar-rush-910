@@ -45,16 +45,23 @@
 				{#each displayLogs.slice(0, 4) as log (log.id)}
 					<a
 						href="/logs/{log.id}"
-						class="flex items-center gap-2 p-3 bg-surface-1 rounded hover:bg-surface-2 transition-colors h-full"
+						class="flex items-center h-12 px-4 bg-surface-1 rounded hover:bg-surface-2 transition-colors"
 					>
-						<FileText size={16} class="text-text-base flex-shrink-0" />
-						<span class="text-sm text-text-base text-center flex-1">{log.text}</span>
-						<span class="text-xs text-text-muted flex-shrink-0">{log.time}</span>
+						<!-- 좌측 아이콘 -->
+						<span class="flex-shrink-0 w-5 h-5 flex items-center justify-center mr-3">
+							<FileText size={16} class="text-text-base flex-shrink-0" />
+						</span>
+						<!-- 중간 텍스트 (좌측정렬) -->
+						<span class="flex-1 text-sm text-text-base truncate text-left">{log.text}</span>
+						<!-- 우측 상태/버튼 -->
+						<span class="flex-shrink-0 flex items-center gap-x-2">
+							<span class="text-xs text-text-muted">{log.time}</span>
+						</span>
 					</a>
 				{/each}
 				{#if displayLogs.length < 4}
 					{#each Array.from({length: 4 - displayLogs.length}) as _, i}
-						<div class="p-3 bg-surface-1 rounded h-full opacity-0 pointer-events-none">&nbsp;</div>
+						<div class="h-12 px-4 bg-surface-1 rounded opacity-0 pointer-events-none">&nbsp;</div>
 					{/each}
 				{/if}
 			{/if}

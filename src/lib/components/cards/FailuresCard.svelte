@@ -124,31 +124,38 @@
 				{#each displayFailures.slice(0, 4) as failure (failure.id)}
 					<a
 						href="/failures/{failure.id}"
-						class="flex items-center gap-2 p-3 bg-surface-1 rounded hover:bg-surface-2 transition-colors h-full"
+						class="flex items-center h-12 px-4 bg-surface-1 rounded hover:bg-surface-2 transition-colors"
 					>
-						<AlertTriangle size={16} class="text-danger-fg flex-shrink-0" />
-						<span class="text-sm text-text-base text-center flex-1">{failure.text}</span>
-						{#if failure.retryable}
-							<button
-								onclick={() => retryFailure(failure.id)}
-								class="text-[10px] px-2 py-1 flex items-center justify-center rounded-md bg-brand-pink hover:bg-hover-cyan text-white font-semibold h-[18px] min-w-[38px] flex-shrink-0"
-								disabled={getRetryState(failure.id) === 'loading' || isOnCooldown(failure.id)}
-								aria-label="재시도"
-								aria-live="polite"
-							>
-								{#if getRetryState(failure.id) === 'loading'}
-									<RotateCcw size={12} class="animate-spin mr-1" />
-								{:else}
-									<RotateCcw size={12} class="mr-1" />
-								{/if}
-								<span>{getButtonText(getRetryState(failure.id))}</span>
-							</button>
-						{/if}
+						<!-- 좌측 아이콘 -->
+						<span class="flex-shrink-0 w-5 h-5 flex items-center justify-center mr-3">
+							<AlertTriangle size={16} class="text-danger-fg flex-shrink-0" />
+						</span>
+						<!-- 중간 텍스트 (좌측정렬) -->
+						<span class="flex-1 text-sm text-text-base truncate text-left">{failure.text}</span>
+						<!-- 우측 상태/버튼 -->
+						<span class="flex-shrink-0 flex items-center gap-x-2">
+							{#if failure.retryable}
+								<button
+									onclick={() => retryFailure(failure.id)}
+									class="text-[10px] px-2 py-1 flex items-center justify-center rounded-md bg-brand-pink hover:bg-hover-cyan text-white font-semibold h-[18px] min-w-[38px] flex-shrink-0"
+									disabled={getRetryState(failure.id) === 'loading' || isOnCooldown(failure.id)}
+									aria-label="재시도"
+									aria-live="polite"
+								>
+									{#if getRetryState(failure.id) === 'loading'}
+										<RotateCcw size={12} class="animate-spin mr-1" />
+									{:else}
+										<RotateCcw size={12} class="mr-1" />
+									{/if}
+									<span>{getButtonText(getRetryState(failure.id))}</span>
+								</button>
+							{/if}
+						</span>
 					</a>
 				{/each}
 				{#if displayFailures.length < 4}
 					{#each Array.from({length: 4 - displayFailures.length}) as _, i}
-						<div class="p-3 bg-surface-1 rounded h-full opacity-0 pointer-events-none">&nbsp;</div>
+						<div class="h-12 px-4 bg-surface-1 rounded opacity-0 pointer-events-none">&nbsp;</div>
 					{/each}
 				{/if}
 			{/if}
