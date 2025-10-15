@@ -70,7 +70,7 @@
 	</div>
 
 	<!-- 하단 액션 -->
-	<a href="/actions" class="self-end text-brand-pink font-semibold text-sm px-4 py-1 rounded transition-colors hover:bg-hover-cyan mt-3">
+	<a href="/actions" class="self-end text-brand-pink text-sm font-semibold px-2 py-1 rounded hover:bg-hover-cyan transition-colors mt-3">
 		자세히 보기
 	</a>
 </div>

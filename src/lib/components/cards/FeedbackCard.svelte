@@ -5,13 +5,24 @@
 	let { feedback = [], loading = false } = $props();
 
 	const defaultFeedback = [
-		{ id: '1', text: '좋은 음악이네요!', from: 'user123' },
-		{ id: '2', text: '다음 앨범 기대됩니다', from: 'fan456' },
-		{ id: '3', text: '음질이 훌륭합니다', from: 'listener789' },
-		{ id: '4', text: '아트워크가 멋져요', from: 'music_lover' }
+		{ id: '1', text: '좋은 음악이네요!', from: 'El' },
+		{ id: '2', text: '다음 앨범 기대됩니다', from: 'Otte' },
+		{ id: '3', text: '음질이 훌륭합니다', from: 'El' },
+		{ id: '4', text: '아트워크가 멋져요', from: 'Otte' }
 	];
 
 	const displayFeedback = feedback.length > 0 ? feedback : defaultFeedback;
+
+	function getAuthorColor(author: string) {
+		switch (author) {
+			case 'El':
+				return 'text-elotte-green';
+			case 'Otte':
+				return 'text-elotte-orange';
+			default:
+				return 'text-text-muted';
+		}
+	}
 </script>
 
 <div class="h-[396px] flex flex-col justify-between p-5 rounded-lg bg-surface-2 border border-border-subtle overflow-hidden pt-[24px]">
@@ -49,7 +60,7 @@
 					>
 						<MessageSquare size={16} class="text-text-base flex-shrink-0" />
 						<span class="text-sm text-text-base text-center flex-1">{item.text}</span>
-						<span class="text-xs text-text-muted flex-shrink-0">{item.from}</span>
+						<span class="text-xs flex-shrink-0 {getAuthorColor(item.from)}">{item.from}</span>
 					</a>
 				{/each}
 				{#if displayFeedback.length < 4}

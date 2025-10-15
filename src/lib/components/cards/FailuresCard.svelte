@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Skeleton from '../Skeleton.svelte';
-	import { RotateCcw, AlertTriangle, Info } from 'lucide-svelte';
+	import { RotateCcwSquare, AlertTriangle, Info, SquareCheck } from 'lucide-svelte';
 
 	let { failures = [], loading = false } = $props();
 
@@ -128,7 +128,7 @@
 					>
 						<!-- 좌측 아이콘 -->
 						<span class="flex-shrink-0 w-5 h-5 flex items-center justify-center mr-3">
-							<AlertTriangle size={16} class="text-danger-fg flex-shrink-0" />
+							<AlertTriangle size={16} class="text-text-base flex-shrink-0" />
 						</span>
 						<!-- 중간 텍스트 (좌측정렬) -->
 						<span class="flex-1 text-sm text-text-base truncate text-left">{failure.text}</span>
@@ -137,18 +137,24 @@
 							{#if failure.retryable}
 								<button
 									onclick={() => retryFailure(failure.id)}
-									class="text-[10px] px-2 py-1 flex items-center justify-center rounded-md bg-brand-pink hover:bg-hover-cyan text-white font-semibold h-[18px] min-w-[38px] flex-shrink-0"
+									class="badge-base badge-high-urgent inline-flex items-center gap-1 cursor-pointer min-w-[60px] hover:opacity-80 transition-opacity"
 									disabled={getRetryState(failure.id) === 'loading' || isOnCooldown(failure.id)}
 									aria-label="재시도"
 									aria-live="polite"
 								>
 									{#if getRetryState(failure.id) === 'loading'}
-										<RotateCcw size={12} class="animate-spin mr-1" />
+										<RotateCcwSquare size={12} class="animate-spin" />
+										재시도 중
 									{:else}
-										<RotateCcw size={12} class="mr-1" />
+										<RotateCcwSquare size={12} />
+										재시도
 									{/if}
-									<span>{getButtonText(getRetryState(failure.id))}</span>
 								</button>
+							{:else}
+								<span class="badge-base badge-low-mint inline-flex items-center gap-1">
+									<SquareCheck size={12} />
+									확인됨
+								</span>
 							{/if}
 						</span>
 					</a>
@@ -163,17 +169,17 @@
 	</div>
 
 	<!-- 하단 액션 -->
-	<div class="flex items-center justify-between">
-		<div class="flex gap-x-2">
-			<a href="/runbook" class="text-[10px] px-2 py-1 flex items-center justify-center rounded-md bg-brand-pink hover:bg-hover-cyan text-white font-semibold h-[18px] min-w-[38px]">
-				<RotateCcw size={12} class="mr-1" />
-				<span>재시도</span>
+	<div class="flex items-center justify-between mt-3">
+		<div class="flex gap-x-2 flex-wrap items-center">
+			<a href="/runbook" class="inline-flex items-center px-3 py-1 rounded border border-brand-pink text-brand-pink text-xs font-medium hover:bg-brand-pink hover:text-white transition cursor-pointer min-w-[70px]" aria-label="안내 가이드" title="안내 가이드">
+				<RotateCcwSquare size={12} class="mr-1" />
+				안내
 			</a>
-			<a href="/failures" class="text-[10px] px-2 py-1 flex items-center justify-center rounded-md bg-brand-pink hover:bg-hover-cyan text-white font-semibold h-[18px] min-w-[38px]">
+			<a href="/failures" class="inline-flex items-center px-3 py-1 rounded border border-brand-pink text-brand-pink text-xs font-medium hover:bg-brand-pink hover:text-white transition cursor-pointer min-w-[70px]" aria-label="원인 분석" title="원인 분석">
 				<AlertTriangle size={12} class="mr-1" />
-				<span>원인</span>
+				원인
 			</a>
 		</div>
-		<a href="/failures" class="text-brand-pink font-semibold text-sm px-4 py-1 rounded transition-colors hover:bg-hover-cyan">자세히 보기</a>
+		<a href="/failures" class="text-brand-pink text-sm font-semibold px-2 py-1 rounded hover:bg-hover-cyan transition-colors">자세히 보기</a>
 	</div>
 </div>

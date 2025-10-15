@@ -57,9 +57,13 @@
 						<span class="flex-1 text-sm text-text-base truncate text-left">{deadline.label}</span>
 						<!-- 우측 상태/버튼 -->
 						<span class="flex-shrink-0 flex items-center gap-x-2">
-							<span class="text-[10px] px-2 py-0.5 rounded text-white" style="background-color: var(--tag-deadline);">
-								D-{deadline.days}
-							</span>
+							{#if deadline.days <= 1}
+								<span class="badge-base badge-high-urgent">D-{deadline.days}</span>
+							{:else if deadline.days <= 3}
+								<span class="badge-base badge-medium-yellow">D-{deadline.days}</span>
+							{:else}
+								<span class="badge-base badge-low-mint">D-{deadline.days}</span>
+							{/if}
 						</span>
 					</a>
 				{/each}
@@ -73,17 +77,17 @@
 	</div>
 
 	<!-- 하단 액션 -->
-	<div class="flex items-center justify-between">
-		<div class="flex gap-x-2">
-			<a href="/releases" class="text-[10px] px-2 py-1 flex items-center justify-center rounded-md bg-brand-pink hover:bg-hover-cyan text-white font-semibold h-[18px] min-w-[38px]">
+	<div class="flex items-center justify-between mt-3">
+		<div class="flex gap-x-2 flex-wrap items-center">
+			<a href="/releases" class="inline-flex items-center px-3 py-1 rounded border border-brand-pink text-brand-pink text-xs font-medium hover:bg-brand-pink hover:text-white transition cursor-pointer min-w-[70px]" aria-label="발매 관리" title="발매 관리">
 				<Calendar size={12} class="mr-1" />
-				<span>발매 관리</span>
+				발매
 			</a>
-			<a href="/calendar/new" class="text-[10px] px-2 py-1 flex items-center justify-center rounded-md bg-brand-pink hover:bg-hover-cyan text-white font-semibold h-[18px] min-w-[38px]">
+			<a href="/calendar/new" class="inline-flex items-center px-3 py-1 rounded border border-brand-pink text-brand-pink text-xs font-medium hover:bg-brand-pink hover:text-white transition cursor-pointer min-w-[70px]" aria-label="일정 추가" title="일정 추가">
 				<Plus size={12} class="mr-1" />
-				<span>일정 추가</span>
+				일정
 			</a>
 		</div>
-		<a href="/calendar" class="text-brand-pink font-semibold text-sm px-4 py-1 rounded transition-colors hover:bg-hover-cyan">자세히 보기</a>
+		<a href="/calendar" class="text-brand-pink text-sm font-semibold px-2 py-1 rounded hover:bg-hover-cyan transition-colors">자세히 보기</a>
 	</div>
 </div>

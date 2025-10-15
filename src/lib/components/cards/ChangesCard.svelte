@@ -5,13 +5,24 @@
 	let { changes = [], loading = false } = $props();
 
 	const defaultChanges = [
-		{ id: '1', text: '앨범 아트워크 업데이트', recent: true, time: '2시간 전' },
-		{ id: '2', text: '트랙 메타데이터 수정', recent: false, time: '1일 전' },
-		{ id: '3', text: '릴리즈 일정 변경', recent: true, time: '3시간 전' },
-		{ id: '4', text: '가격 정책 업데이트', recent: false, time: '2일 전' }
+		{ id: '1', text: '앨범 아트워크 업데이트', recent: true, time: '2시간 전', author: 'El' },
+		{ id: '2', text: '트랙 메타데이터 수정', recent: false, time: '1일 전', author: 'Otte' },
+		{ id: '3', text: '릴리즈 일정 변경', recent: true, time: '3시간 전', author: 'El' },
+		{ id: '4', text: '가격 정책 업데이트', recent: false, time: '2일 전', author: 'Otte' }
 	];
 
 	const displayChanges = changes.length > 0 ? changes : defaultChanges;
+
+	function getAuthorColor(author: string) {
+		switch (author) {
+			case 'El':
+				return 'text-elotte-green';
+			case 'Otte':
+				return 'text-elotte-orange';
+			default:
+				return 'text-text-muted';
+		}
+	}
 
 	const miniStats = [
 		{ label: '오늘', value: changes.filter(c => c.today).length },
@@ -54,13 +65,16 @@
 							<FileText size={16} class="text-text-base flex-shrink-0" />
 						</span>
 						<!-- 중간 텍스트 (좌측정렬) -->
-						<span class="flex-1 text-sm text-text-base truncate text-left">{change.text}</span>
+						<span class="flex-1 text-sm text-text-base truncate text-left">
+							{#if change.author}
+								<span class={getAuthorColor(change.author)}>{change.author}</span>
+								<span class="text-text-muted mx-1">·</span>
+							{/if}
+							{change.text}
+						</span>
 						<!-- 우측 상태/버튼 -->
 						<span class="flex-shrink-0 flex items-center gap-x-2">
-							{#if change.recent}
-								<span class="text-[10px] px-2 py-0.5 rounded text-white" style="background-color: var(--ok-fg);">최근</span>
-							{/if}
-							<span class="text-xs text-text-muted truncate">{change.time}</span>
+							<span class="text-xs text-text-muted">{change.time}</span>
 						</span>
 					</a>
 				{/each}
@@ -74,7 +88,7 @@
 	</div>
 
 	<!-- 하단 액션 -->
-	<a href="/changes" class="self-end text-brand-pink font-semibold text-sm px-4 py-1 rounded transition-colors hover:bg-hover-cyan mt-3">
+	<a href="/changes" class="self-end text-brand-pink text-sm font-semibold px-2 py-1 rounded hover:bg-hover-cyan transition-colors mt-3">
 		자세히 보기
 	</a>
 </div>

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Skeleton from '../Skeleton.svelte';
-	import { Info } from 'lucide-svelte';
+	import { Info, Plus, MessageCircle } from 'lucide-svelte';
 
 	let { tasks = [], loading = false } = $props();
 
@@ -49,16 +49,25 @@
 						href="/tasks/{task.id}"
 						class="flex items-center h-12 px-4 bg-surface-1 rounded hover:bg-surface-2 transition-colors"
 					>
-						<!-- 좌측 아이콘 -->
+						<!-- 좌측 체크박스 -->
 						<span class="flex-shrink-0 w-5 h-5 flex items-center justify-center mr-3">
-							<input type="checkbox" class="rounded" />
+							<input 
+								type="checkbox" 
+								class="w-4 h-4 rounded appearance-none bg-transparent border border-[color:var(--text-base)] 
+									   checked:bg-transparent checked:border-[color:var(--brand-pink)] checked:shadow-none
+									   hover:border-[color:var(--hover-cyan)] focus:ring-2 focus:ring-[#FF3DAE]
+									   transition-all duration-200 cursor-pointer relative" 
+								aria-label="작업 완료 체크"
+							/>
 						</span>
 						<!-- 중간 텍스트 (좌측정렬) -->
 						<span class="flex-1 text-sm text-text-base truncate text-left">{task.title}</span>
 						<!-- 우측 상태/버튼 -->
 						<span class="flex-shrink-0 flex items-center gap-x-2">
 							{#if task.priority}
-								<span class="text-[10px] px-2 py-0.5 rounded text-white" style="background-color: var(--danger-fg);">우선</span>
+								<span class="badge-base badge-high-urgent">높음</span>
+							{:else}
+								<span class="badge-base badge-medium-yellow">보통</span>
 							{/if}
 						</span>
 					</a>
@@ -74,14 +83,16 @@
 
 	<!-- 하단 액션 -->
 	<div class="flex items-center justify-between mt-3">
-		<div class="flex gap-x-2">
-			<a href="/tasks/new" class="text-[10px] px-2 py-1 flex items-center justify-center rounded-md bg-brand-pink hover:bg-hover-cyan text-white font-semibold h-[18px] min-w-[38px]">
-				<span>+ 새 태스크</span>
+		<div class="flex gap-x-2 flex-wrap items-center">
+			<a href="/tasks/new" class="inline-flex items-center px-3 py-1 rounded border border-brand-pink text-brand-pink text-xs font-medium hover:bg-brand-pink hover:text-white transition cursor-pointer min-w-[70px]" aria-label="새 태스크" title="새 태스크">
+				<Plus size={12} class="mr-1" />
+				작업
 			</a>
-			<a href="/mentions" class="text-[10px] px-2 py-1 flex items-center justify-center rounded-md bg-brand-pink hover:bg-hover-cyan text-white font-semibold h-[18px] min-w-[38px]">
-				<span>멘션</span>
+			<a href="/mentions" class="inline-flex items-center px-3 py-1 rounded border border-brand-pink text-brand-pink text-xs font-medium hover:bg-brand-pink hover:text-white transition cursor-pointer min-w-[70px]" aria-label="멘션" title="멘션">
+				<MessageCircle size={12} class="mr-1" />
+				멘션
 			</a>
 		</div>
-		<a href="/tasks" class="text-brand-pink font-semibold text-sm px-4 py-1 rounded transition-colors hover:bg-hover-cyan">자세히 보기</a>
+		<a href="/tasks" class="text-brand-pink text-sm font-semibold px-2 py-1 rounded hover:bg-hover-cyan transition-colors">자세히 보기</a>
 	</div>
 </div>

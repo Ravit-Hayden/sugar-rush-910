@@ -33,13 +33,13 @@
 		switch (status.toLowerCase()) {
 			case 'ok':
 			case 'healthy':
-				return 'var(--ok-fg)';
+				return 'var(--badge-low-mint)';
 			case 'warning':
 			case 'degraded':
-				return 'var(--warn-fg)';
+				return 'var(--badge-medium-yellow)';
 			case 'error':
 			case 'down':
-				return 'var(--danger-fg)';
+				return 'var(--badge-high-urgent)';
 			default:
 				return 'var(--text-muted)';
 		}
@@ -84,15 +84,22 @@
 						<span class="flex-shrink-0 w-5 h-5 flex items-center justify-center mr-3">
 							<IconComponent
 								size={16}
-								style="color: {getStatusColor(item.value)}"
-								class="flex-shrink-0"
+								class="text-text-base flex-shrink-0"
 							/>
 						</span>
 						<!-- 중간 텍스트 (좌측정렬) -->
 						<span class="flex-1 text-sm text-text-base truncate text-left">{item.key}</span>
 						<!-- 우측 상태/버튼 -->
 						<span class="flex-shrink-0 flex items-center gap-x-2">
-							<span class="text-xs text-text-muted">{item.value}</span>
+							{#if item.value === 'ok' || item.value === 'healthy'}
+								<span class="badge-base badge-low-mint">{item.value}</span>
+							{:else if item.value === 'warning' || item.value === 'degraded'}
+								<span class="badge-base badge-medium-yellow">{item.value}</span>
+							{:else if item.value === 'error' || item.value === 'down'}
+								<span class="badge-base badge-high-urgent">{item.value}</span>
+							{:else}
+								<span class="text-xs text-text-muted">{item.value}</span>
+							{/if}
 						</span>
 					</a>
 				{/each}
@@ -106,7 +113,7 @@
 	</div>
 
 	<!-- 하단 액션 -->
-	<a href="/status" class="self-end text-brand-pink font-semibold text-sm px-4 py-1 rounded transition-colors hover:bg-hover-cyan mt-3">
+	<a href="/status" class="self-end text-brand-pink text-sm font-semibold px-2 py-1 rounded hover:bg-hover-cyan transition-colors mt-3">
 		자세히 보기
 	</a>
 </div>
