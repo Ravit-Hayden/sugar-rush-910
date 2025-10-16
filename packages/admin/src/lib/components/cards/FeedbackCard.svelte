@@ -12,7 +12,7 @@
 	{:else}
 		<div class="space-y-2">
 			{#each feedback.slice(0, 4) as item (item.id)}
-				<div class="flex items-start gap-2 p-2 bg-surface-1 rounded">
+				<a href="/feedback/{item.id}" class="flex items-start gap-2 p-2 bg-surface-1 rounded border border-border-subtle hover:bg-surface-2 hover:border-hover-cyan transition-all">
 					<MessageSquare size={14} class="text-text-muted mt-0.5" />
 					<div class="flex-1">
 						<p class="text-sm text-text-base">{item.text}</p>
@@ -21,7 +21,7 @@
 							<span class="text-xs text-text-muted">{item.time}</span>
 						</div>
 					</div>
-				</div>
+				</a>
 			{/each}
 		</div>
 	{/if}

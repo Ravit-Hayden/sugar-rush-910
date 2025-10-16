@@ -23,11 +23,11 @@
   --tag-album: #FF3DAE;
   --tag-track: #68b1ff;
   --tag-deadline: #7ea59e;
-  --user-el: rgb(140,158,255);
+  --user-el: #00ddff;
   --user-ot: #FF835C;
   
   /* El Otte 브랜드 시그니처 컬러 */
-  --elotte-green: rgb(140,158,255);      /* 비스타 블루로 변경 */
+  --elotte-green: #00ddff;      /* 형광녹색 */
   --elotte-orange: #FF7A00;     /* 형광오렌지 */
   
   /* 형광 포인트 컬러 팔레트 */
@@ -37,9 +37,9 @@
   --badge-medium-yellow: #FFD700;    /* 더 진한 노랑 (대조비 향상) */
   --badge-medium-lemon: #FFB000;     /* 더 진한 레몬 (대조비 향상) */
   --badge-medium-gold: #FFD600;      /* 골드 */
-  --badge-low-mint: #00FFA5;         /* 형광 민트 */
+  --badge-low-mint: #00FF2E;         /* 형광 민트 */
   --badge-low-green: #00FF2E;        /* 형광 그린 */
-  --badge-info-cyan: #00FF2E;         /* 형광 그린으로 변경 */
+  --badge-info-cyan: #00DDFF;         /* 팝 블루 */
   --badge-info-blue: #45ADFF;         /* 팝 블루계열 */
   --badge-special-purple: #D400FF;    /* 네온 퍼플 */
   --badge-special-violet: #9800FF;    /* 네온 바이올렛 */
@@ -156,11 +156,6 @@ html {
   box-sizing: border-box;
 }
 
-/* 메인 콘텐츠 영역 hover 효과 */
-.main-content-area:hover {
-  outline: 1px solid #17E1BC;
-}
-
 /* 메인 영역 패딩 체계 */
 .main-content-area {
   padding-left: 16px;
@@ -252,7 +247,6 @@ header {
 .badge-low-green { color: var(--badge-low-green); }
 .badge-info-cyan { color: var(--badge-info-cyan); }
 .badge-info-blue { color: var(--badge-info-blue); }
-.badge-confirmed { color: var(--badge-info-cyan); } /* 확인됨 배지도 동일한 색상 */
 .text-elotte-green { color: var(--elotte-green); }
 .text-elotte-orange { color: var(--elotte-orange); }
 
@@ -426,40 +420,6 @@ aside nav ul li a.sidebar-menu-item.active .lucide-icon {
   color: #FFFFFF !important;
 }
 
-/* 텍스트 요소 hover 효과 - 버튼, 배지 등 */
-.button:hover,
-.badge-base:hover,
-.btn-retry:hover {
-  color: #17E1BC !important;
-}
-
-/* 링크 hover 효과 */
-a:hover:not(.sidebar-menu-item):not(.active) {
-  color: #17E1BC !important;
-}
-
-/* Lucide 아이콘 hover 효과 */
-.lucide-icon:hover {
-  color: #17E1BC !important;
-  fill: #17E1BC !important;
-  stroke: #17E1BC !important;
-}
-
-/* 선택된 영역 스타일 - 핫핑크 색상 */
-.selected,
-.active {
-  border-color: #FF3DAE !important;
-  color: #FF3DAE !important;
-}
-
-/* 선택된 영역의 아이콘도 핫핑크 색상 */
-.selected .lucide-icon,
-.active .lucide-icon {
-  color: #FF3DAE !important;
-  fill: #FF3DAE !important;
-  stroke: #FF3DAE !important;
-}
-
 /* 검색창 플레이스홀더 스타일 */
 input::placeholder {
   color: var(--text-muted) !important;
@@ -494,4 +454,91 @@ input[type="checkbox"]:checked::after {
   font-size: 10px;
   font-weight: bold;
   line-height: 1;
+}
+
+/* =========================
+   개별 요소 hover 효과
+   ========================= */
+
+/* 카드 호버 효과 */
+.bg-surface-1:hover,
+.bg-surface-2:hover {
+  border-color: #17E1BC !important;
+  transition: border-color 0.2s ease;
+}
+
+/* 링크 호버 효과 */
+a:hover {
+  color: #17E1BC !important;
+  transition: color 0.2s ease;
+}
+
+/* 버튼 호버 효과 (배경 없는 텍스트 버튼) */
+button:not([class*="bg-"]):hover {
+  color: #17E1BC !important;
+  transition: color 0.2s ease;
+}
+
+/* 배지 호버 효과 제거 - 배지는 호버 효과 불필요 */
+
+/* 아이콘 호버 효과 */
+.lucide-icon:hover {
+  color: #17E1BC !important;
+  transition: color 0.2s ease;
+}
+
+/* ActionsCard 아이콘 호버 효과 */
+a[href*="/albums/new"]:hover svg,
+a[href*="/tracks/new"]:hover svg,
+a[href*="/files/upload"]:hover svg,
+a[href*="/revenue"]:hover svg {
+  color: #17E1BC !important;
+  transition: color 0.2s ease;
+}
+
+/* 리스트 항목 호버 효과 (할일 카드 등) - 체크박스와 텍스트가 함께 선택됨 */
+a[href*="/tasks/"]:hover,
+a[href*="/calendar/"]:hover,
+a[href*="/status/"]:hover,
+a[href*="/failures/"]:hover,
+a[href*="/logs/"]:hover,
+a[href*="/releases/"]:hover,
+a[href*="/changes/"]:hover,
+a[href*="/feedback/"]:hover,
+a[href*="/albums/new"]:hover,
+a[href*="/tracks/new"]:hover,
+a[href*="/files/upload"]:hover,
+a[href*="/revenue"]:hover {
+  background-color: var(--surface-2) !important;
+  border-color: #17E1BC !important;
+  transition: all 0.2s ease;
+}
+
+/* 리스트 항목 내부 체크박스 호버 효과 */
+a[href*="/tasks/"]:hover input[type="checkbox"],
+a[href*="/calendar/"]:hover input[type="checkbox"],
+a[href*="/status/"]:hover input[type="checkbox"],
+a[href*="/failures/"]:hover input[type="checkbox"],
+a[href*="/logs/"]:hover input[type="checkbox"],
+a[href*="/releases/"]:hover input[type="checkbox"],
+a[href*="/changes/"]:hover input[type="checkbox"] {
+  border-color: #17E1BC !important;
+  transition: border-color 0.2s ease;
+}
+
+/* 리스트 항목 내부 텍스트 호버 효과 */
+a[href*="/tasks/"]:hover .text-text-base,
+a[href*="/calendar/"]:hover .text-text-base,
+a[href*="/status/"]:hover .text-text-base,
+a[href*="/failures/"]:hover .text-text-base,
+a[href*="/logs/"]:hover .text-text-base,
+a[href*="/releases/"]:hover .text-text-base,
+a[href*="/changes/"]:hover .text-text-base,
+a[href*="/feedback/"]:hover .text-text-base,
+a[href*="/albums/new"]:hover .text-text-base,
+a[href*="/tracks/new"]:hover .text-text-base,
+a[href*="/files/upload"]:hover .text-text-base,
+a[href*="/revenue"]:hover .text-text-base {
+  color: #17E1BC !important;
+  transition: color 0.2s ease;
 }
