@@ -19,7 +19,7 @@
 	} from 'lucide-svelte';
 
 	let sidebarOpen = $state(false);
-	let sidebarCollapsed = $state(true); // 기본값을 true로 변경 (축소 상태)
+	let sidebarCollapsed = $state(false); // 기본값을 false로 변경 (확장 상태)
 	let isSearching = $state(false);
 	let sidebarToggleHovered = $state(false);
 	let sidebarToggleClicked = $state(false);

@@ -14,7 +14,7 @@
 	let searchLoading = false;
 	let notificationHovered = false;
 	let notificationClicked = false;
-	let sidebarWidth = 72; // 기본값은 축소 상태
+	let sidebarWidth = 250; // 기본값은 확장 상태
 	let isMobile = false; // 모바일 화면 크기 추적
 
 	// 메뉴 아이템 정의 (사이드바와 동일)
