@@ -181,11 +181,17 @@ header {
 .main-content-area.sidebar-collapsed {
   margin-left: 72px;
   width: calc(100% - 72px);
+  transition: margin-left 200ms ease-in-out, width 200ms ease-in-out;
+  z-index: 20;
+  position: relative;
 }
 
 .main-content-area.sidebar-expanded {
   margin-left: 250px;
   width: calc(100% - 250px);
+  transition: margin-left 200ms ease-in-out, width 200ms ease-in-out;
+  z-index: 20;
+  position: relative;
 }
 
 /* 사이드바 애니메이션 통일 */

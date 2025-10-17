@@ -51,6 +51,8 @@
 			// 데스크톱에서는 축소/확장 토글
 			if (window.innerWidth >= 768) {
 				sidebarCollapsed = !sidebarCollapsed;
+				console.log('Desktop sidebar toggle - collapsed:', sidebarCollapsed);
+				
 				// 메인 콘텐츠에 사이드바 상태 알림
 				window.dispatchEvent(new CustomEvent('sidebar-collapse-change', { 
 					detail: { collapsed: sidebarCollapsed } 
@@ -62,6 +64,8 @@
 			} else {
 				// 모바일에서는 열기/닫기 토글
 				sidebarOpen = !sidebarOpen;
+				console.log('Mobile sidebar toggle - open:', sidebarOpen);
+				
 				window.dispatchEvent(new CustomEvent('sidebar-toggle', { 
 					detail: { open: sidebarOpen } 
 				}));

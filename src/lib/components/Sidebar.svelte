@@ -140,7 +140,7 @@
 
 <!-- 사이드바 컨테이너 - 애니메이션은 여기에만 적용 -->
 	<aside 
-		class="top-0 fixed left-0 h-screen bg-surface-2 border-r border-border-subtle z-50 overflow-hidden"
+		class="top-0 fixed left-0 h-screen bg-surface-2 border-r border-border-subtle z-10 overflow-hidden"
 		class:w-[72px]={sidebarCollapsed}
 		class:w-[250px]={!sidebarCollapsed}
 		style="transition: width 200ms ease-in-out, transform 200ms ease-in-out;"

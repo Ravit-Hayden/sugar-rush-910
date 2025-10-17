@@ -10,13 +10,15 @@
 
 	onMount(() => {
 		const handleSidebarCollapseChange = (event: CustomEvent) => {
+			console.log('Sidebar collapse change:', event.detail);
 			sidebarCollapsed = event.detail.collapsed;
 		};
 
 		const handleSidebarToggle = (event: CustomEvent) => {
+			console.log('Sidebar toggle:', event.detail);
 			// 모바일에서만 사이드바 열림 상태 추적
 			if (typeof window !== 'undefined' && window.innerWidth < 768) {
-				sidebarOpen = !sidebarOpen;
+				sidebarOpen = event.detail.open;
 			}
 		};
 
@@ -43,7 +45,8 @@
 	<Header />
 	<Sidebar />
 	
-	<main class="main-content-area {sidebarCollapsed ? 'sidebar-collapsed' : 'sidebar-expanded'}">
+	<main class="main-content-area {sidebarCollapsed ? 'sidebar-collapsed' : 'sidebar-expanded'}" 
+		  style="transition: margin-left 200ms ease-in-out, width 200ms ease-in-out;">
 		{@render children?.()}
 	</main>
 </div>
