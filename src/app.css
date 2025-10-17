@@ -179,8 +179,8 @@ header {
 
 /* 사이드바 상태에 따른 마진 조정 */
 .main-content-area.sidebar-collapsed {
-  margin-left: 72px;
-  width: calc(100% - 72px);
+  margin-left: 60px;
+  width: calc(100% - 60px);
   transition: margin-left 200ms ease-in-out, width 200ms ease-in-out;
   z-index: 20;
   position: relative;
@@ -194,21 +194,7 @@ header {
   position: relative;
 }
 
-/* 사이드바 애니메이션 통일 */
-.sidebar-text-animation {
-  transition: all 200ms ease-in-out;
-}
-
-.sidebar-text-animation.collapsed {
-  opacity: 0;
-  width: 0;
-  overflow: hidden;
-}
-
-.sidebar-text-animation.expanded {
-  opacity: 1;
-  width: auto;
-}
+/* 사이드바 애니메이션 통일 - 제거됨 (hidden/block 사용) */
 
 /* Tailwind CSS 클래스 오버라이드 */
 .bg-bg { background-color: var(--bg); }

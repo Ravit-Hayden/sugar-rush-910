@@ -57,7 +57,7 @@
 				}));
 				// 헤더에 사이드바 너비 변경 알림
 				window.dispatchEvent(new CustomEvent('sidebar-width-change', {
-					detail: { width: sidebarCollapsed ? 72 : 250 }
+					detail: { width: sidebarCollapsed ? 60 : 250 }
 				}));
 			} else {
 				// 모바일에서는 열기/닫기 토글
@@ -140,10 +140,9 @@
 
 <!-- 사이드바 컨테이너 - 애니메이션은 여기에만 적용 -->
 	<aside 
-		class="top-0 fixed left-0 h-screen bg-surface-2 border-r border-border-subtle z-10 overflow-hidden"
-		class:w-[72px]={sidebarCollapsed}
+		class="top-0 fixed left-0 h-screen bg-surface-2 border-r border-border-subtle z-10 overflow-hidden transition-all duration-200"
+		class:w-[60px]={sidebarCollapsed}
 		class:w-[250px]={!sidebarCollapsed}
-		style="transition: width 200ms ease-in-out, transform 200ms ease-in-out;"
 	>
 	<!-- 내부 컨텐츠 - overflow: hidden으로 튀어나오지 않게 처리 -->
 	<div class="h-full w-full overflow-hidden">
@@ -182,8 +181,8 @@
 					</button>
 				</div>
 				
-				<!-- 로고 - 메뉴 텍스트와 완전히 동일한 애니메이션 -->
-				<div class="sidebar-text-animation ml-3 {sidebarCollapsed ? 'collapsed' : 'expanded'}">
+				<!-- 로고 - 상태에 따라 숨김/표시 -->
+				<div class="ml-3 {sidebarCollapsed ? 'hidden' : 'block'}">
 					<img src="/logo.svg" alt="Sugar Rush" class="h-6 w-auto" />
 				</div>
 			</div>
@@ -205,10 +204,8 @@
 							<IconComponent size={20} class="lucide-icon transition-colors duration-200 ease-in-out" />
 						</div>
 						
-						<!-- 텍스트 - 로고와 완전히 동일한 애니메이션 -->
-						<div class="sidebar-text-animation ml-3 {sidebarCollapsed ? 'collapsed' : 'expanded'}">
-							<span class="text-sm whitespace-nowrap hidden md:inline">{item.label}</span>
-						</div>
+						<!-- 텍스트 - 상태에 따라 숨김/표시 -->
+						<span class="ml-3 text-sm whitespace-nowrap {sidebarCollapsed ? 'hidden' : 'inline'}">{item.label}</span>
 					</a>
 				</li>
 			{/each}
