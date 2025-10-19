@@ -102,7 +102,7 @@
 		<!-- 상단 타이틀영역 -->
 		<div class="flex items-center justify-between mb-4">
 			<h3 class="text-lg font-bold text-text-strong truncate">실패 태스크(재시도)</h3>
-			<button class="inline-flex items-center justify-center w-5 h-5 rounded-full hover:bg-surface-1 transition-colors ml-2" aria-label="정보" title="실패 작업 복구 또는 원인 분석 전환">
+			<button class="inline-flex items-center justify-center w-5 h-5 rounded-full hover:bg-surface-1 transition-colors ml-2" aria-label="정보" title="실패 작업 복구 또는 원인 분석 전환" type="button">
 				<Info size={12} class="text-text-muted" />
 			</button>
 		</div>
@@ -135,9 +135,10 @@
 						<!-- 우측 상태/버튼 -->
 						<span class="flex-shrink-0 flex items-center gap-x-2">
 							{#if failure.retryable}
-								<button
-									onclick={() => retryFailure(failure.id)}
-									class="badge-base badge-high-urgent inline-flex items-center gap-1 cursor-pointer min-w-[60px] hover:opacity-80 transition-opacity"
+										<button
+											onclick={() => retryFailure(failure.id)}
+											class="badge-base badge-high-urgent inline-flex items-center gap-1 cursor-pointer min-w-[60px] hover:opacity-80 transition-opacity"
+											type="button"
 									disabled={getRetryState(failure.id) === 'loading' || isOnCooldown(failure.id)}
 									aria-label="재시도"
 									aria-live="polite"

@@ -25,7 +25,7 @@
 		<!-- 상단 타이틀영역 -->
 		<div class="flex items-center justify-between mb-4">
 			<h3 class="text-lg font-bold text-text-strong truncate">할 일 · 멘션</h3>
-			<button class="inline-flex items-center justify-center w-5 h-5 rounded-full hover:bg-surface-1 transition-colors ml-2" aria-label="정보" title="내가 해야 할 업무와 호출 멘션 요약">
+			<button class="inline-flex items-center justify-center w-5 h-5 rounded-full hover:bg-surface-1 transition-colors ml-2" aria-label="정보" title="내가 해야 할 업무와 호출 멘션 요약" type="button">
 				<Info size={12} class="text-text-muted" />
 			</button>
 		</div>

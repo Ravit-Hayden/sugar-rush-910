@@ -2,24 +2,13 @@
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import {
-		LayoutGrid,
-		Disc3,
-		Music,
-		FolderOpen,
-		Heart,
-		Rocket,
-		DollarSign,
-		Calendar,
-		MessageSquare,
-		Shield,
-		Settings,
-		PanelLeftOpen,
-		PanelLeftClose,
-		PanelsTopLeft
+		LayoutGrid, Disc3, Music, FolderOpen, Heart, Rocket,
+		DollarSign, Calendar, MessageSquare, Shield, Settings,
+		PanelLeftOpen, PanelLeftClose, PanelsTopLeft
 	} from 'lucide-svelte';
 
 	let sidebarOpen = $state(false);
-	let sidebarCollapsed = $state(false); // 기본값을 false로 변경 (확장 상태)
+	let sidebarCollapsed = $state(true); // 기본값: 축소 상태
 	let isSearching = $state(false);
 	let sidebarToggleHovered = $state(false);
 	let sidebarToggleClicked = $state(false);
@@ -28,14 +17,33 @@
 	// 화면 크기 감지 함수
 	function checkScreenSize() {
 		if (typeof window !== 'undefined') {
+			const wasMobile = isMobile;
 			isMobile = window.innerWidth < 768;
-		}
-	}
-
-	// 키보드 이벤트 핸들러
-	function handleKeydown(event: KeyboardEvent) {
-		if (event.key === 'Escape') {
-			sidebarOpen = false;
+			
+			// 화면 크기가 변경될 때 사이드바 상태 조정
+			if (wasMobile !== isMobile) {
+				if (isMobile) {
+					// 모바일로 전환될 때: 사이드바를 축소 상태로 강제 설정
+					sidebarCollapsed = true;
+					sidebarOpen = false;
+					window.dispatchEvent(new CustomEvent('sidebar-collapse-change', { 
+						detail: { collapsed: true } 
+					}));
+					window.dispatchEvent(new CustomEvent('sidebar-width-change', {
+						detail: { width: 72 }
+					}));
+				} else {
+					// 데스크톱으로 전환될 때: 기본 축소 상태 유지
+					sidebarCollapsed = true;
+					sidebarOpen = false;
+					window.dispatchEvent(new CustomEvent('sidebar-collapse-change', { 
+						detail: { collapsed: true } 
+					}));
+					window.dispatchEvent(new CustomEvent('sidebar-width-change', {
+						detail: { width: 72 }
+					}));
+				}
+			}
 		}
 	}
 
@@ -46,21 +54,18 @@
 			sidebarToggleClicked = false;
 		}, 150);
 		
-		// 브라우저 환경에서만 실행
 		if (typeof window !== 'undefined') {
-			// 데스크톱에서는 축소/확장 토글
+			// 데스크톱: 축소/확장 토글
 			if (window.innerWidth >= 768) {
 				sidebarCollapsed = !sidebarCollapsed;
-				// 메인 콘텐츠에 사이드바 상태 알림
 				window.dispatchEvent(new CustomEvent('sidebar-collapse-change', { 
 					detail: { collapsed: sidebarCollapsed } 
 				}));
-				// 헤더에 사이드바 너비 변경 알림
 				window.dispatchEvent(new CustomEvent('sidebar-width-change', {
-					detail: { width: sidebarCollapsed ? 60 : 250 }
+					detail: { width: sidebarCollapsed ? 72 : 250 }
 				}));
 			} else {
-				// 모바일에서는 열기/닫기 토글
+				// 모바일: 열기/닫기 토글
 				sidebarOpen = !sidebarOpen;
 				window.dispatchEvent(new CustomEvent('sidebar-toggle', { 
 					detail: { open: sidebarOpen } 
@@ -69,36 +74,7 @@
 		}
 	}
 
-	// 이벤트 리스너 등록
-	onMount(() => {
-		const handleSearchChange = (event: CustomEvent) => {
-			isSearching = event.detail.show;
-			// 강제 리렌더링을 위해 상태 업데이트
-			isSearching = isSearching;
-		};
-
-		const handleResize = () => {
-			checkScreenSize();
-		};
-		
-		if (typeof window !== 'undefined') {
-			// 초기 화면 크기 확인
-			checkScreenSize();
-			
-			window.addEventListener('search-change', handleSearchChange as EventListener);
-			window.addEventListener('keydown', handleKeydown);
-			window.addEventListener('resize', handleResize);
-		}
-		
-		return () => {
-			if (typeof window !== 'undefined') {
-				window.removeEventListener('search-change', handleSearchChange as EventListener);
-				window.removeEventListener('keydown', handleKeydown);
-				window.removeEventListener('resize', handleResize);
-			}
-		};
-	});
-
+	// 메뉴 아이템 정의
 	const menuItems = [
 		{ icon: LayoutGrid, label: '대시보드', href: '/' },
 		{ icon: Disc3, label: '앨범 관리', href: '/albums' },
@@ -113,81 +89,107 @@
 		{ icon: Settings, label: '설정', href: '/settings' }
 	];
 
-	// 현재 페이지가 메뉴 항목과 일치하는지 확인
+	// 현재 페이지 활성화 확인
 	function isActive(href: string): boolean {
-		// 검색 중일 때는 모든 메뉴 선택 해제
-		if (isSearching) {
-			return false;
-		}
-		
+		if (isSearching) return false;
 		const currentPath = $page.url.pathname;
-		const isCurrentPage = href === '/' ? currentPath === '/' : currentPath.startsWith(href);
-		
-		return isCurrentPage;
+		return href === '/' ? currentPath === '/' : currentPath.startsWith(href);
 	}
 
-	// 메뉴 클릭 시 검색 초기화 및 페이지 이동
+	// 메뉴 클릭 처리
 	function handleMenuClick(event: Event, href: string) {
-		// 검색 상태라면 검색 초기화
 		if (isSearching) {
 			window.dispatchEvent(new CustomEvent('search-clear'));
 		}
-		
-		// 접힌 상태에서도 페이지 이동 허용
-		// 기본 링크 동작을 막지 않음
 	}
+
+	// 컴포넌트 마운트 시 초기화
+	onMount(() => {
+		// 초기 화면 크기 확인
+		checkScreenSize();
+		
+		// 초기 사이드바 상태를 헤더에 알림
+		if (typeof window !== 'undefined') {
+			window.dispatchEvent(new CustomEvent('sidebar-width-change', {
+				detail: { width: sidebarCollapsed ? 72 : 250 }
+			}));
+		}
+		
+		// 리사이즈 이벤트 리스너
+		const handleResize = () => {
+			checkScreenSize();
+		};
+		
+		// ui.js에서 발생하는 사이드바 토글 이벤트 수신
+		const handleSidebarToggle = (event: CustomEvent) => {
+			const newState = event.detail.state;
+			sidebarCollapsed = newState === 'collapsed';
+			
+			// 헤더에 상태 변경 알림
+			window.dispatchEvent(new CustomEvent('sidebar-width-change', {
+				detail: { width: sidebarCollapsed ? 72 : 250 }
+			}));
+		};
+		
+		if (typeof window !== 'undefined') {
+			window.addEventListener('resize', handleResize);
+			window.addEventListener('sidebar-toggle', handleSidebarToggle as EventListener);
+		}
+		
+		return () => {
+			if (typeof window !== 'undefined') {
+				window.removeEventListener('resize', handleResize);
+				window.removeEventListener('sidebar-toggle', handleSidebarToggle as EventListener);
+			}
+		};
+	});
 </script>
 
-<!-- 사이드바 컨테이너 - 애니메이션은 여기에만 적용 -->
-	<aside 
-		class="top-0 fixed left-0 h-screen bg-surface-2 border-r border-border-subtle z-10 overflow-hidden transition-all duration-200"
-		class:w-[60px]={sidebarCollapsed}
-		class:w-[250px]={!sidebarCollapsed}
-	>
-	<!-- 내부 컨텐츠 - overflow: hidden으로 튀어나오지 않게 처리 -->
+<!-- 사이드바 컨테이너 -->
+<aside 
+	class="top-0 fixed left-0 h-screen bg-surface-2 sidebar-border-right z-50 overflow-hidden"
+	style="width: {sidebarCollapsed ? '72px' : '250px'}; transition: width 200ms ease-in-out, transform 200ms ease-in-out;"
+>
 	<div class="h-full w-full overflow-hidden">
 		<nav class="h-full flex flex-col">
-			<!-- 상단 토글 버튼과 로고 섹션 - 아이콘 위치 고정 -->
+			<!-- 상단 토글 버튼과 로고 -->
 			<div class="flex items-center h-20 border-b border-border-subtle flex-shrink-0 px-6">
-				<!-- 토글 버튼 - 항상 왼쪽 고정 위치 -->
-				<div class="flex-shrink-0 w-6 h-6">
-					<button
-						onclick={handleSidebarToggle}
-						onmouseenter={() => { if (!isMobile) sidebarToggleHovered = true; }}
-						onmouseleave={() => { if (!isMobile) sidebarToggleHovered = false; }}
-						class="inline-flex items-center justify-center w-6 h-6 rounded-md transition-colors duration-200 ease-in-out focus:outline-none focus:ring-0"
-						aria-label="사이드바 토글"
-						title="사이드바 토글"
-					>
-						{#if isMobile}
-							<!-- 모바일에서는 항상 PanelsTopLeft 아이콘 표시 (호버 효과 없음) -->
-							<PanelsTopLeft 
-								size={20} 
-								class="transition-colors duration-200 ease-in-out {sidebarToggleClicked ? 'text-brand-pink' : 'text-brand-pink'}" 
-							/>
-						{:else if sidebarCollapsed}
-							<!-- 데스크톱에서 축소 상태일 때 -->
-							<PanelLeftOpen 
-								size={20} 
-								class="transition-colors duration-200 ease-in-out {sidebarToggleClicked ? 'text-brand-pink' : sidebarToggleHovered ? 'text-hover-cyan' : 'text-brand-pink'}" 
-							/>
-						{:else}
-							<!-- 데스크톱에서 확장 상태일 때 -->
-							<PanelLeftClose 
-								size={20} 
-								class="transition-colors duration-200 ease-in-out {sidebarToggleClicked ? 'text-brand-pink' : sidebarToggleHovered ? 'text-hover-cyan' : 'text-brand-pink'}" 
-							/>
-						{/if}
-					</button>
-				</div>
+				<!-- 토글 버튼 -->
+				<button
+					onclick={handleSidebarToggle}
+					onmouseenter={() => { if (!isMobile) sidebarToggleHovered = true; }}
+					onmouseleave={() => { if (!isMobile) sidebarToggleHovered = false; }}
+					class="flex-shrink-0 w-6 h-6 inline-flex items-center justify-center rounded-md transition-colors duration-200 ease-in-out focus:outline-none focus:ring-0 cursor-pointer"
+					aria-label="사이드바 토글"
+					title="사이드바 토글"
+					type="button"
+					data-action="toggle-sidebar"
+				>
+					{#if isMobile}
+						<PanelsTopLeft 
+							size={20} 
+							class="transition-colors duration-200 ease-in-out text-brand-pink" 
+						/>
+					{:else if sidebarCollapsed}
+						<PanelLeftOpen 
+							size={20} 
+							class="transition-colors duration-200 ease-in-out {sidebarToggleClicked ? 'text-brand-pink' : sidebarToggleHovered ? 'text-hover-cyan' : 'text-brand-pink'}" 
+						/>
+					{:else}
+						<PanelLeftClose 
+							size={20} 
+							class="transition-colors duration-200 ease-in-out {sidebarToggleClicked ? 'text-brand-pink' : sidebarToggleHovered ? 'text-hover-cyan' : 'text-brand-pink'}" 
+						/>
+					{/if}
+				</button>
 				
-				<!-- 로고 - 상태에 따라 숨김/표시 -->
-				<div class="ml-3 {sidebarCollapsed ? 'hidden' : 'block'}">
+				<!-- 로고 -->
+				<div class="sidebar-text-animation ml-3 {sidebarCollapsed ? 'collapsed' : 'expanded'}">
 					<img src="/logo.svg" alt="Sugar Rush" class="h-6 w-auto" />
 				</div>
 			</div>
 
-			<!-- 메뉴 아이템들 - 아이콘 위치 고정 -->
+			<!-- 메뉴 아이템들 -->
 			<ul class="space-y-0 flex-1 overflow-hidden">
 			{#each menuItems as item (item.label)}
 				{@const IconComponent = item.icon}
@@ -198,14 +200,17 @@
 						class="sidebar-menu-item flex items-center h-12 w-full text-text-base transition-colors duration-200 ease-in-out px-6 {isActive(item.href) ? 'active' : ''}"
 						style="outline: none;"
 						title={sidebarCollapsed ? item.label : ''}
+						aria-current={isActive(item.href) ? 'page' : undefined}
 					>
-						<!-- 아이콘 - 항상 왼쪽 고정 위치 -->
+						<!-- 아이콘 -->
 						<div class="flex-shrink-0 w-5 h-5 flex items-center justify-center">
 							<IconComponent size={20} class="lucide-icon transition-colors duration-200 ease-in-out" />
 						</div>
 						
-						<!-- 텍스트 - 상태에 따라 숨김/표시 -->
-						<span class="ml-3 text-sm whitespace-nowrap {sidebarCollapsed ? 'hidden' : 'inline'}">{item.label}</span>
+						<!-- 텍스트 -->
+						<div class="sidebar-text-animation ml-3 {sidebarCollapsed ? 'collapsed' : 'expanded'}">
+							<span class="text-sm whitespace-nowrap hidden md:inline">{item.label}</span>
+						</div>
 					</a>
 				</li>
 			{/each}
@@ -213,5 +218,3 @@
 		</nav>
 	</div>
 </aside>
-
-<!-- 모바일에서는 오버레이 없이 메인 콘텐츠가 밀려나도록 함 -->

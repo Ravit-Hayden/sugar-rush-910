@@ -47,6 +47,7 @@
 						<button
 							onclick={() => activeTab = tab.id}
 							class="w-full flex items-center gap-3 px-3 py-2 text-left rounded-md transition-colors {activeTab === tab.id ? 'bg-brand-pink text-white' : 'text-text-muted hover:bg-surface-1 hover:text-text-strong'}"
+							type="button"
 						>
 							<IconComponent size={16} />
 							<span class="text-sm font-medium">{tab.label}</span>
@@ -193,14 +194,14 @@
 							<div class="bg-surface-1 rounded-lg p-4">
 								<h4 class="text-sm font-medium text-text-strong mb-2">데이터 내보내기</h4>
 								<p class="text-xs text-text-muted mb-3">계정 데이터를 JSON 파일로 다운로드할 수 있습니다.</p>
-								<button class="btn-primary text-sm">
+										<button class="btn-primary text-sm" type="button">
 									데이터 내보내기
 								</button>
 							</div>
 							<div class="bg-surface-1 rounded-lg p-4">
 								<h4 class="text-sm font-medium text-text-strong mb-2">계정 삭제</h4>
 								<p class="text-xs text-text-muted mb-3">계정과 모든 데이터를 영구적으로 삭제합니다.</p>
-								<button class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors text-sm">
+										<button class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors text-sm" type="button">
 									계정 삭제
 								</button>
 							</div>

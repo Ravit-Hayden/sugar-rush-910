@@ -51,8 +51,6 @@
 			// 데스크톱에서는 축소/확장 토글
 			if (window.innerWidth >= 768) {
 				sidebarCollapsed = !sidebarCollapsed;
-				console.log('Desktop sidebar toggle - collapsed:', sidebarCollapsed);
-				
 				// 메인 콘텐츠에 사이드바 상태 알림
 				window.dispatchEvent(new CustomEvent('sidebar-collapse-change', { 
 					detail: { collapsed: sidebarCollapsed } 
@@ -64,8 +62,6 @@
 			} else {
 				// 모바일에서는 열기/닫기 토글
 				sidebarOpen = !sidebarOpen;
-				console.log('Mobile sidebar toggle - open:', sidebarOpen);
-				
 				window.dispatchEvent(new CustomEvent('sidebar-toggle', { 
 					detail: { open: sidebarOpen } 
 				}));
@@ -85,6 +81,17 @@
 			checkScreenSize();
 		};
 		
+		// ui.js에서 발생하는 사이드바 토글 이벤트 수신
+		const handleSidebarToggle = (event: CustomEvent) => {
+			const newState = event.detail.state;
+			sidebarCollapsed = newState === 'collapsed';
+			
+			// 헤더에 상태 변경 알림
+			window.dispatchEvent(new CustomEvent('sidebar-width-change', {
+				detail: { width: sidebarCollapsed ? 72 : 250 }
+			}));
+		};
+		
 		if (typeof window !== 'undefined') {
 			// 초기 화면 크기 확인
 			checkScreenSize();
@@ -92,6 +99,7 @@
 			window.addEventListener('search-change', handleSearchChange as EventListener);
 			window.addEventListener('keydown', handleKeydown);
 			window.addEventListener('resize', handleResize);
+			window.addEventListener('sidebar-toggle', handleSidebarToggle as EventListener);
 		}
 		
 		return () => {
@@ -99,6 +107,7 @@
 				window.removeEventListener('search-change', handleSearchChange as EventListener);
 				window.removeEventListener('keydown', handleKeydown);
 				window.removeEventListener('resize', handleResize);
+				window.removeEventListener('sidebar-toggle', handleSidebarToggle as EventListener);
 			}
 		};
 	});
@@ -145,9 +154,7 @@
 <!-- 사이드바 컨테이너 - 애니메이션은 여기에만 적용 -->
 	<aside 
 		class="top-0 fixed left-0 h-screen bg-surface-2 border-r border-border-subtle z-50 overflow-hidden"
-		class:w-[72px]={sidebarCollapsed}
-		class:w-[250px]={!sidebarCollapsed}
-		style="transition: width 200ms ease-in-out, transform 200ms ease-in-out;"
+		style="width: {sidebarCollapsed ? '72px' : '250px'}; transition: width 200ms ease-in-out, transform 200ms ease-in-out;"
 	>
 	<!-- 내부 컨텐츠 - overflow: hidden으로 튀어나오지 않게 처리 -->
 	<div class="h-full w-full overflow-hidden">
@@ -163,6 +170,8 @@
 						class="inline-flex items-center justify-center w-6 h-6 rounded-md transition-colors duration-200 ease-in-out focus:outline-none focus:ring-0"
 						aria-label="사이드바 토글"
 						title="사이드바 토글"
+						type="button"
+						data-action="toggle-sidebar"
 					>
 						{#if isMobile}
 							<!-- 모바일에서는 항상 PanelsTopLeft 아이콘 표시 (호버 효과 없음) -->

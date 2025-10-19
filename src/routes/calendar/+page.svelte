@@ -54,7 +54,7 @@
 				<h1 class="text-3xl font-bold text-text-strong mb-2">일정·캘린더</h1>
 				<p class="text-text-muted">음악 프로젝트 일정을 관리하세요.</p>
 			</div>
-			<button class="inline-flex items-center gap-2 px-4 py-2 bg-brand-pink text-white rounded-md hover:bg-brand-pink/90 transition-colors">
+			<button class="inline-flex items-center gap-2 px-4 py-2 bg-brand-pink text-white rounded-md hover:bg-brand-pink/90 transition-colors" type="button">
 				<Plus size={16} />
 				새 일정 추가
 			</button>

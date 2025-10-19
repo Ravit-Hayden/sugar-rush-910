@@ -12,6 +12,7 @@
 			<button
 				class="inline-flex items-center justify-center w-5 h-5 rounded-full hover:bg-surface-1 transition-colors ml-2"
 				aria-label="정보"
+				type="button"
 				title={tooltip}
 			>
 				<Info size={12} class="text-text-muted" />

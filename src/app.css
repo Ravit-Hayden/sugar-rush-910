@@ -133,19 +133,12 @@ html {
   overflow-x: hidden;
 }
 
-/* 전체 페이지 가로 스크롤바 방지 */
-html {
-  overflow-x: hidden;
-  margin: 0;
-  padding: 0;
-}
-
 /* 통일된 메인 영역 스타일 */
 .main-content-area {
   padding-top: 5rem; /* pt-20 (80px) */
   padding-bottom: 0.375rem; /* pb-1.5 (6px) */
-  padding-left: 16px; /* gutter(8px) + padding(16px) = 24px 가시적 여백 */
-  padding-right: 16px; /* gutter(8px) + padding(16px) = 24px 가시적 여백 */
+  padding-left: 16px; /* 16px + gutter(8px) = 24px 가시적 여백 */
+  padding-right: 16px; /* 16px + gutter(8px) = 24px 가시적 여백 */
   transition: all 300ms ease-in-out;
   overflow-x: hidden;
   overflow-y: auto; /* 스크롤 생성 */
@@ -156,45 +149,40 @@ html {
   box-sizing: border-box;
 }
 
-/* 메인 영역 패딩 체계 */
-.main-content-area {
-  padding-left: 16px;
-  padding-right: 16px;
-}
-
-/* 헤더 강제 패딩 - gutter 없으므로 24px로 메인과 시각적 일치 */
-header {
-  padding-left: 24px;
-  padding-right: 24px;
-}
-
 /* 파이어폭스 전용 - 스크롤바 오버레이 방식이므로 원래 패딩 유지 */
 @-moz-document url-prefix() {
-  header,
   .main-content-area {
-    padding-left: 24px !important;
-    padding-right: 24px !important;
+    padding-left: 24px !important; /* 파이어폭스에서는 24px 패딩 */
+    padding-right: 24px !important; /* 파이어폭스에서는 24px 패딩 */
   }
 }
 
 /* 사이드바 상태에 따른 마진 조정 */
 .main-content-area.sidebar-collapsed {
-  margin-left: 60px;
-  width: calc(100% - 60px);
-  transition: margin-left 200ms ease-in-out, width 200ms ease-in-out;
-  z-index: 20;
-  position: relative;
+  margin-left: 72px;
+  width: calc(100% - 72px);
 }
 
 .main-content-area.sidebar-expanded {
   margin-left: 250px;
   width: calc(100% - 250px);
-  transition: margin-left 200ms ease-in-out, width 200ms ease-in-out;
-  z-index: 20;
-  position: relative;
 }
 
-/* 사이드바 애니메이션 통일 - 제거됨 (hidden/block 사용) */
+/* 사이드바 애니메이션 통일 */
+.sidebar-text-animation {
+  transition: all 200ms ease-in-out;
+}
+
+.sidebar-text-animation.collapsed {
+  opacity: 0;
+  width: 0;
+  overflow: hidden;
+}
+
+.sidebar-text-animation.expanded {
+  opacity: 1;
+  width: auto;
+}
 
 /* Tailwind CSS 클래스 오버라이드 */
 .bg-bg { background-color: var(--bg); }
@@ -242,11 +230,6 @@ header {
 .text-elotte-green { color: var(--elotte-green); }
 .text-elotte-orange { color: var(--elotte-orange); }
 
-/* 포커스 링 스타일 - 사이드바 메뉴, input, 버튼은 제외 */
-*:focus:not(a):not(input):not(button) {
-  outline: 2px solid var(--brand-pink);
-  outline-offset: 2px;
-}
 
 /* input 요소 포커스 스타일 */
 input:focus {
@@ -293,72 +276,37 @@ input:focus {
 
 /* 헤더 반응형 정렬 */
 @media (max-width: 767px) {
-  /* 모바일에서 검색창이 메인 콘텐츠와 좌측 정렬되도록 */
   .search-container {
     margin-left: 0;
     padding-left: 0;
-    flex: 1; /* 사용 가능한 공간을 모두 사용 */
-    min-width: 0; /* flex 아이템이 축소될 수 있도록 */
+    flex: 1;
   }
   
-  /* 모바일에서 검색창 최대 너비 제한 해제 */
   .search-container .relative {
-    max-width: none !important;
-    width: 100%;
+    max-width: none;
   }
   
-  /* 모바일에서 메인 콘텐츠 패딩 */
-  .main-content-area {
-    padding-left: 1rem !important; /* 16px */
-    padding-right: 1rem !important; /* 16px */
-  }
-  
-  /* 모바일에서 헤더 강제 패딩 - gutter 없으므로 24px로 메인과 시각적 일치 */
   header {
     padding-left: 1.5rem !important; /* 24px */
     padding-right: 1.5rem !important; /* 24px */
   }
   
-  /* 모바일에서도 파이어폭스는 원래 패딩 유지 */
-  @-moz-document url-prefix() {
-    header,
-    .main-content-area {
-      padding-left: 1.5rem !important; /* 24px - 파이어폭스 전용 */
-      padding-right: 1.5rem !important; /* 24px - 파이어폭스 전용 */
-    }
-  }
-  
-  /* 모바일에서 오른쪽 섹션은 좌측 정렬 */
   header .flex-1.justify-end {
     justify-content: flex-start;
-  }
-  
-  /* 모바일에서 검색창 입력 필드 확장 */
-  .search-container input {
-    width: 100% !important;
-    min-width: 120px;
   }
 }
 
 @media (min-width: 768px) {
-  /* 데스크톱에서 검색창은 원래 크기 유지 */
   .search-container {
-    flex: none; /* 고정 크기 유지 */
+    flex: none;
   }
   
   .search-container .relative {
-    max-width: 320px; /* 원래 최대 너비 복원 */
-    width: auto;
+    max-width: 320px;
   }
   
-  /* 데스크톱에서 오른쪽 섹션은 오른쪽 정렬 (메인 영역 오른쪽 패딩에 맞춤) */
   header .flex-1.justify-end {
     justify-content: flex-end;
-  }
-  
-  /* 데스크톱에서 검색창 입력 필드 */
-  .search-container input {
-    width: 100%;
   }
 }
 .sidebar-menu-item {
@@ -391,6 +339,45 @@ input:focus {
 /* 사이드바 전체 애니메이션 최적화 */
 aside {
   will-change: transform, width;
+}
+
+/* 사이드바 토글 버튼 스타일 */
+aside button[aria-label="사이드바 토글"] {
+  background: none !important;
+  border: none !important;
+}
+
+/* 모바일에서 토글 버튼 호버 효과 제거 */
+@media (max-width: 767px) {
+  aside button[aria-label="사이드바 토글"]:hover {
+    background-color: transparent !important;
+    color: var(--brand-pink) !important;
+  }
+  
+  aside button[aria-label="사이드바 토글"]:hover svg {
+    color: var(--brand-pink) !important;
+  }
+}
+
+/* 데스크톱에서만 토글 버튼 호버 효과 적용 */
+@media (min-width: 768px) {
+  aside button[aria-label="사이드바 토글"]:hover {
+    background-color: transparent !important;
+  }
+  
+  aside button[aria-label="사이드바 토글"]:hover svg {
+    color: var(--hover-cyan) !important;
+  }
+}
+
+/* 사이드바 전용 테두리 스타일 */
+.sidebar-border-right {
+  border-right: 1px solid var(--border-subtle);
+}
+
+/* 사이드바 호버 시 테두리 색상 변경 방지 */
+aside:hover {
+  border-right: 1px solid var(--border-subtle) !important;
 }
 
 /* 더 강력한 호버 효과를 위한 추가 CSS */
@@ -452,11 +439,16 @@ input[type="checkbox"]:checked::after {
    개별 요소 hover 효과
    ========================= */
 
-/* 카드 호버 효과 */
-.bg-surface-1:hover,
-.bg-surface-2:hover {
-  border-color: #17E1BC !important;
+/* 카드 호버 효과 - 메인 영역의 카드/패널에만 적용 */
+main.main-content-area .bg-surface-1:hover,
+main.main-content-area .bg-surface-2:hover {
+  border-color: var(--hover-cyan) !important;
   transition: border-color 0.2s ease;
+}
+
+/* 사이드바는 항상 원래 색 유지 */
+aside.bg-surface-2:hover {
+  border-color: var(--border-subtle) !important;
 }
 
 /* 링크 호버 효과 */
@@ -534,3 +526,30 @@ a[href*="/revenue"]:hover .text-text-base {
   color: #17E1BC !important;
   transition: color 0.2s ease;
 }
+
+/* 키보드 탐색 사용자에게만 포커스 링 표시 */
+:focus {
+  outline: none;
+}
+:focus-visible {
+  outline: 2px solid var(--brand-pink);
+  outline-offset: 2px;
+}
+
+/* form 요소 자체 box-shadow 제거를 원한다면 일관 처리 */
+input:focus-visible, button:focus-visible {
+  box-shadow: none;
+}
+
+/* 애니메이션 감속(저시력/멀미 보호) */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* 현재 data-theme에 맞춰 브라우저 기본 위젯 색 힌트 */
+:root[data-theme="dark"] { color-scheme: dark; }
+:root[data-theme="light"] { color-scheme: light; }

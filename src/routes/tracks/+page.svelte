@@ -85,7 +85,7 @@
 					<h1>트랙 관리</h1>
 					<p>음악 트랙을 관리하고 분석하세요.</p>
 				</div>
-				<button class="btn-primary">
+				<button class="btn-primary" type="button">
 					<Plus size={16} />
 					새 트랙 추가
 				</button>
@@ -132,7 +132,7 @@
 							<tr class="hover:bg-surface-1 transition-colors">
 								<td class="px-6 py-4 whitespace-nowrap">
 									<div class="flex items-center gap-3">
-										<button class="w-8 h-8 bg-surface-1 rounded-full flex items-center justify-center hover:bg-brand-pink hover:text-white transition-colors">
+										<button class="w-8 h-8 bg-surface-1 rounded-full flex items-center justify-center hover:bg-brand-pink hover:text-white transition-colors" type="button">
 											<Play size={14} class="ml-0.5" />
 										</button>
 										<div>
@@ -158,13 +158,13 @@
 								</td>
 								<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
 									<div class="action-buttons justify-end">
-										<button class="action-button" title="편집">
+												<button class="action-button" title="편집" type="button">
 											<Edit size={14} />
 										</button>
-										<button class="action-button" title="다운로드">
+												<button class="action-button" title="다운로드" type="button">
 											<Download size={14} />
 										</button>
-										<button class="action-button" title="공유">
+												<button class="action-button" title="공유" type="button">
 											<Share size={14} />
 										</button>
 									</div>
@@ -183,7 +183,7 @@
 					<p>
 						{searchQuery ? '검색 조건에 맞는 트랙이 없습니다.' : '아직 트랙이 없습니다.'}
 					</p>
-					<button class="btn-primary">
+					<button class="btn-primary" type="button">
 						<Plus size={16} />
 						첫 번째 트랙 추가
 					</button>

@@ -19,7 +19,7 @@
 		<!-- 상단 타이틀영역 -->
 		<div class="flex items-center justify-between mb-4">
 			<h3 class="text-lg font-bold text-text-strong truncate">시스템 로그</h3>
-			<button class="inline-flex items-center justify-center w-5 h-5 rounded-full hover:bg-surface-1 transition-colors ml-2" aria-label="정보" title="운영 이벤트">
+			<button class="inline-flex items-center justify-center w-5 h-5 rounded-full hover:bg-surface-1 transition-colors ml-2" aria-label="정보" title="운영 이벤트" type="button">
 				<Info size={12} class="text-text-muted" />
 			</button>
 		</div>

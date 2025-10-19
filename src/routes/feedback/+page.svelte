@@ -169,18 +169,20 @@
 		<div class="mb-8">
 			<div class="border-b border-border-subtle">
 				<nav class="-mb-px flex space-x-8">
-					<button
-						onclick={() => selectedTab = 'feedback'}
-						class="py-2 px-1 border-b-2 font-medium text-sm transition-colors {selectedTab === 'feedback' ? 'border-brand-pink text-brand-pink' : 'border-transparent text-text-muted hover:text-text-strong hover:border-border-subtle'}"
+				<button
+					onclick={() => selectedTab = 'feedback'}
+					class="py-2 px-1 border-b-2 font-medium text-sm transition-colors {selectedTab === 'feedback' ? 'border-brand-pink text-brand-pink' : 'border-transparent text-text-muted hover:text-text-strong hover:border-border-subtle'}"
+					type="button"
 					>
 						<div class="flex items-center gap-2">
 							<MessageSquare size={16} />
 							피드백 ({feedbacks.length})
 						</div>
 					</button>
-					<button
-						onclick={() => selectedTab = 'notifications'}
-						class="py-2 px-1 border-b-2 font-medium text-sm transition-colors {selectedTab === 'notifications' ? 'border-brand-pink text-brand-pink' : 'border-transparent text-text-muted hover:text-text-strong hover:border-border-subtle'}"
+				<button
+					onclick={() => selectedTab = 'notifications'}
+					class="py-2 px-1 border-b-2 font-medium text-sm transition-colors {selectedTab === 'notifications' ? 'border-brand-pink text-brand-pink' : 'border-transparent text-text-muted hover:text-text-strong hover:border-border-subtle'}"
+					type="button"
 					>
 						<div class="flex items-center gap-2">
 							<Bell size={16} />
@@ -280,15 +282,15 @@
 
 									<!-- 액션 버튼 -->
 									<div class="flex items-center gap-2">
-										<button class="inline-flex items-center gap-1 px-3 py-1 text-sm bg-brand-pink text-white rounded hover:bg-brand-pink/90 transition-colors">
+										<button class="inline-flex items-center gap-1 px-3 py-1 text-sm bg-brand-pink text-white rounded hover:bg-brand-pink/90 transition-colors" type="button">
 											<Reply size={14} />
 											답변
 										</button>
-										<button class="inline-flex items-center gap-1 px-3 py-1 text-sm bg-surface-1 text-text-muted rounded hover:bg-surface-2 transition-colors">
+										<button class="inline-flex items-center gap-1 px-3 py-1 text-sm bg-surface-1 text-text-muted rounded hover:bg-surface-2 transition-colors" type="button">
 											<Archive size={14} />
 											보관
 										</button>
-										<button class="inline-flex items-center gap-1 px-3 py-1 text-sm bg-red-500/10 text-red-500 rounded hover:bg-red-500/20 transition-colors">
+										<button class="inline-flex items-center gap-1 px-3 py-1 text-sm bg-red-500/10 text-red-500 rounded hover:bg-red-500/20 transition-colors" type="button">
 											<Trash2 size={14} />
 											삭제
 										</button>
@@ -340,7 +342,7 @@
 										{#if notification.status === 'unread'}
 											<div class="w-2 h-2 bg-brand-pink rounded-full"></div>
 										{/if}
-										<button class="p-1 hover:bg-surface-1 rounded transition-colors">
+										<button class="p-1 hover:bg-surface-1 rounded transition-colors" type="button">
 											<Trash2 size={14} class="text-text-muted" />
 										</button>
 									</div>

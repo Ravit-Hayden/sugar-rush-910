@@ -5,20 +5,18 @@
 	import Sidebar from '$lib/components/Sidebar.svelte';
 
 	let { children } = $props();
-	let sidebarCollapsed = $state(false); // 기본값을 false로 변경 (확장 상태)
+	let sidebarCollapsed = $state(true); // 기본값을 true로 변경 (축소 상태)
 	let sidebarOpen = $state(false);
 
 	onMount(() => {
 		const handleSidebarCollapseChange = (event: CustomEvent) => {
-			console.log('Sidebar collapse change:', event.detail);
 			sidebarCollapsed = event.detail.collapsed;
 		};
 
 		const handleSidebarToggle = (event: CustomEvent) => {
-			console.log('Sidebar toggle:', event.detail);
 			// 모바일에서만 사이드바 열림 상태 추적
 			if (typeof window !== 'undefined' && window.innerWidth < 768) {
-				sidebarOpen = event.detail.open;
+				sidebarOpen = !sidebarOpen;
 			}
 		};
 
@@ -45,8 +43,7 @@
 	<Header />
 	<Sidebar />
 	
-	<main class="main-content-area {sidebarCollapsed ? 'sidebar-collapsed' : 'sidebar-expanded'}" 
-		  style="transition: margin-left 200ms ease-in-out, width 200ms ease-in-out;">
+	<main class="main-content-area {sidebarCollapsed ? 'sidebar-collapsed' : 'sidebar-expanded'}">
 		{@render children?.()}
 	</main>
 </div>
