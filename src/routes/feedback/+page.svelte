@@ -282,15 +282,15 @@
 
 									<!-- 액션 버튼 -->
 									<div class="flex items-center gap-2">
-										<button class="inline-flex items-center gap-1 px-3 py-1 text-sm bg-brand-pink text-white rounded hover:bg-brand-pink/90 transition-colors" type="button">
+										<button class="inline-flex items-center gap-1 px-1.5 py-1 text-sm bg-brand-pink text-white rounded hover:bg-brand-pink/90 transition-colors" type="button">
 											<Reply size={14} />
 											답변
 										</button>
-										<button class="inline-flex items-center gap-1 px-3 py-1 text-sm bg-surface-1 text-text-muted rounded hover:bg-surface-2 transition-colors" type="button">
+										<button class="inline-flex items-center gap-1 px-1.5 py-1 text-sm bg-surface-1 text-text-muted rounded hover:bg-surface-2 transition-colors" type="button">
 											<Archive size={14} />
 											보관
 										</button>
-										<button class="inline-flex items-center gap-1 px-3 py-1 text-sm bg-red-500/10 text-red-500 rounded hover:bg-red-500/20 transition-colors" type="button">
+										<button class="inline-flex items-center gap-1 px-1.5 py-1 text-sm bg-red-500/10 text-red-500 rounded hover:bg-red-500/20 transition-colors" type="button">
 											<Trash2 size={14} />
 											삭제
 										</button>

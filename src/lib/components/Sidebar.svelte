@@ -154,34 +154,39 @@
 		<nav class="h-full flex flex-col">
 			<!-- 상단 토글 버튼과 로고 -->
 			<div class="flex items-center h-20 border-b border-border-subtle flex-shrink-0 px-6">
-				<!-- 토글 버튼 -->
-				<button
-					onclick={handleSidebarToggle}
-					onmouseenter={() => { if (!isMobile) sidebarToggleHovered = true; }}
-					onmouseleave={() => { if (!isMobile) sidebarToggleHovered = false; }}
-					class="flex-shrink-0 w-6 h-6 inline-flex items-center justify-center rounded-md transition-colors duration-200 ease-in-out focus:outline-none focus:ring-0 cursor-pointer"
-					aria-label="사이드바 토글"
-					title="사이드바 토글"
-					type="button"
-					data-action="toggle-sidebar"
-				>
-					{#if isMobile}
+				<!-- 상태 표시 아이콘 (클릭 불가, 호버 효과 완전 차단) -->
+				{#if isMobile}
+					<div class="flex-shrink-0 w-6 h-6 inline-flex items-center justify-center pointer-events-none" style="color: var(--brand-pink) !important;">
 						<PanelsTopLeft 
 							size={20} 
-							class="transition-colors duration-200 ease-in-out text-brand-pink" 
+							style="color: var(--brand-pink) !important; pointer-events: none;"
 						/>
-					{:else if sidebarCollapsed}
-						<PanelLeftOpen 
-							size={20} 
-							class="transition-colors duration-200 ease-in-out {sidebarToggleClicked ? 'text-brand-pink' : sidebarToggleHovered ? 'text-hover-cyan' : 'text-brand-pink'}" 
-						/>
-					{:else}
-						<PanelLeftClose 
-							size={20} 
-							class="transition-colors duration-200 ease-in-out {sidebarToggleClicked ? 'text-brand-pink' : sidebarToggleHovered ? 'text-hover-cyan' : 'text-brand-pink'}" 
-						/>
-					{/if}
-				</button>
+					</div>
+				{:else}
+					<!-- 토글 버튼 (클릭 가능) -->
+					<button
+						onclick={handleSidebarToggle}
+						onmouseenter={() => sidebarToggleHovered = true}
+						onmouseleave={() => sidebarToggleHovered = false}
+						class="flex-shrink-0 w-6 h-6 inline-flex items-center justify-center rounded-md transition-colors duration-200 ease-in-out focus:outline-none focus:ring-0 cursor-pointer"
+						aria-label="사이드바 토글"
+						title="사이드바 토글"
+						type="button"
+						data-action="toggle-sidebar"
+					>
+						{#if sidebarCollapsed}
+							<PanelLeftOpen 
+								size={20} 
+								class="transition-colors duration-200 ease-in-out {sidebarToggleClicked ? 'text-brand-pink' : sidebarToggleHovered ? 'text-hover-cyan' : 'text-brand-pink'}" 
+							/>
+						{:else}
+							<PanelLeftClose 
+								size={20} 
+								class="transition-colors duration-200 ease-in-out {sidebarToggleClicked ? 'text-brand-pink' : sidebarToggleHovered ? 'text-hover-cyan' : 'text-brand-pink'}" 
+							/>
+						{/if}
+					</button>
+				{/if}
 				
 				<!-- 로고 -->
 				<div class="sidebar-text-animation ml-3 {sidebarCollapsed ? 'collapsed' : 'expanded'}">

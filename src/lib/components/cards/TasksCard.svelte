@@ -40,14 +40,14 @@
 		</div>
 
 		<!-- 메인 목록/컨텐츠: 줄/행 개수 무조건 동일, 남는 줄은 placeholder -->
-		<div class="grid grid-rows-4 gap-3">
+		<div class="grid grid-rows-4 gap-3 min-h-0">
 			{#if loading}
 				<Skeleton lines={2} />
 			{:else}
 				{#each displayTasks.slice(0, 4) as task, i (task.id)}
 					<a
 						href="/tasks/{task.id}"
-						class="flex items-center h-12 px-4 bg-surface-1 rounded hover:bg-surface-2 transition-colors"
+						class="flex items-center h-12 px-4 bg-surface-1 rounded hover:bg-surface-2 transition-colors min-w-0"
 					>
 						<!-- 좌측 체크박스 -->
 						<span class="flex-shrink-0 w-5 h-5 flex items-center justify-center mr-3">
@@ -61,13 +61,13 @@
 							/>
 						</span>
 						<!-- 중간 텍스트 (좌측정렬) -->
-						<span class="flex-1 text-sm text-text-base truncate text-left">{task.title}</span>
+						<span class="flex-1 text-sm text-text-base truncate text-left min-w-0">{task.title}</span>
 						<!-- 우측 상태/버튼 -->
-						<span class="flex-shrink-0 flex items-center gap-x-2">
+						<span class="flex-shrink-0 flex items-center gap-x-2 ml-2">
 							{#if task.priority}
-								<span class="badge-base badge-high-urgent">높음</span>
+								<span class="badge-base badge-high-urgent whitespace-nowrap">높음</span>
 							{:else}
-								<span class="badge-base badge-medium-yellow">보통</span>
+								<span class="badge-base badge-medium-yellow whitespace-nowrap">보통</span>
 							{/if}
 						</span>
 					</a>
@@ -84,11 +84,11 @@
 	<!-- 하단 액션 -->
 	<div class="flex items-center justify-between mt-3">
 		<div class="flex gap-x-2 flex-wrap items-center">
-			<a href="/tasks/new" class="inline-flex items-center px-3 py-1 rounded border border-brand-pink text-brand-pink text-xs font-medium hover:bg-brand-pink hover:text-white transition cursor-pointer min-w-[70px]" aria-label="새 태스크" title="새 태스크">
+			<a href="/tasks/new" class="inline-flex items-center pl-1.5 pr-2 py-1 rounded border border-brand-pink text-brand-pink text-xs font-medium hover:bg-brand-pink hover:text-white transition cursor-pointer" aria-label="새 태스크" title="새 태스크">
 				<Plus size={12} class="mr-1" />
 				작업
 			</a>
-			<a href="/mentions" class="inline-flex items-center px-3 py-1 rounded border border-brand-pink text-brand-pink text-xs font-medium hover:bg-brand-pink hover:text-white transition cursor-pointer min-w-[70px]" aria-label="멘션" title="멘션">
+			<a href="/mentions" class="inline-flex items-center pl-1.5 pr-2 py-1 rounded border border-brand-pink text-brand-pink text-xs font-medium hover:bg-brand-pink hover:text-white transition cursor-pointer" aria-label="멘션" title="멘션">
 				<MessageCircle size={12} class="mr-1" />
 				멘션
 			</a>

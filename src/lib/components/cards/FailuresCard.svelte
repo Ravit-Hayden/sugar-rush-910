@@ -117,23 +117,23 @@
 		</div>
 
 		<!-- 메인 목록/컨텐츠: 줄/행 개수 무조건 동일, 남는 줄은 placeholder -->
-		<div class="grid grid-rows-4 gap-3">
+		<div class="grid grid-rows-4 gap-3 min-h-0">
 			{#if loading}
 				<Skeleton lines={2} />
 			{:else}
 				{#each displayFailures.slice(0, 4) as failure (failure.id)}
 					<a
 						href="/failures/{failure.id}"
-						class="flex items-center h-12 px-4 bg-surface-1 rounded hover:bg-surface-2 transition-colors"
+						class="flex items-center h-12 px-4 bg-surface-1 rounded hover:bg-surface-2 transition-colors min-w-0"
 					>
 						<!-- 좌측 아이콘 -->
 						<span class="flex-shrink-0 w-5 h-5 flex items-center justify-center mr-3">
 							<AlertTriangle size={16} class="text-text-base flex-shrink-0" />
 						</span>
 						<!-- 중간 텍스트 (좌측정렬) -->
-						<span class="flex-1 text-sm text-text-base truncate text-left">{failure.text}</span>
+						<span class="flex-1 text-sm text-text-base truncate text-left min-w-0">{failure.text}</span>
 						<!-- 우측 상태/버튼 -->
-						<span class="flex-shrink-0 flex items-center gap-x-2">
+						<span class="flex-shrink-0 flex items-center gap-x-2 ml-2">
 							{#if failure.retryable}
 										<button
 											onclick={() => retryFailure(failure.id)}
@@ -172,11 +172,11 @@
 	<!-- 하단 액션 -->
 	<div class="flex items-center justify-between mt-3">
 		<div class="flex gap-x-2 flex-wrap items-center">
-			<a href="/runbook" class="inline-flex items-center px-3 py-1 rounded border border-brand-pink text-brand-pink text-xs font-medium hover:bg-brand-pink hover:text-white transition cursor-pointer min-w-[70px]" aria-label="안내 가이드" title="안내 가이드">
+			<a href="/runbook" class="inline-flex items-center pl-1.5 pr-2 py-1 rounded border border-brand-pink text-brand-pink text-xs font-medium hover:bg-brand-pink hover:text-white transition cursor-pointer" aria-label="안내 가이드" title="안내 가이드">
 				<RotateCcwSquare size={12} class="mr-1" />
 				안내
 			</a>
-			<a href="/failures" class="inline-flex items-center px-3 py-1 rounded border border-brand-pink text-brand-pink text-xs font-medium hover:bg-brand-pink hover:text-white transition cursor-pointer min-w-[70px]" aria-label="원인 분석" title="원인 분석">
+			<a href="/failures" class="inline-flex items-center pl-1.5 pr-2 py-1 rounded border border-brand-pink text-brand-pink text-xs font-medium hover:bg-brand-pink hover:text-white transition cursor-pointer" aria-label="원인 분석" title="원인 분석">
 				<AlertTriangle size={12} class="mr-1" />
 				원인
 			</a>

@@ -38,24 +38,24 @@
 		</div>
 
 		<!-- 메인 목록/컨텐츠: 줄/행 개수 무조건 동일, 남는 줄은 placeholder -->
-		<div class="grid grid-rows-4 gap-3">
+		<div class="grid grid-rows-4 gap-3 min-h-0">
 			{#if loading}
 				<Skeleton lines={2} />
 			{:else}
 				{#each displayLogs.slice(0, 4) as log (log.id)}
 					<a
 						href="/logs/{log.id}"
-						class="flex items-center h-12 px-4 bg-surface-1 rounded hover:bg-surface-2 transition-colors"
+						class="flex items-center h-12 px-4 bg-surface-1 rounded hover:bg-surface-2 transition-colors min-w-0"
 					>
 						<!-- 좌측 아이콘 -->
 						<span class="flex-shrink-0 w-5 h-5 flex items-center justify-center mr-3">
 							<FileText size={16} class="text-text-base flex-shrink-0" />
 						</span>
 						<!-- 중간 텍스트 (좌측정렬) -->
-						<span class="flex-1 text-sm text-text-base truncate text-left">{log.text}</span>
+						<span class="flex-1 text-sm text-text-base truncate text-left min-w-0">{log.text}</span>
 						<!-- 우측 상태/버튼 -->
-						<span class="flex-shrink-0 flex items-center gap-x-2">
-							<span class="text-xs text-text-muted">{log.time}</span>
+						<span class="flex-shrink-0 flex items-center gap-x-2 ml-2">
+							<span class="text-xs text-text-muted whitespace-nowrap">{log.time}</span>
 						</span>
 					</a>
 				{/each}

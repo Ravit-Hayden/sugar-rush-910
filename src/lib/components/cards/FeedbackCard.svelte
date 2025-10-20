@@ -49,18 +49,18 @@
 		</div>
 
 		<!-- 메인 목록/컨텐츠: 줄/행 개수 무조건 동일, 남는 줄은 placeholder -->
-		<div class="grid grid-rows-4 gap-3">
+		<div class="grid grid-rows-4 gap-3 min-h-0">
 			{#if loading}
 				<Skeleton lines={2} />
 			{:else}
 				{#each displayFeedback.slice(0, 4) as item (item.id)}
 					<a
 						href="/feedback/{item.id}"
-						class="flex items-center gap-2 p-3 bg-surface-1 rounded hover:bg-surface-2 transition-colors h-full"
+						class="flex items-center gap-2 p-3 bg-surface-1 rounded hover:bg-surface-2 transition-colors h-full min-w-0"
 					>
 						<MessageSquare size={16} class="text-text-base flex-shrink-0" />
-						<span class="text-sm text-text-base text-center flex-1">{item.text}</span>
-						<span class="text-xs flex-shrink-0 {getAuthorColor(item.from)}">{item.from}</span>
+						<span class="text-sm text-text-base text-center flex-1 truncate min-w-0">{item.text}</span>
+						<span class="text-xs flex-shrink-0 {getAuthorColor(item.from)} whitespace-nowrap">{item.from}</span>
 					</a>
 				{/each}
 				{#if displayFeedback.length < 4}
