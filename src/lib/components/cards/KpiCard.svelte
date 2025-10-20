@@ -92,7 +92,7 @@
 				</div>
 				
 				<!-- 추가 설명 (우측 절반, 세로 중앙 정렬) -->
-				<div class="hidden lg:flex lg:flex-1 lg:flex-col lg:justify-center lg:pl-6 min-w-0">
+				<div class="hidden lg:flex lg:flex-1 lg:flex-col lg:justify-center lg:pl-10 min-w-0">
 					<div class="space-y-3 min-w-0">
 						<!-- 일평균 텍스트와 동일한 좌측 여백으로 정렬 (개발자도구에서 확인된 40px) -->
 						<div class="text-xs text-ok-fg -mt-6 truncate">일평균</div>
