@@ -3,8 +3,6 @@
 	import { Eclipse } from 'lucide-svelte';
 
 	let theme = 'dark';
-	let themeHovered = false;
-	let themeClicked = false;
 
 	onMount(() => {
 		if (typeof window !== 'undefined') {
@@ -15,11 +13,6 @@
 	});
 
 	function toggleTheme() {
-		themeClicked = true;
-		setTimeout(() => {
-			themeClicked = false;
-		}, 150);
-		
 		if (typeof window !== 'undefined') {
 			theme = theme === 'dark' ? 'light' : 'dark';
 			localStorage.setItem('sr_theme', theme);
@@ -30,9 +23,7 @@
 
 <button
 	onclick={toggleTheme}
-	class="inline-flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 rounded-md transition-colors focus:outline-none focus:ring-0"
-	onmouseenter={() => themeHovered = true}
-	onmouseleave={() => themeHovered = false}
+	class="theme-toggle-button inline-flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 rounded-md transition-colors focus:outline-none focus:ring-0"
 	aria-label="테마 전환"
 	title="다크/라이트 모드 전환"
 	type="button"
@@ -40,6 +31,6 @@
 >
 	<Eclipse 
 		size={14} 
-		class="sm:w-4 sm:h-4 transition-colors {themeClicked ? 'text-brand-pink' : themeHovered ? 'text-hover-cyan' : 'text-text-base'}" 
+		class="sm:w-4 sm:h-4 transition-colors text-text-base lucide-icon" 
 	/>
 </button>

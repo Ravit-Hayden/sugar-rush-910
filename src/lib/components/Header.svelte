@@ -63,7 +63,7 @@
 			<!-- 검색창 -->
 			<div class="flex items-center search-container">
 				<div class="relative w-full min-w-[120px] sm:min-w-[160px] md:min-w-[200px] lg:min-w-[240px] xl:min-w-[280px] max-w-[320px]">
-					<Search size={16} class="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-base" />
+					<Search size={16} class="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-base lucide-icon" />
 					<input
 						type="text"
 						placeholder="검색..."
@@ -74,10 +74,15 @@
 
 			<!-- 알림 버튼 -->
 			<div class="flex items-center flex-shrink-0">
-				<button class="relative inline-flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 rounded-md transition-colors focus:outline-none focus:ring-0" aria-label="알림" type="button">
-					<Bell size={14} class="sm:w-4 sm:h-4 transition-colors text-text-base" />
-					<span class="absolute -top-0.5 -right-0.5 w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full" style="background-color: var(--brand-pink);"></span>
-				</button>
+				<a href="/feedback" class="notification-button relative inline-flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 rounded-md transition-colors focus:outline-none focus:ring-0" aria-label="알림">
+					<Bell 
+						size={14} 
+						class="sm:w-4 sm:h-4 transition-colors lucide-icon {$page.url.pathname.startsWith('/feedback') ? 'text-brand-pink' : 'text-text-base'}" 
+					/>
+					{#if !$page.url.pathname.startsWith('/feedback')}
+						<span class="notification-dot absolute -top-0.5 -right-0.5 w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full" style="background-color: var(--brand-pink);"></span>
+					{/if}
+				</a>
 			</div>
 
 			<!-- 테마 토글 -->

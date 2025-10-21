@@ -56,13 +56,29 @@
 
 /* 라이트 모드 색상 변수 */
 [data-theme="light"] {
-  --text-base: #D9CCBC;
-  --text-strong: #C5b5A9;
-  --text-muted: #A59686;
-  --bg: #F7F3E9;
-  --surface-2: #F3EBDD;
-  --surface-1: #FFF8EF;
-  --border-subtle: #D9CCBC;
+   --text-base: #8B7355;        /* 2단계 진하게 (기존 #D9CCBC) */
+   --text-strong: #6B5B47;      /* 1단계 진하게 (기존 #C5b5A9) */
+   --text-muted: #5C4F3F;       /* 더 진하게 (기존 #A59686) */
+   --bg: #F7F3E9;
+   --surface-2: #F3EBDD;
+   --surface-1: #FFF8EF;
+   --border-subtle: #B8A896;    /* 더 진하게 (기존 #D9CCBC) */
+   --hover-cyan: #8A2BE2;       /* 라이트 모드 전용 보라색 호버 색상 */
+  
+  /* 라이트 모드 배지 색상 (더 진하고 선명하게) */
+  --badge-high-urgent: #FF3DAE; /* 핫핑크 유지 */
+  --badge-high-red: #FF1900;    /* 진한 레드 유지 */
+  --badge-medium-yellow: #FF8C00; /* 오렌지계열 (기존 노랑) */
+  --badge-medium-lemon: #FF7F00;  /* 오렌지계열 (기존 레몬) */
+  --badge-medium-gold: #FF8C00;   /* 오렌지계열 (기존 골드) */
+		--badge-low-mint: #228B22;      /* 맑고 진한 진그린 */
+		--badge-low-green: #228B22;     /* 맑고 진한 진그린 */
+  --badge-info-cyan: #00BFFF;     /* 진한 시안 */
+  --badge-info-blue: #0066FF;     /* 진한 블루 */
+  --badge-special-purple: #8A2BE2; /* 진한 퍼플 */
+  --badge-special-violet: #8A2BE2; /* 진한 바이올렛 */
+  --elotte-green: #057dff;        /* 라이트 모드에서 El 색상 변경 */
+  --ok-fg: #008fff;               /* 라이트 모드에서 KPI 색상 변경 (밝은 파란색) */
 }
 
 /* 멤버 컬러 토큰 */
@@ -214,8 +230,163 @@ html {
   font-size: 0.625rem;
   font-weight: 700;
   line-height: 1;
-  text-shadow: 0 0 2px rgba(0, 0, 0, 0.3); /* 텍스트 가독성 향상 */
   letter-spacing: 0.025em; /* 글자 간격 약간 증가 */
+}
+
+/* 라이트 모드에서 배지 텍스트 그림자 제거 */
+[data-theme="light"] .badge-base {
+  text-shadow: none !important;
+}
+
+/* 라이트 모드에서 호버 색상만 보라색으로 변경 (배경은 그대로) */
+[data-theme="light"] .search-container:hover .lucide-icon {
+  color: var(--hover-cyan) !important;
+}
+
+[data-theme="light"] .notification-button:hover .lucide-icon {
+  color: var(--hover-cyan) !important;
+}
+
+[data-theme="light"] .theme-toggle-button:hover .lucide-icon {
+  color: var(--hover-cyan) !important;
+}
+
+/* 라이트 모드에서 테마 토글 버튼 호버 배경색 변경 방지 */
+[data-theme="light"] .theme-toggle-button:hover {
+  background-color: transparent !important;
+}
+
+[data-theme="light"] .hover\:bg-hover-cyan:hover {
+  color: var(--hover-cyan) !important;
+}
+
+[data-theme="light"] .hover\:text-hover-cyan:hover {
+  color: var(--hover-cyan) !important;
+}
+
+/* 라이트 모드에서 사이드바 버튼 호버 색상 변경 */
+[data-theme="light"] .sidebar-menu-item:hover:not(.active) {
+  background-color: var(--hover-cyan) !important;
+  color: var(--surface-2) !important;
+}
+
+[data-theme="light"] .sidebar-menu-item:hover:not(.active) .lucide-icon {
+  color: var(--surface-2) !important;
+}
+
+[data-theme="light"] aside nav ul li a.sidebar-menu-item:hover:not(.active) {
+  background-color: var(--hover-cyan) !important;
+  color: var(--surface-2) !important;
+}
+
+[data-theme="light"] aside nav ul li a.sidebar-menu-item:hover:not(.active) .lucide-icon {
+  color: var(--surface-2) !important;
+}
+
+/* 라이트 모드에서 일반 링크와 버튼 호버 색상 변경 */
+[data-theme="light"] a:hover {
+  color: var(--hover-cyan) !important;
+}
+
+[data-theme="light"] button:not([class*="bg-"]):hover {
+  color: var(--hover-cyan) !important;
+}
+
+[data-theme="light"] .lucide-icon:hover {
+  color: var(--hover-cyan) !important;
+}
+
+/* 라이트 모드에서 ActionsCard 아이콘 호버 색상 변경 */
+[data-theme="light"] a[href*="/albums/new"]:hover svg,
+[data-theme="light"] a[href*="/tracks/new"]:hover svg,
+[data-theme="light"] a[href*="/files/upload"]:hover svg,
+[data-theme="light"] a[href*="/revenue"]:hover svg {
+  color: var(--hover-cyan) !important;
+}
+
+/* 라이트 모드에서 리스트 항목 호버 테두리 색상 변경 */
+[data-theme="light"] a[href*="/tasks/"]:hover,
+[data-theme="light"] a[href*="/calendar/"]:hover,
+[data-theme="light"] a[href*="/status/"]:hover,
+[data-theme="light"] a[href*="/failures/"]:hover,
+[data-theme="light"] a[href*="/logs/"]:hover,
+[data-theme="light"] a[href*="/releases/"]:hover,
+[data-theme="light"] a[href*="/changes/"]:hover,
+[data-theme="light"] a[href*="/feedback/"]:hover,
+[data-theme="light"] a[href*="/albums/new"]:hover,
+[data-theme="light"] a[href*="/tracks/new"]:hover,
+[data-theme="light"] a[href*="/files/upload"]:hover,
+[data-theme="light"] a[href*="/revenue"]:hover {
+  border-color: var(--hover-cyan) !important;
+}
+
+/* 라이트 모드에서 체크박스 호버 테두리 색상 변경 */
+[data-theme="light"] input[type="checkbox"]:hover {
+  border-color: var(--hover-cyan) !important;
+}
+
+/* 라이트 모드에서 정보 버튼 호버 색상 변경 */
+[data-theme="light"] button[aria-label="정보"]:hover .lucide-icon {
+  color: var(--hover-cyan) !important;
+}
+
+/* 라이트 모드에서 카드 호버 테두리 색상 변경 */
+[data-theme="light"] main.main-content-area .bg-surface-1:hover,
+[data-theme="light"] main.main-content-area .bg-surface-2:hover {
+  border-color: var(--hover-cyan) !important;
+}
+
+/* 라이트 모드에서 일반 버튼 호버 배경 색상 변경 (테마 토글 버튼 제외) */
+[data-theme="light"] button:hover:not([class*="bg-"]):not(.theme-toggle-button) {
+  background-color: var(--surface-1) !important;
+}
+
+/* 라이트 모드에서 버튼 내부 아이콘 호버 색상 변경 (trending-up 아이콘 제외) */
+[data-theme="light"] button:hover .lucide-icon:not(.lucide-trending-up) {
+  color: var(--hover-cyan) !important;
+}
+
+/* 라이트 모드에서 할일 항목 호버 효과 변경 */
+[data-theme="light"] a[href*="/tasks/"]:hover,
+[data-theme="light"] a[href*="/calendar/"]:hover,
+[data-theme="light"] a[href*="/status/"]:hover,
+[data-theme="light"] a[href*="/failures/"]:hover,
+[data-theme="light"] a[href*="/logs/"]:hover,
+[data-theme="light"] a[href*="/releases/"]:hover,
+[data-theme="light"] a[href*="/changes/"]:hover,
+[data-theme="light"] a[href*="/feedback/"]:hover {
+  border-color: var(--hover-cyan) !important;
+}
+
+/* 라이트 모드에서 할일 항목 내부 체크박스 호버 효과 변경 */
+[data-theme="light"] a[href*="/tasks/"]:hover input[type="checkbox"],
+[data-theme="light"] a[href*="/calendar/"]:hover input[type="checkbox"],
+[data-theme="light"] a[href*="/status/"]:hover input[type="checkbox"],
+[data-theme="light"] a[href*="/failures/"]:hover input[type="checkbox"],
+[data-theme="light"] a[href*="/logs/"]:hover input[type="checkbox"],
+[data-theme="light"] a[href*="/releases/"]:hover input[type="checkbox"],
+[data-theme="light"] a[href*="/changes/"]:hover input[type="checkbox"] {
+  border-color: var(--hover-cyan) !important;
+}
+
+/* 라이트 모드에서 할일 항목 내부 텍스트 호버 효과 변경 */
+[data-theme="light"] a[href*="/tasks/"]:hover .text-text-base,
+[data-theme="light"] a[href*="/calendar/"]:hover .text-text-base,
+[data-theme="light"] a[href*="/status/"]:hover .text-text-base,
+[data-theme="light"] a[href*="/failures/"]:hover .text-text-base,
+[data-theme="light"] a[href*="/logs/"]:hover .text-text-base,
+[data-theme="light"] a[href*="/releases/"]:hover .text-text-base,
+[data-theme="light"] a[href*="/changes/"]:hover .text-text-base,
+[data-theme="light"] a[href*="/feedback/"]:hover .text-text-base {
+  color: var(--hover-cyan) !important;
+}
+
+/* 라이트 모드에서 빠른 액션 버튼 텍스트 호버 효과 변경 */
+[data-theme="light"] a[href*="/albums/new"]:hover .text-text-base,
+[data-theme="light"] a[href*="/tracks/new"]:hover .text-text-base,
+[data-theme="light"] a[href*="/files/upload"]:hover .text-text-base,
+[data-theme="light"] a[href*="/revenue"]:hover .text-text-base {
+  color: var(--hover-cyan) !important;
 }
 
 .badge-high-urgent { color: var(--badge-high-urgent); }
@@ -368,6 +539,15 @@ aside button[aria-label="사이드바 토글"] {
   aside button[aria-label="사이드바 토글"]:hover svg {
     color: var(--hover-cyan) !important;
   }
+}
+
+/* 라이트 모드에서 사이드바 토글 버튼 호버 색상 변경 (배경색 변경 방지) */
+[data-theme="light"] aside button[aria-label="사이드바 토글"]:hover {
+  background-color: transparent !important;
+}
+
+[data-theme="light"] aside button[aria-label="사이드바 토글"]:hover svg {
+  color: var(--hover-cyan) !important;
 }
 
 /* 사이드바 전용 테두리 스타일 */
@@ -548,6 +728,67 @@ input:focus-visible, button:focus-visible {
     transition: none !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* 검색창 호버/포커스 효과 */
+.search-container:hover .lucide-icon {
+  color: var(--hover-cyan) !important;
+  transition: color 0.3s ease;
+}
+
+.search-container:hover input {
+  border-color: var(--hover-cyan) !important;
+  transition: border-color 0.3s ease;
+}
+
+.search-container input:focus {
+  border-color: var(--brand-pink) !important;
+  transition: border-color 0.3s ease;
+}
+
+.search-container input:focus + .lucide-icon,
+.search-container:focus-within .lucide-icon {
+  color: var(--brand-pink) !important;
+  transition: color 0.3s ease;
+}
+
+/* 라이트 모드에서 검색 바 포커스 효과는 핫핑크 유지 */
+[data-theme="light"] .search-container input:focus {
+  border-color: var(--brand-pink) !important;
+}
+
+[data-theme="light"] .search-container input:focus + .lucide-icon,
+[data-theme="light"] .search-container:focus-within .lucide-icon {
+  color: var(--brand-pink) !important;
+}
+
+/* 알림 버튼 호버/선택 효과 */
+.notification-button:hover .lucide-icon {
+  color: var(--hover-cyan) !important;
+  transition: color 0.3s ease;
+}
+
+.notification-button:hover .notification-dot {
+  background-color: var(--hover-cyan) !important;
+  transition: background-color 0.3s ease;
+}
+
+/* 알림 페이지에서 호버 효과 비활성화 */
+.notification-button .text-brand-pink:hover {
+  color: var(--brand-pink) !important;
+}
+
+/* 알림 페이지에서 핫핑크 점 숨김은 이미 조건부 렌더링으로 처리됨 */
+
+/* 테마 토글 호버/선택 효과 */
+.theme-toggle-button:hover .lucide-icon {
+  color: var(--hover-cyan) !important;
+  transition: color 0.3s ease;
+}
+
+.theme-toggle-button:active .lucide-icon {
+  color: var(--brand-pink) !important;
+  transition: color 0.1s ease;
 }
 
 /* 현재 data-theme에 맞춰 브라우저 기본 위젯 색 힌트 */

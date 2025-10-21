@@ -105,7 +105,7 @@
 	/>
 {:else}
 	<!-- 기본 대시보드 -->
-	<div class="pt-0 pb-6" style="background-color: #000000; color: #B6B6B6;">
+	<div class="pt-0 pb-6 bg-bg text-text-base">
 		<!-- 헤더 -->
 		<div class="mb-8 mt-1.5">
 			<h1 class="text-3xl font-bold text-text-strong mb-2">대시보드</h1>
