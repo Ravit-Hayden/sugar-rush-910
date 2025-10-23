@@ -170,7 +170,6 @@
 						onmouseleave={() => sidebarToggleHovered = false}
 						class="flex-shrink-0 w-6 h-6 inline-flex items-center justify-center rounded-md transition-colors duration-200 ease-in-out focus:outline-none focus:ring-0 cursor-pointer"
 						aria-label="사이드바 토글"
-						title="사이드바 토글"
 						type="button"
 						data-action="toggle-sidebar"
 					>
