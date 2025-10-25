@@ -165,7 +165,7 @@ html {
   box-sizing: border-box;
 }
 
-/* 모든 페이지 컨텐츠 영역에 일관된 스크롤바 위치 적용 - 최적화됨 */
+/* 모든 페이지 컨텐츠 영역에 일관된 스크롤바 위치 적용 */
 .content-area,
 .page-content,
 .dashboard-body,
@@ -190,9 +190,10 @@ div[class*="body"],
 div[class*="area"],
 div[class*="panel"] {
   padding-right: 16px !important; /* 스크롤바 공간 확보 */
+  box-sizing: border-box !important;
 }
 
-/* 파이어폭스 전용 - 스크롤바 오버레이 방식이므로 원래 패딩 유지 - 최적화됨 */
+/* 파이어폭스 전용 - 스크롤바 오버레이 방식이므로 원래 패딩 유지 */
 @-moz-document url-prefix() {
   .main-content-area {
     padding-left: 24px !important; /* 파이어폭스에서는 24px 패딩 */
@@ -504,7 +505,26 @@ input:focus {
     justify-content: flex-start;
   }
   
-  /* 모바일에서 스크롤바 위치 일관성 보장 - 중복 제거됨 */
+  /* 모바일에서 스크롤바 위치 일관성 보장 */
+  .main-content-area,
+  .content-area,
+  .page-content,
+  .dashboard-body,
+  .content-panel,
+  main,
+  .PageContent,
+  .page-wrapper,
+  .content-wrapper,
+  .app-content,
+  .layout-content,
+  .container,
+  .wrapper,
+  div[class*="content"],
+  div[class*="page"],
+  div[class*="main"],
+  div[class*="container"] {
+    padding-right: 16px !important;
+  }
 }
 
 @media (min-width: 768px) {
@@ -520,7 +540,26 @@ input:focus {
     justify-content: flex-end;
   }
   
-  /* 데스크톱에서 스크롤바 위치 일관성 보장 - 중복 제거됨 */
+  /* 데스크톱에서 스크롤바 위치 일관성 보장 */
+  .main-content-area,
+  .content-area,
+  .page-content,
+  .dashboard-body,
+  .content-panel,
+  main,
+  .PageContent,
+  .page-wrapper,
+  .content-wrapper,
+  .app-content,
+  .layout-content,
+  .container,
+  .wrapper,
+  div[class*="content"],
+  div[class*="page"],
+  div[class*="main"],
+  div[class*="container"] {
+    padding-right: 16px !important;
+  }
 }
 .sidebar-menu-item {
   transition: all 200ms ease-in-out;
@@ -960,7 +999,9 @@ input:focus-visible, button:focus-visible {
   --header-height: 80px;   /* 헤더 높이 (h-20 = 80px) */
 }
 
-/* 전역 박스 모델 통일 - 최적화됨 */
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   2단계: 전역 박스 모델 통일
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 *,
 *::before,
 *::after {
