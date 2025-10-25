@@ -4,7 +4,7 @@
 	import {
 		LayoutGrid, Disc3, Music, FolderOpen, Heart, Rocket,
 		DollarSign, Calendar, MessageSquare, Shield, Settings,
-		PanelLeftOpen, PanelLeftClose, PanelsTopLeft
+		PanelLeftOpen, PanelLeftClose, PanelsTopLeft, Video
 	} from 'lucide-svelte';
 
 	let sidebarOpen = $state(false);
@@ -79,6 +79,7 @@
 		{ icon: LayoutGrid, label: '대시보드', href: '/' },
 		{ icon: Disc3, label: '앨범 관리', href: '/albums' },
 		{ icon: Music, label: '트랙 관리', href: '/tracks' },
+		{ icon: Video, label: '뮤직비디오 센터', href: '/music-videos' },
 		{ icon: FolderOpen, label: '업로드·검증 센터', href: '/upload' },
 		{ icon: Heart, label: '제작·협업 보드', href: '/collaboration' },
 		{ icon: Rocket, label: '발매 관리', href: '/releases' },

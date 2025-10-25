@@ -1,5 +1,10 @@
 <script lang="ts">
-	import { Music, Plus, Search, Play, Pause, Edit, Trash2, Download, Share } from 'lucide-svelte';
+	import { Music, Plus, Play, Edit, Download, Share, Video } from 'lucide-svelte';
+	import PageHeader from '$lib/components/PageHeader.svelte';
+	import PageContent from '$lib/components/PageContent.svelte';
+	import SearchFilterBar from '$lib/components/SearchFilterBar.svelte';
+	import EmptyState from '$lib/components/EmptyState.svelte';
+
 	let searchQuery = '';
 	let selectedGenre = 'all';
 	let tracks = [
@@ -52,15 +57,22 @@
 			fileSize: '8.9MB'
 		}
 	];
+
 	const genres = ['all', 'Electronic', 'Pop', 'Rock', 'Jazz', 'Classical'];
+	const filterOptions = genres.map(genre => ({
+		value: genre,
+		label: genre === 'all' ? '모든 장르' : genre
+	}));
+
 	function getStatusColor(status: string) {
 		switch (status) {
-			case 'published': return 'text-green-500 bg-green-500/10';
-			case 'draft': return 'text-yellow-500 bg-yellow-500/10';
-			case 'archived': return 'text-gray-500 bg-gray-500/10';
-			default: return 'text-gray-500 bg-gray-500/10';
+			case 'published': return 'badge-low-green';
+			case 'draft': return 'badge-medium-yellow';
+			case 'archived': return 'text-text-muted';
+			default: return 'text-text-muted';
 		}
 	}
+
 	function getStatusLabel(status: string) {
 		switch (status) {
 			case 'published': return '발매됨';
@@ -69,6 +81,7 @@
 			default: return '알 수 없음';
 		}
 	}
+
 	const filteredTracks = tracks.filter(track => {
 		const matchesSearch = track.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
 							 track.artist.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -76,46 +89,39 @@
 		const matchesGenre = selectedGenre === 'all' || track.genre === selectedGenre;
 		return matchesSearch && matchesGenre;
 	});
+
+	function handleCreateTrack() {
+		console.log('새 트랙 추가');
+	}
 </script>
-	<div class="w-full">
-		<!-- 헤더 -->
-		<div class="page-header">
-			<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-				<div>
-					<h1>트랙 관리</h1>
-					<p>음악 트랙을 관리하고 분석하세요.</p>
-				</div>
-				<button class="btn-primary" type="button">
-					<Plus size={16} />
-					새 트랙 추가
-				</button>
-			</div>
-		</div>
-		<!-- 검색 및 필터 -->
-		<div class="page-content">
-			<div class="flex flex-col sm:flex-row gap-4 mb-8">
-				<div class="search-input flex-1">
-					<Search size={16} class="search-icon" />
-					<input 
-						type="text" 
-						placeholder="트랙, 아티스트 또는 앨범 검색..."
-						bind:value={searchQuery}
-					/>
-				</div>
-				<select 
-					bind:value={selectedGenre}
-					class="filter-select"
-				>
-					{#each genres as genre}
-						<option value={genre}>{genre === 'all' ? '모든 장르' : genre}</option>
-					{/each}
-				</select>
-			</div>
-		<!-- 트랙 목록 -->
-		<div class="bg-surface-2 rounded-lg overflow-hidden">
+<PageContent>
+	<PageHeader 
+		title="트랙 관리" 
+		description="음악 트랙을 관리하고 분석하세요."
+		actions={[
+			{
+				icon: Plus,
+				label: '새 트랙 추가',
+				onclick: handleCreateTrack
+			}
+		]}
+	/>
+
+	<!-- 검색 및 필터 -->
+	<SearchFilterBar 
+		bind:searchQuery
+		bind:selectedFilter={selectedGenre}
+		searchPlaceholder="트랙, 아티스트 또는 앨범 검색..."
+		showFilter={true}
+		{filterOptions}
+	/>
+
+	<!-- 트랙 목록 -->
+	{#if filteredTracks.length > 0}
+		<div class="bg-surface-1 rounded-lg overflow-hidden border border-border-subtle">
 			<div class="overflow-x-auto">
 				<table class="w-full">
-					<thead class="bg-surface-1 border-b border-border-subtle">
+					<thead class="bg-surface-2 border-b border-border-subtle">
 						<tr>
 							<th class="px-6 py-3 text-left text-xs font-medium text-text-muted uppercase tracking-wider">트랙</th>
 							<th class="px-6 py-3 text-left text-xs font-medium text-text-muted uppercase tracking-wider">아티스트</th>
@@ -129,10 +135,10 @@
 					</thead>
 					<tbody class="divide-y divide-border-subtle">
 						{#each filteredTracks as track (track.id)}
-							<tr class="hover:bg-surface-1 transition-colors">
+							<tr class="hover:bg-surface-2 transition-colors duration-200">
 								<td class="px-6 py-4 whitespace-nowrap">
 									<div class="flex items-center gap-3">
-										<button class="w-8 h-8 bg-surface-1 rounded-full flex items-center justify-center hover:bg-brand-pink hover:text-white transition-colors" type="button">
+										<button class="w-8 h-8 bg-surface-2 rounded-full flex items-center justify-center hover:bg-brand-pink hover:text-white transition-colors duration-200">
 											<Play size={14} class="ml-0.5" />
 										</button>
 										<div>
@@ -146,7 +152,7 @@
 								<td class="px-6 py-4 whitespace-nowrap text-sm text-text-muted">{track.genre}</td>
 								<td class="px-6 py-4 whitespace-nowrap text-sm text-text-muted">{track.duration}</td>
 								<td class="px-6 py-4 whitespace-nowrap">
-									<span class="px-2 py-1 text-xs font-medium rounded-full {getStatusColor(track.status)}">
+									<span class="badge-base {getStatusColor(track.status)}">
 										{getStatusLabel(track.status)}
 									</span>
 								</td>
@@ -157,15 +163,18 @@
 									</div>
 								</td>
 								<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-									<div class="action-buttons justify-end">
-												<button class="action-button" title="편집" type="button">
-											<Edit size={14} />
+									<div class="flex items-center justify-end gap-1">
+										<button class="w-8 h-8 inline-flex items-center justify-center rounded-md hover:bg-surface-2 transition-colors" title="뮤직비디오 생성">
+											<Video size={14} class="text-text-muted" />
 										</button>
-												<button class="action-button" title="다운로드" type="button">
-											<Download size={14} />
+										<button class="w-8 h-8 inline-flex items-center justify-center rounded-md hover:bg-surface-2 transition-colors" title="편집">
+											<Edit size={14} class="text-text-muted" />
 										</button>
-												<button class="action-button" title="공유" type="button">
-											<Share size={14} />
+										<button class="w-8 h-8 inline-flex items-center justify-center rounded-md hover:bg-surface-2 transition-colors" title="다운로드">
+											<Download size={14} class="text-text-muted" />
+										</button>
+										<button class="w-8 h-8 inline-flex items-center justify-center rounded-md hover:bg-surface-2 transition-colors" title="공유">
+											<Share size={14} class="text-text-muted" />
 										</button>
 									</div>
 								</td>
@@ -175,19 +184,13 @@
 				</table>
 			</div>
 		</div>
-			<!-- 빈 상태 -->
-			{#if filteredTracks.length === 0}
-				<div class="empty-state">
-					<Music size={48} class="empty-state-icon" />
-					<h3>트랙을 찾을 수 없습니다</h3>
-					<p>
-						{searchQuery ? '검색 조건에 맞는 트랙이 없습니다.' : '아직 트랙이 없습니다.'}
-					</p>
-					<button class="btn-primary" type="button">
-						<Plus size={16} />
-						첫 번째 트랙 추가
-					</button>
-				</div>
-			{/if}
-		</div>
-	</div>
+	{:else}
+		<EmptyState 
+			icon={Music}
+			title="트랙을 찾을 수 없습니다"
+			description={searchQuery ? '검색 조건에 맞는 트랙이 없습니다.' : '아직 트랙이 없습니다.'}
+			actionLabel="첫 번째 트랙 추가"
+			onAction={handleCreateTrack}
+		/>
+	{/if}
+</PageContent>

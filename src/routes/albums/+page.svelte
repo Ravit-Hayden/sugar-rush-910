@@ -1,5 +1,9 @@
 <script lang="ts">
-	import { Disc3, Plus, Search, Filter, MoreVertical, Play, Pause, Edit, Trash2 } from 'lucide-svelte';
+	import { Disc3, Plus, MoreVertical, Play, Edit } from 'lucide-svelte';
+	import PageHeader from '$lib/components/PageHeader.svelte';
+	import PageContent from '$lib/components/PageContent.svelte';
+	import SearchFilterBar from '$lib/components/SearchFilterBar.svelte';
+	import EmptyState from '$lib/components/EmptyState.svelte';
 
 	let searchQuery = '';
 	let selectedFilter = 'all';
@@ -41,10 +45,10 @@
 
 	function getStatusColor(status: string) {
 		switch (status) {
-			case 'published': return 'text-green-500 bg-green-500/10';
-			case 'draft': return 'text-yellow-500 bg-yellow-500/10';
-			case 'archived': return 'text-gray-500 bg-gray-500/10';
-			default: return 'text-gray-500 bg-gray-500/10';
+			case 'published': return 'badge-low-green';
+			case 'draft': return 'badge-medium-yellow';
+			case 'archived': return 'text-text-muted';
+			default: return 'text-text-muted';
 		}
 	}
 
@@ -63,51 +67,49 @@
 		const matchesFilter = selectedFilter === 'all' || album.status === selectedFilter;
 		return matchesSearch && matchesFilter;
 	});
+
+	const filterOptions = [
+		{ value: 'all', label: '모든 상태' },
+		{ value: 'published', label: '발매됨' },
+		{ value: 'draft', label: '초안' },
+		{ value: 'archived', label: '보관됨' }
+	];
+
+	function handleCreateAlbum() {
+		// 새 앨범 생성 로직
+		console.log('새 앨범 생성');
+	}
 </script>
 
-	<div class="w-full">
-		<!-- 헤더 -->
-		<div class="page-header">
-			<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-				<div>
-					<h1>앨범 관리</h1>
-					<p>음악 앨범을 관리하고 발매하세요.</p>
-				</div>
-				<button class="btn-primary">
-					<Plus size={16} />
-					새 앨범 만들기
-				</button>
-			</div>
-		</div>
+<PageContent>
+	<PageHeader 
+		title="앨범 관리" 
+		description="음악 앨범을 관리하고 발매하세요."
+		actions={[
+			{
+				icon: Plus,
+				label: '새 앨범 만들기',
+				onclick: handleCreateAlbum
+			}
+		]}
+	/>
 
-		<!-- 검색 및 필터 -->
-		<div class="page-content">
-			<div class="flex flex-col sm:flex-row gap-4 mb-8">
-				<div class="search-input flex-1">
-					<Search size={16} class="search-icon" />
-					<input 
-						type="text" 
-						placeholder="앨범 또는 아티스트 검색..."
-						bind:value={searchQuery}
-					/>
-				</div>
-				<select 
-					bind:value={selectedFilter}
-					class="filter-select"
-				>
-					<option value="all">모든 상태</option>
-					<option value="published">발매됨</option>
-					<option value="draft">초안</option>
-					<option value="archived">보관됨</option>
-				</select>
-			</div>
+	<!-- 검색 및 필터 -->
+	<SearchFilterBar 
+		bind:searchQuery
+		bind:selectedFilter
+		searchPlaceholder="앨범 또는 아티스트 검색..."
+		showFilter={true}
+		{filterOptions}
+	/>
 
-		<!-- 앨범 그리드 -->
+	<!-- 앨범 그리드 -->
+	{#if filteredAlbums.length > 0}
 		<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
 			{#each filteredAlbums as album (album.id)}
-				<div class="bg-surface-2 rounded-lg overflow-hidden hover:bg-surface-1 transition-colors group">
+				<div class="bg-surface-1 rounded-lg overflow-hidden hover:bg-surface-2 transition-colors duration-200 group border border-border-subtle">
 					<!-- 앨범 커버 -->
-					<div class="relative aspect-square bg-surface-1">
+					<div class="relative aspect-square bg-surface-2">
 						<div class="absolute inset-0 flex items-center justify-center">
 							<Disc3 size={48} class="text-text-muted" />
 						</div>
@@ -119,7 +121,7 @@
 						</div>
 						<!-- 상태 배지 -->
 						<div class="absolute top-2 right-2">
-							<span class="px-2 py-1 text-xs font-medium rounded-full {getStatusColor(album.status)}">
+							<span class="badge-base {getStatusColor(album.status)}">
 								{getStatusLabel(album.status)}
 							</span>
 						</div>
@@ -137,12 +139,12 @@
 
 						<div class="flex items-center justify-between">
 							<span class="text-xs text-text-muted">{album.plays.toLocaleString()}회 재생</span>
-							<div class="action-buttons">
-								<button class="action-button">
-									<Edit size={14} />
+							<div class="flex items-center gap-1">
+								<button class="w-8 h-8 inline-flex items-center justify-center rounded-md hover:bg-surface-2 transition-colors">
+									<Edit size={14} class="text-text-muted" />
 								</button>
-								<button class="action-button">
-									<MoreVertical size={14} />
+								<button class="w-8 h-8 inline-flex items-center justify-center rounded-md hover:bg-surface-2 transition-colors">
+									<MoreVertical size={14} class="text-text-muted" />
 								</button>
 							</div>
 						</div>
@@ -150,20 +152,13 @@
 				</div>
 			{/each}
 		</div>
-
-			<!-- 빈 상태 -->
-			{#if filteredAlbums.length === 0}
-				<div class="empty-state">
-					<Disc3 size={48} class="empty-state-icon" />
-					<h3>앨범을 찾을 수 없습니다</h3>
-					<p>
-						{searchQuery ? '검색 조건에 맞는 앨범이 없습니다.' : '아직 앨범이 없습니다.'}
-					</p>
-					<button class="btn-primary">
-						<Plus size={16} />
-						첫 번째 앨범 만들기
-					</button>
-				</div>
-			{/if}
-		</div>
-	</div>
+	{:else}
+		<EmptyState 
+			icon={Disc3}
+			title="앨범을 찾을 수 없습니다"
+			description={searchQuery ? '검색 조건에 맞는 앨범이 없습니다.' : '아직 앨범이 없습니다.'}
+			actionLabel="첫 번째 앨범 만들기"
+			onAction={handleCreateAlbum}
+		/>
+	{/if}
+</PageContent>

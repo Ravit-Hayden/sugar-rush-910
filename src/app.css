@@ -165,10 +165,57 @@ html {
   box-sizing: border-box;
 }
 
-/* 파이어폭스 전용 - 스크롤바 오버레이 방식이므로 원래 패딩 유지 */
+/* 모든 페이지 컨텐츠 영역에 일관된 스크롤바 위치 적용 - 최적화됨 */
+.content-area,
+.page-content,
+.dashboard-body,
+.content-panel,
+main,
+.PageContent,
+.page-wrapper,
+.content-wrapper,
+.app-content,
+.layout-content,
+.container,
+.wrapper,
+div[class*="content"],
+div[class*="page"],
+div[class*="main"],
+div[class*="container"],
+/* 추가 포괄적 선택자 */
+div[class*="wrapper"],
+div[class*="layout"],
+div[class*="app"],
+div[class*="body"],
+div[class*="area"],
+div[class*="panel"] {
+  padding-right: 16px !important; /* 스크롤바 공간 확보 */
+}
+
+/* 파이어폭스 전용 - 스크롤바 오버레이 방식이므로 원래 패딩 유지 - 최적화됨 */
 @-moz-document url-prefix() {
   .main-content-area {
     padding-left: 24px !important; /* 파이어폭스에서는 24px 패딩 */
+    padding-right: 24px !important; /* 파이어폭스에서는 24px 패딩 */
+  }
+  
+  /* 모든 페이지 컨텐츠 영역에도 파이어폭스 전용 패딩 적용 */
+  .content-area,
+  .page-content,
+  .dashboard-body,
+  .content-panel,
+  main,
+  .PageContent,
+  .page-wrapper,
+  .content-wrapper,
+  .app-content,
+  .layout-content,
+  .container,
+  .wrapper,
+  div[class*="content"],
+  div[class*="page"],
+  div[class*="main"],
+  div[class*="container"] {
     padding-right: 24px !important; /* 파이어폭스에서는 24px 패딩 */
   }
 }
@@ -327,12 +374,6 @@ html {
   color: var(--hover-cyan) !important;
 }
 
-/* 라이트 모드에서 카드 호버 테두리 색상 변경 */
-[data-theme="light"] main.main-content-area .bg-surface-1:hover,
-[data-theme="light"] main.main-content-area .bg-surface-2:hover {
-  border-color: var(--hover-cyan) !important;
-}
-
 /* 라이트 모드에서 일반 버튼 호버 배경 색상 변경 (테마 토글 버튼 제외) */
 [data-theme="light"] button:hover:not([class*="bg-"]):not(.theme-toggle-button) {
   background-color: var(--surface-1) !important;
@@ -462,6 +503,8 @@ input:focus {
   header .flex-1.justify-end {
     justify-content: flex-start;
   }
+  
+  /* 모바일에서 스크롤바 위치 일관성 보장 - 중복 제거됨 */
 }
 
 @media (min-width: 768px) {
@@ -476,6 +519,8 @@ input:focus {
   header .flex-1.justify-end {
     justify-content: flex-end;
   }
+  
+  /* 데스크톱에서 스크롤바 위치 일관성 보장 - 중복 제거됨 */
 }
 .sidebar-menu-item {
   transition: all 200ms ease-in-out;
@@ -653,7 +698,7 @@ input[type="checkbox"]:checked::after {
    개별 요소 hover 효과
    ========================= */
 
-/* 카드 호버 효과 - 메인 영역의 카드/패널에만 적용 */
+/* 카드 호버 효과 - 메인 영역의 카드/패널에만 적용 (라이트/다크 모드 통합) */
 main.main-content-area .bg-surface-1:hover,
 main.main-content-area .bg-surface-2:hover {
   border-color: var(--hover-cyan) !important;
@@ -843,3 +888,171 @@ input:focus-visible, button:focus-visible {
 /* 현재 data-theme에 맞춰 브라우저 기본 위젯 색 힌트 */
 :root[data-theme="dark"] { color-scheme: dark; }
 :root[data-theme="light"] { color-scheme: light; }
+
+/* 검색창 상태별 스타일링 - 강제 적용 */
+.group .lucide-search,
+.group .lucide-filter {
+  transition: color 0.3s ease !important;
+}
+
+/* 기본 상태 */
+.group .lucide-search,
+.group .lucide-filter {
+  color: var(--text-base) !important;
+}
+
+.group input,
+.group select {
+  border-color: var(--border-subtle) !important;
+  transition: border-color 0.3s ease !important;
+}
+
+/* 호버 상태 (포커스가 아닐 때만) */
+.group:hover:not(:focus-within) .lucide-search,
+.group:hover:not(:focus-within) .lucide-filter {
+  color: var(--hover-cyan) !important;
+}
+
+.group:hover:not(:focus-within) input,
+.group:hover:not(:focus-within) select {
+  border-color: var(--hover-cyan) !important;
+}
+
+/* 포커스 상태 */
+.group:focus-within .lucide-search,
+.group:focus-within .lucide-filter {
+  color: var(--brand-pink) !important;
+}
+
+.group:focus-within input,
+.group:focus-within select {
+  border-color: var(--brand-pink) !important;
+}
+
+/* 포커스+호버: 포커스가 우선 */
+.group:focus-within:hover .lucide-search,
+.group:focus-within:hover .lucide-filter {
+  color: var(--brand-pink) !important;
+}
+
+/* ============================================================
+   Sugar Rush Admin 레이아웃 보정 (최종 안정 + 안전망 버전)
+   ------------------------------------------------------------
+   해결 내역:
+   ✅ 헤더/메인 우측 끝 완전 정렬
+   ✅ 스크롤바 유무와 무관하게 레이아웃 고정
+   ✅ 메인/사이드바 콘텐츠 헤더 겹침 방지
+   ✅ Chrome, Firefox, Edge, Safari 모두 호환
+   ✅ 선택자 안전망 추가 (클래스명이 다를 경우 대비)
+   
+   적용 범위:
+   - 기존 HTML/Svelte/Tailwind 완전 보존
+   - 기존 디자인 완전 유지
+   - CSS만 추가
+   ============================================================ */
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   1단계: CSS 변수 정의
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+:root {
+  --sbw: 8px;              /* 스크롤바 폭 */
+  --pad-right: 16px;       /* 우측 기본 패딩 */
+  --header-height: 80px;   /* 헤더 높이 (h-20 = 80px) */
+}
+
+/* 전역 박스 모델 통일 - 최적화됨 */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   3단계: 스크롤 기본 설정
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+html,
+body {
+  overflow-x: hidden;
+}
+
+html {
+  scrollbar-gutter: stable; /* 스크롤바 공간 항상 예약 */
+  height: 100%;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   4단계: 구형 브라우저 대응 (IE, Safari 구버전)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+@supports not (scrollbar-gutter: stable) {
+  html {
+    overflow-y: scroll; /* 스크롤바 항상 표시 (레이아웃 고정) */
+  }
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   5단계: 헤더/메인 영역 우측 여백 정렬 + 안전망
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* 기본 선택자: .main-content-area 클래스 */
+header,
+.main-content-area {
+  box-sizing: border-box !important;
+  padding-right: calc(var(--pad-right) + var(--sbw)) !important;
+}
+
+/* 안전망: 다른 메인 래퍼 클래스들도 대비 */
+.page-wrapper,
+.content-wrapper,
+main.main-content,
+[data-main-content] {
+  box-sizing: border-box !important;
+  padding-right: calc(var(--pad-right) + var(--sbw)) !important;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   6단계: 메인 영역 헤더 아래에서 시작 (겹침 방지) + 안전망
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* 기본 선택자 */
+.main-content-area {
+  padding-top: var(--header-height) !important;
+}
+
+/* 안전망: 다른 메인 래퍼들도 대비 */
+.page-wrapper,
+.content-wrapper,
+main.main-content,
+[data-main-content] {
+  padding-top: var(--header-height) !important;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   7단계: 스크롤바 스타일 (시각적 최소화)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+/* Chrome / Edge / Safari */
+*::-webkit-scrollbar {
+  width: var(--sbw);
+  height: var(--sbw);
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 9999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.35);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.35) transparent;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   적용 완료
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */

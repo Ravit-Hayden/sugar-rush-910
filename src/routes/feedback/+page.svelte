@@ -1,5 +1,8 @@
 <script lang="ts">
 	import { MessageSquare, Bell, User, Clock, CheckCircle, AlertCircle, Star, Reply, Archive, Trash2, Filter, Search } from 'lucide-svelte';
+	import PageHeader from '$lib/components/PageHeader.svelte';
+	import PageContent from '$lib/components/PageContent.svelte';
+	import SearchFilterBar from '$lib/components/SearchFilterBar.svelte';
 
 	let searchQuery = '';
 	let selectedFilter = 'all';
@@ -85,11 +88,11 @@
 
 	function getStatusColor(status: string) {
 		switch (status) {
-			case 'unread': return 'text-blue-500 bg-blue-500/10';
-			case 'read': return 'text-gray-500 bg-gray-500/10';
-			case 'replied': return 'text-green-500 bg-green-500/10';
-			case 'archived': return 'text-yellow-500 bg-yellow-500/10';
-			default: return 'text-gray-500 bg-gray-500/10';
+			case 'unread': return 'badge-info-blue';
+			case 'read': return 'text-text-muted';
+			case 'replied': return 'badge-low-green';
+			case 'archived': return 'badge-medium-yellow';
+			default: return 'text-text-muted';
 		}
 	}
 
@@ -105,10 +108,10 @@
 
 	function getPriorityColor(priority: string) {
 		switch (priority) {
-			case 'high': return 'text-red-500 bg-red-500/10';
-			case 'medium': return 'text-yellow-500 bg-yellow-500/10';
-			case 'low': return 'text-green-500 bg-green-500/10';
-			default: return 'text-gray-500 bg-gray-500/10';
+			case 'high': return 'badge-high-urgent';
+			case 'medium': return 'badge-medium-yellow';
+			case 'low': return 'badge-low-green';
+			default: return 'text-text-muted';
 		}
 	}
 
@@ -123,10 +126,10 @@
 
 	function getNotificationTypeColor(type: string) {
 		switch (type) {
-			case 'feedback': return 'text-brand-pink bg-brand-pink/10';
-			case 'release': return 'text-blue-500 bg-blue-500/10';
-			case 'system': return 'text-green-500 bg-green-500/10';
-			default: return 'text-gray-500 bg-gray-500/10';
+			case 'feedback': return 'badge-high-urgent';
+			case 'release': return 'badge-info-blue';
+			case 'system': return 'badge-low-green';
+			default: return 'text-text-muted';
 		}
 	}
 
@@ -152,37 +155,30 @@
 </script>
 
 <div>
-	<div class="w-full">
-		<!-- 헤더 -->
-		<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-			<div>
-				<h1 class="text-3xl font-bold text-text-strong mb-2">피드백·알림 센터</h1>
-				<p class="text-text-muted">사용자 피드백과 시스템 알림을 관리하세요.</p>
-			</div>
-			<div class="flex items-center gap-2">
-				<span class="text-sm text-text-muted">읽지 않은 피드백: {unreadCount}개</span>
-				<span class="text-sm text-text-muted">읽지 않은 알림: {notificationUnreadCount}개</span>
-			</div>
-		</div>
+	<PageContent>
+		<PageHeader 
+			title="피드백·알림 센터" 
+			description="사용자 피드백과 시스템 알림을 관리하세요."
+		/>
 
 		<!-- 탭 네비게이션 -->
 		<div class="mb-8">
 			<div class="border-b border-border-subtle">
 				<nav class="-mb-px flex space-x-8">
-				<button
-					onclick={() => selectedTab = 'feedback'}
-					class="py-2 px-1 border-b-2 font-medium text-sm transition-colors {selectedTab === 'feedback' ? 'border-brand-pink text-brand-pink' : 'border-transparent text-text-muted hover:text-text-strong hover:border-border-subtle'}"
-					type="button"
+					<button
+						onclick={() => selectedTab = 'feedback'}
+						class="py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200 {selectedTab === 'feedback' ? 'border-brand-pink text-brand-pink' : 'border-transparent text-text-muted hover:text-text-strong hover:border-border-subtle'}"
+						type="button"
 					>
 						<div class="flex items-center gap-2">
 							<MessageSquare size={16} />
 							피드백 ({feedbacks.length})
 						</div>
 					</button>
-				<button
-					onclick={() => selectedTab = 'notifications'}
-					class="py-2 px-1 border-b-2 font-medium text-sm transition-colors {selectedTab === 'notifications' ? 'border-brand-pink text-brand-pink' : 'border-transparent text-text-muted hover:text-text-strong hover:border-border-subtle'}"
-					type="button"
+					<button
+						onclick={() => selectedTab = 'notifications'}
+						class="py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200 {selectedTab === 'notifications' ? 'border-brand-pink text-brand-pink' : 'border-transparent text-text-muted hover:text-text-strong hover:border-border-subtle'}"
+						type="button"
 					>
 						<div class="flex items-center gap-2">
 							<Bell size={16} />
@@ -197,32 +193,24 @@
 			<!-- 피드백 섹션 -->
 			<div class="mb-8">
 				<!-- 검색 및 필터 -->
-				<div class="flex flex-col sm:flex-row gap-4 mb-6">
-					<div class="flex-1 relative">
-						<Search size={16} class="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-muted" />
-						<input 
-							type="text" 
-							placeholder="피드백 검색..."
-							bind:value={searchQuery}
-							class="w-full pl-10 pr-4 py-2 bg-surface-2 border border-border-subtle rounded-md text-text-strong placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-brand-pink focus:border-transparent"
-						/>
-					</div>
-					<select 
-						bind:value={selectedFilter}
-						class="px-4 py-2 bg-surface-2 border border-border-subtle rounded-md text-text-strong focus:outline-none focus:ring-2 focus:ring-brand-pink focus:border-transparent"
-					>
-						<option value="all">모든 상태</option>
-						<option value="unread">읽지 않음</option>
-						<option value="read">읽음</option>
-						<option value="replied">답변됨</option>
-						<option value="archived">보관됨</option>
-					</select>
-				</div>
+				<SearchFilterBar
+					bind:searchQuery
+					bind:selectedFilter
+					searchPlaceholder="피드백 검색..."
+					showFilter={true}
+					filterOptions={[
+						{ value: 'all', label: '모든 상태' },
+						{ value: 'unread', label: '읽지 않음' },
+						{ value: 'read', label: '읽음' },
+						{ value: 'replied', label: '답변됨' },
+						{ value: 'archived', label: '보관됨' }
+					]}
+				/>
 
 				<!-- 피드백 목록 -->
 				<div class="space-y-4">
 					{#each filteredFeedbacks as feedback (feedback.id)}
-						<div class="bg-surface-2 rounded-lg p-6 hover:bg-surface-1 transition-colors {feedback.status === 'unread' ? 'ring-2 ring-brand-pink/20' : ''}">
+						<div class="bg-surface-1 rounded-lg p-6 hover:bg-surface-2 transition-colors duration-200 border border-border-subtle {feedback.status === 'unread' ? 'ring-2 ring-brand-pink/20' : ''}">
 							<div class="flex items-start gap-4">
 								<!-- 아바타 -->
 								<div class="flex-shrink-0">
@@ -247,11 +235,11 @@
 										</div>
 										<div class="flex items-center gap-2">
 											<!-- 우선순위 -->
-											<span class="px-2 py-1 text-xs font-medium rounded-full {getPriorityColor(feedback.priority)}">
+											<span class="badge-base {getPriorityColor(feedback.priority)}">
 												{getPriorityLabel(feedback.priority)}
 											</span>
 											<!-- 상태 -->
-											<span class="px-2 py-1 text-xs font-medium rounded-full {getStatusColor(feedback.status)}">
+											<span class="badge-base {getStatusColor(feedback.status)}">
 												{getStatusLabel(feedback.status)}
 											</span>
 										</div>
@@ -282,15 +270,15 @@
 
 									<!-- 액션 버튼 -->
 									<div class="flex items-center gap-2">
-										<button class="inline-flex items-center gap-1 px-1.5 py-1 text-sm bg-brand-pink text-white rounded hover:bg-brand-pink/90 transition-colors" type="button">
+										<button class="inline-flex items-center gap-1 px-3 py-1.5 text-sm bg-brand-pink text-white rounded-lg hover:bg-brand-pink/90 transition-colors duration-200 font-medium" type="button">
 											<Reply size={14} />
 											답변
 										</button>
-										<button class="inline-flex items-center gap-1 px-1.5 py-1 text-sm bg-surface-1 text-text-muted rounded hover:bg-surface-2 transition-colors" type="button">
+										<button class="inline-flex items-center gap-1 px-3 py-1.5 text-sm bg-surface-2 text-text-muted rounded-lg hover:bg-surface-1 transition-colors duration-200 font-medium" type="button">
 											<Archive size={14} />
 											보관
 										</button>
-										<button class="inline-flex items-center gap-1 px-1.5 py-1 text-sm bg-red-500/10 text-red-500 rounded hover:bg-red-500/20 transition-colors" type="button">
+										<button class="inline-flex items-center gap-1 px-3 py-1.5 text-sm bg-red-500/10 text-red-500 rounded-lg hover:bg-red-500/20 transition-colors duration-200 font-medium" type="button">
 											<Trash2 size={14} />
 											삭제
 										</button>
@@ -316,10 +304,10 @@
 			<!-- 알림 섹션 -->
 			<div class="space-y-4">
 				{#each notifications as notification (notification.id)}
-					<div class="bg-surface-2 rounded-lg p-4 hover:bg-surface-1 transition-colors {notification.status === 'unread' ? 'ring-2 ring-brand-pink/20' : ''}">
+					<div class="bg-surface-1 rounded-lg p-4 hover:bg-surface-2 transition-colors duration-200 border border-border-subtle {notification.status === 'unread' ? 'ring-2 ring-brand-pink/20' : ''}">
 						<div class="flex items-start gap-3">
 							<div class="flex-shrink-0">
-								<div class="w-8 h-8 bg-surface-1 rounded-full flex items-center justify-center">
+								<div class="w-8 h-8 bg-surface-2 rounded-full flex items-center justify-center border border-border-subtle">
 									<Bell size={16} class="text-brand-pink" />
 								</div>
 							</div>
@@ -329,7 +317,7 @@
 										<h4 class="text-sm font-medium text-text-strong mb-1">{notification.title}</h4>
 										<p class="text-sm text-text-muted mb-2">{notification.message}</p>
 										<div class="flex items-center gap-2">
-											<span class="px-2 py-1 text-xs font-medium rounded-full {getNotificationTypeColor(notification.type)}">
+											<span class="badge-base {getNotificationTypeColor(notification.type)}">
 												{getNotificationTypeLabel(notification.type)}
 											</span>
 											<span class="text-xs text-text-muted flex items-center gap-1">
@@ -342,7 +330,7 @@
 										{#if notification.status === 'unread'}
 											<div class="w-2 h-2 bg-brand-pink rounded-full"></div>
 										{/if}
-										<button class="p-1 hover:bg-surface-1 rounded transition-colors" type="button">
+										<button class="p-1 hover:bg-surface-2 rounded transition-colors duration-200" type="button">
 											<Trash2 size={14} class="text-text-muted" />
 										</button>
 									</div>
@@ -362,5 +350,5 @@
 				</div>
 			{/if}
 		{/if}
-	</div>
+	</PageContent>
 </div>

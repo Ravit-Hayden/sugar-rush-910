@@ -11,6 +11,7 @@
 		{ href: '/', label: '대시보드' },
 		{ href: '/albums', label: '앨범 관리' },
 		{ href: '/tracks', label: '트랙 관리' },
+		{ href: '/music-videos', label: '뮤직비디오 센터' },
 		{ href: '/upload', label: '업로드·검증 센터' },
 		{ href: '/collaboration', label: '제작·협업 보드' },
 		{ href: '/releases', label: '발매 관리' },
@@ -61,13 +62,13 @@
 		<!-- 오른쪽 섹션: 검색창, 알림, 테마 토글 -->
 		<div class="flex items-center gap-2 sm:gap-4 flex-1 justify-end">
 			<!-- 검색창 -->
-			<div class="flex items-center search-container">
+			<div class="flex items-center search-container group">
 				<div class="relative w-full min-w-[120px] sm:min-w-[160px] md:min-w-[200px] lg:min-w-[240px] xl:min-w-[280px] max-w-[320px]">
-					<Search size={16} class="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-base lucide-icon" />
+					<Search size={16} class="absolute left-3 top-1/2 transform -translate-y-1/2 lucide-icon lucide-search" />
 					<input
 						type="text"
 						placeholder="검색..."
-						class="pl-10 pr-10 py-1.5 w-full bg-surface-1 border border-border-subtle border-[1px] rounded-md text-text-base placeholder-text-muted hover:border-hover-cyan focus:outline-none focus:ring-0 focus:border-[1px] focus:border-brand-pink transition-colors duration-300"
+						class="pl-10 pr-10 py-1.5 w-full bg-surface-1 border border-border-subtle border-[1px] rounded-md text-text-base placeholder-text-muted focus:outline-none focus:ring-0"
 					/>
 				</div>
 			</div>
