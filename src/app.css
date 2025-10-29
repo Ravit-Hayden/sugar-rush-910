@@ -1097,3 +1097,91 @@ main.main-content,
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    적용 완료
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+.filter-dropdown { position: relative }
+.filter-dropdown button { border-color: var(--border-subtle) !important }
+.filter-dropdown:hover button { border-color: var(--hover-cyan) !important }
+.filter-dropdown:focus-within button { border-color: var(--brand-pink) !important }
+.filter-dropdown[data-open="true"] > button { border-color: var(--brand-pink) !important }
+
+.filter-dropdown ul { margin-top: 6px !important; margin-bottom: 0 !important; padding-top: 0 !important; padding-bottom: 0 !important; border-color: var(--border-subtle) !important; border-radius: 6px; overflow: hidden; box-shadow: none !important }
+.filter-dropdown [role="option"] { display: block; margin: 0; border-radius: 0 !important; padding: 8px 16px; font-size: .875rem; line-height: 1.5; color: var(--text-base); transition: background-color .15s, color .15s }
+
+.filter-dropdown [role="option"][aria-selected="true"] { background-color: var(--brand-pink) !important; color: #fff !important }
+.filter-dropdown [role="option"]:hover:not([aria-selected="true"]) { background-color: var(--hover-cyan) !important; color: #000 !important }
+.filter-dropdown [role="option"]:focus-visible:not([aria-selected="true"]) { background-color: var(--brand-pink) !important; color: #fff !important; outline: none }
+
+[data-theme="light"] .filter-dropdown [role="option"]:hover:not([aria-selected="true"]) { background-color: var(--hover-cyan) !important; color: var(--surface-2) !important }
+[data-theme="light"] .filter-dropdown [role="option"]:focus-visible:not([aria-selected="true"]) { background-color: var(--brand-pink) !important; color: #fff !important }
+
+.filter-dropdown *:focus { outline: none !important; box-shadow: none }
+.filter-dropdown *:focus-visible { outline: none !important; box-shadow: none }
+
+.filter-dropdown ul:hover { border-color: var(--border-subtle) !important }
+.filter-dropdown [role="option"].rounded-md { border-radius: 0 !important }
+
+.filter-dropdown [role="option"][aria-selected="true"]:hover,
+.filter-dropdown [role="option"][aria-selected="true"]:focus,
+.filter-dropdown [role="option"][aria-selected="true"]:focus-visible {
+  background-color: var(--brand-pink) !important;
+  color: #fff !important;
+}
+
+
+.filter-dropdown [role="option"],
+.filter-dropdown [role="option"].rounded,
+.filter-dropdown [role="option"].rounded-md,
+.filter-dropdown [role="option"].rounded-lg {
+  border-radius: 0 !important;
+}
+
+.filter-dropdown [role="option"]:hover:not([aria-selected="true"]) {
+  background-color: var(--hover-cyan) !important;
+}
+.filter-dropdown [role="option"]:focus-visible:not([aria-selected="true"]) {
+  background-color: var(--brand-pink) !important; color:#fff !important; outline: none;
+}
+
+[data-theme="light"] .filter-dropdown [role="option"]:hover:not([aria-selected="true"]) {
+  color: var(--surface-2) !important;
+}
+
+.filter-dropdown[data-open="true"] > button {
+  border-color: var(--brand-pink) !important;
+}
+.filter-dropdown[data-open="true"]:hover > button,
+.filter-dropdown[data-open="true"]:focus-within > button {
+  border-color: var(--brand-pink) !important;
+}
+
+.filter-dropdown *:focus,
+.filter-dropdown *:focus-visible {
+  outline: none !important; box-shadow: none !important;
+}
+
+button.bg-brand-pink:hover,
+button[class*="bg-brand-pink"]:hover,
+button.hover\:bg-brand-pink\/90:hover {
+  background-color: var(--hover-cyan) !important;
+  color: #000000 !important;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+button.bg-brand-pink:hover .lucide-icon,
+button[class*="bg-brand-pink"]:hover .lucide-icon,
+button.hover\:bg-brand-pink\/90:hover .lucide-icon {
+  color: #000000 !important;
+}
+
+[data-theme="light"] button.bg-brand-pink:hover,
+[data-theme="light"] button[class*="bg-brand-pink"]:hover,
+[data-theme="light"] button.hover\:bg-brand-pink\/90:hover {
+  background-color: var(--hover-cyan) !important;
+  color: var(--surface-2) !important;
+}
+
+[data-theme="light"] button.bg-brand-pink:hover .lucide-icon,
+[data-theme="light"] button[class*="bg-brand-pink"]:hover .lucide-icon,
+[data-theme="light"] button.hover\:bg-brand-pink\/90:hover .lucide-icon {
+  color: var(--surface-2) !important;
+}

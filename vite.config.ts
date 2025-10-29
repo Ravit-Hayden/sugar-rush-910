@@ -8,7 +8,7 @@ export default defineConfig({
 		hmr: {
 			port: 5173
 		},
-		host: 'localhost',
+		host: true,
 		port: 5173
 	},
 	test: {
