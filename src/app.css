@@ -928,49 +928,49 @@ input:focus-visible, button:focus-visible {
 :root[data-theme="dark"] { color-scheme: dark; }
 :root[data-theme="light"] { color-scheme: light; }
 
-/* 검색창 상태별 스타일링 - 강제 적용 */
-.group .lucide-search,
-.group .lucide-filter {
+/* 검색창 상태별 스타일링 - 강제 적용 (필터 드롭다운 제외) */
+.group:not(.filter-dropdown) .lucide-search,
+.group:not(.filter-dropdown) .lucide-filter {
   transition: color 0.3s ease !important;
 }
 
 /* 기본 상태 */
-.group .lucide-search,
-.group .lucide-filter {
+.group:not(.filter-dropdown) .lucide-search,
+.group:not(.filter-dropdown) .lucide-filter {
   color: var(--text-base) !important;
 }
 
-.group input,
-.group select {
+.group:not(.filter-dropdown) input,
+.group:not(.filter-dropdown) select {
   border-color: var(--border-subtle) !important;
   transition: border-color 0.3s ease !important;
 }
 
 /* 호버 상태 (포커스가 아닐 때만) */
-.group:hover:not(:focus-within) .lucide-search,
-.group:hover:not(:focus-within) .lucide-filter {
+.group:not(.filter-dropdown):hover:not(:focus-within) .lucide-search,
+.group:not(.filter-dropdown):hover:not(:focus-within) .lucide-filter {
   color: var(--hover-cyan) !important;
 }
 
-.group:hover:not(:focus-within) input,
-.group:hover:not(:focus-within) select {
+.group:not(.filter-dropdown):hover:not(:focus-within) input,
+.group:not(.filter-dropdown):hover:not(:focus-within) select {
   border-color: var(--hover-cyan) !important;
 }
 
 /* 포커스 상태 */
-.group:focus-within .lucide-search,
-.group:focus-within .lucide-filter {
+.group:not(.filter-dropdown):focus-within .lucide-search,
+.group:not(.filter-dropdown):focus-within .lucide-filter {
   color: var(--brand-pink) !important;
 }
 
-.group:focus-within input,
-.group:focus-within select {
+.group:not(.filter-dropdown):focus-within input,
+.group:not(.filter-dropdown):focus-within select {
   border-color: var(--brand-pink) !important;
 }
 
 /* 포커스+호버: 포커스가 우선 */
-.group:focus-within:hover .lucide-search,
-.group:focus-within:hover .lucide-filter {
+.group:not(.filter-dropdown):focus-within:hover .lucide-search,
+.group:not(.filter-dropdown):focus-within:hover .lucide-filter {
   color: var(--brand-pink) !important;
 }
 
@@ -1100,9 +1100,39 @@ main.main-content,
 
 .filter-dropdown { position: relative }
 .filter-dropdown button { border-color: var(--border-subtle) !important }
-.filter-dropdown:hover button { border-color: var(--hover-cyan) !important }
+
+.filter-dropdown .lucide-filter { color: var(--text-base) !important; transition: color .2s ease }
+.filter-dropdown button svg { color: var(--text-base) !important; transition: color .2s ease }
+
+.filter-dropdown:hover:not(:focus-within) button { border-color: var(--hover-cyan) !important }
+.filter-dropdown:hover:not(:focus-within) .lucide-filter { color: var(--hover-cyan) !important }
+.filter-dropdown:hover:not(:focus-within) button svg { color: var(--hover-cyan) !important }
+
 .filter-dropdown:focus-within button { border-color: var(--brand-pink) !important }
+.filter-dropdown:focus-within .lucide-filter,
+.filter-dropdown[data-open="true"] .lucide-filter { color: var(--brand-pink) !important }
+.filter-dropdown:focus-within button svg,
+.filter-dropdown[data-open="true"] button svg { color: var(--brand-pink) !important }
+
+.filter-dropdown:focus-within:hover button { border-color: var(--brand-pink) !important }
+.filter-dropdown:focus-within:hover .lucide-filter { color: var(--brand-pink) !important }
+.filter-dropdown:focus-within:hover button svg { color: var(--brand-pink) !important }
+
 .filter-dropdown[data-open="true"] > button { border-color: var(--brand-pink) !important }
+
+[data-theme="light"] .filter-dropdown .lucide-filter { color: var(--text-base) !important }
+[data-theme="light"] .filter-dropdown button svg { color: var(--text-base) !important }
+
+[data-theme="light"] .filter-dropdown:hover:not(:focus-within) .lucide-filter { color: var(--hover-cyan) !important }
+[data-theme="light"] .filter-dropdown:hover:not(:focus-within) button svg { color: var(--hover-cyan) !important }
+
+[data-theme="light"] .filter-dropdown:focus-within .lucide-filter,
+[data-theme="light"] .filter-dropdown[data-open="true"] .lucide-filter { color: var(--brand-pink) !important }
+[data-theme="light"] .filter-dropdown:focus-within button svg,
+[data-theme="light"] .filter-dropdown[data-open="true"] button svg { color: var(--brand-pink) !important }
+
+[data-theme="light"] .filter-dropdown:focus-within:hover .lucide-filter { color: var(--brand-pink) !important }
+[data-theme="light"] .filter-dropdown:focus-within:hover button svg { color: var(--brand-pink) !important }
 
 .filter-dropdown ul { margin-top: 6px !important; margin-bottom: 0 !important; padding-top: 0 !important; padding-bottom: 0 !important; border-color: var(--border-subtle) !important; border-radius: 6px; overflow: hidden; box-shadow: none !important }
 .filter-dropdown [role="option"] { display: block; margin: 0; border-radius: 0 !important; padding: 8px 16px; font-size: .875rem; line-height: 1.5; color: var(--text-base); transition: background-color .15s, color .15s }
@@ -1152,6 +1182,19 @@ main.main-content,
 .filter-dropdown[data-open="true"]:hover > button,
 .filter-dropdown[data-open="true"]:focus-within > button {
   border-color: var(--brand-pink) !important;
+}
+.filter-dropdown[data-open="true"]:hover .lucide-filter,
+.filter-dropdown[data-open="true"]:hover button svg,
+.filter-dropdown[data-open="true"]:focus-within .lucide-filter,
+.filter-dropdown[data-open="true"]:focus-within button svg {
+  color: var(--brand-pink) !important;
+}
+
+[data-theme="light"] .filter-dropdown[data-open="true"]:hover .lucide-filter,
+[data-theme="light"] .filter-dropdown[data-open="true"]:hover button svg,
+[data-theme="light"] .filter-dropdown[data-open="true"]:focus-within .lucide-filter,
+[data-theme="light"] .filter-dropdown[data-open="true"]:focus-within button svg {
+  color: var(--brand-pink) !important;
 }
 
 .filter-dropdown *:focus,
