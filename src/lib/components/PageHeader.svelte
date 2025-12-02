@@ -38,11 +38,11 @@
 		</div>
 		
 		{#if actions && actions.length > 0}
-			<div class="flex items-center gap-3">
+			<div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
 				{#each actions as action}
 					<button 
 						onclick={action.onclick}
-						class="inline-flex items-center gap-2 px-4 py-2 bg-brand-pink text-white rounded-lg hover:bg-brand-pink/90 transition-colors duration-200 font-medium"
+						class="inline-flex items-center justify-center gap-2 px-4 py-2 w-full sm:w-auto bg-brand-pink text-white rounded-lg hover:bg-brand-pink/90 transition-colors duration-200 font-medium"
 					>
 						{#if action.icon}
 							<svelte:component this={action.icon} size={16} />

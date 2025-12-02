@@ -4,16 +4,18 @@
 	import PageContent from '$lib/components/PageContent.svelte';
 	import SearchFilterBar from '$lib/components/SearchFilterBar.svelte';
 	import EmptyState from '$lib/components/EmptyState.svelte';
+	import { getStatusColor, getStatusLabel } from '$lib/utils/status';
 
 	let searchQuery = '';
 	let selectedFilter = 'all';
 	let albums = [
+		// 1. 작곡가/작사가 작업
 		{
 			id: '1',
 			title: 'Sugar Rush Vol.1',
 			artist: 'Sugar Rush',
 			year: 2024,
-			status: 'published',
+			status: 'draft',
 			tracks: 12,
 			duration: '45:30',
 			cover: '/api/placeholder/300/300',
@@ -24,9 +26,9 @@
 			title: 'Summer Night',
 			artist: 'Sugar Rush',
 			year: 2024,
-			status: 'draft',
-			tracks: 1,
-			duration: '3:45',
+			status: 'editing',
+			tracks: 8,
+			duration: '32:15',
 			cover: '/api/placeholder/300/300',
 			plays: 890
 		},
@@ -35,31 +37,116 @@
 			title: 'Demo Collection',
 			artist: 'Various',
 			year: 2024,
+			status: 'revision_requested',
+			tracks: 6,
+			duration: '24:30',
+			cover: '/api/placeholder/300/300',
+			plays: 456
+		},
+		// 2. 편집자 작업
+		{
+			id: '4',
+			title: 'Morning Light',
+			artist: 'Sugar Rush',
+			year: 2024,
+			status: 'pending_review',
+			tracks: 10,
+			duration: '38:20',
+			cover: '/api/placeholder/300/300',
+			plays: 234
+		},
+		{
+			id: '5',
+			title: 'City Lights',
+			artist: 'Sugar Rush',
+			year: 2024,
+			status: 'under_review',
+			tracks: 9,
+			duration: '35:45',
+			cover: '/api/placeholder/300/300',
+			plays: 345
+		},
+		{
+			id: '6',
+			title: 'Ocean Wave',
+			artist: 'Sugar Rush',
+			year: 2024,
+			status: 'editing_complete',
+			tracks: 11,
+			duration: '42:10',
+			cover: '/api/placeholder/300/300',
+			plays: 567
+		},
+		{
+			id: '7',
+			title: 'Mountain Peak',
+			artist: 'Various',
+			year: 2024,
+			status: 'approved',
+			tracks: 7,
+			duration: '28:50',
+			cover: '/api/placeholder/300/300',
+			plays: 890
+		},
+		// 3. 발매업체 작업
+		{
+			id: '8',
+			title: 'Desert Storm',
+			artist: 'Sugar Rush',
+			year: 2024,
+			status: 'scheduled',
+			tracks: 12,
+			duration: '48:15',
+			cover: '/api/placeholder/300/300',
+			plays: 1120
+		},
+		{
+			id: '9',
+			title: 'Sugar Rush Vol.2',
+			artist: 'Sugar Rush',
+			year: 2024,
+			status: 'published',
+			tracks: 15,
+			duration: '56:30',
+			cover: '/api/placeholder/300/300',
+			plays: 2150
+		},
+		// 4. 공통 상태
+		{
+			id: '10',
+			title: 'Evening Breeze',
+			artist: 'Sugar Rush',
+			year: 2024,
+			status: 'paused',
+			tracks: 5,
+			duration: '20:00',
+			cover: '/api/placeholder/300/300',
+			plays: 0
+		},
+		{
+			id: '11',
+			title: 'Midnight Drive',
+			artist: 'Various',
+			year: 2024,
 			status: 'archived',
 			tracks: 8,
 			duration: '28:15',
 			cover: '/api/placeholder/300/300',
-			plays: 456
+			plays: 234
+		},
+		// 5. 삭제됨
+		{
+			id: '12',
+			title: 'Deleted Album',
+			artist: 'Sugar Rush',
+			year: 2024,
+			status: 'deleted',
+			tracks: 3,
+			duration: '12:30',
+			cover: '/api/placeholder/300/300',
+			plays: 0
 		}
 	];
-
-	function getStatusColor(status: string) {
-		switch (status) {
-			case 'published': return 'badge-low-green';
-			case 'draft': return 'badge-medium-yellow';
-			case 'archived': return 'text-text-muted';
-			default: return 'text-text-muted';
-		}
-	}
-
-	function getStatusLabel(status: string) {
-		switch (status) {
-			case 'published': return '발매됨';
-			case 'draft': return '초안';
-			case 'archived': return '보관됨';
-			default: return '알 수 없음';
-		}
-	}
 
 	const filteredAlbums = albums.filter(album => {
 		const matchesSearch = album.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -70,9 +157,22 @@
 
 	const filterOptions = [
 		{ value: 'all', label: '모든 상태' },
-		{ value: 'published', label: '발매됨' },
+		// 작곡가/작사가 작업
 		{ value: 'draft', label: '초안' },
-		{ value: 'archived', label: '보관됨' }
+		{ value: 'editing', label: '수정 중' },
+		{ value: 'revision_requested', label: '수정 요청' },
+		// 편집자 작업
+		{ value: 'pending_review', label: '검토 대기' },
+		{ value: 'under_review', label: '검토 중' },
+		{ value: 'editing_complete', label: '편집 완료' },
+		{ value: 'approved', label: '승인됨' },
+		// 발매업체 작업
+		{ value: 'scheduled', label: '발매 예정' },
+		{ value: 'published', label: '발매됨' },
+		// 공통 상태
+		{ value: 'paused', label: '일시정지' },
+		{ value: 'archived', label: '보관됨' },
+		{ value: 'deleted', label: '삭제됨' }
 	];
 
 	function handleCreateAlbum() {
@@ -107,7 +207,7 @@
 	{#if filteredAlbums.length > 0}
 		<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
 			{#each filteredAlbums as album (album.id)}
-				<div class="bg-surface-1 rounded-lg overflow-hidden hover:bg-surface-2 transition-colors duration-200 group border border-border-subtle">
+				<div class="album-card bg-surface-1 rounded-lg overflow-hidden hover:bg-surface-2 transition-colors duration-200 group border border-border-subtle">
 					<!-- 앨범 커버 -->
 					<div class="relative aspect-square bg-surface-2">
 						<div class="absolute inset-0 flex items-center justify-center">
@@ -115,8 +215,8 @@
 						</div>
 						<!-- 플레이 버튼 (호버 시) -->
 						<div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-							<button class="w-12 h-12 bg-brand-pink rounded-full flex items-center justify-center hover:bg-brand-pink/90 transition-colors">
-								<Play size={20} class="text-white ml-1" />
+							<button class="play-button w-12 h-12 bg-brand-pink rounded-full flex items-center justify-center transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-brand-pink focus-visible:outline-offset-2">
+								<Play size={20} class="play-button-icon text-white" />
 							</button>
 						</div>
 						<!-- 상태 배지 -->

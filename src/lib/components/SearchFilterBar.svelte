@@ -40,13 +40,13 @@
 	
 	<!-- 필터 선택 - 커스텀 드롭다운 -->
 	{#if showFilter && filterOptions.length > 0}
-		<div class="relative group filter-dropdown" data-open={dropdownOpen ? 'true' : 'false'}>
+		<div class="relative flex-1 sm:flex-none group filter-dropdown" data-open={dropdownOpen ? 'true' : 'false'}>
 			<!-- 드롭다운 버튼 -->
 			<button
 				type="button"
 				aria-haspopup="listbox"
 				aria-expanded={dropdownOpen}
-				class="flex items-center pl-10 pr-8 py-1.5 bg-surface-1 rounded-[6px] text-text-base min-w-[140px] transition-all duration-200 cursor-pointer border focus:outline-none"
+				class="flex items-center w-full sm:w-auto pl-10 pr-10 sm:pr-8 py-1.5 bg-surface-1 rounded-[6px] text-text-base sm:min-w-[140px] transition-all duration-200 cursor-pointer border border-border-subtle focus:outline-none"
 				on:click={toggleDropdown}
 				tabindex="0"
 			>
@@ -56,7 +56,7 @@
 				</div>
 				
 				<!-- 선택된 값 표시 -->
-				<span class="flex-1 text-left truncate">
+				<span class="flex-1 text-left truncate pr-2">
 					{filterOptions.find(o => o.value === selectedFilter)?.label || '선택하세요'}
 				</span>
 				
