@@ -34,7 +34,7 @@
   --badge-bg-base: #222222;
   --badge-high-urgent: #FF008C;      /* 진형광핑크 */
   --badge-high-red: #FF1900;         /* 레드 */
-  --badge-medium-yellow: #FFD700;    /* 더 진한 노랑 (대조비 향상) */
+  --badge-medium-yellow: #FFEB3B;    /* 상쾌한 - 밝은 노랑 (더 선명하게) */
   --badge-medium-lemon: #FFB000;     /* 더 진한 레몬 (대조비 향상) */
   --badge-medium-gold: #FFD600;      /* 골드 */
   --badge-low-mint: #00FF2E;         /* 형광 민트 */
@@ -44,7 +44,6 @@
   --badge-special-purple: #D400FF;    /* 네온 퍼플 */
   --badge-special-violet: #7B2CBF;    /* 신비로운 - 선명한 바이올렛 (다크 모드) */
   --badge-cute-pink: #ff69b4;         /* 핫핑크 (귀여운 배지용) */
-  --badge-medium-yellow: #FFEB3B;    /* 상쾌한 - 밝은 노랑 (더 선명하게) */
   
   /* 캐릭터 스타일 확장 색상 (다크 모드) */
   --style-vintage: #8B4513;           /* 빈티지한 - 새들 브라운 (더 어두운 브라운) */
@@ -91,7 +90,7 @@
   /* 라이트 모드 배지 색상 (더 진하고 선명하게) */
   --badge-high-urgent: #FF3DAE; /* 핫핑크 유지 */
   --badge-high-red: #FF1900;    /* 진한 레드 유지 */
-  --badge-medium-yellow: #FF8C00; /* 오렌지계열 (기존 노랑) */
+  --badge-medium-yellow: #FFC107;  /* 상쾌한 - 앰버 (라이트 모드에서도 선명하게) */
   --badge-medium-lemon: #FF7F00;  /* 오렌지계열 (기존 레몬) */
   --badge-medium-gold: #FF8C00;   /* 오렌지계열 (기존 골드) */
 		--badge-low-mint: #3ABA00;      /* 라이트 모드 전용 민트 그린 */
@@ -101,7 +100,6 @@
   --badge-special-purple: #8A2BE2; /* 진한 퍼플 */
   --badge-special-violet: #6A0DAD; /* 신비로운 - 다크 바이올렛 (라이트 모드) */
   --badge-cute-pink: #ff69b4;      /* 핫핑크 (귀여운 배지용) */
-  --badge-medium-yellow: #FFC107;  /* 상쾌한 - 앰버 (라이트 모드에서도 선명하게) */
   
   /* 캐릭터 스타일 확장 색상 (라이트 모드) */
   --style-vintage: #654321;         /* 빈티지한 - 다크 브라운 (더 어두운 브라운) */

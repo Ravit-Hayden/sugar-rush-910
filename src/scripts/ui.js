@@ -59,19 +59,19 @@
   });
 
   function initFilterDropdowns() {
+    // 외부 클릭 시 드롭다운 닫기
     document.addEventListener('click', function(e){
       const dd = e.target.closest('.filter-dropdown');
       document.querySelectorAll('.filter-dropdown').forEach(el=>{
         if(el!==dd){ el.dataset.open='false'; el.querySelector('button')?.setAttribute('aria-expanded','false') }
       });
+      // 버튼 클릭은 Svelte 컴포넌트에서 처리하므로 여기서는 드롭다운 토글만 처리
       if(!dd) return;
       const btn = dd.querySelector('button');
-      if(btn && btn.contains(e.target)){
-        const open = dd.dataset.open === 'true';
-        dd.dataset.open = open ? 'false' : 'true';
-        btn.setAttribute('aria-expanded', String(!open));
-      }
+      // 버튼 자체를 클릭한 경우는 Svelte의 on:click이 처리하므로 여기서는 처리하지 않음
+      // 옵션 클릭도 Svelte의 on:click이 처리하므로 여기서는 처리하지 않음
     });
+    // Escape 키로 드롭다운 닫기
     document.addEventListener('keydown', function(e){
       const openDD = document.querySelector('.filter-dropdown[data-open="true"]');
       if(!openDD) return;
@@ -81,18 +81,8 @@
         openDD.querySelector('button')?.focus();
       }
     });
-    document.querySelectorAll('.filter-dropdown [role="option"]').forEach(opt=>{
-      opt.addEventListener('click', function(){
-        const ul = this.parentElement;
-        ul.querySelectorAll('[role="option"]').forEach(o=>o.setAttribute('aria-selected','false'));
-        this.setAttribute('aria-selected','true');
-        const dd = ul.closest('.filter-dropdown');
-        const label = dd.querySelector('button span');
-        if(label) label.textContent = this.textContent.trim();
-        dd.dataset.open='false';
-        dd.querySelector('button')?.setAttribute('aria-expanded','false');
-      });
-    });
+    // Svelte 컴포넌트가 이벤트를 처리하므로 여기서는 옵션 클릭 리스너를 추가하지 않음
+    // SearchFilterBar.svelte의 on:click 핸들러가 모든 클릭 이벤트를 처리함
   }
 
   if (document.readyState === 'loading') {
