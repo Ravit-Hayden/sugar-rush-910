@@ -59,30 +59,45 @@
   });
 
   function initFilterDropdowns() {
-    // 외부 클릭 시 드롭다운 닫기
+    // 외부 클릭 시 드롭다운 닫기 (필터 및 정렬 드롭다운 모두 처리)
     document.addEventListener('click', function(e){
-      const dd = e.target.closest('.filter-dropdown');
+      const filterDD = e.target.closest('.filter-dropdown');
+      const sortDD = e.target.closest('.sort-dropdown');
+      
+      // 필터 드롭다운 처리
       document.querySelectorAll('.filter-dropdown').forEach(el=>{
-        if(el!==dd){ el.dataset.open='false'; el.querySelector('button')?.setAttribute('aria-expanded','false') }
+        if(el!==filterDD){ el.dataset.open='false'; el.querySelector('button')?.setAttribute('aria-expanded','false') }
       });
+      
+      // 정렬 드롭다운 처리
+      document.querySelectorAll('.sort-dropdown').forEach(el=>{
+        if(el!==sortDD){ el.dataset.open='false'; el.querySelector('button')?.setAttribute('aria-expanded','false') }
+      });
+      
       // 버튼 클릭은 Svelte 컴포넌트에서 처리하므로 여기서는 드롭다운 토글만 처리
-      if(!dd) return;
-      const btn = dd.querySelector('button');
-      // 버튼 자체를 클릭한 경우는 Svelte의 on:click이 처리하므로 여기서는 처리하지 않음
-      // 옵션 클릭도 Svelte의 on:click이 처리하므로 여기서는 처리하지 않음
+      if(!filterDD && !sortDD) return;
     });
-    // Escape 키로 드롭다운 닫기
+    
+    // Escape 키로 드롭다운 닫기 (필터 및 정렬 드롭다운 모두 처리)
     document.addEventListener('keydown', function(e){
-      const openDD = document.querySelector('.filter-dropdown[data-open="true"]');
-      if(!openDD) return;
+      const openFilterDD = document.querySelector('.filter-dropdown[data-open="true"]');
+      const openSortDD = document.querySelector('.sort-dropdown[data-open="true"]');
+      
       if(e.key==='Escape'){
-        openDD.dataset.open='false';
-        openDD.querySelector('button')?.setAttribute('aria-expanded','false');
-        openDD.querySelector('button')?.focus();
+        if(openFilterDD){
+          openFilterDD.dataset.open='false';
+          openFilterDD.querySelector('button')?.setAttribute('aria-expanded','false');
+          openFilterDD.querySelector('button')?.focus();
+        }
+        if(openSortDD){
+          openSortDD.dataset.open='false';
+          openSortDD.querySelector('button')?.setAttribute('aria-expanded','false');
+          openSortDD.querySelector('button')?.focus();
+        }
       }
     });
     // Svelte 컴포넌트가 이벤트를 처리하므로 여기서는 옵션 클릭 리스너를 추가하지 않음
-    // SearchFilterBar.svelte의 on:click 핸들러가 모든 클릭 이벤트를 처리함
+    // SearchFilterBar.svelte와 앨범 페이지의 onclick 핸들러가 모든 클릭 이벤트를 처리함
   }
 
   if (document.readyState === 'loading') {
