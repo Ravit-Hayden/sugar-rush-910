@@ -255,7 +255,7 @@
 
 					<!-- 앨범 정보 -->
 					<div class="p-4">
-						<div class="flex items-start justify-between gap-2 mb-1">
+						<div class="flex items-start justify-between gap-2 mb-0">
 							<h3 class="font-semibold text-text-strong line-clamp-1 flex-1">{album.title}</h3>
 							<span class="badge-base {getStatusColor(album.status)} flex-shrink-0 pr-0">
 								{getStatusLabel(album.status)}
@@ -263,12 +263,11 @@
 						</div>
 						<p class="text-sm text-text-muted mb-2">{album.artist} • {album.year}</p>
 						
-						<div class="flex items-center justify-between text-xs text-text-muted mb-3">
-							<span>{album.tracks}곡</span>
-							<span class="flex-shrink-0">{album.duration}</span>
+						<div class="text-xs text-text-muted mb-4 mt-4">
+							<span>{album.tracks}곡 • {album.duration}</span>
 						</div>
 
-						<div class="flex items-center justify-between text-xs text-text-muted mb-2">
+						<div class="flex items-center justify-between text-xs text-text-muted mb-3">
 							<div class="flex flex-col gap-0.5">
 								<div class="flex items-center gap-2">
 									<span>좋아요</span>
