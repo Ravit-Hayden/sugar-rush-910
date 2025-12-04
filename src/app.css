@@ -1699,6 +1699,152 @@ main.main-content,
 }
 
 /* ============================================================
+   트랙 목록 오버레이 스타일
+   ============================================================ */
+.track-list-overlay {
+  min-width: calc(100% + 2rem);
+  width: max-content;
+  max-width: calc(100vw - 2rem);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
+  left: -1rem;
+  right: -1rem;
+}
+
+/* 그리드 레이아웃에서 오버레이가 다른 카드 위에 표시되도록 */
+.album-card {
+  position: relative;
+  overflow: visible;
+}
+
+/* ============================================================
+   트랙 목록 스크롤바 커스텀 스타일
+   ============================================================ */
+.track-list-scroll::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.track-list-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.track-list-scroll::-webkit-scrollbar-thumb {
+  background: var(--border-subtle);
+  border-radius: 3px;
+}
+
+.track-list-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Firefox */
+.track-list-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-subtle) transparent;
+}
+
+/* 라이트 모드 */
+[data-theme="light"] .track-list-scroll::-webkit-scrollbar-thumb {
+  background: var(--border-subtle);
+}
+
+[data-theme="light"] .track-list-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+[data-theme="light"] .track-list-scroll {
+  scrollbar-color: var(--border-subtle) transparent;
+}
+
+/* ============================================================
+   트랙 목록 토글 버튼 호버/포커스 효과
+   ============================================================ */
+.track-toggle-btn {
+  transition: color 0.2s ease;
+  outline: none !important;
+}
+
+.track-toggle-btn:hover:not(:focus):not(:focus-visible) {
+  color: var(--hover-cyan) !important;
+}
+
+.track-toggle-btn:focus,
+.track-toggle-btn:focus-visible {
+  color: var(--brand-pink) !important;
+  outline: none !important;
+}
+
+.track-toggle-btn:focus:hover,
+.track-toggle-btn:focus-visible:hover {
+  color: var(--brand-pink) !important;
+  outline: none !important;
+}
+
+/* ============================================================
+   트랙 목록 아이템 호버/포커스 효과
+   ============================================================ */
+.track-item {
+  transition: color 0.2s ease;
+}
+
+/* 호버 효과 (포커스가 아닐 때만) - 배경색 없이 폰트 색상만 */
+.track-item:hover:not(:focus):not(:focus-visible) {
+  color: var(--hover-cyan) !important;
+}
+
+.track-item:hover:not(:focus):not(:focus-visible) .track-number,
+.track-item:hover:not(:focus):not(:focus-visible) .track-title,
+.track-item:hover:not(:focus):not(:focus-visible) .track-duration {
+  color: var(--hover-cyan) !important;
+}
+
+.track-item:hover:not(:focus):not(:focus-visible) .track-title {
+  font-weight: 500 !important;
+}
+
+/* 포커스 효과 (호버보다 우선) - 배경색 없이 폰트 색상만 */
+.track-item:focus,
+.track-item:focus-visible {
+  outline: none !important;
+  color: var(--brand-pink) !important;
+}
+
+.track-item:focus .track-number,
+.track-item:focus-visible .track-number,
+.track-item:focus .track-title,
+.track-item:focus-visible .track-title,
+.track-item:focus .track-duration,
+.track-item:focus-visible .track-duration {
+  color: var(--brand-pink) !important;
+}
+
+.track-item:focus .track-title,
+.track-item:focus-visible .track-title {
+  font-weight: 500 !important;
+}
+
+/* 포커스 + 호버 시 포커스 스타일 유지 */
+.track-item:focus:hover,
+.track-item:focus-visible:hover {
+  outline: none !important;
+  color: var(--brand-pink) !important;
+}
+
+.track-item:focus:hover .track-number,
+.track-item:focus-visible:hover .track-number,
+.track-item:focus:hover .track-title,
+.track-item:focus-visible:hover .track-title,
+.track-item:focus:hover .track-duration,
+.track-item:focus-visible:hover .track-duration {
+  color: var(--brand-pink) !important;
+}
+
+.track-item:focus:hover .track-title,
+.track-item:focus-visible:hover .track-title {
+  font-weight: 500 !important;
+}
+
+/* ============================================================
    경우 2: 배경색 + 아이콘/텍스트 (bg-brand-pink 버튼)
    ============================================================ */
 
