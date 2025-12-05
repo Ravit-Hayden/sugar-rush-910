@@ -745,7 +745,7 @@
 			{#each filteredAndSortedAlbums as album (album.id)}
 				<div 
 					onclick={() => handleAlbumClick(album.id, album.title)}
-					class="album-card bg-surface-1 rounded-lg hover:bg-surface-2 transition-colors duration-200 group border border-border-subtle cursor-pointer focus-visible:outline-2 focus-visible:outline-brand-pink focus-visible:outline-offset-2"
+					class="album-card bg-surface-1 rounded-lg hover:bg-surface-2 transition-colors duration-200 group border border-border-subtle cursor-pointer focus-visible:border-brand-pink"
 					role="button"
 					tabindex="0"
 					aria-label="{album.title} 앨범 상세 보기"
@@ -757,9 +757,9 @@
 					}}
 				>
 					<!-- 앨범 커버 -->
-					<div class="relative aspect-square bg-surface-2 overflow-hidden">
+					<div class="relative aspect-square bg-surface-2 overflow-hidden rounded-t-lg">
 						<!-- 기본 이미지 (회색 배경 + 회색 로고) -->
-						<div class="absolute inset-0 flex items-center justify-center bg-surface-2 {imageErrorStates.get(album.id) ? '' : (album.cover && album.cover !== '/api/placeholder/300/300' ? 'hidden' : '')}">
+						<div class="absolute inset-0 flex items-center justify-center bg-surface-2 rounded-t-lg {imageErrorStates.get(album.id) ? '' : (album.cover && album.cover !== '/api/placeholder/300/300' ? 'hidden' : '')}">
 							<Disc3 size={48} class="text-text-muted opacity-30" />
 						</div>
 						<!-- 실제 이미지 (있을 경우) -->
@@ -768,7 +768,7 @@
 								src={album.cover}
 								alt="{album.title} 앨범 커버"
 								loading="lazy"
-								class="absolute inset-0 w-full h-full object-cover"
+								class="absolute inset-0 w-full h-full object-cover rounded-t-lg"
 								onerror={(e: Event) => {
 									const target = e.currentTarget as HTMLImageElement;
 									imageErrorStates.set(album.id, true);
@@ -780,7 +780,7 @@
 						<div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
 							<button 
 								onclick={(e) => { e.preventDefault(); e.stopPropagation(); handlePlayAlbum(album.id); }}
-								class="play-button w-12 h-12 bg-brand-pink rounded-full flex items-center justify-center hover:bg-brand-pink/90 focus-visible:outline-2 focus-visible:outline-brand-pink focus-visible:outline-offset-2 transition-colors duration-200" 
+								class="play-button w-12 h-12 bg-brand-pink rounded-full flex items-center justify-center hover:bg-brand-pink/90 transition-colors duration-200" 
 								aria-label="재생"
 							>
 								<Play size={20} class="play-button-icon text-white" />
@@ -913,7 +913,7 @@
 								<button 
 									onclick={(e) => { e.preventDefault(); e.stopPropagation(); handleEdit(album.id); }}
 									onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') e.stopPropagation(); }}
-									class="w-8 h-8 inline-flex items-end justify-center rounded-md hover:bg-surface-2 focus-visible:outline-2 focus-visible:outline-brand-pink focus-visible:outline-offset-2 transition-colors duration-200 pb-0.5" 
+									class="w-8 h-8 inline-flex items-end justify-center rounded-md hover:bg-surface-2 focus-visible:bg-surface-2 transition-colors duration-200 pb-0.5" 
 									aria-label="편집" 
 									title="편집"
 								>
@@ -922,7 +922,7 @@
 								<button 
 									onclick={(e) => { e.preventDefault(); e.stopPropagation(); handleMoreOptions(album.id); }}
 									onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') e.stopPropagation(); }}
-									class="w-8 h-8 inline-flex items-end justify-center rounded-md hover:bg-surface-2 focus-visible:outline-2 focus-visible:outline-brand-pink focus-visible:outline-offset-2 transition-colors duration-200 -ml-1 pb-0.5" 
+									class="w-8 h-8 inline-flex items-end justify-center rounded-md hover:bg-surface-2 focus-visible:bg-surface-2 transition-colors duration-200 -ml-1 pb-0.5" 
 									aria-label="더보기" 
 									title="더보기"
 								>

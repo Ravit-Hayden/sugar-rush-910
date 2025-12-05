@@ -156,151 +156,6 @@
 			plays: 0,
 			likes: 0,
 			fileSize: '8.0MB'
-		},
-		// 추가 샘플 - 각 상태값별로 더 많은 예시
-		{
-			id: '13',
-			title: 'Another Draft',
-			artist: 'Various',
-			album: 'Demo Collection',
-			genre: 'Pop',
-			duration: '3:50',
-			status: 'draft',
-			plays: 89,
-			likes: 5,
-			fileSize: '7.5MB'
-		},
-		{
-			id: '14',
-			title: 'Still Editing',
-			artist: 'Sugar Rush',
-			album: 'Sugar Rush Vol.1',
-			genre: 'Jazz',
-			duration: '5:15',
-			status: 'editing',
-			plays: 156,
-			likes: 9,
-			fileSize: '10.8MB'
-		},
-		{
-			id: '15',
-			title: 'Revision Needed',
-			artist: 'Various',
-			album: 'Demo Collection',
-			genre: 'Classical',
-			duration: '6:30',
-			status: 'revision_requested',
-			plays: 201,
-			likes: 12,
-			fileSize: '13.2MB'
-		},
-		{
-			id: '16',
-			title: 'Waiting Review',
-			artist: 'Sugar Rush',
-			album: 'Sugar Rush Vol.2',
-			genre: 'Rock',
-			duration: '4:25',
-			status: 'pending_review',
-			plays: 312,
-			likes: 18,
-			fileSize: '9.1MB'
-		},
-		{
-			id: '17',
-			title: 'In Review',
-			artist: 'Sugar Rush',
-			album: 'Sugar Rush Vol.1',
-			genre: 'Electronic',
-			duration: '3:55',
-			status: 'under_review',
-			plays: 445,
-			likes: 27,
-			fileSize: '8.3MB'
-		},
-		{
-			id: '18',
-			title: 'Edit Done',
-			artist: 'Various',
-			album: 'Demo Collection',
-			genre: 'Pop',
-			duration: '4:10',
-			status: 'editing_complete',
-			plays: 523,
-			likes: 31,
-			fileSize: '8.7MB'
-		},
-		{
-			id: '19',
-			title: 'Approved Track',
-			artist: 'Sugar Rush',
-			album: 'Sugar Rush Vol.2',
-			genre: 'Jazz',
-			duration: '5:40',
-			status: 'approved',
-			plays: 678,
-			likes: 42,
-			fileSize: '11.5MB'
-		},
-		{
-			id: '20',
-			title: 'Scheduled Release',
-			artist: 'Sugar Rush',
-			album: 'Sugar Rush Vol.1',
-			genre: 'Electronic',
-			duration: '4:00',
-			status: 'scheduled',
-			plays: 789,
-			likes: 51,
-			fileSize: '8.4MB'
-		},
-		{
-			id: '21',
-			title: 'Published Song',
-			artist: 'Sugar Rush',
-			album: 'Sugar Rush Vol.2',
-			genre: 'Pop',
-			duration: '3:35',
-			status: 'published',
-			plays: 1456,
-			likes: 98,
-			fileSize: '7.6MB'
-		},
-		{
-			id: '22',
-			title: 'Paused Track',
-			artist: 'Various',
-			album: 'Demo Collection',
-			genre: 'Rock',
-			duration: '4:50',
-			status: 'paused',
-			plays: 0,
-			likes: 0,
-			fileSize: '9.8MB'
-		},
-		{
-			id: '23',
-			title: 'Archived Song',
-			artist: 'Sugar Rush',
-			album: 'Sugar Rush Vol.1',
-			genre: 'Classical',
-			duration: '6:20',
-			status: 'archived',
-			plays: 189,
-			likes: 11,
-			fileSize: '12.8MB'
-		},
-		{
-			id: '24',
-			title: 'Removed Track',
-			artist: 'Various',
-			album: 'Demo Collection',
-			genre: 'Jazz',
-			duration: '4:15',
-			status: 'deleted',
-			plays: 0,
-			likes: 0,
-			fileSize: '8.9MB'
 		}
 	];
 
@@ -355,7 +210,7 @@
 						<!-- 트랙 정보 (전체 너비) -->
 						<div class="mb-4">
 							<div class="flex gap-3 items-center min-w-0">
-								<button aria-label="재생" class="w-9 h-9 sm:w-10 sm:h-10 flex-shrink-0 bg-surface-2 rounded-full flex items-center justify-center hover:bg-brand-pink hover:text-white focus:outline-none focus-visible:outline-2 focus-visible:outline-brand-pink focus-visible:outline-offset-2 transition-colors duration-200 shadow-sm">
+								<button aria-label="재생" class="w-9 h-9 sm:w-10 sm:h-10 flex-shrink-0 bg-surface-2 rounded-full flex items-center justify-center hover:bg-brand-pink hover:text-white focus:outline-none transition-colors duration-200 shadow-sm">
 									<Play size={16} class="sm:w-5 sm:h-5 ml-0.5" />
 								</button>
 								<div class="min-w-0 flex-1">
@@ -367,47 +222,41 @@
 						<!-- 나머지 정보를 2열 그리드로 배치 -->
 						<div class="grid grid-cols-2 gap-x-4 gap-y-3 sm:gap-x-6 sm:gap-y-4 -mx-4 sm:-mx-5 px-4 sm:px-5 pt-4 border-t" style="border-color: var(--border-subtle);">
 							<div class="flex flex-col">
-								<div class="text-[10px] sm:text-xs text-text-muted mb-1.5 sm:mb-1.5 font-normal uppercase tracking-wider">아티스트</div>
-								<div class="text-sm sm:text-base font-semibold sm:font-semibold text-text-strong sm:text-text-strong">{track.artist}</div>
+								<div class="text-[10px] sm:text-xs text-text-muted mb-1.5 font-normal uppercase tracking-wider">아티스트</div>
+								<div class="text-sm sm:text-base font-semibold text-text-strong">{track.artist}</div>
 							</div>
 							<div class="flex flex-col">
-								<div class="text-[10px] sm:text-xs text-text-muted mb-1.5 sm:mb-1.5 font-normal uppercase tracking-wider">앨범</div>
-								<div class="text-sm sm:text-base font-medium sm:font-normal text-text-strong sm:text-text-muted break-words">{track.album}</div>
+								<div class="text-[10px] sm:text-xs text-text-muted mb-1.5 font-normal uppercase tracking-wider">앨범</div>
+								<div class="text-sm sm:text-base text-text-muted break-words">{track.album}</div>
 							</div>
 							<div class="flex flex-col">
-								<div class="text-[10px] sm:text-xs text-text-muted mb-1.5 sm:mb-1.5 font-normal uppercase tracking-wider">길이</div>
-								<div class="text-sm sm:text-base font-medium sm:font-normal text-text-strong sm:text-text-muted">{track.duration}</div>
+								<div class="text-[10px] sm:text-xs text-text-muted mb-1.5 font-normal uppercase tracking-wider">길이</div>
+								<div class="text-sm sm:text-base text-text-muted">{track.duration}</div>
 							</div>
 							<div class="flex flex-col">
-								<div class="text-[10px] sm:text-xs text-text-muted mb-1.5 sm:mb-1.5 font-normal uppercase tracking-wider">장르</div>
-								<div class="text-sm sm:text-base font-medium sm:font-normal text-text-strong sm:text-text-muted">{track.genre}</div>
+								<div class="text-[10px] sm:text-xs text-text-muted mb-1.5 font-normal uppercase tracking-wider">장르</div>
+								<div class="text-sm sm:text-base text-text-muted">{track.genre}</div>
 							</div>
 							<div class="flex flex-col">
-								<div class="text-[10px] sm:text-xs text-text-muted mb-1.5 sm:mb-1.5 font-normal uppercase tracking-wider">상태</div>
-								<span class="inline-block whitespace-nowrap badge-base {getStatusColor(track.status)} -ml-2 pl-0 lg:pl-2">
+								<div class="text-[10px] sm:text-xs text-text-muted mb-1.5 font-normal uppercase tracking-wider">상태</div>
+								<span class="inline-block whitespace-nowrap badge-base {getStatusColor(track.status)} pl-0 lg:pl-2">
 									{getStatusLabel(track.status)}
 								</span>
 							</div>
 							<div class="flex flex-col">
-								<div class="text-[10px] sm:text-xs text-text-muted mb-1.5 sm:mb-1.5 font-normal uppercase tracking-wider">통계</div>
-								<div class="space-y-1 sm:space-y-0.5">
-									<div class="text-sm sm:text-base">
-										<span class="font-semibold sm:font-normal text-hover-cyan sm:text-text-muted">{track.plays.toLocaleString()}</span>
-										<span class="text-text-muted text-sm sm:text-base">회 재생</span>
-									</div>
-									<div class="text-sm sm:text-base">
-										<span class="font-semibold sm:font-normal text-hover-cyan sm:text-text-muted">{track.likes}</span>
-										<span class="text-text-muted text-sm sm:text-base"> 좋아요</span>
-									</div>
+								<div class="text-[10px] sm:text-xs text-text-muted mb-1.5 font-normal uppercase tracking-wider">통계</div>
+								<div class="space-y-0.5 text-sm sm:text-base text-text-muted">
+									<div>{track.plays.toLocaleString()}회 재생</div>
+									<div>{track.likes} 좋아요</div>
 								</div>
 							</div>
 							<div class="flex flex-col col-span-2">
-								<div class="flex flex-row gap-2">
-									<button class="action-button h-9 w-auto px-5 whitespace-nowrap rounded-md border border-border-subtle bg-surface-2 focus-visible:outline-2 focus-visible:outline-brand-pink focus-visible:outline-offset-2 text-sm font-medium">
+								<div class="flex flex-col sm:flex-row gap-2">
+									<button class="action-button h-8 sm:h-9 w-full sm:w-auto px-4 sm:px-5 whitespace-nowrap rounded-md border border-border-subtle bg-surface-2 hover:bg-surface-1 focus-visible:bg-surface-1 text-xs sm:text-sm font-medium transition-colors duration-200">
 										<span class="action-button-text">편집</span>
 									</button>
-									<button aria-label="더보기" class="action-button h-9 w-9 flex items-center justify-center rounded-md border border-border-subtle bg-surface-2 focus-visible:outline-2 focus-visible:outline-brand-pink focus-visible:outline-offset-2">
-										<ChevronRight size={20} class="action-button-icon" />
+									<button aria-label="더보기" class="action-button h-8 sm:h-9 w-8 sm:w-9 flex items-center justify-center rounded-md border border-border-subtle bg-surface-2 hover:bg-surface-1 focus-visible:bg-surface-1 transition-colors duration-200">
+										<ChevronRight size={16} class="action-button-icon sm:w-5 sm:h-5" />
 									</button>
 								</div>
 							</div>
@@ -438,7 +287,7 @@
 							<tr class="border-b last:border-b-0" style="border-color: var(--border-subtle);">
 								<td class="py-4 text-left text-sm min-w-0" style="width: 25%; padding-left: 1rem; padding-right: 1rem;">
 									<div class="flex gap-3 items-center min-w-0">
-										<button aria-label="재생" class="w-8 h-8 flex-shrink-0 bg-surface-2 rounded-full flex items-center justify-center hover:bg-brand-pink hover:text-white focus:outline-none focus-visible:outline-2 focus-visible:outline-brand-pink focus-visible:outline-offset-2 transition-colors duration-200 shadow-sm">
+										<button aria-label="재생" class="w-8 h-8 flex-shrink-0 bg-surface-2 rounded-full flex items-center justify-center hover:bg-brand-pink hover:text-white focus:outline-none transition-colors duration-200 shadow-sm">
 											<Play size={16} class="w-4 h-4 ml-0.5" />
 										</button>
 										<div class="min-w-0 flex-1">
@@ -478,10 +327,10 @@
 								</td>
 								<td class="py-4 text-right text-xs sm:text-sm font-medium" style="width: 13%; padding-left: 1rem; padding-right: 1rem;">
 									<div class="flex gap-1 justify-end items-center">
-										<button class="action-button h-8 w-auto px-3 whitespace-nowrap rounded-md border border-border-subtle bg-surface-2 focus-visible:outline-2 focus-visible:outline-brand-pink focus-visible:outline-offset-2 text-xs sm:text-sm font-medium">
-											<span class="action-button-text">편집</span>
-										</button>
-										<button aria-label="더보기" class="action-button h-8 w-8 flex items-center justify-center rounded-md border border-border-subtle bg-surface-2 focus-visible:outline-2 focus-visible:outline-brand-pink focus-visible:outline-offset-2">
+										<button class="action-button h-8 w-auto px-3 whitespace-nowrap rounded-md border border-border-subtle bg-surface-2 hover:bg-surface-1 focus-visible:bg-surface-1 text-xs sm:text-sm font-medium transition-colors duration-200">
+										<span class="action-button-text">편집</span>
+									</button>
+									<button aria-label="더보기" class="action-button h-8 w-8 flex items-center justify-center rounded-md border border-border-subtle bg-surface-2 hover:bg-surface-1 focus-visible:bg-surface-1 transition-colors duration-200">
 											<ChevronRight size={16} class="action-button-icon" />
 										</button>
 									</div>
