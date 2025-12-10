@@ -1,35 +1,14 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
-	
 	export let title: string;
 	export let description: string = '';
-	export let showBackButton: boolean = false;
 	export let actions: any[] = [];
-	
-	const dispatch = createEventDispatcher();
-	
-	function handleBack() {
-		dispatch('back');
-		window.history.back();
-	}
 </script>
 
 <!-- 페이지 헤더 -->
 <div class="mb-8 mt-1.5">
 	<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-		<div class="flex items-center gap-3">
-			{#if showBackButton}
-				<button 
-					onclick={handleBack}
-					class="flex-shrink-0 w-8 h-8 inline-flex items-center justify-center rounded-md transition-colors duration-200 ease-in-out focus:outline-none focus:ring-0 cursor-pointer hover:bg-surface-2"
-					aria-label="뒤로 가기"
-				>
-					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-text-base">
-						<path d="m15 18-6-6 6-6"/>
-					</svg>
-				</button>
-			{/if}
-			<div>
+		<div class="flex items-center gap-0 pl-0">
+			<div class="pl-0">
 				<h1 class="text-3xl font-bold text-text-strong mb-2">{title}</h1>
 				{#if description}
 					<p class="text-text-muted">{description}</p>
@@ -40,15 +19,27 @@
 		{#if actions && actions.length > 0}
 			<div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
 				{#each actions as action}
-					<button 
-						onclick={action.onclick}
-						class="inline-flex items-center justify-center gap-2 px-4 py-2 w-full sm:w-auto bg-brand-pink text-white rounded-lg hover:bg-brand-pink/90 transition-colors duration-200 font-medium"
-					>
-						{#if action.icon}
-							<svelte:component this={action.icon} size={16} />
-						{/if}
-						{action.label}
-					</button>
+					{#if action.href}
+						<a 
+							href={action.href}
+							class="page-header-action-button inline-flex items-center justify-center gap-2 px-4 py-2 w-full sm:w-auto rounded-lg transition-colors duration-200 font-medium {action.label === '편집' ? 'page-header-edit-button bg-transparent border border-brand-pink text-brand-pink focus:bg-brand-pink focus:border-brand-pink focus:text-white focus-visible:bg-brand-pink focus-visible:border-brand-pink focus-visible:text-white focus:outline-none focus:ring-0' : 'page-header-primary-button bg-brand-pink text-white focus:bg-brand-pink focus:text-white focus-visible:bg-brand-pink focus-visible:text-white focus:outline-none focus:ring-0'}"
+						>
+							{#if action.icon}
+								<svelte:component this={action.icon} size={16} />
+							{/if}
+							{action.label}
+						</a>
+					{:else}
+						<button 
+							onclick={action.onclick}
+							class="page-header-action-button inline-flex items-center justify-center gap-2 px-4 py-2 w-full sm:w-auto rounded-lg transition-colors duration-200 font-medium {action.label === '편집' ? 'page-header-edit-button bg-transparent border border-brand-pink text-brand-pink focus:bg-brand-pink focus:border-brand-pink focus:text-white focus-visible:bg-brand-pink focus-visible:border-brand-pink focus-visible:text-white focus:outline-none focus:ring-0' : 'page-header-primary-button bg-brand-pink text-white focus:bg-brand-pink focus:text-white focus-visible:bg-brand-pink focus-visible:text-white focus:outline-none focus:ring-0'}"
+						>
+							{#if action.icon}
+								<svelte:component this={action.icon} size={16} />
+							{/if}
+							{action.label}
+						</button>
+					{/if}
 				{/each}
 			</div>
 		{/if}

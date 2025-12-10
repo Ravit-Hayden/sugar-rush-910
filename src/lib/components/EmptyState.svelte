@@ -1,5 +1,4 @@
 <script lang="ts">
-	export let icon: any;
 	export let title: string;
 	export let description: string = '';
 	export let actionLabel: string = '';
@@ -8,12 +7,6 @@
 
 <!-- 빈 상태 컴포넌트 -->
 <div class="flex flex-col items-center justify-center py-16 px-4 text-center">
-	<div class="mb-6">
-		{#if icon}
-			<svelte:component this={icon} size={64} class="text-text-muted mx-auto" />
-		{/if}
-	</div>
-	
 	<h3 class="text-xl font-semibold text-text-strong mb-2">{title}</h3>
 	
 	{#if description}
