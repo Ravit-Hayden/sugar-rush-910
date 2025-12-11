@@ -50,13 +50,14 @@
 	<!-- 검색 입력 -->
 	<div class="relative flex-1 group">
 		<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-			<Search size={16} class="lucide-icon lucide-search" />
+			<Search size={16} class="lucide-icon lucide-search" aria-hidden="true" />
 		</div>
 		<input 
 			type="text" 
 			placeholder={searchPlaceholder}
 			bind:value={searchQuery}
 			on:input={(e) => onSearchChange((e.target as HTMLInputElement).value)}
+			aria-label="검색"
 			class="w-full pl-10 pr-4 py-1.5 bg-surface-1 border border-border-subtle border-[1px] rounded-md text-text-base placeholder-text-muted focus:outline-none focus:ring-0"
 		/>
 	</div>
@@ -140,22 +141,22 @@
 						{/each}
 					{:else}
 						<!-- 그룹이 없는 경우 (기존 방식) -->
-						{#each filterOptions as opt}
-							<li
-								role="option"
-								aria-selected={selectedFilter === opt.value}
-								tabindex="0"
-								on:click={() => selectOption(opt.value)}
-								on:keydown={(e) => {
-									if (e.key === 'Enter' || e.key === ' ') {
-										e.preventDefault();
-										selectOption(opt.value);
-									}
-								}}
-							>
-								{opt.label}
-							</li>
-						{/each}
+					{#each filterOptions as opt}
+						<li
+							role="option"
+							aria-selected={selectedFilter === opt.value}
+							tabindex="0"
+							on:click={() => selectOption(opt.value)}
+							on:keydown={(e) => {
+								if (e.key === 'Enter' || e.key === ' ') {
+									e.preventDefault();
+									selectOption(opt.value);
+								}
+							}}
+						>
+							{opt.label}
+						</li>
+					{/each}
 					{/if}
 				</ul>
 			{/if}

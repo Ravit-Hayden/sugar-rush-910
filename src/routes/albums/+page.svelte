@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { Disc3, Plus, MoreVertical, Play, Edit, ArrowUpDown, Search, Filter } from 'lucide-svelte';
+	import { goto } from '$app/navigation';
+	import { Disc3, Plus, MoreVertical, Play, Edit, ArrowUpDown, Search, Filter, Download, Share2, Trash2, ChevronLeft, ChevronRight, UserPlus, Link } from 'lucide-svelte';
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import PageContent from '$lib/components/PageContent.svelte';
 	import EmptyState from '$lib/components/EmptyState.svelte';
@@ -12,6 +13,7 @@
 	let filterDropdownOpen = $state(false);
 	let selectedAlbumId = $state<string | null>(null);
 	let imageErrorStates = $state(new Map<string, boolean>());
+	let moreMenuOpenId = $state<string | null>(null);
 	let albums = [
 		{
 			id: '1',
@@ -276,6 +278,191 @@
 				{ id: '1', title: 'Deleted Track 1', duration: '4:05' },
 				{ id: '2', title: 'Deleted Track 2', duration: '4:10' }
 			]
+		},
+		// 추가 샘플 데이터 (2페이지 테스트용)
+		{
+			id: '13',
+			title: 'Starlight Collection',
+			artist: 'Sugar Rush',
+			year: 2024,
+			status: 'published',
+			tracks: 10,
+			duration: '38:20',
+			cover: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=300&h=300&fit=crop',
+			plays: 980,
+			likes: 67,
+			created_at: '2024-10-22',
+			release_date_kr: '2024-10-25',
+			release_date_global: '2024-10-30',
+			trackList: [
+				{ id: '1', title: 'Starlight Dreams', duration: '3:52' },
+				{ id: '2', title: 'Neon Nights', duration: '4:25' },
+				{ id: '3', title: 'Golden Hour', duration: '5:10' },
+				{ id: '4', title: 'Electric Pulse', duration: '3:38' },
+				{ id: '5', title: 'Midnight Serenade', duration: '6:45' },
+				{ id: '6', title: 'Sunset Boulevard', duration: '4:50' },
+				{ id: '7', title: 'Cosmic Dance', duration: '4:15' },
+				{ id: '8', title: 'Rainbow Bridge', duration: '3:28' },
+				{ id: '9', title: 'Moonlight Sonata', duration: '5:20' },
+				{ id: '10', title: 'Dawn Chorus', duration: '3:37' }
+			]
+		},
+		{
+			id: '14',
+			title: 'Neon Dreams',
+			artist: 'Various',
+			year: 2024,
+			status: 'draft',
+			tracks: 6,
+			duration: '22:15',
+			cover: '/api/placeholder/300/300',
+			plays: 0,
+			likes: 0,
+			created_at: '2024-10-25',
+			trackList: [
+				{ id: '1', title: 'Neon Track 1', duration: '3:40' },
+				{ id: '2', title: 'Neon Track 2', duration: '3:45' },
+				{ id: '3', title: 'Neon Track 3', duration: '3:50' },
+				{ id: '4', title: 'Neon Track 4', duration: '3:35' },
+				{ id: '5', title: 'Neon Track 5', duration: '3:55' },
+				{ id: '6', title: 'Neon Track 6', duration: '3:20' }
+			]
+		},
+		{
+			id: '15',
+			title: 'Golden Hour Sessions',
+			artist: 'Sugar Rush',
+			year: 2024,
+			status: 'editing',
+			tracks: 8,
+			duration: '32:40',
+			cover: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=300&h=300&fit=crop',
+			plays: 0,
+			likes: 0,
+			created_at: '2024-10-28',
+			trackList: [
+				{ id: '1', title: 'Golden Track 1', duration: '4:10' },
+				{ id: '2', title: 'Golden Track 2', duration: '4:15' },
+				{ id: '3', title: 'Golden Track 3', duration: '4:00' },
+				{ id: '4', title: 'Golden Track 4', duration: '4:20' },
+				{ id: '5', title: 'Golden Track 5', duration: '4:05' },
+				{ id: '6', title: 'Golden Track 6', duration: '4:10' },
+				{ id: '7', title: 'Golden Track 7', duration: '4:15' },
+				{ id: '8', title: 'Golden Track 8', duration: '3:25' }
+			]
+		},
+		{
+			id: '16',
+			title: 'Electric Vibes',
+			artist: 'Various',
+			year: 2024,
+			status: 'revision_requested',
+			tracks: 5,
+			duration: '18:45',
+			cover: '/api/placeholder/300/300',
+			plays: 0,
+			likes: 0,
+			created_at: '2024-11-01',
+			trackList: [
+				{ id: '1', title: 'Electric Track 1', duration: '3:45' },
+				{ id: '2', title: 'Electric Track 2', duration: '3:50' },
+				{ id: '3', title: 'Electric Track 3', duration: '3:40' },
+				{ id: '4', title: 'Electric Track 4', duration: '3:55' },
+				{ id: '5', title: 'Electric Track 5', duration: '3:35' }
+			]
+		},
+		{
+			id: '17',
+			title: 'Midnight Sessions',
+			artist: 'Sugar Rush',
+			year: 2024,
+			status: 'pending_review',
+			tracks: 9,
+			duration: '35:20',
+			cover: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=300&h=300&fit=crop',
+			plays: 0,
+			likes: 0,
+			created_at: '2024-11-05',
+			trackList: [
+				{ id: '1', title: 'Midnight Track 1', duration: '3:55' },
+				{ id: '2', title: 'Midnight Track 2', duration: '4:00' },
+				{ id: '3', title: 'Midnight Track 3', duration: '3:50' },
+				{ id: '4', title: 'Midnight Track 4', duration: '4:05' },
+				{ id: '5', title: 'Midnight Track 5', duration: '3:45' },
+				{ id: '6', title: 'Midnight Track 6', duration: '4:10' },
+				{ id: '7', title: 'Midnight Track 7', duration: '3:55' },
+				{ id: '8', title: 'Midnight Track 8', duration: '4:00' },
+				{ id: '9', title: 'Midnight Track 9', duration: '3:20' }
+			]
+		},
+		{
+			id: '18',
+			title: 'Sunset Collection',
+			artist: 'Various',
+			year: 2024,
+			status: 'under_review',
+			tracks: 7,
+			duration: '26:30',
+			cover: '/api/placeholder/300/300',
+			plays: 0,
+			likes: 0,
+			created_at: '2024-11-08',
+			trackList: [
+				{ id: '1', title: 'Sunset Track 1', duration: '3:50' },
+				{ id: '2', title: 'Sunset Track 2', duration: '3:55' },
+				{ id: '3', title: 'Sunset Track 3', duration: '3:45' },
+				{ id: '4', title: 'Sunset Track 4', duration: '4:00' },
+				{ id: '5', title: 'Sunset Track 5', duration: '3:50' },
+				{ id: '6', title: 'Sunset Track 6', duration: '4:05' },
+				{ id: '7', title: 'Sunset Track 7', duration: '3:45' }
+			]
+		},
+		{
+			id: '19',
+			title: 'Cosmic Journey',
+			artist: 'Sugar Rush',
+			year: 2024,
+			status: 'editing_complete',
+			tracks: 11,
+			duration: '42:15',
+			cover: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=300&h=300&fit=crop',
+			plays: 0,
+			likes: 0,
+			created_at: '2024-11-10',
+			trackList: [
+				{ id: '1', title: 'Cosmic Track 1', duration: '3:55' },
+				{ id: '2', title: 'Cosmic Track 2', duration: '4:00' },
+				{ id: '3', title: 'Cosmic Track 3', duration: '3:50' },
+				{ id: '4', title: 'Cosmic Track 4', duration: '4:05' },
+				{ id: '5', title: 'Cosmic Track 5', duration: '3:45' },
+				{ id: '6', title: 'Cosmic Track 6', duration: '4:10' },
+				{ id: '7', title: 'Cosmic Track 7', duration: '3:55' },
+				{ id: '8', title: 'Cosmic Track 8', duration: '4:00' },
+				{ id: '9', title: 'Cosmic Track 9', duration: '3:50' },
+				{ id: '10', title: 'Cosmic Track 10', duration: '4:05' },
+				{ id: '11', title: 'Cosmic Track 11', duration: '3:20' }
+			]
+		},
+		{
+			id: '20',
+			title: 'Rainbow Spectrum',
+			artist: 'Various',
+			year: 2024,
+			status: 'approved',
+			tracks: 6,
+			duration: '24:10',
+			cover: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=300&h=300&fit=crop',
+			plays: 0,
+			likes: 0,
+			created_at: '2024-11-12',
+			trackList: [
+				{ id: '1', title: 'Rainbow Track 1', duration: '4:05' },
+				{ id: '2', title: 'Rainbow Track 2', duration: '4:10' },
+				{ id: '3', title: 'Rainbow Track 3', duration: '4:00' },
+				{ id: '4', title: 'Rainbow Track 4', duration: '4:15' },
+				{ id: '5', title: 'Rainbow Track 5', duration: '3:50' },
+				{ id: '6', title: 'Rainbow Track 6', duration: '3:50' }
+			]
 		}
 	];
 
@@ -433,18 +620,24 @@
 		{ value: 'deleted', label: '삭제됨', group: '공통 상태' }
 	];
 
-	function handleCreateAlbum() {
-		// 새 앨범 생성 로직
-		console.log('새 앨범 생성');
-	}
 
 	function toggleSortDropdown() {
 		sortDropdownOpen = !sortDropdownOpen;
 	}
 
-	function selectSort(value: string) {
+	function selectSort(value: string, event?: MouseEvent | KeyboardEvent) {
 		selectedSort = value;
+		// 클릭한 항목에 포커스 효과를 보여주기 위해 약간의 지연 후 드롭다운 닫기
+		if (event && event.currentTarget) {
+			(event.currentTarget as HTMLElement).focus();
+		}
+		setTimeout(() => {
 		sortDropdownOpen = false;
+			const button = document.querySelector('.sort-dropdown button') as HTMLButtonElement;
+			if (button) {
+				button.focus();
+			}
+		}, 150);
 	}
 
 	function toggleTrackList(albumId: string) {
@@ -484,6 +677,47 @@
 		};
 	});
 
+	// 외부 클릭 시 더보기 메뉴 닫기
+	$effect(() => {
+		if (moreMenuOpenId === null) return;
+
+		function handleClickOutside(event: MouseEvent) {
+			const target = event.target as HTMLElement;
+			// 더보기 메뉴 드롭다운을 클릭한 경우는 무시
+			if (target.closest('.more-menu-dropdown')) {
+				return;
+			}
+			// 외부 클릭 시 더보기 메뉴 닫기
+			moreMenuOpenId = null;
+		}
+
+		// 이벤트 리스너 추가 (다음 틱에 실행하여 현재 클릭 이벤트와 충돌 방지)
+		const timeoutId = setTimeout(() => {
+			document.addEventListener('click', handleClickOutside, true);
+		}, 0);
+
+		return () => {
+			clearTimeout(timeoutId);
+			document.removeEventListener('click', handleClickOutside, true);
+		};
+	});
+
+	// Escape 키로 더보기 메뉴 닫기
+	$effect(() => {
+		if (moreMenuOpenId === null) return;
+
+		function handleEscape(e: KeyboardEvent) {
+			if (e.key === 'Escape') {
+				moreMenuOpenId = null;
+			}
+		}
+
+		document.addEventListener('keydown', handleEscape);
+		return () => {
+			document.removeEventListener('keydown', handleEscape);
+		};
+	});
+
 	function handlePlayAlbum(albumId: string) {
 		// 앨범 전체 재생 로직
 		console.log('앨범 재생:', albumId);
@@ -492,37 +726,62 @@
 	}
 
 	function handleEdit(albumId: string) {
-		// 앨범 편집 로직
-		console.log('앨범 편집:', albumId);
-		const album = albums.find(a => a.id === albumId);
-		alert(`앨범 편집\n제목: ${album?.title || '알 수 없음'}\nID: ${albumId}\n\n(편집 기능은 추후 구현 예정)`);
+		// 앨범 편집 페이지로 이동
+		goto(`/albums/${albumId}/edit`);
 	}
 
-	function handleMoreOptions(albumId: string) {
-		// 더보기 메뉴 로직
-		console.log('더보기 옵션:', albumId);
-		alert(`앨범 ID: ${albumId}\n더보기 메뉴 기능 (추후 구현 예정)`);
+	function toggleMoreMenu(albumId: string) {
+		moreMenuOpenId = moreMenuOpenId === albumId ? null : albumId;
+	}
+
+	function handleDelete(albumId: string) {
+		const album = albums.find(a => a.id === albumId);
+		if (confirm(`정말 "${album?.title || '앨범'}" 앨범을 삭제하시겠습니까?`)) {
+			console.log('앨범 삭제:', albumId);
+			// 실제 삭제 로직 구현 예정
+			moreMenuOpenId = null;
+		}
+	}
+
+	function handleDownload(albumId: string) {
+		console.log('앨범 다운로드:', albumId);
+		// 실제 다운로드 로직 구현 예정
+		moreMenuOpenId = null;
+	}
+
+	function handleShare(albumId: string) {
+		console.log('앨범 공유:', albumId);
+		// 실제 공유 로직 구현 예정
+		moreMenuOpenId = null;
 	}
 
 	function handleAlbumClick(albumId: string, albumTitle: string) {
-		// 앨범 상세 페이지로 이동 (추후 구현)
-		console.log('앨범 클릭:', albumId, albumTitle);
-		alert(`앨범 상세 페이지\n제목: ${albumTitle}\nID: ${albumId}\n\n(페이지는 추후 구현 예정)`);
+		// 앨범 상세 페이지로 이동
+		goto(`/albums/${albumId}`);
 	}
 
 	function handleTrackClick(albumId: string, albumTitle: string, trackId: string, trackTitle: string) {
-		// 트랙 상세 페이지로 이동 (추후 구현)
-		console.log('트랙 클릭:', { albumId, albumTitle, trackId, trackTitle });
-		alert(`트랙 상세 페이지\n앨범: ${albumTitle}\n트랙: ${trackTitle}\n앨범 ID: ${albumId}\n트랙 ID: ${trackId}\n\n(페이지는 추후 구현 예정)`);
+		// 트랙 상세 페이지로 이동
+		goto(`/tracks/${trackId}`);
 	}
 
 	function toggleFilterDropdown() {
 		filterDropdownOpen = !filterDropdownOpen;
 	}
 
-	function selectFilterOption(value: string) {
+	function selectFilterOption(value: string, event?: MouseEvent | KeyboardEvent) {
 		selectedFilter = value;
+		// 클릭한 항목에 포커스 효과를 보여주기 위해 약간의 지연 후 드롭다운 닫기
+		if (event && event.currentTarget) {
+			(event.currentTarget as HTMLElement).focus();
+		}
+		setTimeout(() => {
 		filterDropdownOpen = false;
+			const button = document.querySelector('.filter-dropdown button') as HTMLButtonElement;
+			if (button) {
+				button.focus();
+			}
+		}, 150);
 	}
 
 	// 필터 옵션 그룹화
@@ -546,9 +805,36 @@
 		
 		return { groups, ungrouped };
 	});
+
+	// 페이지네이션 상태
+	let currentPage = $state(1);
+	const itemsPerPage = 12;
+	const totalPages = $derived(Math.ceil(filteredAndSortedAlbums.length / itemsPerPage));
+	const paginatedAlbums = $derived.by(() => {
+		const start = (currentPage - 1) * itemsPerPage;
+		const end = start + itemsPerPage;
+		return filteredAndSortedAlbums.slice(start, end);
+	});
+
+	// 페이지 변경 시 상단으로 스크롤
+	function goToPage(page: number) {
+		if (page >= 1 && page <= totalPages) {
+			currentPage = page;
+			window.scrollTo({ top: 0, behavior: 'smooth' });
+		}
+	}
+
+	// 필터/검색 변경 시 첫 페이지로 리셋
+	$effect(() => {
+		currentPage = 1;
+	});
+
+	function handleCreateAlbum() {
+		goto('/albums/new');
+	}
 </script>
 
-<PageContent>
+<PageContent className="min-h-screen overflow-visible" padding="pt-0 pb-64">
 	<PageHeader 
 		title="앨범" 
 		description="음악 앨범을 관리하고 발매하세요."
@@ -556,7 +842,7 @@
 			{
 				icon: Plus,
 				label: '새 앨범 만들기',
-				onclick: handleCreateAlbum
+				href: '/albums/new'
 			}
 		]}
 	/>
@@ -619,7 +905,7 @@
 										role="option"
 										aria-selected={selectedFilter === opt.value}
 										tabindex="0"
-										onclick={() => selectFilterOption(opt.value)}
+										onclick={(e) => selectFilterOption(opt.value, e)}
 										onkeydown={(e) => {
 											if (e.key === 'Enter' || e.key === ' ') {
 												e.preventDefault();
@@ -640,7 +926,7 @@
 										role="option"
 										aria-selected={selectedFilter === opt.value}
 										tabindex="0"
-										onclick={() => selectFilterOption(opt.value)}
+										onclick={(e) => selectFilterOption(opt.value, e)}
 										onkeydown={(e) => {
 											if (e.key === 'Enter' || e.key === ' ') {
 												e.preventDefault();
@@ -658,7 +944,7 @@
 									role="option"
 									aria-selected={selectedFilter === opt.value}
 									tabindex="0"
-									onclick={() => selectFilterOption(opt.value)}
+									onclick={(e) => selectFilterOption(opt.value, e)}
 									onkeydown={(e) => {
 										if (e.key === 'Enter' || e.key === ' ') {
 											e.preventDefault();
@@ -675,12 +961,12 @@
 			</div>
 		
 			<!-- 정렬 드롭다운 -->
-			<div class="relative group sort-dropdown w-full sm:w-auto" data-open={sortDropdownOpen ? 'true' : 'false'}>
+			<div class="relative group sort-dropdown filter-dropdown w-full sm:w-auto" data-open={sortDropdownOpen ? 'true' : 'false'}>
 			<button
 				type="button"
 				aria-haspopup="listbox"
 				aria-expanded={sortDropdownOpen}
-				class="flex items-center justify-between pl-10 pr-8 py-1.5 w-full sm:w-[160px] bg-surface-1 rounded-[6px] text-text-base transition-all duration-200 cursor-pointer border focus:outline-none"
+				class="flex items-center justify-between pl-10 pr-8 py-1.5 w-full sm:w-auto sm:min-w-[140px] bg-surface-1 rounded-[6px] text-text-base transition-all duration-200 cursor-pointer border focus:outline-none"
 				onclick={toggleSortDropdown}
 				tabindex="0"
 			>
@@ -704,13 +990,13 @@
 			
 			<!-- 드롭다운 리스트 -->
 			{#if sortDropdownOpen}
-				<ul role="listbox" class="absolute left-0 w-full sm:w-[160px] mt-[6px] bg-surface-1 border rounded-[6px] z-10 border-border-subtle overflow-hidden shadow-lg">
+				<ul role="listbox" class="absolute left-0 w-full mt-[6px] bg-surface-1 border rounded-[6px] z-10 border-border-subtle overflow-hidden shadow-lg">
 					{#each sortOptions as opt}
 						<li
 							role="option"
 							aria-selected={selectedSort === opt.value}
 							tabindex="0"
-							onclick={() => selectSort(opt.value)}
+							onclick={(e) => selectSort(opt.value, e)}
 							onkeydown={(e) => {
 								if (e.key === 'Enter' || e.key === ' ') {
 									e.preventDefault();
@@ -742,7 +1028,7 @@
 	<!-- 앨범 그리드 -->
 	{#if filteredAndSortedAlbums.length > 0}
 		<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-			{#each filteredAndSortedAlbums as album (album.id)}
+			{#each paginatedAlbums as album (album.id)}
 				<div 
 					onclick={() => handleAlbumClick(album.id, album.title)}
 					class="album-card bg-surface-1 rounded-lg hover:bg-surface-2 transition-colors duration-200 group border border-border-subtle cursor-pointer focus-visible:border-brand-pink"
@@ -780,7 +1066,7 @@
 						<div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
 							<button 
 								onclick={(e) => { e.preventDefault(); e.stopPropagation(); handlePlayAlbum(album.id); }}
-								class="play-button w-12 h-12 bg-brand-pink rounded-full flex items-center justify-center hover:bg-brand-pink/90 transition-colors duration-200" 
+								class="play-button w-12 h-12 bg-brand-pink rounded-full flex items-center justify-center transition-colors duration-200" 
 								aria-label="재생"
 							>
 								<Play size={20} class="play-button-icon text-white" />
@@ -886,7 +1172,7 @@
 							</div>
 						{/if}
 						</div>
-						
+
 						{#if album.trackList && album.trackList.length === 0}
 							<div class="text-xs text-text-muted/60 mb-4 italic">트랙 정보 없음</div>
 						{/if}
@@ -904,39 +1190,164 @@
 							</div>
 						</div>
 						<div class="flex items-end justify-between text-xs text-text-muted">
-							<div class="flex flex-col gap-0.5">
+							<div class="flex flex-col gap-1">
 								<span class="leading-none">작업 생성: {album.created_at}</span>
 								<span class="leading-none">국내 발매: {album.release_date_kr || '미정'}</span>
 								<span class="leading-none">해외 발매: {album.release_date_global || '미정'}</span>
 							</div>
-							<div class="flex items-end -mr-4" role="group" aria-label="앨범 액션 버튼">
+							<div class="flex items-end -mr-4 gap-0" role="group" aria-label="앨범 액션 버튼">
 								<button 
 									onclick={(e) => { e.preventDefault(); e.stopPropagation(); handleEdit(album.id); }}
 									onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') e.stopPropagation(); }}
-									class="w-8 h-8 inline-flex items-end justify-center rounded-md hover:bg-surface-2 focus-visible:bg-surface-2 transition-colors duration-200 pb-0.5" 
+									class="w-8 h-8 inline-flex items-end justify-center rounded-md hover:bg-surface-2 focus-visible:bg-surface-2 transition-colors duration-200 pb-0.5 action-button" 
 									aria-label="편집" 
 									title="편집"
 								>
-									<Edit size={14} class="text-text-muted" />
+									<Edit size={14} class="text-text-muted action-button-icon" />
 								</button>
-								<button 
-									onclick={(e) => { e.preventDefault(); e.stopPropagation(); handleMoreOptions(album.id); }}
-									onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') e.stopPropagation(); }}
-									class="w-8 h-8 inline-flex items-end justify-center rounded-md hover:bg-surface-2 focus-visible:bg-surface-2 transition-colors duration-200 -ml-1 pb-0.5" 
-									aria-label="더보기" 
-									title="더보기"
-								>
-									<MoreVertical size={14} class="text-text-muted" />
-								</button>
+								<div class="relative more-menu-dropdown -ml-1 flex items-end">
+									<button
+										class="w-8 h-8 inline-flex items-end justify-center rounded-md hover:bg-transparent focus-visible:bg-transparent hover:text-text-strong focus-visible:text-text-strong transition-colors duration-200 pb-0.5 action-button"
+										aria-label="더보기"
+										aria-expanded={moreMenuOpenId === album.id}
+										aria-haspopup="menu"
+										title="더보기"
+										tabindex="0"
+										onclick={(e) => { e.preventDefault(); e.stopPropagation(); toggleMoreMenu(album.id); }}
+										onkeydown={(e) => { 
+											if (e.key === 'Enter' || e.key === ' ') { 
+												e.preventDefault(); 
+												e.stopPropagation(); 
+												toggleMoreMenu(album.id); 
+											} 
+										}}
+									>
+										<MoreVertical size={14} class="action-button-icon" />
+									</button>
+
+									{#if moreMenuOpenId === album.id}
+										<div 
+											role="menu"
+											class="absolute right-0 bottom-full mb-1 w-48 bg-surface-1 border border-border-subtle rounded-lg z-50 animate-in fade-in slide-in-from-bottom-2 duration-200"
+										>
+											<div class="py-1">
+												<button 
+													role="menuitem"
+													class="group w-full flex items-center gap-2 px-4 py-2 text-sm text-text-base hover:bg-transparent hover:text-[var(--hover-cyan)] transition-colors duration-200 text-left" 
+													aria-label="다운로드"
+													onclick={(e) => { e.preventDefault(); e.stopPropagation(); handleDownload(album.id); }}
+													onkeydown={(e) => {
+														if (e.key === 'Enter' || e.key === ' ') {
+															e.preventDefault();
+															e.stopPropagation();
+															handleDownload(album.id);
+														}
+													}}
+												>
+													<Download size={16} class="text-text-muted group-hover:text-[var(--hover-cyan)] transition-colors duration-200" />
+													다운로드
+												</button>
+												
+												<button 
+													role="menuitem"
+													class="group w-full flex items-center gap-2 px-4 py-2 text-sm text-text-base hover:bg-transparent hover:text-[var(--hover-cyan)] transition-colors duration-200 text-left" 
+													aria-label="멤버 배정"
+													onclick={(e) => { e.preventDefault(); e.stopPropagation(); handleAssignMember(album.id); }}
+													onkeydown={(e) => {
+														if (e.key === 'Enter' || e.key === ' ') {
+															e.preventDefault();
+															e.stopPropagation();
+															handleAssignMember(album.id);
+														}
+													}}
+												>
+													<UserPlus size={16} class="text-text-muted group-hover:text-[var(--hover-cyan)] transition-colors duration-200" />
+													멤버 배정
+												</button>
+												<button 
+													role="menuitem"
+													class="group w-full flex items-center gap-2 px-4 py-2 text-sm text-text-base hover:bg-transparent hover:text-[var(--hover-cyan)] transition-colors duration-200 text-left" 
+													aria-label="공유 링크 복사"
+													onclick={(e) => { e.preventDefault(); e.stopPropagation(); handleCopyShareLink(album.id); }}
+													onkeydown={(e) => {
+														if (e.key === 'Enter' || e.key === ' ') {
+															e.preventDefault();
+															e.stopPropagation();
+															handleCopyShareLink(album.id);
+														}
+													}}
+												>
+													<Link size={16} class="text-text-muted group-hover:text-[var(--hover-cyan)] transition-colors duration-200" />
+													공유 링크 복사
+												</button>
+												
+												<div class="border-t border-border-subtle my-1" role="separator"></div>
+												
+												<button 
+													role="menuitem"
+													class="group w-full flex items-center gap-2 px-4 py-2 text-sm text-danger-fg hover:bg-transparent hover:text-danger-fg/80 transition-colors duration-200 text-left" 
+													aria-label="삭제"
+													onclick={(e) => { e.preventDefault(); e.stopPropagation(); handleDelete(album.id); }}
+													onkeydown={(e) => {
+														if (e.key === 'Enter' || e.key === ' ') {
+															e.preventDefault();
+															e.stopPropagation();
+															handleDelete(album.id);
+														}
+													}}
+												>
+													<Trash2 size={16} class="text-danger-fg group-hover:text-danger-fg/80" />
+													삭제
+												</button>
+											</div>
+										</div>
+									{/if}
+								</div>
 							</div>
 						</div>
 					</div>
 				</div>
 			{/each}
 		</div>
+
+		<!-- 페이지네이션 -->
+		{#if totalPages > 1}
+			<div class="flex justify-center items-center gap-2 mt-6">
+				<button
+					onclick={() => goToPage(currentPage - 1)}
+					disabled={currentPage === 1}
+					class="w-8 h-8 flex items-center justify-center rounded-md bg-surface-2 hover:bg-surface-3 disabled:opacity-50 disabled:cursor-not-allowed text-sm transition-colors duration-200"
+					aria-label="이전 페이지"
+				>
+					<ChevronLeft size={16} />
+				</button>
+				{#each Array(totalPages) as _, i}
+					{@const page = i + 1}
+					{#if page === 1 || page === totalPages || (page >= currentPage - 1 && page <= currentPage + 1)}
+						<button
+							onclick={() => goToPage(page)}
+							class="w-8 h-8 flex items-center justify-center rounded-md bg-surface-2 hover:bg-surface-3 text-sm transition-colors duration-200 {currentPage === page ? 'bg-brand-pink text-white hover:bg-brand-pink/90' : ''}"
+							aria-label="페이지 {page}"
+							aria-current={currentPage === page ? 'page' : undefined}
+						>
+							{page}
+						</button>
+					{:else if page === currentPage - 2 || page === currentPage + 2}
+						<span class="text-text-muted">...</span>
+					{/if}
+				{/each}
+				<button
+					onclick={() => goToPage(currentPage + 1)}
+					disabled={currentPage === totalPages}
+					class="w-8 h-8 flex items-center justify-center rounded-md bg-surface-2 hover:bg-surface-3 disabled:opacity-50 disabled:cursor-not-allowed text-sm transition-colors duration-200"
+					aria-label="다음 페이지"
+				>
+					<ChevronRight size={16} />
+				</button>
+			</div>
+		{/if}
 	{:else}
 		<EmptyState 
-			icon={Disc3}
 			title="앨범을 찾을 수 없습니다"
 			description={searchQuery ? '검색 조건에 맞는 앨범이 없습니다.' : '아직 앨범이 없습니다.'}
 			actionLabel="첫 번째 앨범 만들기"

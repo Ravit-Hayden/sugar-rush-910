@@ -16,7 +16,7 @@
 	{#if actionLabel}
 		<button 
 			onclick={onAction}
-			class="inline-flex items-center gap-2 px-6 py-3 bg-brand-pink text-white rounded-lg hover:bg-brand-pink/90 transition-colors duration-200 font-medium"
+			class="inline-flex items-center justify-center gap-2 px-6 py-3 w-full sm:w-auto bg-brand-pink text-white rounded-lg hover:bg-brand-pink/90 transition-colors duration-200 font-medium"
 		>
 			{actionLabel}
 		</button>

@@ -3,6 +3,7 @@
 	import '../app.css';
 	import Header from '$lib/components/Header.svelte';
 	import Sidebar from '$lib/components/Sidebar.svelte';
+	import ToastContainer from '$lib/components/ToastContainer.svelte';
 
 	let { children } = $props();
 	let sidebarCollapsed = $state(true); // 기본값: 축소 상태
@@ -53,4 +54,6 @@
 	<main class="main-content-area {sidebarCollapsed ? 'sidebar-collapsed' : 'sidebar-expanded'}">
 		{@render children?.()}
 	</main>
+	
+	<ToastContainer />
 </div>

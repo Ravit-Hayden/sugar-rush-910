@@ -88,7 +88,7 @@
           openFilterDD.dataset.open='false';
           openFilterDD.querySelector('button')?.setAttribute('aria-expanded','false');
           openFilterDD.querySelector('button')?.focus();
-        }
+      }
         if(openSortDD){
           openSortDD.dataset.open='false';
           openSortDD.querySelector('button')?.setAttribute('aria-expanded','false');

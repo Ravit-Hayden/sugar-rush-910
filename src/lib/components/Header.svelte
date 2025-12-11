@@ -5,6 +5,7 @@
 	import ThemeToggle from './ThemeToggle.svelte';
 
 	let sidebarWidth = 72; // 기본값: 축소 상태
+	let searchInput: HTMLInputElement;
 
 	// 메뉴 아이템 정의 (사이드바와 동일)
 	const menuItems = [
@@ -42,8 +43,28 @@
 		};
 
 		window.addEventListener('sidebar-width-change', handleSidebarWidthChange as EventListener);
+
+		// 키보드 단축키: Ctrl+K 또는 Cmd+K로 검색창 포커스
+		function handleKeyDown(e: KeyboardEvent) {
+			// Ctrl+K (Windows/Linux) 또는 Cmd+K (Mac)
+			if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+				// input 필드에 포커스가 있으면 기본 동작 허용
+				if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+					return;
+				}
+				e.preventDefault();
+				if (searchInput) {
+					searchInput.focus();
+					searchInput.select();
+				}
+			}
+		}
+
+		document.addEventListener('keydown', handleKeyDown);
+
 		return () => {
 			window.removeEventListener('sidebar-width-change', handleSidebarWidthChange as EventListener);
+			document.removeEventListener('keydown', handleKeyDown);
 		};
 	});
 </script>
@@ -64,12 +85,16 @@
 			<!-- 검색창 -->
 			<div class="flex items-center search-container group">
 				<div class="relative w-full min-w-[120px] sm:min-w-[160px] md:min-w-[200px] lg:min-w-[240px] xl:min-w-[280px] max-w-[320px]">
-					<Search size={16} class="absolute left-3 top-1/2 transform -translate-y-1/2 lucide-icon lucide-search" />
+					<Search size={16} class="absolute left-3 top-1/2 transform -translate-y-1/2 lucide-icon lucide-search" aria-hidden="true" />
 					<input
 						type="text"
 						placeholder="검색..."
+						bind:this={searchInput}
+						aria-label="검색"
+						aria-describedby="search-description"
 						class="pl-10 pr-10 py-1.5 w-full bg-surface-1 border border-border-subtle border-[1px] rounded-md text-text-base placeholder-text-muted focus:outline-none focus:ring-0"
 					/>
+					<span id="search-description" class="sr-only">Ctrl+K 또는 Cmd+K를 눌러 검색창에 포커스할 수 있습니다</span>
 				</div>
 			</div>
 

@@ -131,7 +131,6 @@
 					</div>
 				{:else}
 					<EmptyState
-						icon={Calendar}
 						title="일정을 찾을 수 없습니다"
 						description={searchQuery ? '검색 조건에 맞는 일정이 없습니다.' : '아직 일정이 없습니다.'}
 						actionLabel="첫 번째 일정 추가"

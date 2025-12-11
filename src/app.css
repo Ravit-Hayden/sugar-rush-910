@@ -365,6 +365,14 @@ div[class*="panel"] {
   padding-right: 0 !important;
 }
 
+/* 트랙 페이지 배지 정렬 (좌우 패딩 제거) */
+.badge-base.pl-0 {
+  padding-left: 0 !important;
+}
+.badge-base.pr-0 {
+  padding-right: 0 !important;
+}
+
 /* 카드 내부 재생 버튼 포커스 시 카드 테두리 변경 (최우선) */
 .album-card:has(.play-button:focus),
 .album-card:has(.play-button:focus-visible) {
@@ -533,12 +541,44 @@ div[class*="panel"] {
   color: #FFFFFF !important;
 }
 
+/* 라이트 모드 - 활성화/포커스 시 아이콘 흰색 강제 (모든 클래스 조합 포함) */
+[data-theme="light"] .sidebar-menu-item.active .lucide-icon,
+[data-theme="light"] .sidebar-menu-item.active:hover .lucide-icon,
+[data-theme="light"] .sidebar-menu-item.active:focus .lucide-icon,
+[data-theme="light"] .sidebar-menu-item.active:focus-visible .lucide-icon,
+[data-theme="light"] .sidebar-menu-item.active:focus:hover .lucide-icon,
+[data-theme="light"] .sidebar-menu-item.active:focus-visible:hover .lucide-icon,
+[data-theme="light"] aside nav ul li a.sidebar-menu-item.active .lucide-icon,
+[data-theme="light"] aside nav ul li a.sidebar-menu-item.active:hover .lucide-icon,
+[data-theme="light"] aside nav ul li a.sidebar-menu-item.active:focus .lucide-icon,
+[data-theme="light"] aside nav ul li a.sidebar-menu-item.active:focus-visible .lucide-icon,
+[data-theme="light"] aside nav ul li a.sidebar-menu-item.active:focus:hover .lucide-icon,
+[data-theme="light"] aside nav ul li a.sidebar-menu-item.active:focus-visible:hover .lucide-icon {
+  color: #FFFFFF !important;
+}
+
+/* 라이트 모드 - 활성화/포커스 시 텍스트 흰색 강제 */
+[data-theme="light"] .sidebar-menu-item.active,
+[data-theme="light"] .sidebar-menu-item.active:hover,
+[data-theme="light"] .sidebar-menu-item.active:focus,
+[data-theme="light"] .sidebar-menu-item.active:focus-visible,
+[data-theme="light"] .sidebar-menu-item.active:focus:hover,
+[data-theme="light"] .sidebar-menu-item.active:focus-visible:hover,
+[data-theme="light"] aside nav ul li a.sidebar-menu-item.active,
+[data-theme="light"] aside nav ul li a.sidebar-menu-item.active:hover,
+[data-theme="light"] aside nav ul li a.sidebar-menu-item.active:focus,
+[data-theme="light"] aside nav ul li a.sidebar-menu-item.active:focus-visible,
+[data-theme="light"] aside nav ul li a.sidebar-menu-item.active:focus:hover,
+[data-theme="light"] aside nav ul li a.sidebar-menu-item.active:focus-visible:hover {
+  color: #FFFFFF !important;
+}
+
 /* 라이트 모드에서 일반 링크와 버튼 호버 색상 변경 (포커스가 아닐 때만) */
 [data-theme="light"] a:hover:not(:focus):not(:focus-visible) {
   color: var(--hover-cyan) !important;
 }
 
-[data-theme="light"] button:not([class*="bg-"]):hover:not(:focus):not(:focus-visible) {
+[data-theme="light"] button:not([class*="bg-"]):not([data-action="toggle-sidebar"]):hover:not(:focus):not(:focus-visible) {
   color: var(--hover-cyan) !important;
 }
 
@@ -581,7 +621,7 @@ div[class*="panel"] {
 }
 
 /* 라이트 모드에서 일반 버튼 호버 배경 색상 변경 (테마 토글 버튼 제외, 포커스가 아닐 때만) */
-[data-theme="light"] button:hover:not([class*="bg-"]):not(.theme-toggle-button):not(:focus):not(:focus-visible) {
+[data-theme="light"] button:hover:not([class*="bg-"]):not(.theme-toggle-button):not([data-action="toggle-sidebar"]):not(:focus):not(:focus-visible) {
   background-color: var(--surface-1) !important;
 }
 
@@ -751,6 +791,11 @@ button#status:focus-visible:hover {
 ::-webkit-scrollbar {
   width: 8px !important; /* scrollbar-gutter와 일치하도록 고정 */
   height: 8px !important;
+}
+::-webkit-scrollbar-button {
+  display: none !important; /* 화살표 버튼 제거 */
+  width: 0 !important;
+  height: 0 !important;
 }
 ::-webkit-scrollbar-track {
   background: var(--bg);
@@ -980,10 +1025,57 @@ button[data-action="toggle-sidebar"]:active svg {
 [data-theme="light"] button[data-action="toggle-sidebar"]:hover,
 [data-theme="light"] button[data-action="toggle-sidebar"]:focus,
 [data-theme="light"] button[data-action="toggle-sidebar"]:focus-visible,
-[data-theme="light"] button[data-action="toggle-sidebar"]:active {
+[data-theme="light"] button[data-action="toggle-sidebar"]:active,
+[data-theme="light"] button[data-action="toggle-sidebar"]:focus:hover,
+[data-theme="light"] button[data-action="toggle-sidebar"]:focus-visible:hover {
   background-color: transparent !important;
   background: none !important;
+  background-image: none !important;
   color: inherit !important;
+  box-shadow: none !important;
+}
+
+/* 라이트 모드에서 사이드바 토글 버튼 포커스 시 아이콘 흰색 */
+[data-theme="light"] button[data-action="toggle-sidebar"]:focus svg,
+[data-theme="light"] button[data-action="toggle-sidebar"]:focus .lucide-icon,
+[data-theme="light"] button[data-action="toggle-sidebar"]:focus-visible svg,
+[data-theme="light"] button[data-action="toggle-sidebar"]:focus-visible .lucide-icon {
+  color: #FFFFFF !important; /* 흰색 */
+}
+
+/* 라이트 모드에서 사이드바 토글 버튼 포커스 상태에서 호버해도 포커스 색상(흰색) 유지 */
+[data-theme="light"] button[data-action="toggle-sidebar"]:focus:hover svg,
+[data-theme="light"] button[data-action="toggle-sidebar"]:focus:hover .lucide-icon,
+[data-theme="light"] button[data-action="toggle-sidebar"]:focus-visible:hover svg,
+[data-theme="light"] button[data-action="toggle-sidebar"]:focus-visible:hover .lucide-icon {
+  color: #FFFFFF !important; /* 흰색 유지 */
+}
+
+/* 라이트 모드에서 사이드바 토글 버튼 호버 시 보라색 (포커스가 아닐 때만) */
+[data-theme="light"] button[data-action="toggle-sidebar"]:hover:not(:focus):not(:focus-visible) svg,
+[data-theme="light"] button[data-action="toggle-sidebar"]:hover:not(:focus):not(:focus-visible) .lucide-icon {
+  color: #8A2BE2 !important; /* 보라색 */
+}
+
+/* 라이트 모드 기본 상태는 브랜드 핑크 유지 */
+[data-theme="light"] button[data-action="toggle-sidebar"] svg,
+[data-theme="light"] button[data-action="toggle-sidebar"] .lucide-icon,
+[data-theme="light"] button[data-action="toggle-sidebar"]:active svg,
+[data-theme="light"] button[data-action="toggle-sidebar"]:active .lucide-icon {
+  color: var(--brand-pink) !important;
+}
+
+/* 라이트 모드에서 text-hover-cyan 클래스 오버라이드 (포커스가 아닐 때만) */
+[data-theme="light"] button[data-action="toggle-sidebar"]:hover:not(:focus):not(:focus-visible) .text-hover-cyan {
+  color: #8A2BE2 !important; /* 보라색 */
+}
+
+/* 라이트 모드에서 포커스 시 text-hover-cyan 클래스도 흰색 */
+[data-theme="light"] button[data-action="toggle-sidebar"]:focus .text-hover-cyan,
+[data-theme="light"] button[data-action="toggle-sidebar"]:focus-visible .text-hover-cyan,
+[data-theme="light"] button[data-action="toggle-sidebar"]:focus:hover .text-hover-cyan,
+[data-theme="light"] button[data-action="toggle-sidebar"]:focus-visible:hover .text-hover-cyan {
+  color: #FFFFFF !important; /* 흰색 */
 }
 
 /* Tailwind 클래스 오버라이드 - 라이트 모드에서 배경색 변화 방지 */
@@ -1773,6 +1865,42 @@ input:focus-visible, button:focus-visible {
   color: var(--brand-pink) !important;
 }
 
+/* 삭제 버튼 (빨간색 유지) */
+.action-button.text-red-500 .action-button-text,
+.action-button.text-red-500 .action-button-icon {
+  color: #FF6B6B !important;
+}
+.action-button.text-red-500:hover:not(:focus):not(:focus-visible) {
+  border-color: var(--hover-cyan) !important;
+  background-color: rgba(255, 107, 107, 0.1) !important;
+}
+.action-button.text-red-500:hover:not(:focus):not(:focus-visible) .action-button-text,
+.action-button.text-red-500:hover:not(:focus):not(:focus-visible) .action-button-icon {
+  color: #FF6B6B !important;
+}
+.action-button.text-red-500:focus,
+.action-button.text-red-500:focus-visible {
+  border-color: var(--brand-pink) !important;
+  background-color: rgba(255, 107, 107, 0.1) !important;
+}
+.action-button.text-red-500:focus .action-button-text,
+.action-button.text-red-500:focus .action-button-icon,
+.action-button.text-red-500:focus-visible .action-button-text,
+.action-button.text-red-500:focus-visible .action-button-icon {
+  color: #FF6B6B !important;
+}
+.action-button.text-red-500:focus:hover,
+.action-button.text-red-500:focus-visible:hover {
+  border-color: var(--brand-pink) !important;
+  background-color: rgba(255, 107, 107, 0.1) !important;
+}
+.action-button.text-red-500:focus:hover .action-button-text,
+.action-button.text-red-500:focus:hover .action-button-icon,
+.action-button.text-red-500:focus-visible:hover .action-button-text,
+.action-button.text-red-500:focus-visible:hover .action-button-icon {
+  color: #FF6B6B !important;
+}
+
 /* 더보기 버튼 - action-button 클래스가 있어도 배경색 제거 */
 .more-menu-dropdown > button.action-button,
 .more-menu-dropdown > button.action-button:hover,
@@ -1998,6 +2126,25 @@ main.main-content,
 [data-theme="light"] .filter-dropdown:focus-within:hover button svg { color: var(--brand-pink) !important }
 
 .filter-dropdown ul { margin-top: 6px !important; margin-bottom: 0 !important; padding-top: 0 !important; padding-bottom: 0 !important; border-color: var(--border-subtle) !important; border-radius: 6px; overflow: hidden; box-shadow: none !important }
+
+/* 장르 필터 드롭다운 ul 마진 제거 (컨테이너 div에 mt-[6px]가 있으므로 ul은 0) */
+.genre-filter-dropdown ul {
+  margin-top: 0 !important;
+}
+
+/* 장르 필터 드롭다운 - Firefox 스크롤바 대응 (스크롤바 공간 확보) */
+.genre-filter-dropdown ul.custom-list-scrollbar {
+  scrollbar-gutter: stable; /* 스크롤바 공간을 미리 확보 (Firefox/Chrome 모두 지원) */
+}
+
+/* Firefox 전용 - 스크롤바와 텍스트 사이 간격 확보 및 호버 시 두꺼워짐 최소화 */
+@-moz-document url-prefix() {
+  .genre-filter-dropdown ul.custom-list-scrollbar {
+    padding-right: 0.5rem !important; /* 8px - 스크롤바 호버 시 두꺼워져도 텍스트와 충분한 간격 */
+    /* Firefox 스크롤바 호버 시 두꺼워지는 현상은 브라우저 기본 동작이므로
+       패딩을 충분히 확보하여 컨텐츠와의 간격을 유지 */
+  }
+}
 .filter-dropdown [role="option"] { 
   display: block; 
   margin: 0 !important; 
@@ -2048,12 +2195,14 @@ main.main-content,
   border-radius: 0 !important;
 }
 
-.filter-dropdown [role="option"]:hover:not([aria-selected="true"]):not(:focus-visible) {
+.filter-dropdown [role="option"]:hover:not([aria-selected="true"]):not(:focus-visible):not(:focus) {
   background-color: var(--hover-cyan) !important;
 }
+.filter-dropdown [role="option"]:focus:not([aria-selected="true"]),
 .filter-dropdown [role="option"]:focus-visible:not([aria-selected="true"]) {
   background-color: var(--brand-pink) !important; color:#fff !important; outline: none;
 }
+.filter-dropdown [role="option"]:focus:not([aria-selected="true"]):hover,
 .filter-dropdown [role="option"]:focus-visible:not([aria-selected="true"]):hover {
   background-color: var(--brand-pink) !important; color:#fff !important; outline: none;
 }
@@ -3130,42 +3279,188 @@ input[type="number"].number-input-custom + div button:focus-visible .lucide-icon
 /* ============================================================
    커스텀 스크롤바 강제 적용 (.custom-list-scrollbar)
    ============================================================ */
-/* 커스텀 스크롤바 강제 표시 */
+/* 1. 커스텀 스크롤바 컨테이너 */
 .custom-list-scrollbar {
-  overflow-y: scroll !important; /* 무조건 스크롤바 영역 확보 */
-  scrollbar-width: thin !important;
-  scrollbar-color: var(--surface-2) var(--bg) !important;
+  overflow-y: scroll !important; /* 항상 스크롤바 영역 확보 */
+  scrollbar-width: thin !important; /* Firefox: thin으로 최소화 (호버 시 두꺼워짐 최소화) */
+  scrollbar-color: rgba(23, 225, 188, 0.3) transparent !important; /* Firefox (Dark) */
+  scrollbar-gutter: stable; /* 스크롤바 공간을 미리 확보하여 레이아웃 시프트 방지 */
 }
 
-/* Webkit (Chrome, Edge, Safari) */
+/* 2. Webkit 스크롤바 전체 크기 */
 .custom-list-scrollbar::-webkit-scrollbar {
   width: 8px !important;
   height: 8px !important;
-  display: block !important; /* 숨김 방지 */
-}
-.custom-list-scrollbar::-webkit-scrollbar-track {
-  background: var(--bg) !important;
-}
-.custom-list-scrollbar::-webkit-scrollbar-thumb {
-  background-color: var(--surface-2) !important;
-  border-radius: 0px !important;
-  border: 2px solid var(--bg); /* 썸 주변 여백 */
-}
-.custom-list-scrollbar::-webkit-scrollbar-thumb:hover {
-  background-color: var(--text-muted) !important;
+  display: block !important;
 }
 
-/* 라이트 모드 대응 */
-[data-theme="light"] .custom-list-scrollbar {
-  scrollbar-color: var(--text-muted) var(--bg) !important;
+/* 3. [핵심] 화살표 버튼 공간 완전 제거 */
+.custom-list-scrollbar::-webkit-scrollbar-button {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
 }
-[data-theme="light"] .custom-list-scrollbar::-webkit-scrollbar-track {
-  background: var(--bg) !important;
+.custom-list-scrollbar::-webkit-scrollbar-corner {
+  display: none !important;
+}
+
+/* 4. 트랙 (투명) */
+.custom-list-scrollbar::-webkit-scrollbar-track {
+  background: transparent !important;
+  margin: 0 !important;
+}
+
+/* 5. 썸 (막대) - 브랜드 포인트 스타일 (Dark Mode) */
+.custom-list-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(23, 225, 188, 0.3) !important; /* 투명한 시안 */
+  border: 2px solid transparent !important; /* 여백 효과 */
+  background-clip: padding-box !important;
+  border-radius: 4px !important;
+}
+.custom-list-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #17E1BC !important; /* 쨍한 시안 */
+}
+
+/* 6. 라이트 모드 오버라이드 (Light Mode) */
+[data-theme="light"] .custom-list-scrollbar {
+  scrollbar-color: rgba(138, 43, 226, 0.3) transparent !important; /* Firefox (Light) */
 }
 [data-theme="light"] .custom-list-scrollbar::-webkit-scrollbar-thumb {
-  background-color: var(--text-muted) !important;
-  border: 2px solid var(--bg);
+  background-color: rgba(138, 43, 226, 0.3) !important; /* 투명한 보라 */
 }
 [data-theme="light"] .custom-list-scrollbar::-webkit-scrollbar-thumb:hover {
-  background-color: var(--text-base) !important;
+  background-color: #8A2BE2 !important; /* 쨍한 보라 */
+}
+
+/* ============================================================
+   고급 검색 범위 입력 아이콘 스타일
+   ============================================================ */
+/* input 포커스 시 아이콘 색상 변경 */
+.relative:has(input:focus) button.text-text-muted {
+  color: var(--hover-cyan) !important;
+}
+
+/* input 포커스 시 아이콘 색상 변경 (더 구체적인 선택자) */
+.relative:has(input[type="number"]:focus) .pointer-events-auto.text-text-muted {
+  color: var(--hover-cyan) !important;
+}
+
+/* 포커스된 input의 형제 버튼 아이콘 색상 변경 */
+.relative:focus-within .pointer-events-auto.text-text-muted {
+  color: var(--hover-cyan) !important;
+}
+
+/* ============================================================
+   고급 검색 버튼 스타일 (호버/포커스 우선순위)
+   ============================================================ */
+/* 고급 검색 버튼 - 패널이 열려있을 때 (aria-expanded="true") */
+button[aria-label="고급 검색"][aria-expanded="true"] {
+  border-color: var(--brand-pink) !important;
+}
+button[aria-label="고급 검색"][aria-expanded="true"] svg,
+button[aria-label="고급 검색"][aria-expanded="true"] .lucide-icon {
+  color: var(--brand-pink) !important;
+}
+
+/* 고급 검색 버튼 - 호버만 있을 때 (포커스 없음, 패널 닫혀있을 때만) */
+button[aria-label="고급 검색"]:hover:not(:focus):not(:focus-visible):not([aria-expanded="true"]) {
+  border-color: var(--hover-cyan) !important;
+}
+button[aria-label="고급 검색"]:hover:not(:focus):not(:focus-visible):not([aria-expanded="true"]) svg,
+button[aria-label="고급 검색"]:hover:not(:focus):not(:focus-visible):not([aria-expanded="true"]) .lucide-icon {
+  color: var(--hover-cyan) !important;
+}
+
+/* 고급 검색 버튼 - 포커스 시 (호버와 관계없이) */
+button[aria-label="고급 검색"]:focus,
+button[aria-label="고급 검색"]:focus-visible {
+  border-color: var(--brand-pink) !important;
+}
+button[aria-label="고급 검색"]:focus svg,
+button[aria-label="고급 검색"]:focus-visible svg,
+button[aria-label="고급 검색"]:focus .lucide-icon,
+button[aria-label="고급 검색"]:focus-visible .lucide-icon {
+  color: var(--hover-cyan) !important;
+}
+
+/* 고급 검색 버튼 - 포커스 + 호버 (포커스 우선) */
+button[aria-label="고급 검색"]:focus:hover,
+button[aria-label="고급 검색"]:focus-visible:hover {
+  border-color: var(--brand-pink) !important;
+}
+button[aria-label="고급 검색"]:focus:hover svg,
+button[aria-label="고급 검색"]:focus-visible:hover svg,
+button[aria-label="고급 검색"]:focus:hover .lucide-icon,
+button[aria-label="고급 검색"]:focus-visible:hover .lucide-icon {
+  color: var(--hover-cyan) !important;
+}
+
+/* 고급 검색 장르 태그 - 선택된 항목 테두리 (다크 모드) */
+.advanced-search-panel button[aria-pressed="true"] {
+  border-color: var(--brand-pink) !important;
+}
+
+/* 고급 검색 장르 태그 - 선택된 항목 테두리 (라이트 모드) */
+[data-theme="light"] .advanced-search-panel button[aria-pressed="true"] {
+  border-color: var(--brand-pink) !important;
+}
+
+/* 고급 검색 장르 태그 - 호버 효과 (포커스 없을 때만, 선택 안 된 항목만) */
+.advanced-search-panel button[aria-pressed="false"]:hover:not(:focus):not(:focus-visible):not([aria-pressed="true"]) {
+  border-color: var(--hover-cyan) !important;
+  background-color: var(--surface-3) !important;
+}
+
+/* 고급 검색 장르 태그 - 포커스 효과 */
+.advanced-search-panel button[aria-pressed="false"]:focus,
+.advanced-search-panel button[aria-pressed="false"]:focus-visible {
+  border-color: var(--brand-pink) !important;
+  background-color: var(--surface-2) !important;
+  color: var(--brand-pink) !important;
+}
+
+/* 고급 검색 장르 태그 - 포커스+호버 (포커스 색상 유지) */
+.advanced-search-panel button[aria-pressed="false"]:focus:hover,
+.advanced-search-panel button[aria-pressed="false"]:focus-visible:hover {
+  border-color: var(--brand-pink) !important;
+  background-color: var(--surface-2) !important;
+  color: var(--brand-pink) !important;
+}
+
+/* 고급 검색 장르 태그 - 선택된 항목 호버/포커스 (핑크 유지, 호버 색상 무시) */
+.advanced-search-panel button[aria-pressed="true"]:hover:not(:focus):not(:focus-visible),
+.advanced-search-panel button[aria-pressed="true"]:focus,
+.advanced-search-panel button[aria-pressed="true"]:focus-visible {
+  border-color: var(--brand-pink) !important;
+  background-color: var(--brand-pink) !important;
+  color: #FFFFFF !important;
+}
+
+.advanced-search-panel button[aria-pressed="true"]:focus:hover,
+.advanced-search-panel button[aria-pressed="true"]:focus-visible:hover {
+  border-color: var(--brand-pink) !important;
+  background-color: var(--brand-pink) !important;
+  color: #FFFFFF !important;
+}
+
+/* 라이트 모드 - 고급 검색 장르 태그 호버 효과 (포커스 없을 때만, 선택 안 된 항목만) */
+[data-theme="light"] .advanced-search-panel button[aria-pressed="false"]:hover:not(:focus):not(:focus-visible):not([aria-pressed="true"]) {
+  border-color: var(--hover-cyan) !important;
+}
+
+/* 라이트 모드 - 고급 검색 장르 태그 포커스 효과 */
+[data-theme="light"] .advanced-search-panel button[aria-pressed="false"]:focus,
+[data-theme="light"] .advanced-search-panel button[aria-pressed="false"]:focus-visible {
+  border-color: var(--brand-pink) !important;
+  background-color: var(--surface-2) !important;
+  color: var(--brand-pink) !important;
+}
+
+/* 라이트 모드 - 고급 검색 장르 태그 포커스+호버 */
+[data-theme="light"] .advanced-search-panel button[aria-pressed="false"]:focus:hover,
+[data-theme="light"] .advanced-search-panel button[aria-pressed="false"]:focus-visible:hover {
+  border-color: var(--brand-pink) !important;
+  background-color: var(--surface-2) !important;
+  color: var(--brand-pink) !important;
 }

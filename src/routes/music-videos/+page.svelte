@@ -969,14 +969,14 @@
 
 	const filteredCharacters = characters.filter(character => {
 		const matchesSearch = character.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-							 character.description.toLowerCase().includes(searchQuery.toLowerCase());
+			   character.description.toLowerCase().includes(searchQuery.toLowerCase());
 		const matchesFilter = selectedFilter === 'all' || character.style === selectedFilter;
 		return matchesSearch && matchesFilter;
 	});
 
 	const filteredAssets = assets.filter(asset => {
 		const matchesSearch = asset.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-							 asset.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+			   asset.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
 		const matchesFilter = selectedFilter === 'all' || asset.type === selectedFilter;
 		return matchesSearch && matchesFilter;
 	});
@@ -1151,7 +1151,6 @@
 			</div>
 		{:else}
 			<EmptyState
-				icon={Video}
 				title="뮤직비디오를 찾을 수 없습니다"
 				description={searchQuery ? '검색 조건에 맞는 뮤직비디오가 없습니다.' : '아직 뮤직비디오가 없습니다.'}
 				actionLabel="첫 번째 뮤직비디오 만들기"
@@ -1191,7 +1190,7 @@
 								<!-- 기본 이미지 (회색 배경 + 회색 로고) -->
 								<div class="absolute inset-0 flex items-center justify-center">
 									<Users size={24} class="text-text-muted opacity-30" />
-								</div>
+							</div>
 								<!-- 실제 이미지 (있을 경우) -->
 								{#if character.image && character.image !== '/api/placeholder/200/200'}
 									<img
@@ -1261,7 +1260,6 @@
 			</div>
 		{:else}
 			<EmptyState
-				icon={Users}
 				title="캐릭터를 찾을 수 없습니다"
 				description={searchQuery ? '검색 조건에 맞는 캐릭터가 없습니다.' : '아직 캐릭터가 없습니다.'}
 				actionLabel="첫 번째 캐릭터 만들기"
@@ -1336,7 +1334,6 @@
 			</div>
 		{:else}
 			<EmptyState
-				icon={Image}
 				title="에셋을 찾을 수 없습니다"
 				description={searchQuery ? '검색 조건에 맞는 에셋이 없습니다.' : '아직 에셋이 없습니다.'}
 				actionLabel="첫 번째 에셋 업로드"

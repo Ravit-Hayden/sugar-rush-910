@@ -1,19 +1,75 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { Music, Plus, Play, ChevronRight, ChevronLeft, Search, Filter, ArrowUpDown, ChevronDown, MoreVertical, Download, FileAudio, UserPlus, Link, Trash2 } from 'lucide-svelte';
+	import { onMount } from 'svelte';
+	import { Music, Plus, Play, ChevronRight, ChevronLeft, Search, Filter, ArrowUpDown, ChevronDown, MoreVertical, Download, FileAudio, UserPlus, Link, Trash2, Check, Settings, X, ChevronUp } from 'lucide-svelte';
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import PageContent from '$lib/components/PageContent.svelte';
 	import EmptyState from '$lib/components/EmptyState.svelte';
 	import { getStatusColor, getStatusLabel } from '$lib/utils/status';
+	import { GENRES } from '$lib/constants/genres';
+	import { toast } from '$lib/stores/toast';
 
-	let searchQuery = $state('');
-	let selectedGenre = $state('all');
-	let selectedStatus = $state('all');
-	let selectedSort = $state('latest');
+	// 필터 상태 저장 키
+	const FILTER_STORAGE_KEY = 'sr_tracks_filters';
+
+	// 필터 상태 (localStorage에서 복원)
+	function loadFiltersFromStorage() {
+		if (typeof window === 'undefined') return null;
+		try {
+			const stored = localStorage.getItem(FILTER_STORAGE_KEY);
+			if (stored) {
+				return JSON.parse(stored);
+			}
+		} catch (e) {
+			console.error('필터 상태 복원 실패:', e);
+		}
+		return null;
+	}
+
+	function saveFiltersToStorage() {
+		if (typeof window === 'undefined') return;
+		try {
+			const filters = {
+				searchQuery,
+				selectedGenre,
+				selectedStatus,
+				selectedSort,
+				selectedGenres: Array.from(selectedGenres),
+				playsMin,
+				playsMax,
+				likesMin,
+				likesMax
+			};
+			localStorage.setItem(FILTER_STORAGE_KEY, JSON.stringify(filters));
+		} catch (e) {
+			console.error('필터 상태 저장 실패:', e);
+		}
+	}
+
+	// 초기 상태 (localStorage에서 복원)
+	const savedFilters = loadFiltersFromStorage();
+	let searchQuery = $state(savedFilters?.searchQuery || '');
+	let selectedGenre = $state(savedFilters?.selectedGenre || 'all');
+	let selectedStatus = $state(savedFilters?.selectedStatus || 'all');
+	let selectedSort = $state(savedFilters?.selectedSort || 'latest');
 	let sortDropdownOpen = $state(false);
 	let genreDropdownOpen = $state(false);
 	let statusDropdownOpen = $state(false);
 	let moreMenuOpenId = $state<string | null>(null);
+	
+	// 고급 검색 옵션
+	let advancedSearchOpen = $state(false);
+	let selectedGenres = $state<Set<string>>(savedFilters?.selectedGenres ? new Set(savedFilters.selectedGenres) : new Set());
+	let dateRangeStart = $state(savedFilters?.dateRangeStart || '');
+	let dateRangeEnd = $state(savedFilters?.dateRangeEnd || '');
+	let playsMin = $state(savedFilters?.playsMin || '');
+	let playsMax = $state(savedFilters?.playsMax || '');
+	let likesMin = $state(savedFilters?.likesMin || '');
+	let likesMax = $state(savedFilters?.likesMax || '');
+	
+	// 일괄 선택 상태
+	let selectedTrackIds = $state<Set<string>>(new Set());
+	let bulkActionMenuOpen = $state(false);
 	let tracks = [
 		// 1. 작곡가/작사가 작업 (노란색 #FFD700)
 		{
@@ -262,16 +318,6 @@
 		}
 	];
 
-	// 장르 리스트 (43개 전체, A-Z 정렬)
-	const GENRES = [
-		'Acoustic', 'Afrobeats', 'Alternative', 'Ambient', 'Anime', 'Ballad', 'Blues', 'Classical', 
-		'Country', 'Dance', 'Disco', 'Drum & Bass', 'Dubstep', 'EDM', 'Electronic', 'Experimental', 
-		'Folk', 'Funk', 'Game', 'Garage', 'Gospel', 'Grime', 'Hip-Hop', 'House', 'Indie', 
-		'Instrumental', 'Jazz', 'J-Pop', 'K-Pop', 'Latin', 'Lo-Fi', 'Metal', 'New Age', 'OST', 
-		'Pop', 'Punk', 'R&B', 'Reggae', 'Rock', 'Soul', 'Soundtrack', 'Synthwave', 'Techno', 
-		'Trap', 'Trance', 'World'
-	];
-	
 	const genreFilterOptions = [
 		{ value: 'all', label: '모든 장르' },
 		...GENRES.map(genre => ({ value: genre, label: genre }))
@@ -396,14 +442,42 @@
 			});
 		}
 		
-		// 장르 필터 적용
-		if (selectedGenre !== 'all') {
+		// 장르 필터 적용 (단일 또는 다중 선택)
+		if (selectedGenres.size > 0) {
+			filtered = filtered.filter(track => selectedGenres.has(track.genre));
+		} else if (selectedGenre !== 'all') {
 			filtered = filtered.filter(track => track.genre === selectedGenre);
 		}
 		
 		// 상태 필터 적용
 		if (selectedStatus !== 'all') {
 			filtered = filtered.filter(track => track.status === selectedStatus);
+		}
+
+		// 통계 범위 필터 적용 (빈 문자열이 아니고 유효한 숫자일 때만)
+		if (playsMin && playsMin.trim() !== '') {
+			const min = parseInt(playsMin);
+			if (!isNaN(min) && min > 0) {
+				filtered = filtered.filter(track => track.plays >= min);
+			}
+		}
+		if (playsMax && playsMax.trim() !== '') {
+			const max = parseInt(playsMax);
+			if (!isNaN(max) && max > 0) {
+				filtered = filtered.filter(track => track.plays <= max);
+			}
+		}
+		if (likesMin && likesMin.trim() !== '') {
+			const min = parseInt(likesMin);
+			if (!isNaN(min) && min > 0) {
+				filtered = filtered.filter(track => track.likes >= min);
+			}
+		}
+		if (likesMax && likesMax.trim() !== '') {
+			const max = parseInt(likesMax);
+			if (!isNaN(max) && max > 0) {
+				filtered = filtered.filter(track => track.likes <= max);
+			}
 		}
 
 		// 2. 정렬 (검색 우선순위 + 선택된 정렬 기준)
@@ -463,13 +537,41 @@
 		}
 	}
 
-	// 필터/검색 변경 시 첫 페이지로 리셋
+	// 필터/검색 변경 시 첫 페이지로 리셋 및 상태 저장
 	$effect(() => {
 		searchQuery; // 감시
 		selectedGenre; // 감시
 		selectedStatus; // 감시
 		selectedSort; // 감시
+		selectedGenres; // 감시
+		playsMin; // 감시
+		playsMax; // 감시
+		likesMin; // 감시
+		likesMax; // 감시
 		currentPage = 1;
+		// 필터 상태 저장
+		saveFiltersToStorage();
+	});
+
+	// 페이지 로드 시 필터 상태 복원
+	onMount(() => {
+		const saved = loadFiltersFromStorage();
+		if (saved) {
+			searchQuery = saved.searchQuery || '';
+			selectedGenre = saved.selectedGenre || 'all';
+			selectedStatus = saved.selectedStatus || 'all';
+			selectedSort = saved.selectedSort || 'latest';
+			if (saved.selectedGenres && Array.isArray(saved.selectedGenres) && saved.selectedGenres.length > 0) {
+				selectedGenres = new Set(saved.selectedGenres);
+			} else {
+				selectedGenres = new Set();
+			}
+			// 통계 범위 필터는 빈 문자열이 아니고 유효한 값일 때만 복원
+			playsMin = (saved.playsMin && saved.playsMin.trim() !== '' && parseInt(saved.playsMin) > 0) ? saved.playsMin : '';
+			playsMax = (saved.playsMax && saved.playsMax.trim() !== '' && parseInt(saved.playsMax) > 0) ? saved.playsMax : '';
+			likesMin = (saved.likesMin && saved.likesMin.trim() !== '' && parseInt(saved.likesMin) > 0) ? saved.likesMin : '';
+			likesMax = (saved.likesMax && saved.likesMax.trim() !== '' && parseInt(saved.likesMax) > 0) ? saved.likesMax : '';
+		}
 	});
 
 	function toggleSortDropdown() {
@@ -497,6 +599,10 @@
 
 	function selectGenreOption(value: string, event?: MouseEvent | KeyboardEvent) {
 		selectedGenre = value;
+		// 단일 장르 선택 시 다중 선택 초기화
+		if (value !== 'all') {
+			selectedGenres = new Set();
+		}
 		// 클릭한 항목에 포커스 효과를 보여주기 위해 약간의 지연 후 드롭다운 닫기
 		if (event && event.currentTarget) {
 			(event.currentTarget as HTMLElement).focus();
@@ -540,42 +646,116 @@
 
 	// 더보기 메뉴 핸들러
 	function handleDownloadAudio(trackId: string) {
+		const track = tracks.find(t => t.id === trackId);
 		// 오디오 다운로드 로직 (추후 구현)
 		console.log('오디오 다운로드:', trackId);
+		toast.add(`${track?.title || '트랙'} 오디오 다운로드를 시작합니다.`, 'success');
 		moreMenuOpenId = null;
 	}
 
 	function handleDownloadStems(trackId: string) {
+		const track = tracks.find(t => t.id === trackId);
 		// 스템 다운로드 로직 (추후 구현)
 		console.log('스템 다운로드:', trackId);
+		toast.add(`${track?.title || '트랙'} 스템 다운로드를 시작합니다.`, 'success');
 		moreMenuOpenId = null;
 	}
 
 	function handleAssignMember(trackId: string) {
+		const track = tracks.find(t => t.id === trackId);
 		// 멤버 배정 로직 (추후 구현)
 		console.log('멤버 배정:', trackId);
+		toast.add(`${track?.title || '트랙'} 멤버 배정 기능은 곧 제공될 예정입니다.`, 'warning');
 		moreMenuOpenId = null;
 	}
 
 	function handleCopyShareLink(trackId: string) {
-		// 공유 링크 복사 로직
 		const url = `${window.location.origin}/tracks/${trackId}`;
 		navigator.clipboard.writeText(url).then(() => {
-			// 성공 알림 (추후 구현)
-			console.log('공유 링크 복사됨:', url);
+			toast.add('공유 링크가 클립보드에 복사되었습니다.', 'success');
 		}).catch(() => {
-			// 실패 알림 (추후 구현)
-			console.error('공유 링크 복사 실패');
+			toast.add('공유 링크 복사에 실패했습니다.', 'error');
 		});
 		moreMenuOpenId = null;
 	}
 
 	function handleDeleteTrack(trackId: string) {
+		const track = tracks.find(t => t.id === trackId);
 		// 삭제 확인 및 로직 (추후 구현)
-		if (confirm('정말 이 트랙을 삭제하시겠습니까?')) {
+		if (confirm(`정말 "${track?.title || '트랙'}" 트랙을 삭제하시겠습니까?`)) {
 			console.log('삭제:', trackId);
+			toast.add(`${track?.title || '트랙'}이(가) 삭제되었습니다.`, 'success');
 			moreMenuOpenId = null;
 		}
+	}
+
+	// 일괄 선택 관련 함수
+	function toggleTrackSelection(trackId: string) {
+		const newSet = new Set(selectedTrackIds);
+		if (newSet.has(trackId)) {
+			newSet.delete(trackId);
+		} else {
+			newSet.add(trackId);
+		}
+		selectedTrackIds = newSet;
+	}
+
+	function toggleSelectAll() {
+		if (selectedTrackIds.size === paginatedTracks.length) {
+			selectedTrackIds = new Set();
+		} else {
+			selectedTrackIds = new Set(paginatedTracks.map(t => t.id));
+		}
+	}
+
+	const isAllSelected = $derived(
+		paginatedTracks.length > 0 && selectedTrackIds.size === paginatedTracks.length
+	);
+	const isSomeSelected = $derived(
+		selectedTrackIds.size > 0 && selectedTrackIds.size < paginatedTracks.length
+	);
+	const selectedCount = $derived(selectedTrackIds.size);
+
+	// 일괄 작업 함수
+	function handleBulkDelete() {
+		if (selectedTrackIds.size === 0) return;
+		const count = selectedTrackIds.size;
+		if (confirm(`선택한 ${count}개의 트랙을 삭제하시겠습니까?`)) {
+			// 실제 삭제 로직 (추후 구현)
+			console.log('일괄 삭제:', Array.from(selectedTrackIds));
+			toast.add(`${count}개의 트랙이 삭제되었습니다.`, 'success');
+			selectedTrackIds = new Set();
+			bulkActionMenuOpen = false;
+		}
+	}
+
+	function handleBulkStatusChange(newStatus: string) {
+		if (selectedTrackIds.size === 0) return;
+		const count = selectedTrackIds.size;
+		const statusLabel = statusFilterOptions.find(opt => opt.value === newStatus)?.label || newStatus;
+		// 실제 상태 변경 로직 (추후 구현)
+		console.log('일괄 상태 변경:', Array.from(selectedTrackIds), newStatus);
+		toast.add(`${count}개의 트랙 상태가 "${statusLabel}"로 변경되었습니다.`, 'success');
+		selectedTrackIds = new Set();
+		bulkActionMenuOpen = false;
+	}
+
+	function handleBulkAssignMember() {
+		if (selectedTrackIds.size === 0) return;
+		const count = selectedTrackIds.size;
+		// 실제 멤버 배정 로직 (추후 구현)
+		console.log('일괄 멤버 배정:', Array.from(selectedTrackIds));
+		toast.add(`${count}개의 트랙 멤버 배정 기능은 곧 제공될 예정입니다.`, 'warning');
+		bulkActionMenuOpen = false;
+	}
+
+	function handleBulkDownload() {
+		if (selectedTrackIds.size === 0) return;
+		const count = selectedTrackIds.size;
+		// 실제 다운로드 로직 (추후 구현)
+		console.log('일괄 다운로드:', Array.from(selectedTrackIds));
+		toast.add(`${count}개의 트랙 다운로드를 시작합니다.`, 'success');
+		bulkActionMenuOpen = false;
 	}
 
 	// 외부 클릭 시 더보기 메뉴 닫기
@@ -586,6 +766,48 @@
 			const target = event.target as HTMLElement;
 			if (!target.closest('.more-menu-dropdown')) {
 				moreMenuOpenId = null;
+			}
+		}
+
+		const timeoutId = setTimeout(() => {
+			document.addEventListener('click', handleClickOutside, true);
+		}, 0);
+
+		return () => {
+			clearTimeout(timeoutId);
+			document.removeEventListener('click', handleClickOutside, true);
+		};
+	});
+
+	// 외부 클릭 시 일괄 작업 메뉴 닫기
+	$effect(() => {
+		if (!bulkActionMenuOpen) return;
+
+		function handleClickOutside(event: MouseEvent) {
+			const target = event.target as HTMLElement;
+			if (!target.closest('.bulk-action-menu')) {
+				bulkActionMenuOpen = false;
+			}
+		}
+
+		const timeoutId = setTimeout(() => {
+			document.addEventListener('click', handleClickOutside, true);
+		}, 0);
+
+		return () => {
+			clearTimeout(timeoutId);
+			document.removeEventListener('click', handleClickOutside, true);
+		};
+	});
+
+	// 외부 클릭 시 고급 검색 패널 닫기
+	$effect(() => {
+		if (!advancedSearchOpen) return;
+
+		function handleClickOutside(event: MouseEvent) {
+			const target = event.target as HTMLElement;
+			if (!target.closest('.advanced-search-panel') && !target.closest('button[aria-label="고급 검색"]')) {
+				advancedSearchOpen = false;
 			}
 		}
 
@@ -710,38 +932,303 @@
 
 	<!-- 검색 및 필터 -->
 	<div class="mb-8 relative overflow-visible">
-		<div class="flex flex-col sm:flex-row gap-4 flex-wrap">
-			<!-- 검색 입력 -->
-			<div class="relative flex-1 group min-w-0">
-				<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-					<Search size={16} class="lucide-icon lucide-search" />
+		<div class="flex flex-col lg:flex-row gap-4">
+			<!-- 검색 입력 및 고급 검색 -->
+			<div class="relative flex-1 group min-w-0 lg:min-w-[200px]">
+				<div class="flex gap-2">
+					<div class="relative flex-1">
+						<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+							<Search size={16} class="lucide-icon lucide-search" />
+						</div>
+						<input 
+							type="text" 
+							placeholder="트랙, 아티스트 또는 앨범 검색..."
+							value={searchQuery}
+							oninput={(e) => {
+								const value = (e.currentTarget as HTMLInputElement).value;
+								searchQuery = value;
+							}}
+							onkeyup={(e) => {
+								const value = (e.currentTarget as HTMLInputElement).value;
+								searchQuery = value;
+							}}
+							class="w-full pl-10 pr-4 py-1.5 bg-surface-1 border border-border-subtle border-[1px] rounded-md text-text-base placeholder-text-muted focus:outline-none focus:border-brand-pink focus:ring-0 transition-colors duration-200"
+							aria-label="트랙, 아티스트 또는 앨범 검색"
+							id="track-search"
+							autocomplete="off"
+						/>
+					</div>
+					<button
+						onclick={() => advancedSearchOpen = !advancedSearchOpen}
+						class="px-3 py-1.5 bg-surface-1 border rounded-md text-text-base focus:outline-none transition-colors duration-200 flex items-center gap-2 {advancedSearchOpen ? 'border-brand-pink' : 'border-border-subtle'}"
+						aria-label="고급 검색"
+						aria-expanded={advancedSearchOpen}
+						title="고급 검색"
+					>
+						<Settings size={16} class="transition-colors duration-200 {advancedSearchOpen ? 'text-brand-pink' : 'text-text-muted'}" />
+					</button>
 				</div>
-				<input 
-					type="text" 
-					placeholder="트랙, 아티스트 또는 앨범 검색..."
-					value={searchQuery}
-					oninput={(e) => {
-						const value = (e.currentTarget as HTMLInputElement).value;
-						searchQuery = value;
-					}}
-					onkeyup={(e) => {
-						const value = (e.currentTarget as HTMLInputElement).value;
-						searchQuery = value;
-					}}
-					class="w-full pl-10 pr-4 py-1.5 bg-surface-1 border border-border-subtle border-[1px] rounded-md text-text-base placeholder-text-muted focus:outline-none focus:border-brand-pink focus:ring-0 transition-colors duration-200"
-					aria-label="트랙, 아티스트 또는 앨범 검색"
-					id="track-search"
-					autocomplete="off"
-				/>
+				
+				<!-- 고급 검색 패널 -->
+				{#if advancedSearchOpen}
+					<div class="advanced-search-panel absolute top-full left-0 right-0 mt-2 p-4 bg-surface-1 border border-border-subtle rounded-lg shadow-lg z-[9999]">
+						<div class="flex items-center justify-between mb-4">
+							<h3 class="text-sm font-semibold text-text-base">고급 검색</h3>
+							<button
+								onclick={() => advancedSearchOpen = false}
+								class="w-6 h-6 flex items-center justify-center rounded hover:bg-surface-2 transition-colors"
+								aria-label="닫기"
+							>
+								<X size={14} class="text-text-muted" />
+							</button>
+						</div>
+						
+						<div class="space-y-4">
+							<!-- 여러 장르 선택 -->
+							<div>
+								<label class="block text-xs font-medium text-text-muted mb-2">장르 (여러 개 선택 가능)</label>
+								<div class="max-h-48 overflow-y-auto custom-list-scrollbar border border-border-subtle rounded-md p-2">
+									<div class="flex flex-wrap gap-2">
+										{#each GENRES as genre}
+											<button
+												onclick={() => {
+													const newSet = new Set(selectedGenres);
+													if (newSet.has(genre)) {
+														newSet.delete(genre);
+													} else {
+														newSet.add(genre);
+													}
+													selectedGenres = newSet;
+													// 단일 장르 선택 해제
+													if (newSet.size > 0) {
+														selectedGenre = 'all';
+													}
+												}}
+												class="px-3 py-1.5 text-xs rounded-md border transition-colors duration-200 {selectedGenres.has(genre) ? 'bg-brand-pink text-white border-brand-pink' : 'bg-surface-2 text-text-base border-border-subtle'}"
+												aria-pressed={selectedGenres.has(genre)}
+											>
+												{genre}
+											</button>
+										{/each}
+									</div>
+								</div>
+								{#if selectedGenres.size > 0}
+									<button
+										onclick={() => {
+											selectedGenres = new Set();
+											selectedGenre = 'all';
+										}}
+										class="mt-2 text-xs text-text-muted hover:text-text-base transition-colors"
+									>
+										선택 해제
+									</button>
+								{/if}
+							</div>
+							
+							<!-- 통계 범위 -->
+							<div class="grid grid-cols-2 gap-4">
+								<div>
+									<label class="block text-xs font-medium text-text-muted mb-2">재생수 범위</label>
+									<div class="flex gap-2">
+										<div class="relative flex-1">
+											<input
+												type="number"
+												placeholder="최소"
+												value={playsMin}
+												oninput={(e) => {
+													playsMin = (e.currentTarget as HTMLInputElement).value;
+												}}
+												class="w-full px-3 pr-8 py-1.5 text-sm bg-surface-2 border border-border-subtle rounded-md text-text-base focus:outline-none focus:border-brand-pink transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+												min="0"
+											/>
+											<div class="absolute inset-y-0 right-0 flex flex-col pointer-events-none pr-1">
+												<button
+													type="button"
+													onclick={(e) => {
+														e.preventDefault();
+														e.stopPropagation();
+														const current = parseInt(playsMin) || 0;
+														playsMin = String(current + 1);
+													}}
+													class="pointer-events-auto h-1/2 flex items-center justify-center text-text-muted hover:text-hover-cyan focus:text-hover-cyan transition-colors duration-200 bg-transparent"
+													aria-label="증가"
+												>
+													<ChevronUp size={12} />
+												</button>
+												<button
+													type="button"
+													onclick={(e) => {
+														e.preventDefault();
+														e.stopPropagation();
+														const current = parseInt(playsMin) || 0;
+														playsMin = String(Math.max(0, current - 1));
+													}}
+													class="pointer-events-auto h-1/2 flex items-center justify-center text-text-muted hover:text-hover-cyan focus:text-hover-cyan transition-colors duration-200 bg-transparent"
+													aria-label="감소"
+												>
+													<ChevronDown size={12} />
+												</button>
+											</div>
+										</div>
+										<span class="flex items-center text-text-muted">~</span>
+										<div class="relative flex-1">
+											<input
+												type="number"
+												placeholder="최대"
+												value={playsMax}
+												oninput={(e) => {
+													playsMax = (e.currentTarget as HTMLInputElement).value;
+												}}
+												class="w-full px-3 pr-8 py-1.5 text-sm bg-surface-2 border border-border-subtle rounded-md text-text-base focus:outline-none focus:border-brand-pink transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+												min="0"
+											/>
+											<div class="absolute inset-y-0 right-0 flex flex-col pointer-events-none pr-1">
+												<button
+													type="button"
+													onclick={(e) => {
+														e.preventDefault();
+														e.stopPropagation();
+														const current = parseInt(playsMax) || 0;
+														playsMax = String(current + 1);
+													}}
+													class="pointer-events-auto h-1/2 flex items-center justify-center text-text-muted hover:text-hover-cyan focus:text-hover-cyan transition-colors duration-200 bg-transparent"
+													aria-label="증가"
+												>
+													<ChevronUp size={12} />
+												</button>
+												<button
+													type="button"
+													onclick={(e) => {
+														e.preventDefault();
+														e.stopPropagation();
+														const current = parseInt(playsMax) || 0;
+														playsMax = String(Math.max(0, current - 1));
+													}}
+													class="pointer-events-auto h-1/2 flex items-center justify-center text-text-muted hover:text-hover-cyan focus:text-hover-cyan transition-colors duration-200 bg-transparent"
+													aria-label="감소"
+												>
+													<ChevronDown size={12} />
+												</button>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div>
+									<label class="block text-xs font-medium text-text-muted mb-2">좋아요 범위</label>
+									<div class="flex gap-2">
+										<div class="relative flex-1">
+											<input
+												type="number"
+												placeholder="최소"
+												value={likesMin}
+												oninput={(e) => {
+													likesMin = (e.currentTarget as HTMLInputElement).value;
+												}}
+												class="w-full px-3 pr-8 py-1.5 text-sm bg-surface-2 border border-border-subtle rounded-md text-text-base focus:outline-none focus:border-brand-pink transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+												min="0"
+											/>
+											<div class="absolute inset-y-0 right-0 flex flex-col pointer-events-none pr-1">
+												<button
+													type="button"
+													onclick={(e) => {
+														e.preventDefault();
+														e.stopPropagation();
+														const current = parseInt(likesMin) || 0;
+														likesMin = String(current + 1);
+													}}
+													class="pointer-events-auto h-1/2 flex items-center justify-center text-text-muted hover:text-hover-cyan focus:text-hover-cyan transition-colors duration-200 bg-transparent"
+													aria-label="증가"
+												>
+													<ChevronUp size={12} />
+												</button>
+												<button
+													type="button"
+													onclick={(e) => {
+														e.preventDefault();
+														e.stopPropagation();
+														const current = parseInt(likesMin) || 0;
+														likesMin = String(Math.max(0, current - 1));
+													}}
+													class="pointer-events-auto h-1/2 flex items-center justify-center text-text-muted hover:text-hover-cyan focus:text-hover-cyan transition-colors duration-200 bg-transparent"
+													aria-label="감소"
+												>
+													<ChevronDown size={12} />
+												</button>
+											</div>
+										</div>
+										<span class="flex items-center text-text-muted">~</span>
+										<div class="relative flex-1">
+											<input
+												type="number"
+												placeholder="최대"
+												value={likesMax}
+												oninput={(e) => {
+													likesMax = (e.currentTarget as HTMLInputElement).value;
+												}}
+												class="w-full px-3 pr-8 py-1.5 text-sm bg-surface-2 border border-border-subtle rounded-md text-text-base focus:outline-none focus:border-brand-pink transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+												min="0"
+											/>
+											<div class="absolute inset-y-0 right-0 flex flex-col pointer-events-none pr-1">
+												<button
+													type="button"
+													onclick={(e) => {
+														e.preventDefault();
+														e.stopPropagation();
+														const current = parseInt(likesMax) || 0;
+														likesMax = String(current + 1);
+													}}
+													class="pointer-events-auto h-1/2 flex items-center justify-center text-text-muted hover:text-hover-cyan focus:text-hover-cyan transition-colors duration-200 bg-transparent"
+													aria-label="증가"
+												>
+													<ChevronUp size={12} />
+												</button>
+												<button
+													type="button"
+													onclick={(e) => {
+														e.preventDefault();
+														e.stopPropagation();
+														const current = parseInt(likesMax) || 0;
+														likesMax = String(Math.max(0, current - 1));
+													}}
+													class="pointer-events-auto h-1/2 flex items-center justify-center text-text-muted hover:text-hover-cyan focus:text-hover-cyan transition-colors duration-200 bg-transparent"
+													aria-label="감소"
+												>
+													<ChevronDown size={12} />
+												</button>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							
+							<!-- 초기화 버튼 -->
+							<div class="flex justify-end gap-2 pt-2 border-t border-border-subtle">
+								<button
+									onclick={() => {
+										selectedGenres = new Set();
+										selectedGenre = 'all';
+										playsMin = '';
+										playsMax = '';
+										likesMin = '';
+										likesMax = '';
+									}}
+									class="px-3 py-1.5 text-xs bg-surface-2 hover:bg-surface-3 text-text-base rounded-md transition-colors"
+								>
+									초기화
+								</button>
+							</div>
+						</div>
+					</div>
+				{/if}
 			</div>
 			
 			<!-- 장르 필터 드롭다운 -->
-			<div class="relative group genre-filter-dropdown filter-dropdown w-full sm:w-auto overflow-visible" data-open={genreDropdownOpen ? 'true' : 'false'}>
+			<div class="relative group genre-filter-dropdown filter-dropdown w-full lg:w-auto overflow-visible" data-open={genreDropdownOpen ? 'true' : 'false'}>
 				<button
 					type="button"
 					aria-haspopup="listbox"
 					aria-expanded={genreDropdownOpen}
-					class="flex items-center pl-10 pr-8 py-1.5 w-full sm:w-auto sm:min-w-[140px] bg-surface-1 rounded-[6px] text-text-base transition-all duration-200 cursor-pointer border focus:outline-none"
+					class="flex items-center pl-10 pr-8 py-1.5 w-full lg:w-auto lg:min-w-[180px] bg-surface-1 rounded-[6px] text-text-base transition-all duration-200 cursor-pointer border focus:outline-none"
 					onclick={toggleGenreDropdown}
 					tabindex="0"
 				>
@@ -749,7 +1236,11 @@
 						<Filter size={16} class="lucide-icon lucide-filter transition-colors duration-200" />
 					</div>
 					<span class="flex-1 text-left truncate">
-						{genreFilterOptions.find(o => o.value === selectedGenre)?.label || '모든 장르'}
+						{#if selectedGenres.size > 0}
+							{selectedGenres.size}개 장르 선택됨
+						{:else}
+							{genreFilterOptions.find(o => o.value === selectedGenre)?.label || '모든 장르'}
+						{/if}
 					</span>
 					<div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
 						<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-text-base transition-colors duration-200">
@@ -758,36 +1249,37 @@
 					</div>
 				</button>
 				{#if genreDropdownOpen}
-					<ul role="listbox" class="absolute left-0 w-full mt-[6px] bg-surface-1 border rounded-[6px] z-10 border-border-subtle overflow-y-scroll max-h-[625px] custom-list-scrollbar" style="backface-visibility: hidden; transform: translateZ(0);">
-						{#each genreFilterOptions as opt}
-							<li
-								role="option"
-								aria-selected={selectedGenre === opt.value}
-								tabindex="0"
-								onclick={(e) => selectGenreOption(opt.value, e)}
-								onkeydown={(e) => {
-									if (e.key === 'Enter' || e.key === ' ') {
-										e.preventDefault();
-										selectGenreOption(opt.value, e);
-									}
-								}}
-								class="px-4 py-2 text-sm text-text-base bg-transparent transition-colors duration-200 cursor-pointer antialiased {selectedGenre === opt.value ? 'bg-brand-pink text-white' : ''}"
-								style="font-smooth: always; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility;"
-							>
-								{opt.label}
-							</li>
-						{/each}
-					</ul>
+					<div class="absolute left-0 w-full mt-[6px] bg-surface-1 border border-border-subtle rounded-[6px] z-[9999] overflow-hidden p-0 flex flex-col">
+						<ul role="listbox" class="overflow-y-scroll max-h-[624px] custom-list-scrollbar p-0 m-0 w-full" style="backface-visibility: hidden; transform: translateZ(0);">
+							{#each genreFilterOptions as opt, index}
+								<li
+									role="option"
+									aria-selected={selectedGenre === opt.value}
+									tabindex="0"
+									onclick={(e) => selectGenreOption(opt.value, e)}
+									onkeydown={(e) => {
+										if (e.key === 'Enter' || e.key === ' ') {
+											e.preventDefault();
+											selectGenreOption(opt.value, e);
+										}
+									}}
+									style="font-smooth: always; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility;"
+								>
+									{opt.label}
+								</li>
+							{/each}
+						</ul>
+					</div>
 				{/if}
 			</div>
 
 			<!-- 상태 필터 드롭다운 -->
-			<div class="relative group status-filter-dropdown filter-dropdown w-full sm:w-auto" data-open={statusDropdownOpen ? 'true' : 'false'}>
+			<div class="relative group status-filter-dropdown filter-dropdown w-full lg:w-auto" data-open={statusDropdownOpen ? 'true' : 'false'}>
 				<button
 					type="button"
 					aria-haspopup="listbox"
 					aria-expanded={statusDropdownOpen}
-					class="flex items-center pl-10 pr-8 py-1.5 w-full sm:w-auto sm:min-w-[140px] bg-surface-1 rounded-[6px] text-text-base transition-all duration-200 cursor-pointer border focus:outline-none"
+					class="flex items-center pl-10 pr-8 py-1.5 w-full lg:w-auto lg:min-w-[140px] bg-surface-1 rounded-[6px] text-text-base transition-all duration-200 cursor-pointer border focus:outline-none"
 					onclick={toggleStatusDropdown}
 					tabindex="0"
 				>
@@ -804,7 +1296,7 @@
 					</div>
 				</button>
 				{#if statusDropdownOpen}
-					<ul role="listbox" class="absolute left-0 w-full mt-[6px] bg-surface-1 border rounded-[6px] z-10 border-border-subtle overflow-hidden">
+					<ul role="listbox" class="absolute left-0 w-full mt-[6px] bg-surface-1 border rounded-[6px] z-[9999] border-border-subtle overflow-hidden pt-0">
 						{#if groupedStatusFilterOptions}
 							{#if groupedStatusFilterOptions.ungrouped.length > 0}
 								{#each groupedStatusFilterOptions.ungrouped as opt}
@@ -868,15 +1360,14 @@
 			</div>
 		
 			<!-- 정렬 드롭다운 -->
-			<div class="relative group sort-dropdown filter-dropdown w-full sm:w-auto" data-open={sortDropdownOpen ? 'true' : 'false'}>
+			<div class="relative group sort-dropdown filter-dropdown w-full lg:w-auto" data-open={sortDropdownOpen ? 'true' : 'false'}>
 				<button
 					type="button"
 					aria-haspopup="listbox"
 					aria-expanded={sortDropdownOpen}
-					class="flex items-center justify-between pl-10 pr-8 py-1.5 w-full sm:w-[160px] bg-surface-1 rounded-[6px] text-sm text-text-base transition-all duration-200 cursor-pointer border border-border-subtle focus:outline-none antialiased"
+					class="flex items-center justify-between pl-10 pr-8 py-1.5 w-full lg:w-auto lg:min-w-[140px] bg-surface-1 rounded-[6px] text-text-base transition-all duration-200 cursor-pointer border focus:outline-none"
 					onclick={toggleSortDropdown}
 					tabindex="0"
-					style="font-smooth: always; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility;"
 				>
 					<!-- 정렬 아이콘 -->
 					<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -884,19 +1375,21 @@
 					</div>
 					
 					<!-- 선택된 값 표시 -->
-					<span class="flex-1 text-left whitespace-nowrap overflow-hidden text-ellipsis">
+					<span class="flex-1 text-left truncate">
 						{sortOptions.find(o => o.value === selectedSort)?.label || '정렬'}
 					</span>
 					
 					<!-- 드롭다운 화살표 -->
 					<div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-						<ChevronDown size={12} class="text-text-base transition-colors duration-200" />
+						<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-text-base transition-colors duration-200">
+							<polyline points="6,9 12,15 18,9"></polyline>
+						</svg>
 					</div>
 				</button>
 				
 				<!-- 드롭다운 리스트 -->
 				{#if sortDropdownOpen}
-					<ul role="listbox" class="absolute left-0 top-full w-full sm:w-[160px] mt-[6px] bg-surface-1 border rounded-[6px] z-[100] border-border-subtle overflow-hidden ">
+					<ul role="listbox" class="absolute left-0 w-full mt-[6px] bg-surface-1 border rounded-[6px] z-[9999] border-border-subtle overflow-hidden shadow-lg pt-0">
 						{#each sortOptions as opt}
 							<li
 								role="option"
@@ -909,8 +1402,6 @@
 										selectSort(opt.value, e);
 									}
 								}}
-								class="px-4 py-2 text-sm text-text-base bg-transparent transition-colors duration-200 cursor-pointer antialiased {selectedSort === opt.value ? 'bg-brand-pink text-white' : ''}"
-								style="font-smooth: always; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility;"
 							>
 								{opt.label}
 							</li>
@@ -933,157 +1424,286 @@
 		</div>
 	</div>
 
+	<!-- 일괄 작업 바 -->
+	{#if selectedCount > 0}
+		<div class="mb-4 p-4 bg-surface-1 border border-border-subtle rounded-lg flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+			<div class="flex items-center gap-2">
+				<span class="text-sm font-medium text-text-base">
+					<span class="text-hover-cyan">{selectedCount}</span>개 선택됨
+				</span>
+			</div>
+			<div class="flex flex-wrap items-center gap-2 flex-1">
+				<button
+					onclick={handleBulkDownload}
+					class="action-button inline-flex items-center gap-2 px-3 py-1.5 text-sm border border-border-subtle bg-surface-1 rounded-md transition-colors duration-200"
+					aria-label="선택한 트랙 다운로드"
+				>
+					<Download size={16} class="action-button-icon" />
+					<span class="action-button-text">다운로드</span>
+				</button>
+				<button
+					onclick={handleBulkAssignMember}
+					class="action-button inline-flex items-center gap-2 px-3 py-1.5 text-sm border border-border-subtle bg-surface-1 rounded-md transition-colors duration-200"
+					aria-label="선택한 트랙 멤버 배정"
+				>
+					<UserPlus size={16} class="action-button-icon" />
+					<span class="action-button-text">멤버 배정</span>
+				</button>
+				<div class="relative bulk-action-menu filter-dropdown" data-open={bulkActionMenuOpen ? 'true' : 'false'}>
+					<button
+						type="button"
+						aria-haspopup="listbox"
+						aria-expanded={bulkActionMenuOpen}
+						onclick={() => bulkActionMenuOpen = !bulkActionMenuOpen}
+						onkeydown={(e) => {
+							if (e.key === 'Enter' || e.key === ' ') {
+								e.preventDefault();
+								bulkActionMenuOpen = !bulkActionMenuOpen;
+							}
+						}}
+						class="action-button inline-flex items-center gap-2 px-3 py-1.5 text-sm border border-border-subtle bg-surface-1 rounded-md transition-colors duration-200"
+						aria-label="상태 변경"
+						tabindex="0"
+					>
+						<span class="action-button-text">상태 변경</span>
+						<ChevronDown size={14} class="action-button-icon {bulkActionMenuOpen ? 'rotate-180' : ''}" />
+					</button>
+					{#if bulkActionMenuOpen}
+						<ul role="listbox" class="absolute left-0 w-full mt-[6px] bg-surface-1 border rounded-[6px] z-[9999] border-border-subtle overflow-hidden pt-0">
+							{#each statusFilterOptions.filter(opt => opt.value !== 'all') as opt}
+								<li
+									role="option"
+									aria-selected={false}
+									tabindex="0"
+									onclick={(e) => {
+										handleBulkStatusChange(opt.value);
+										bulkActionMenuOpen = false;
+									}}
+									onkeydown={(e) => {
+										if (e.key === 'Enter' || e.key === ' ') {
+											e.preventDefault();
+											handleBulkStatusChange(opt.value);
+											bulkActionMenuOpen = false;
+										}
+									}}
+								>
+									{opt.label}
+								</li>
+							{/each}
+						</ul>
+					{/if}
+				</div>
+				<button
+					onclick={handleBulkDelete}
+					class="action-button inline-flex items-center gap-2 px-3 py-1.5 text-sm border border-border-subtle bg-surface-1 rounded-md transition-colors duration-200 text-red-500"
+					aria-label="선택한 트랙 삭제"
+				>
+					<Trash2 size={16} class="action-button-icon" />
+					<span class="action-button-text">삭제</span>
+				</button>
+			</div>
+			<button
+				onclick={() => selectedTrackIds = new Set()}
+				class="text-sm text-text-muted hover:text-hover-cyan focus:text-brand-pink focus-visible:text-brand-pink transition-colors duration-200"
+				aria-label="선택 해제"
+			>
+				선택 해제
+			</button>
+		</div>
+	{/if}
+
 	<!-- 트랙 목록 -->
 	{#if filteredAndSortedTracks.length > 0}
 		<div class="max-w-full overflow-visible">
 			<!-- 모바일/태블릿: 카드 레이아웃 -->
 			<div class="lg:hidden space-y-4">
+				<!-- 전체 선택 체크박스 (모바일) -->
+				<div class="flex items-center gap-2 pb-2">
+					<button
+						onclick={toggleSelectAll}
+						class="w-5 h-5 flex items-center justify-center border border-border-subtle rounded bg-surface-1 hover:bg-surface-2 transition-colors duration-200 focus:outline-none"
+						aria-label="{isAllSelected ? '전체 선택 해제' : '전체 선택'}"
+						aria-checked={isAllSelected}
+						role="checkbox"
+						title="{isAllSelected ? '전체 선택 해제' : '전체 선택'}"
+					>
+						{#if isAllSelected}
+							<Check size={14} class="text-brand-pink" />
+						{:else if isSomeSelected}
+							<div class="w-2 h-2 bg-brand-pink rounded-sm"></div>
+						{/if}
+					</button>
+					<span class="text-sm text-text-muted">
+						{#if isAllSelected}
+							전체 선택됨
+						{:else if isSomeSelected}
+							{selectedCount}개 선택됨
+						{:else}
+							전체 선택
+						{/if}
+					</span>
+				</div>
+				
 				{#each paginatedTracks as track (track.id)}
 					<div class="relative border rounded-xl bg-bg p-4 sm:p-5" style="border-color: var(--border-subtle);">
-						<!-- 액션 버튼 (우측 상단) -->
-						<div class="absolute top-4 right-4 flex gap-1 z-10">
-							<a href="/tracks/{track.id}/edit" class="action-button h-8 w-auto px-3 whitespace-nowrap rounded-md border border-border-subtle bg-surface-1 hover:bg-surface-2 focus-visible:bg-surface-2 text-xs sm:text-sm font-medium transition-colors duration-200 inline-flex items-center justify-center leading-none">
-								<span class="action-button-text flex items-center">편집</span>
-							</a>
-							<div class="relative more-menu-dropdown">
-								<button
-									onclick={(e) => { e.preventDefault(); e.stopPropagation(); toggleMoreMenu(track.id); }}
-									onkeydown={(e) => {
-										if (e.key === 'Enter' || e.key === ' ') {
-											e.preventDefault();
-											e.stopPropagation();
-											toggleMoreMenu(track.id);
-										}
-									}}
-									class="action-button h-8 w-8 inline-flex items-center justify-center rounded-md border border-border-subtle bg-surface-1 hover:bg-surface-2 focus-visible:bg-surface-2 transition-colors duration-200"
-									aria-label="더보기"
-									aria-expanded={moreMenuOpenId === track.id}
-									aria-haspopup="menu"
-									title="더보기"
-									tabindex="0"
-								>
-									<MoreVertical size={16} class="action-button-icon" />
-								</button>
-								
-								{#if moreMenuOpenId === track.id}
-									<div 
-										role="menu"
-										class="absolute right-0 bottom-full mb-1 w-48 bg-surface-1 border border-border-subtle rounded-lg z-50 animate-in fade-in slide-in-from-bottom-2 duration-200"
-									>
-										<div class="py-1">
-											<!-- 섹션 1: 에셋 -->
-											<button 
-												role="menuitem"
-												onclick={(e) => { e.preventDefault(); e.stopPropagation(); handleDownloadAudio(track.id); }}
-												onkeydown={(e) => {
-													if (e.key === 'Enter' || e.key === ' ') {
-														e.preventDefault();
-														e.stopPropagation();
-														handleDownloadAudio(track.id);
-													}
-												}}
-												class="group w-full flex items-center gap-2 px-4 py-2 text-sm text-text-base hover:bg-transparent hover:text-[var(--hover-cyan)] transition-colors duration-200 text-left"
-												aria-label="오디오 다운로드"
-											>
-												<Download size={16} class="text-text-muted group-hover:text-[var(--hover-cyan)] transition-colors duration-200" />
-												오디오 다운로드
-											</button>
-											<button 
-												role="menuitem"
-												onclick={(e) => { e.preventDefault(); e.stopPropagation(); handleDownloadStems(track.id); }}
-												onkeydown={(e) => {
-													if (e.key === 'Enter' || e.key === ' ') {
-														e.preventDefault();
-														e.stopPropagation();
-														handleDownloadStems(track.id);
-													}
-												}}
-												class="group w-full flex items-center gap-2 px-4 py-2 text-sm text-text-base hover:bg-transparent hover:text-[var(--hover-cyan)] transition-colors duration-200 text-left"
-												aria-label="스템(Stems) 다운로드"
-											>
-												<FileAudio size={16} class="text-text-muted group-hover:text-[var(--hover-cyan)] transition-colors duration-200" />
-												스템(Stems) 다운로드
-											</button>
-											<!-- 섹션 2: 협업 -->
-											<div class="border-t border-border-subtle my-1" role="separator"></div>
-											<button 
-												role="menuitem"
-												onclick={(e) => { e.preventDefault(); e.stopPropagation(); handleAssignMember(track.id); }}
-												onkeydown={(e) => {
-													if (e.key === 'Enter' || e.key === ' ') {
-														e.preventDefault();
-														e.stopPropagation();
-														handleAssignMember(track.id);
-													}
-												}}
-												class="group w-full flex items-center gap-2 px-4 py-2 text-sm text-text-base hover:bg-transparent hover:text-[var(--hover-cyan)] transition-colors duration-200 text-left"
-												aria-label="멤버 배정"
-											>
-												<UserPlus size={16} class="text-text-muted group-hover:text-[var(--hover-cyan)] transition-colors duration-200" />
-												멤버 배정
-											</button>
-											<button 
-												role="menuitem"
-												onclick={(e) => { e.preventDefault(); e.stopPropagation(); handleCopyShareLink(track.id); }}
-												onkeydown={(e) => {
-													if (e.key === 'Enter' || e.key === ' ') {
-														e.preventDefault();
-														e.stopPropagation();
-														handleCopyShareLink(track.id);
-													}
-												}}
-												class="group w-full flex items-center gap-2 px-4 py-2 text-sm text-text-base hover:bg-transparent hover:text-[var(--hover-cyan)] transition-colors duration-200 text-left"
-												aria-label="공유 링크 복사"
-											>
-												<Link size={16} class="text-text-muted group-hover:text-[var(--hover-cyan)] transition-colors duration-200" />
-												공유 링크 복사
-											</button>
-											<!-- 섹션 3: 관리 -->
-											<div class="border-t border-border-subtle my-1" role="separator"></div>
-											<button 
-												role="menuitem"
-												onclick={(e) => { e.preventDefault(); e.stopPropagation(); handleDeleteTrack(track.id); }}
-												onkeydown={(e) => {
-													if (e.key === 'Enter' || e.key === ' ') {
-														e.preventDefault();
-														e.stopPropagation();
-														handleDeleteTrack(track.id);
-													}
-												}}
-												class="group w-full flex items-center gap-2 px-4 py-2 text-sm text-red-500 hover:bg-transparent hover:text-red-400 transition-colors duration-200 text-left"
-												aria-label="삭제"
-											>
-												<Trash2 size={16} class="text-red-500 group-hover:text-red-400 transition-colors duration-200" />
-												삭제
-											</button>
-										</div>
-									</div>
+						<!-- 트랙 정보 (재생 버튼 기준 정렬) -->
+						<div class="mb-4 flex items-center gap-3 min-w-0">
+							<!-- 체크박스 -->
+							<button
+								onclick={() => toggleTrackSelection(track.id)}
+								class="w-5 h-5 flex items-center justify-center border border-border-subtle rounded bg-surface-1 hover:bg-surface-2 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-brand-pink focus:ring-offset-2 flex-shrink-0"
+								aria-label="{selectedTrackIds.has(track.id) ? '선택 해제' : '선택'}"
+								aria-checked={selectedTrackIds.has(track.id)}
+								role="checkbox"
+							>
+								{#if selectedTrackIds.has(track.id)}
+									<Check size={14} class="text-brand-pink" />
 								{/if}
+							</button>
+							
+							<!-- 재생 버튼 -->
+							<button aria-label="재생" class="w-9 h-9 sm:w-10 sm:h-10 flex-shrink-0 bg-surface-2 rounded-full flex items-center justify-center hover:bg-brand-pink hover:text-white focus:outline-none transition-colors duration-200">
+								<Play size={16} class="sm:w-5 sm:h-5 ml-0.5" />
+							</button>
+							
+							<!-- 트랙 제목 및 파일 크기 -->
+							<div class="min-w-0 flex-1">
+								<div class="font-semibold text-brand-pink break-words text-base sm:text-lg">
+									{#if searchQuery.trim()}
+										{@const titleParts = highlightSearchTerm(track.title, searchQuery.trim())}
+										{#each titleParts as part}
+											{#if part.isMatch}
+												<span class="text-hover-cyan font-bold">{part.text}</span>
+											{:else}
+												{part.text}
+											{/if}
+										{/each}
+									{:else}
+										{track.title}
+									{/if}
+								</div>
+								<div class="text-text-muted text-xs sm:text-sm mt-0.5">{track.fileSize}</div>
 							</div>
-						</div>
-						
-						<!-- 트랙 정보 (전체 너비) -->
-						<div class="mb-4 pr-20">
-							<div class="flex gap-3 items-center min-w-0">
-								<button aria-label="재생" class="w-9 h-9 sm:w-10 sm:h-10 flex-shrink-0 bg-surface-2 rounded-full flex items-center justify-center hover:bg-brand-pink hover:text-white focus:outline-none transition-colors duration-200 ">
-									<Play size={16} class="sm:w-5 sm:h-5 ml-0.5" />
-								</button>
-								<div class="min-w-0 flex-1">
-									<div class="font-semibold text-brand-pink break-words text-base sm:text-lg">
-										{#if searchQuery.trim()}
-											{@const titleParts = highlightSearchTerm(track.title, searchQuery.trim())}
-											{#each titleParts as part}
-												{#if part.isMatch}
-													<span class="text-hover-cyan font-bold">{part.text}</span>
-												{:else}
-													{part.text}
-												{/if}
-											{/each}
-										{:else}
-											{track.title}
-										{/if}
-									</div>
-									<div class="text-text-muted text-xs sm:text-sm mt-0.5">{track.fileSize}</div>
+							
+							<!-- 액션 버튼 (편집, 더보기) -->
+							<div class="flex gap-1 flex-shrink-0">
+								<a href="/tracks/{track.id}/edit" class="action-button h-8 w-auto px-3 whitespace-nowrap rounded-md border border-border-subtle bg-surface-1 hover:bg-surface-2 focus-visible:bg-surface-2 text-xs sm:text-sm font-medium transition-colors duration-200 inline-flex items-center justify-center leading-none">
+									<span class="action-button-text flex items-center">편집</span>
+								</a>
+								<div class="relative more-menu-dropdown">
+									<button
+										onclick={(e) => { e.preventDefault(); e.stopPropagation(); toggleMoreMenu(track.id); }}
+										onkeydown={(e) => {
+											if (e.key === 'Enter' || e.key === ' ') {
+												e.preventDefault();
+												e.stopPropagation();
+												toggleMoreMenu(track.id);
+											}
+										}}
+										class="action-button h-8 w-8 inline-flex items-center justify-center rounded-md border border-border-subtle bg-surface-1 hover:bg-surface-2 focus-visible:bg-surface-2 transition-colors duration-200"
+										aria-label="더보기"
+										aria-expanded={moreMenuOpenId === track.id}
+										aria-haspopup="menu"
+										title="더보기"
+										tabindex="0"
+									>
+										<MoreVertical size={16} class="action-button-icon" />
+									</button>
+									
+									{#if moreMenuOpenId === track.id}
+										<div 
+											role="menu"
+											class="absolute right-0 bottom-full mb-1 w-48 bg-surface-1 border border-border-subtle rounded-lg z-50 animate-in fade-in slide-in-from-bottom-2 duration-200"
+										>
+											<div class="py-1">
+												<!-- 섹션 1: 에셋 -->
+												<button 
+													role="menuitem"
+													onclick={(e) => { e.preventDefault(); e.stopPropagation(); handleDownloadAudio(track.id); }}
+													onkeydown={(e) => {
+														if (e.key === 'Enter' || e.key === ' ') {
+															e.preventDefault();
+															e.stopPropagation();
+															handleDownloadAudio(track.id);
+														}
+													}}
+													class="group w-full flex items-center gap-2 px-4 py-2 text-sm text-text-base hover:bg-transparent hover:text-[var(--hover-cyan)] transition-colors duration-200 text-left"
+													aria-label="오디오 다운로드"
+												>
+													<Download size={16} class="text-text-muted group-hover:text-[var(--hover-cyan)] transition-colors duration-200" />
+													오디오 다운로드
+												</button>
+												<button 
+													role="menuitem"
+													onclick={(e) => { e.preventDefault(); e.stopPropagation(); handleDownloadStems(track.id); }}
+													onkeydown={(e) => {
+														if (e.key === 'Enter' || e.key === ' ') {
+															e.preventDefault();
+															e.stopPropagation();
+															handleDownloadStems(track.id);
+														}
+													}}
+													class="group w-full flex items-center gap-2 px-4 py-2 text-sm text-text-base hover:bg-transparent hover:text-[var(--hover-cyan)] transition-colors duration-200 text-left"
+													aria-label="스템(Stems) 다운로드"
+												>
+													<FileAudio size={16} class="text-text-muted group-hover:text-[var(--hover-cyan)] transition-colors duration-200" />
+													스템(Stems) 다운로드
+												</button>
+												<!-- 섹션 2: 협업 -->
+												<div class="border-t border-border-subtle my-1" role="separator"></div>
+												<button 
+													role="menuitem"
+													onclick={(e) => { e.preventDefault(); e.stopPropagation(); handleAssignMember(track.id); }}
+													onkeydown={(e) => {
+														if (e.key === 'Enter' || e.key === ' ') {
+															e.preventDefault();
+															e.stopPropagation();
+															handleAssignMember(track.id);
+														}
+													}}
+													class="group w-full flex items-center gap-2 px-4 py-2 text-sm text-text-base hover:bg-transparent hover:text-[var(--hover-cyan)] transition-colors duration-200 text-left"
+													aria-label="멤버 배정"
+												>
+													<UserPlus size={16} class="text-text-muted group-hover:text-[var(--hover-cyan)] transition-colors duration-200" />
+													멤버 배정
+												</button>
+												<button 
+													role="menuitem"
+													onclick={(e) => { e.preventDefault(); e.stopPropagation(); handleCopyShareLink(track.id); }}
+													onkeydown={(e) => {
+														if (e.key === 'Enter' || e.key === ' ') {
+															e.preventDefault();
+															e.stopPropagation();
+															handleCopyShareLink(track.id);
+														}
+													}}
+													class="group w-full flex items-center gap-2 px-4 py-2 text-sm text-text-base hover:bg-transparent hover:text-[var(--hover-cyan)] transition-colors duration-200 text-left"
+													aria-label="공유 링크 복사"
+												>
+													<Link size={16} class="text-text-muted group-hover:text-[var(--hover-cyan)] transition-colors duration-200" />
+													공유 링크 복사
+												</button>
+												<!-- 섹션 3: 관리 -->
+												<div class="border-t border-border-subtle my-1" role="separator"></div>
+												<button 
+													role="menuitem"
+													onclick={(e) => { e.preventDefault(); e.stopPropagation(); handleDeleteTrack(track.id); }}
+													onkeydown={(e) => {
+														if (e.key === 'Enter' || e.key === ' ') {
+															e.preventDefault();
+															e.stopPropagation();
+															handleDeleteTrack(track.id);
+														}
+													}}
+													class="group w-full flex items-center gap-2 px-4 py-2 text-sm text-red-500 hover:bg-transparent hover:text-red-400 transition-colors duration-200 text-left"
+													aria-label="삭제"
+												>
+													<Trash2 size={16} class="text-red-500 group-hover:text-red-400 transition-colors duration-200" />
+													삭제
+												</button>
+											</div>
+										</div>
+									{/if}
 								</div>
 							</div>
 						</div>
@@ -1120,7 +1740,7 @@
 							</div>
 							<div class="flex flex-col">
 								<div class="text-[10px] sm:text-xs text-text-muted mb-1.5 font-normal uppercase tracking-wider">상태</div>
-								<span class="inline-block whitespace-normal badge-base {getStatusColor(track.status)}" style="word-break: keep-all;">
+								<span class="inline-block whitespace-normal badge-base pl-0 pr-0 {getStatusColor(track.status)}" style="word-break: keep-all;">
 									{getStatusLabel(track.status)}
 								</span>
 							</div>
@@ -1143,20 +1763,59 @@
 					<caption class="sr-only">트랙 리스트</caption>
 					<thead>
 						<tr class="border-b" style="border-color: var(--border-subtle);">
-							<th class="py-4 text-left text-xs font-medium text-text-muted uppercase tracking-wider" style="width: 25%; padding-left: 1rem; padding-right: 1rem;">트랙</th>
+							<th class="py-4 text-left text-xs font-medium text-text-muted uppercase tracking-wider" style="width: 10%; padding-left: 1rem; padding-right: 1rem;">
+								<div class="flex items-center gap-2">
+									<button
+										onclick={toggleSelectAll}
+										class="w-5 h-5 flex items-center justify-center border border-border-subtle rounded bg-surface-1 hover:bg-surface-2 transition-colors duration-200 focus:outline-none flex-shrink-0"
+										aria-label="{isAllSelected ? '전체 선택 해제' : '전체 선택'}"
+										aria-checked={isAllSelected}
+										role="checkbox"
+										title="{isAllSelected ? '전체 선택 해제' : '전체 선택'}"
+									>
+										{#if isAllSelected}
+											<Check size={14} class="text-brand-pink" />
+										{:else if isSomeSelected}
+											<div class="w-2 h-2 bg-brand-pink rounded-sm"></div>
+										{/if}
+									</button>
+									<div class="flex flex-col items-start gap-0 leading-tight">
+										<span class="text-xs font-medium text-text-muted normal-case tracking-normal">
+											전체
+										</span>
+										<span class="text-xs font-medium text-text-muted normal-case tracking-normal">
+											선택
+										</span>
+									</div>
+								</div>
+							</th>
+							<th class="py-4 text-left text-xs font-medium text-text-muted uppercase tracking-wider" style="width: 22%; padding-left: 3.75rem; padding-right: 1rem;">트랙</th>
 							<th class="py-4 text-left text-xs font-medium text-text-muted uppercase tracking-wider" style="width: 12%; padding-left: 1rem; padding-right: 1rem;">아티스트</th>
 							<th class="py-4 text-left text-xs font-medium text-text-muted uppercase tracking-wider" style="width: 12%; padding-left: 1rem; padding-right: 1rem;">앨범</th>
 							<th class="py-4 text-left text-xs font-medium text-text-muted uppercase tracking-wider" style="width: 8%; padding-left: 1rem; padding-right: 1rem;">길이</th>
 							<th class="py-4 text-left text-xs font-medium text-text-muted uppercase tracking-wider" style="width: 10%; padding-left: 1rem; padding-right: 1rem;">장르</th>
 							<th class="py-4 text-left text-xs font-medium text-text-muted uppercase tracking-wider" style="width: 10%; padding-left: 1rem; padding-right: 1rem;">상태</th>
 							<th class="py-4 text-left text-xs font-medium text-text-muted uppercase tracking-wider" style="width: 10%; padding-left: 1rem; padding-right: 1rem;">통계</th>
-							<th class="py-4 text-right text-xs font-medium text-text-muted uppercase tracking-wider" style="width: 13%; padding-left: 1rem; padding-right: 1rem;">작업</th>
+							<th class="py-4 text-left text-xs font-medium text-text-muted uppercase tracking-wider" style="width: 10%; padding-left: 1rem; padding-right: 0.5rem;"></th>
 					</tr>
 				</thead>
 					<tbody>
 						{#each paginatedTracks as track (track.id)}
-							<tr class="border-b last:border-b-0" style="border-color: var(--border-subtle);">
-								<td class="py-4 text-left text-sm min-w-0" style="width: 25%; padding-left: 1rem; padding-right: 1rem;">
+							<tr class="border-b last:border-b-0 hover:bg-surface-1/50 transition-colors duration-150" style="border-color: var(--border-subtle);">
+								<td class="py-4 text-left" style="width: 10%; padding-left: 1rem; padding-right: 1rem;">
+									<button
+										onclick={() => toggleTrackSelection(track.id)}
+										class="w-5 h-5 flex items-center justify-center border border-border-subtle rounded bg-surface-1 hover:bg-surface-2 transition-colors duration-200 focus:outline-none"
+										aria-label="{selectedTrackIds.has(track.id) ? '선택 해제' : '선택'}"
+										aria-checked={selectedTrackIds.has(track.id)}
+										role="checkbox"
+									>
+										{#if selectedTrackIds.has(track.id)}
+											<Check size={14} class="text-brand-pink" />
+										{/if}
+									</button>
+								</td>
+								<td class="py-4 text-left text-sm min-w-0" style="width: 22%; padding-left: 1rem; padding-right: 1rem;">
 								<div class="flex gap-3 items-center min-w-0">
 										<button aria-label="재생" class="w-8 h-8 flex-shrink-0 bg-surface-2 rounded-full flex items-center justify-center hover:bg-brand-pink hover:text-white focus:outline-none transition-colors duration-200 ">
 											<Play size={16} class="w-4 h-4 ml-0.5" />
@@ -1203,8 +1862,8 @@
 								<td class="py-4 text-left text-xs sm:text-sm text-text-muted" style="width: 10%; padding-left: 1rem; padding-right: 1rem;">
 									{track.genre}
 							</td>
-								<td class="py-4 text-left text-xs sm:text-sm" style="width: 10%; padding-left: 0; padding-right: 0;">
-									<span class="badge-base {getStatusColor(track.status)} whitespace-normal" style="word-break: keep-all;">
+								<td class="py-4 text-left text-xs sm:text-sm" style="width: 10%; padding-left: 1rem; padding-right: 1rem;">
+									<span class="badge-base pl-0 pr-0 {getStatusColor(track.status)} whitespace-normal" style="word-break: keep-all;">
 									{getStatusLabel(track.status)}
 								</span>
 							</td>
@@ -1220,8 +1879,8 @@
 										</div>
 								</div>
 							</td>
-								<td class="py-4 text-center text-xs sm:text-sm font-medium" style="width: 13%; padding-left: 1rem; padding-right: 1rem;">
-									<div class="flex gap-1 justify-center items-center">
+								<td class="py-4 text-left text-xs sm:text-sm font-medium" style="width: 10%; padding-left: 1rem; padding-right: 0.5rem;">
+									<div class="flex gap-1 justify-end items-center">
 										<a href="/tracks/{track.id}/edit" class="action-button h-8 w-auto px-3 whitespace-nowrap rounded-md border border-border-subtle bg-surface-1 hover:bg-surface-2 focus-visible:bg-surface-2 text-xs sm:text-sm font-medium transition-colors duration-200 inline-flex items-center justify-center leading-none">
 										<span class="action-button-text flex items-center">편집</span>
 									</a>
@@ -1248,7 +1907,7 @@
 										{#if moreMenuOpenId === track.id}
 											<div 
 												role="menu"
-												class="absolute right-0 top-full mt-1 w-48 bg-surface-1 border border-border-subtle rounded-lg z-[100]  animate-in fade-in slide-in-from-top-2 duration-200"
+												class="absolute right-0 bottom-full mb-1 w-48 bg-surface-1 border border-border-subtle rounded-lg z-50 animate-in fade-in slide-in-from-bottom-2 duration-200"
 											>
 												<div class="py-1">
 													<!-- 섹션 1: 에셋 -->
@@ -1396,40 +2055,3 @@
 	{/if}
 </PageContent>
 
-<style>
-	/* 기본 (다크 모드) */
-	.custom-list-scrollbar::-webkit-scrollbar {
-		width: 8px !important;
-		height: 8px !important;
-	}
-	.custom-list-scrollbar::-webkit-scrollbar-track {
-		background: var(--bg); /* #000000 */
-	}
-	.custom-list-scrollbar::-webkit-scrollbar-thumb {
-		background: var(--surface-2); /* #121212 */
-		border-radius: 0px; /* 각진 모서리 */
-	}
-	.custom-list-scrollbar::-webkit-scrollbar-thumb:hover {
-		background: var(--text-muted); /* #6F6F6F */
-	}
-
-	/* 라이트 모드 오버라이드 */
-	:global([data-theme="light"]) .custom-list-scrollbar::-webkit-scrollbar-track {
-		background: var(--bg); /* #F7F3E9 */
-	}
-	:global([data-theme="light"]) .custom-list-scrollbar::-webkit-scrollbar-thumb {
-		background: var(--text-muted); /* #5C4F3F */
-	}
-	:global([data-theme="light"]) .custom-list-scrollbar::-webkit-scrollbar-thumb:hover {
-		background: var(--text-base); /* #8B7355 */
-	}
-
-	/* Firefox 지원 */
-	.custom-list-scrollbar {
-		scrollbar-width: thin;
-		scrollbar-color: var(--surface-2) var(--bg);
-	}
-	:global([data-theme="light"]) .custom-list-scrollbar {
-		scrollbar-color: var(--text-muted) var(--bg);
-	}
-</style>

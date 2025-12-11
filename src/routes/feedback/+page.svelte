@@ -274,7 +274,7 @@
 											<Reply size={14} />
 											답변
 										</button>
-										<button class="inline-flex items-center gap-1 px-3 py-1.5 text-sm bg-surface-2 text-text-muted rounded-lg hover:bg-surface-1 transition-colors duration-200 font-medium" type="button">
+										<button class="cancel-button inline-flex items-center gap-1 px-3 py-1.5 text-sm bg-surface-2 text-text-muted rounded-lg border border-border-subtle transition-colors duration-200 font-medium" type="button">
 											<Archive size={14} />
 											보관
 										</button>

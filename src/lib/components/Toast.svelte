@@ -5,6 +5,7 @@
 	export let message: string;
 	export let type: 'success' | 'error' | 'warning' = 'success';
 	export let duration: number = 3000;
+	export let onClose: (() => void) | undefined = undefined;
 
 	let visible = false;
 	let timeoutId: ReturnType<typeof setTimeout>;
@@ -40,6 +41,9 @@
 		if (timeoutId) {
 			clearTimeout(timeoutId);
 		}
+		if (onClose) {
+			onClose();
+		}
 	}
 
 	onMount(() => {
@@ -57,7 +61,7 @@
 
 {#if visible}
 	<div 
-		class="fixed top-20 right-4 z-50 bg-surface-2 border border-border-subtle rounded-lg p-4 shadow-lg max-w-sm"
+		class="bg-surface-2 border border-border-subtle rounded-lg p-4 shadow-lg max-w-sm animate-in fade-in slide-in-from-right-2 duration-200"
 		role="alert"
 		aria-live="polite"
 	>

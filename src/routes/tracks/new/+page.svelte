@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { Asterisk, ChevronUp, ChevronDown, ChevronDown as ChevronDownIcon, X, Image, Upload } from 'lucide-svelte';
+	import { Asterisk, ChevronDown, ChevronDown as ChevronDownIcon, X } from 'lucide-svelte';
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import PageContent from '$lib/components/PageContent.svelte';
 	import DatePicker from '$lib/components/DatePicker.svelte';
@@ -8,25 +8,18 @@
 
 	// 현재 날짜 정보
 	const currentDate = new Date();
-	const currentYear = currentDate.getFullYear();
 	const today = currentDate.toISOString().split('T')[0]; // YYYY-MM-DD 형식
 
-	// 폼 상태 (ISO 형식으로 저장)
+	// 폼 상태 (빈 데이터로 초기화 - Create Mode)
 	let formData = $state({
 		title: '',
 		artist: '',
-		year: currentYear,
-		status: 'draft',
+		album: '',
 		genres: [] as string[],
-		release_date_kr: today, // ISO YYYY-MM-DD (오늘 날짜)
-		release_date_global: today // ISO YYYY-MM-DD (오늘 날짜)
+		status: 'draft',
+		release_date_kr: today, // 오늘 날짜로 초기화
+		release_date_global: today // 오늘 날짜로 초기화
 	});
-
-	// 이미지 업로드 상태
-	let imageFile = $state<File | null>(null);
-	let previewUrl = $state<string>('');
-	let fileInput: HTMLInputElement;
-	let isDragging = $state(false);
 
 	// 상태 드롭다운 열림 상태
 	let statusDropdownOpen = $state(false);
@@ -69,36 +62,18 @@
 
 	const statusLabel = $derived(statusOptions.find(o => o.value === formData.status)?.label || '선택하세요');
 
-	// 발매일 변경 시 연도 자동 업데이트
-	$effect(() => {
-		// 국내 발매일이 있으면 해당 연도로 업데이트
-		if (formData.release_date_kr) {
-			const date = new Date(formData.release_date_kr);
-			if (!isNaN(date.getTime())) {
-				formData.year = date.getFullYear();
-			}
-		}
-		// 국내 발매일이 없고 해외 발매일이 있으면 해외 발매일의 연도로 업데이트
-		else if (formData.release_date_global) {
-			const date = new Date(formData.release_date_global);
-			if (!isNaN(date.getTime())) {
-				formData.year = date.getFullYear();
-			}
-		}
-	});
-
 	function handleSubmit() {
-		console.log('앨범 생성:', $state.snapshot(formData));
+		console.log('트랙 생성:', $state.snapshot(formData));
 		// 실제 저장 로직 구현 예정
-		// 저장 후 생성된 앨범의 상세 페이지로 이동
+		// 저장 후 생성된 트랙의 상세 페이지로 이동
 		// 임시로 목록 페이지로 이동
-		goto('/albums');
+		goto('/tracks');
 	}
 
 	function handleCancel(event: MouseEvent) {
 		const button = event.currentTarget as HTMLButtonElement;
 		if (confirm('작성 중인 내용을 저장하지 않고 나가시겠습니까?')) {
-			goto('/albums');
+			goto('/tracks');
 		} else {
 			// confirm에서 취소를 선택한 경우 포커스 해제
 			button.blur();
@@ -112,57 +87,6 @@
 	function selectStatusOption(value: string) {
 		formData.status = value;
 		statusDropdownOpen = false;
-	}
-
-	// 파일 처리 공통 함수
-	function processFile(file: File) {
-		if (file && file.type.startsWith('image/')) {
-			imageFile = file;
-			// 기존 미리보기 URL 해제
-			if (previewUrl) {
-				URL.revokeObjectURL(previewUrl);
-			}
-			previewUrl = URL.createObjectURL(file);
-		}
-	}
-
-	// 이미지 선택 핸들러
-	function handleImageSelect(event: Event) {
-		const target = event.target as HTMLInputElement;
-		const file = target.files?.[0];
-		if (file) {
-			processFile(file);
-		}
-	}
-
-	// 이미지 업로드 영역 클릭 핸들러
-	function handleImageAreaClick() {
-		fileInput?.click();
-	}
-
-	// 드래그 앤 드롭 핸들러
-	function handleDragOver(event: DragEvent) {
-		event.preventDefault();
-		event.stopPropagation();
-		isDragging = true;
-	}
-
-	function handleDragLeave(event: DragEvent) {
-		event.preventDefault();
-		event.stopPropagation();
-		isDragging = false;
-	}
-
-	function handleDrop(event: DragEvent) {
-		event.preventDefault();
-		event.stopPropagation();
-		isDragging = false;
-
-		const files = event.dataTransfer?.files;
-		if (files && files.length > 0) {
-			const file = files[0];
-			processFile(file);
-		}
 	}
 
 	// 외부 클릭 및 Escape 키 처리
@@ -194,78 +118,25 @@
 			document.removeEventListener('keydown', handleEscape);
 		};
 	});
-
-	// 컴포넌트 언마운트 시 미리보기 URL 정리
-	$effect(() => {
-		return () => {
-			if (previewUrl) {
-				URL.revokeObjectURL(previewUrl);
-			}
-		};
-	});
 </script>
 
 <PageContent>
 	<PageHeader 
-		title="새 앨범 만들기"
-		description="새로운 앨범을 만듭니다"
+		title="새 트랙 만들기"
+		description="새로운 트랙을 만듭니다"
 	/>
 
 	<!-- 생성 폼 -->
 	<div class="bg-surface-1 rounded-lg border border-border-subtle p-6">
-		<form onsubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
-			<!-- 좌우 배치 컨테이너 -->
-			<div class="flex flex-col lg:flex-row gap-10">
-				<!-- [좌측] 이미지 업로드 영역 -->
-				<div class="w-full lg:w-80 flex-shrink-0">
-					<div
-						onclick={handleImageAreaClick}
-						ondragover={handleDragOver}
-						ondragleave={handleDragLeave}
-						ondrop={handleDrop}
-						class="w-full aspect-square bg-surface-1 rounded-xl border-2 border-dashed cursor-pointer flex items-center justify-center transition-colors duration-200 overflow-hidden {isDragging ? 'border-brand-pink bg-surface-2/50' : 'border-border-subtle hover:border-brand-pink hover:bg-surface-2'}"
-						role="button"
-						tabindex="0"
-						onkeydown={(e) => {
-							if (e.key === 'Enter' || e.key === ' ') {
-								e.preventDefault();
-								handleImageAreaClick();
-							}
-						}}
-						aria-label="앨범 커버 업로드"
-					>
-						<input
-							type="file"
-							accept="image/*"
-							class="hidden"
-							bind:this={fileInput}
-							onchange={handleImageSelect}
-						/>
-						{#if previewUrl}
-							<img
-								src={previewUrl}
-								alt="앨범 커버 미리보기"
-								class="w-full h-full object-cover rounded-xl"
-							/>
-						{:else}
-							<div class="flex flex-col items-center justify-center gap-3 text-text-muted">
-								<Image size={48} class="lucide-icon" />
-								<span class="text-sm font-medium">커버 업로드</span>
-							</div>
-						{/if}
-					</div>
-				</div>
-
-				<!-- [우측] 입력 필드 영역 -->
-				<div class="flex-1 space-y-6">
+		<form onsubmit={(e) => { e.preventDefault(); handleSubmit(); }} class="space-y-6">
 			<!-- 기본 정보 -->
 			<div class="space-y-4">
 				<h3 class="text-lg font-semibold text-text-strong mb-4">기본 정보</h3>
 				
-				<!-- 앨범 제목 -->
+				<!-- 트랙 제목 -->
 				<div class="w-full">
 					<label for="title" class="block text-sm font-medium text-text-strong mb-2">
-						앨범 제목 <Asterisk size={12} class="inline text-brand-pink ml-0" />
+						트랙 제목 <Asterisk size={12} class="inline text-brand-pink ml-0" />
 					</label>
 					<input
 						type="text"
@@ -274,7 +145,7 @@
 						bind:value={formData.title}
 						required
 						class="w-full h-10 px-4 bg-surface-2 border border-border-subtle rounded-lg text-text-base focus:outline-none focus:border-brand-pink focus:ring-0 transition-colors duration-200"
-						placeholder="앨범 제목을 입력하세요"
+						placeholder="트랙 제목을 입력하세요"
 					/>
 				</div>
 
@@ -294,53 +165,19 @@
 					/>
 				</div>
 
-				<!-- 발매 연도 -->
+				<!-- 앨범 -->
 				<div class="w-full">
-					<label for="year" class="block text-sm font-medium text-text-strong mb-2">
-						발매 연도 <Asterisk size={12} class="inline text-brand-pink ml-0" />
+					<label for="album" class="block text-sm font-medium text-text-strong mb-2">
+						앨범
 					</label>
-					<div class="relative w-full">
-						<input
-							type="number"
-							id="year"
-							name="year"
-							bind:value={formData.year}
-							required
-							min="1900"
-							max="2100"
-							class="w-full h-10 px-4 pr-[2.625rem] bg-surface-2 border border-border-subtle rounded-lg text-text-base focus:outline-none focus:border-brand-pink focus:ring-0 transition-colors duration-200 number-input-custom"
-							placeholder="2024"
-						/>
-						<!-- 오른쪽 아이콘 래퍼: 통일된 패턴 -->
-						<div class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center">
-							<div class="flex flex-col gap-0.5">
-								<button
-									type="button"
-									onclick={(e) => {
-										e.preventDefault();
-										e.stopPropagation();
-										if (formData.year < 2100) formData.year += 1;
-									}}
-									class="pointer-events-auto flex h-4 w-4 items-center justify-center rounded-sm hover:bg-surface-1 transition-colors duration-200"
-									aria-label="연도 증가"
-								>
-									<ChevronUp size={12} class="text-text-muted" />
-								</button>
-								<button
-									type="button"
-									onclick={(e) => {
-										e.preventDefault();
-										e.stopPropagation();
-										if (formData.year > 1900) formData.year -= 1;
-									}}
-									class="pointer-events-auto flex h-4 w-4 items-center justify-center rounded-sm hover:bg-surface-1 transition-colors duration-200"
-									aria-label="연도 감소"
-								>
-									<ChevronDown size={12} class="text-text-muted" />
-								</button>
-							</div>
-						</div>
-					</div>
+					<input
+						type="text"
+						id="album"
+						name="album"
+						bind:value={formData.album}
+						class="w-full h-10 px-4 bg-surface-2 border border-border-subtle rounded-lg text-text-base focus:outline-none focus:border-brand-pink focus:ring-0 transition-colors duration-200"
+						placeholder="앨범 이름을 입력하세요"
+					/>
 				</div>
 
 				<!-- 장르 -->
@@ -472,7 +309,7 @@
 			</div>
 
 			<!-- 발매일 정보 -->
-					<div class="-mx-4 sm:-mx-6 lg:-mx-8 pt-6 border-t border-border-subtle px-4 sm:px-6 lg:px-8">
+			<div class="-mx-6 px-6 pt-6 border-t border-border-subtle">
 				<div class="space-y-4">
 					<h3 class="text-lg font-semibold text-text-strong mb-4">발매일 정보</h3>
 					
@@ -491,7 +328,7 @@
 			</div>
 
 			<!-- 액션 버튼 -->
-					<div class="-mx-4 sm:-mx-6 lg:-mx-8 flex items-center justify-end gap-3 pt-6 border-t border-border-subtle px-4 sm:px-6 lg:px-8">
+			<div class="-mx-6 px-6 flex items-center justify-end gap-3 pt-6 border-t border-border-subtle">
 				<button
 					type="button"
 					onclick={handleCancel}
@@ -505,8 +342,6 @@
 				>
 					생성
 				</button>
-					</div>
-				</div>
 			</div>
 		</form>
 	</div>

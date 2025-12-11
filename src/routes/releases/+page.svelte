@@ -137,7 +137,6 @@
 	</div>
 	{:else}
 		<EmptyState
-			icon={Rocket}
 			title="발매를 찾을 수 없습니다"
 			description={searchQuery ? '검색 조건에 맞는 발매가 없습니다.' : '아직 발매가 없습니다.'}
 			actionLabel="첫 번째 발매 생성"
