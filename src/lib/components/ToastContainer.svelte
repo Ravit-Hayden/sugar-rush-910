@@ -10,6 +10,8 @@
 				message={t.message} 
 				type={t.type} 
 				duration={t.duration || 3000}
+				action={t.action}
+				dismissAction={t.dismissAction}
 				onClose={() => toast.remove(t.id)}
 			/>
 		</div>

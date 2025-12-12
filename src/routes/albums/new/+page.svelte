@@ -5,6 +5,7 @@
 	import PageContent from '$lib/components/PageContent.svelte';
 	import DatePicker from '$lib/components/DatePicker.svelte';
 	import { GENRES } from '$lib/constants/genres';
+	import ArtistSelect from '$lib/components/ArtistSelect.svelte';
 
 	// 현재 날짜 정보
 	const currentDate = new Date();
@@ -283,14 +284,12 @@
 					<label for="artist" class="block text-sm font-medium text-text-strong mb-2">
 						아티스트 <Asterisk size={12} class="inline text-brand-pink ml-0" />
 					</label>
-					<input
-						type="text"
-						id="artist"
-						name="artist"
-						bind:value={formData.artist}
+					<ArtistSelect
+						value={formData.artist}
+						onChange={(value) => formData.artist = value}
 						required
-						class="w-full h-10 px-4 bg-surface-2 border border-border-subtle rounded-lg text-text-base focus:outline-none focus:border-brand-pink focus:ring-0 transition-colors duration-200"
-						placeholder="아티스트 이름을 입력하세요"
+						placeholder="아티스트를 선택하거나 입력하세요"
+						allowCustom={true}
 					/>
 				</div>
 

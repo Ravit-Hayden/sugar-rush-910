@@ -8,46 +8,20 @@
 	import { getStatusColor, getStatusLabel } from '$lib/utils/status';
 	import { GENRES } from '$lib/constants/genres';
 	import { toast } from '$lib/stores/toast';
+	import { loadFiltersFromStorage, saveFiltersToStorage } from '$lib/utils/filterStorage';
+	import type { FilterState } from '$lib/utils/filterStorage';
+	import { useClickOutside, useEscapeKey } from '$lib/utils/clickOutside';
+	import SortDropdown from '$lib/components/SortDropdown.svelte';
+	import StatusDropdown from '$lib/components/StatusDropdown.svelte';
+	import MoreMenuDropdown, { type MenuItem } from '$lib/components/MoreMenuDropdown.svelte';
+	import BulkActionBar from '$lib/components/BulkActionBar.svelte';
+	import AdvancedSearchPanel from '$lib/components/AdvancedSearchPanel.svelte';
 
 	// 필터 상태 저장 키
 	const FILTER_STORAGE_KEY = 'sr_tracks_filters';
 
-	// 필터 상태 (localStorage에서 복원)
-	function loadFiltersFromStorage() {
-		if (typeof window === 'undefined') return null;
-		try {
-			const stored = localStorage.getItem(FILTER_STORAGE_KEY);
-			if (stored) {
-				return JSON.parse(stored);
-			}
-		} catch (e) {
-			console.error('필터 상태 복원 실패:', e);
-		}
-		return null;
-	}
-
-	function saveFiltersToStorage() {
-		if (typeof window === 'undefined') return;
-		try {
-			const filters = {
-				searchQuery,
-				selectedGenre,
-				selectedStatus,
-				selectedSort,
-				selectedGenres: Array.from(selectedGenres),
-				playsMin,
-				playsMax,
-				likesMin,
-				likesMax
-			};
-			localStorage.setItem(FILTER_STORAGE_KEY, JSON.stringify(filters));
-		} catch (e) {
-			console.error('필터 상태 저장 실패:', e);
-		}
-	}
-
 	// 초기 상태 (localStorage에서 복원)
-	const savedFilters = loadFiltersFromStorage();
+	const savedFilters = loadFiltersFromStorage(FILTER_STORAGE_KEY);
 	let searchQuery = $state(savedFilters?.searchQuery || '');
 	let selectedGenre = $state(savedFilters?.selectedGenre || 'all');
 	let selectedStatus = $state(savedFilters?.selectedStatus || 'all');
@@ -344,27 +318,7 @@
 		{ value: 'deleted', label: '삭제됨', group: '공통 상태' }
 	];
 
-	// 필터 옵션 그룹화
-	const groupedStatusFilterOptions = $derived.by(() => {
-		const hasGroups = statusFilterOptions.some(opt => opt.group);
-		if (!hasGroups) return null;
-		
-		const groups: { [key: string]: typeof statusFilterOptions } = {};
-		const ungrouped: typeof statusFilterOptions = [];
-		
-		statusFilterOptions.forEach(opt => {
-			if (opt.group) {
-				if (!groups[opt.group]) {
-					groups[opt.group] = [];
-				}
-				groups[opt.group].push(opt);
-			} else {
-				ungrouped.push(opt);
-			}
-		});
-		
-		return { groups, ungrouped };
-	});
+	// 필터 옵션 그룹화는 StatusDropdown 컴포넌트 내부에서 처리됨
 
 	// 정렬 옵션
 	const sortOptions = [
@@ -550,12 +504,22 @@
 		likesMax; // 감시
 		currentPage = 1;
 		// 필터 상태 저장
-		saveFiltersToStorage();
+		saveFiltersToStorage(FILTER_STORAGE_KEY, {
+			searchQuery,
+			selectedGenre,
+			selectedStatus,
+			selectedSort,
+			selectedGenres: Array.from(selectedGenres),
+			playsMin,
+			playsMax,
+			likesMin,
+			likesMax
+		});
 	});
 
 	// 페이지 로드 시 필터 상태 복원
 	onMount(() => {
-		const saved = loadFiltersFromStorage();
+		const saved = loadFiltersFromStorage(FILTER_STORAGE_KEY);
 		if (saved) {
 			searchQuery = saved.searchQuery || '';
 			selectedGenre = saved.selectedGenre || 'all';
@@ -644,13 +608,17 @@
 		moreMenuOpenId = moreMenuOpenId === trackId ? null : trackId;
 	}
 
+	function closeMoreMenu() {
+		moreMenuOpenId = null;
+	}
+
 	// 더보기 메뉴 핸들러
 	function handleDownloadAudio(trackId: string) {
 		const track = tracks.find(t => t.id === trackId);
 		// 오디오 다운로드 로직 (추후 구현)
 		console.log('오디오 다운로드:', trackId);
 		toast.add(`${track?.title || '트랙'} 오디오 다운로드를 시작합니다.`, 'success');
-		moreMenuOpenId = null;
+		closeMoreMenu();
 	}
 
 	function handleDownloadStems(trackId: string) {
@@ -658,7 +626,7 @@
 		// 스템 다운로드 로직 (추후 구현)
 		console.log('스템 다운로드:', trackId);
 		toast.add(`${track?.title || '트랙'} 스템 다운로드를 시작합니다.`, 'success');
-		moreMenuOpenId = null;
+		closeMoreMenu();
 	}
 
 	function handleAssignMember(trackId: string) {
@@ -666,7 +634,7 @@
 		// 멤버 배정 로직 (추후 구현)
 		console.log('멤버 배정:', trackId);
 		toast.add(`${track?.title || '트랙'} 멤버 배정 기능은 곧 제공될 예정입니다.`, 'warning');
-		moreMenuOpenId = null;
+		closeMoreMenu();
 	}
 
 	function handleCopyShareLink(trackId: string) {
@@ -676,7 +644,7 @@
 		}).catch(() => {
 			toast.add('공유 링크 복사에 실패했습니다.', 'error');
 		});
-		moreMenuOpenId = null;
+		closeMoreMenu();
 	}
 
 	function handleDeleteTrack(trackId: string) {
@@ -685,8 +653,19 @@
 		if (confirm(`정말 "${track?.title || '트랙'}" 트랙을 삭제하시겠습니까?`)) {
 			console.log('삭제:', trackId);
 			toast.add(`${track?.title || '트랙'}이(가) 삭제되었습니다.`, 'success');
-			moreMenuOpenId = null;
+			closeMoreMenu();
 		}
+	}
+
+	// 더보기 메뉴 항목 생성 함수
+	function getMoreMenuItems(trackId: string): MenuItem[] {
+		return [
+			{ label: '오디오 다운로드', icon: Download, onClick: () => handleDownloadAudio(trackId), ariaLabel: '오디오 다운로드' },
+			{ label: '스템(Stems) 다운로드', icon: FileAudio, onClick: () => handleDownloadStems(trackId), ariaLabel: '스템(Stems) 다운로드' },
+			{ label: '멤버 배정', icon: UserPlus, onClick: () => handleAssignMember(trackId), ariaLabel: '멤버 배정', separator: true },
+			{ label: '공유 링크 복사', icon: Link, onClick: () => handleCopyShareLink(trackId), ariaLabel: '공유 링크 복사' },
+			{ label: '삭제', icon: Trash2, onClick: () => handleDeleteTrack(trackId), ariaLabel: '삭제', separator: true, danger: true }
+		];
 	}
 
 	// 일괄 선택 관련 함수
@@ -758,162 +737,43 @@
 		bulkActionMenuOpen = false;
 	}
 
-	// 외부 클릭 시 더보기 메뉴 닫기
-	$effect(() => {
-		if (moreMenuOpenId === null) return;
+	// 더보기 메뉴 외부 클릭 감지는 MoreMenuDropdown 컴포넌트 내부에서 처리됨
 
-		function handleClickOutside(event: MouseEvent) {
-			const target = event.target as HTMLElement;
-			if (!target.closest('.more-menu-dropdown')) {
-				moreMenuOpenId = null;
-			}
-		}
+	// 일괄 작업 메뉴 외부 클릭 감지는 BulkActionBar 컴포넌트 내부에서 처리됨
 
-		const timeoutId = setTimeout(() => {
-			document.addEventListener('click', handleClickOutside, true);
-		}, 0);
-
-		return () => {
-			clearTimeout(timeoutId);
-			document.removeEventListener('click', handleClickOutside, true);
-		};
-	});
-
-	// 외부 클릭 시 일괄 작업 메뉴 닫기
-	$effect(() => {
-		if (!bulkActionMenuOpen) return;
-
-		function handleClickOutside(event: MouseEvent) {
-			const target = event.target as HTMLElement;
-			if (!target.closest('.bulk-action-menu')) {
-				bulkActionMenuOpen = false;
-			}
-		}
-
-		const timeoutId = setTimeout(() => {
-			document.addEventListener('click', handleClickOutside, true);
-		}, 0);
-
-		return () => {
-			clearTimeout(timeoutId);
-			document.removeEventListener('click', handleClickOutside, true);
-		};
-	});
-
-	// 외부 클릭 시 고급 검색 패널 닫기
-	$effect(() => {
-		if (!advancedSearchOpen) return;
-
-		function handleClickOutside(event: MouseEvent) {
-			const target = event.target as HTMLElement;
-			if (!target.closest('.advanced-search-panel') && !target.closest('button[aria-label="고급 검색"]')) {
-				advancedSearchOpen = false;
-			}
-		}
-
-		const timeoutId = setTimeout(() => {
-			document.addEventListener('click', handleClickOutside, true);
-		}, 0);
-
-		return () => {
-			clearTimeout(timeoutId);
-			document.removeEventListener('click', handleClickOutside, true);
-		};
-	});
+	// 고급 검색 패널 외부 클릭 감지는 AdvancedSearchPanel 컴포넌트 내부에서 처리됨
 
 	// Escape 키로 더보기 메뉴 닫기
 	$effect(() => {
-		if (moreMenuOpenId === null) return;
-
-		function handleEscape(e: KeyboardEvent) {
-			if (e.key === 'Escape') {
-				moreMenuOpenId = null;
-			}
-		}
-
-		document.addEventListener('keydown', handleEscape);
-		return () => {
-			document.removeEventListener('keydown', handleEscape);
-		};
+		return useEscapeKey(() => {
+			moreMenuOpenId = null;
+		}, moreMenuOpenId !== null);
 	});
 
 	// 외부 클릭 시 장르 필터 드롭다운 닫기
 	$effect(() => {
-		if (!genreDropdownOpen) return;
-
-		function handleClickOutside(event: MouseEvent) {
-			const target = event.target as HTMLElement;
-			if (!target.closest('.genre-filter-dropdown')) {
-				genreDropdownOpen = false;
-			}
-		}
-
-		const timeoutId = setTimeout(() => {
-			document.addEventListener('click', handleClickOutside, true);
-		}, 0);
-
-		return () => {
-			clearTimeout(timeoutId);
-			document.removeEventListener('click', handleClickOutside, true);
-		};
+		return useClickOutside('.genre-filter-dropdown', () => {
+			genreDropdownOpen = false;
+		}, genreDropdownOpen);
 	});
 
-	// 외부 클릭 시 상태 필터 드롭다운 닫기
-	$effect(() => {
-		if (!statusDropdownOpen) return;
-
-		function handleClickOutside(event: MouseEvent) {
-			const target = event.target as HTMLElement;
-			if (!target.closest('.status-filter-dropdown')) {
-				statusDropdownOpen = false;
-			}
-		}
-
-		const timeoutId = setTimeout(() => {
-			document.addEventListener('click', handleClickOutside, true);
-		}, 0);
-
-		return () => {
-			clearTimeout(timeoutId);
-			document.removeEventListener('click', handleClickOutside, true);
-		};
-	});
+	// 상태 필터 드롭다운 외부 클릭 감지는 StatusDropdown 컴포넌트 내부에서 처리됨
 
 	// 외부 클릭 시 정렬 드롭다운 닫기
 	$effect(() => {
-		if (!sortDropdownOpen) return;
-
-		function handleClickOutside(event: MouseEvent) {
-			const target = event.target as HTMLElement;
-			if (!target.closest('.sort-dropdown')) {
-				sortDropdownOpen = false;
-			}
-		}
-
-		const timeoutId = setTimeout(() => {
-			document.addEventListener('click', handleClickOutside, true);
-		}, 0);
-
-		return () => {
-			clearTimeout(timeoutId);
-			document.removeEventListener('click', handleClickOutside, true);
-		};
+		return useClickOutside('.sort-dropdown', () => {
+			sortDropdownOpen = false;
+		}, sortDropdownOpen);
 	});
 
 	// Escape 키로 드롭다운 닫기
 	$effect(() => {
-		function handleEscape(e: KeyboardEvent) {
-			if (e.key === 'Escape') {
-				genreDropdownOpen = false;
-				statusDropdownOpen = false;
-				sortDropdownOpen = false;
-			}
-		}
-
-		document.addEventListener('keydown', handleEscape);
-		return () => {
-			document.removeEventListener('keydown', handleEscape);
-		};
+		const anyOpen = genreDropdownOpen || statusDropdownOpen || sortDropdownOpen;
+		return useEscapeKey(() => {
+			genreDropdownOpen = false;
+			statusDropdownOpen = false;
+			sortDropdownOpen = false;
+		}, anyOpen);
 	});
 
 </script>
@@ -970,256 +830,44 @@
 				</div>
 				
 				<!-- 고급 검색 패널 -->
-				{#if advancedSearchOpen}
-					<div class="advanced-search-panel absolute top-full left-0 right-0 mt-2 p-4 bg-surface-1 border border-border-subtle rounded-lg shadow-lg z-[9999]">
-						<div class="flex items-center justify-between mb-4">
-							<h3 class="text-sm font-semibold text-text-base">고급 검색</h3>
-							<button
-								onclick={() => advancedSearchOpen = false}
-								class="w-6 h-6 flex items-center justify-center rounded hover:bg-surface-2 transition-colors"
-								aria-label="닫기"
-							>
-								<X size={14} class="text-text-muted" />
-							</button>
-						</div>
-						
-						<div class="space-y-4">
-							<!-- 여러 장르 선택 -->
-							<div>
-								<label class="block text-xs font-medium text-text-muted mb-2">장르 (여러 개 선택 가능)</label>
-								<div class="max-h-48 overflow-y-auto custom-list-scrollbar border border-border-subtle rounded-md p-2">
-									<div class="flex flex-wrap gap-2">
-										{#each GENRES as genre}
-											<button
-												onclick={() => {
-													const newSet = new Set(selectedGenres);
-													if (newSet.has(genre)) {
-														newSet.delete(genre);
-													} else {
-														newSet.add(genre);
-													}
-													selectedGenres = newSet;
-													// 단일 장르 선택 해제
-													if (newSet.size > 0) {
-														selectedGenre = 'all';
-													}
-												}}
-												class="px-3 py-1.5 text-xs rounded-md border transition-colors duration-200 {selectedGenres.has(genre) ? 'bg-brand-pink text-white border-brand-pink' : 'bg-surface-2 text-text-base border-border-subtle'}"
-												aria-pressed={selectedGenres.has(genre)}
-											>
-												{genre}
-											</button>
-										{/each}
-									</div>
-								</div>
-								{#if selectedGenres.size > 0}
-									<button
-										onclick={() => {
-											selectedGenres = new Set();
-											selectedGenre = 'all';
-										}}
-										class="mt-2 text-xs text-text-muted hover:text-text-base transition-colors"
-									>
-										선택 해제
-									</button>
-								{/if}
-							</div>
-							
-							<!-- 통계 범위 -->
-							<div class="grid grid-cols-2 gap-4">
-								<div>
-									<label class="block text-xs font-medium text-text-muted mb-2">재생수 범위</label>
-									<div class="flex gap-2">
-										<div class="relative flex-1">
-											<input
-												type="number"
-												placeholder="최소"
-												value={playsMin}
-												oninput={(e) => {
-													playsMin = (e.currentTarget as HTMLInputElement).value;
-												}}
-												class="w-full px-3 pr-8 py-1.5 text-sm bg-surface-2 border border-border-subtle rounded-md text-text-base focus:outline-none focus:border-brand-pink transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-												min="0"
-											/>
-											<div class="absolute inset-y-0 right-0 flex flex-col pointer-events-none pr-1">
-												<button
-													type="button"
-													onclick={(e) => {
-														e.preventDefault();
-														e.stopPropagation();
-														const current = parseInt(playsMin) || 0;
-														playsMin = String(current + 1);
-													}}
-													class="pointer-events-auto h-1/2 flex items-center justify-center text-text-muted hover:text-hover-cyan focus:text-hover-cyan transition-colors duration-200 bg-transparent"
-													aria-label="증가"
-												>
-													<ChevronUp size={12} />
-												</button>
-												<button
-													type="button"
-													onclick={(e) => {
-														e.preventDefault();
-														e.stopPropagation();
-														const current = parseInt(playsMin) || 0;
-														playsMin = String(Math.max(0, current - 1));
-													}}
-													class="pointer-events-auto h-1/2 flex items-center justify-center text-text-muted hover:text-hover-cyan focus:text-hover-cyan transition-colors duration-200 bg-transparent"
-													aria-label="감소"
-												>
-													<ChevronDown size={12} />
-												</button>
-											</div>
-										</div>
-										<span class="flex items-center text-text-muted">~</span>
-										<div class="relative flex-1">
-											<input
-												type="number"
-												placeholder="최대"
-												value={playsMax}
-												oninput={(e) => {
-													playsMax = (e.currentTarget as HTMLInputElement).value;
-												}}
-												class="w-full px-3 pr-8 py-1.5 text-sm bg-surface-2 border border-border-subtle rounded-md text-text-base focus:outline-none focus:border-brand-pink transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-												min="0"
-											/>
-											<div class="absolute inset-y-0 right-0 flex flex-col pointer-events-none pr-1">
-												<button
-													type="button"
-													onclick={(e) => {
-														e.preventDefault();
-														e.stopPropagation();
-														const current = parseInt(playsMax) || 0;
-														playsMax = String(current + 1);
-													}}
-													class="pointer-events-auto h-1/2 flex items-center justify-center text-text-muted hover:text-hover-cyan focus:text-hover-cyan transition-colors duration-200 bg-transparent"
-													aria-label="증가"
-												>
-													<ChevronUp size={12} />
-												</button>
-												<button
-													type="button"
-													onclick={(e) => {
-														e.preventDefault();
-														e.stopPropagation();
-														const current = parseInt(playsMax) || 0;
-														playsMax = String(Math.max(0, current - 1));
-													}}
-													class="pointer-events-auto h-1/2 flex items-center justify-center text-text-muted hover:text-hover-cyan focus:text-hover-cyan transition-colors duration-200 bg-transparent"
-													aria-label="감소"
-												>
-													<ChevronDown size={12} />
-												</button>
-											</div>
-										</div>
-									</div>
-								</div>
-								<div>
-									<label class="block text-xs font-medium text-text-muted mb-2">좋아요 범위</label>
-									<div class="flex gap-2">
-										<div class="relative flex-1">
-											<input
-												type="number"
-												placeholder="최소"
-												value={likesMin}
-												oninput={(e) => {
-													likesMin = (e.currentTarget as HTMLInputElement).value;
-												}}
-												class="w-full px-3 pr-8 py-1.5 text-sm bg-surface-2 border border-border-subtle rounded-md text-text-base focus:outline-none focus:border-brand-pink transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-												min="0"
-											/>
-											<div class="absolute inset-y-0 right-0 flex flex-col pointer-events-none pr-1">
-												<button
-													type="button"
-													onclick={(e) => {
-														e.preventDefault();
-														e.stopPropagation();
-														const current = parseInt(likesMin) || 0;
-														likesMin = String(current + 1);
-													}}
-													class="pointer-events-auto h-1/2 flex items-center justify-center text-text-muted hover:text-hover-cyan focus:text-hover-cyan transition-colors duration-200 bg-transparent"
-													aria-label="증가"
-												>
-													<ChevronUp size={12} />
-												</button>
-												<button
-													type="button"
-													onclick={(e) => {
-														e.preventDefault();
-														e.stopPropagation();
-														const current = parseInt(likesMin) || 0;
-														likesMin = String(Math.max(0, current - 1));
-													}}
-													class="pointer-events-auto h-1/2 flex items-center justify-center text-text-muted hover:text-hover-cyan focus:text-hover-cyan transition-colors duration-200 bg-transparent"
-													aria-label="감소"
-												>
-													<ChevronDown size={12} />
-												</button>
-											</div>
-										</div>
-										<span class="flex items-center text-text-muted">~</span>
-										<div class="relative flex-1">
-											<input
-												type="number"
-												placeholder="최대"
-												value={likesMax}
-												oninput={(e) => {
-													likesMax = (e.currentTarget as HTMLInputElement).value;
-												}}
-												class="w-full px-3 pr-8 py-1.5 text-sm bg-surface-2 border border-border-subtle rounded-md text-text-base focus:outline-none focus:border-brand-pink transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-												min="0"
-											/>
-											<div class="absolute inset-y-0 right-0 flex flex-col pointer-events-none pr-1">
-												<button
-													type="button"
-													onclick={(e) => {
-														e.preventDefault();
-														e.stopPropagation();
-														const current = parseInt(likesMax) || 0;
-														likesMax = String(current + 1);
-													}}
-													class="pointer-events-auto h-1/2 flex items-center justify-center text-text-muted hover:text-hover-cyan focus:text-hover-cyan transition-colors duration-200 bg-transparent"
-													aria-label="증가"
-												>
-													<ChevronUp size={12} />
-												</button>
-												<button
-													type="button"
-													onclick={(e) => {
-														e.preventDefault();
-														e.stopPropagation();
-														const current = parseInt(likesMax) || 0;
-														likesMax = String(Math.max(0, current - 1));
-													}}
-													class="pointer-events-auto h-1/2 flex items-center justify-center text-text-muted hover:text-hover-cyan focus:text-hover-cyan transition-colors duration-200 bg-transparent"
-													aria-label="감소"
-												>
-													<ChevronDown size={12} />
-												</button>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-							
-							<!-- 초기화 버튼 -->
-							<div class="flex justify-end gap-2 pt-2 border-t border-border-subtle">
-								<button
-									onclick={() => {
-										selectedGenres = new Set();
-										selectedGenre = 'all';
-										playsMin = '';
-										playsMax = '';
-										likesMin = '';
-										likesMax = '';
-									}}
-									class="px-3 py-1.5 text-xs bg-surface-2 hover:bg-surface-3 text-text-base rounded-md transition-colors"
-								>
-									초기화
-								</button>
-							</div>
-						</div>
-					</div>
-				{/if}
+				<AdvancedSearchPanel
+					open={advancedSearchOpen}
+					selectedGenres={selectedGenres}
+					playsMin={playsMin}
+					playsMax={playsMax}
+					likesMin={likesMin}
+					likesMax={likesMax}
+					onClose={() => advancedSearchOpen = false}
+					onGenreToggle={(genre) => {
+						const newSet = new Set(selectedGenres);
+						if (newSet.has(genre)) {
+							newSet.delete(genre);
+						} else {
+							newSet.add(genre);
+						}
+						selectedGenres = newSet;
+						// 단일 장르 선택 해제
+						if (newSet.size > 0) {
+							selectedGenre = 'all';
+						}
+					}}
+					onGenreClear={() => {
+						selectedGenres = new Set();
+						selectedGenre = 'all';
+					}}
+					onPlaysMinChange={(value) => playsMin = value}
+					onPlaysMaxChange={(value) => playsMax = value}
+					onLikesMinChange={(value) => likesMin = value}
+					onLikesMaxChange={(value) => likesMax = value}
+					onReset={() => {
+						selectedGenres = new Set();
+						selectedGenre = 'all';
+						playsMin = '';
+						playsMax = '';
+						likesMin = '';
+						likesMax = '';
+					}}
+				/>
 			</div>
 			
 			<!-- 장르 필터 드롭다운 -->
@@ -1274,141 +922,26 @@
 			</div>
 
 			<!-- 상태 필터 드롭다운 -->
-			<div class="relative group status-filter-dropdown filter-dropdown w-full lg:w-auto" data-open={statusDropdownOpen ? 'true' : 'false'}>
-				<button
-					type="button"
-					aria-haspopup="listbox"
-					aria-expanded={statusDropdownOpen}
-					class="flex items-center pl-10 pr-8 py-1.5 w-full lg:w-auto lg:min-w-[140px] bg-surface-1 rounded-[6px] text-text-base transition-all duration-200 cursor-pointer border focus:outline-none"
-					onclick={toggleStatusDropdown}
-					tabindex="0"
-				>
-					<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-						<Filter size={16} class="lucide-icon lucide-filter transition-colors duration-200" />
-					</div>
-					<span class="flex-1 text-left truncate">
-						{statusFilterOptions.find(o => o.value === selectedStatus)?.label || '모든 상태'}
-					</span>
-					<div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-						<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-text-base transition-colors duration-200">
-							<polyline points="6,9 12,15 18,9"></polyline>
-						</svg>
-					</div>
-				</button>
-				{#if statusDropdownOpen}
-					<ul role="listbox" class="absolute left-0 w-full mt-[6px] bg-surface-1 border rounded-[6px] z-[9999] border-border-subtle overflow-hidden pt-0">
-						{#if groupedStatusFilterOptions}
-							{#if groupedStatusFilterOptions.ungrouped.length > 0}
-								{#each groupedStatusFilterOptions.ungrouped as opt}
-									<li
-										role="option"
-										aria-selected={selectedStatus === opt.value}
-										tabindex="0"
-										onclick={(e) => selectStatusOption(opt.value, e)}
-										onkeydown={(e) => {
-											if (e.key === 'Enter' || e.key === ' ') {
-												e.preventDefault();
-												selectStatusOption(opt.value, e);
-											}
-										}}
-									>
-										{opt.label}
-									</li>
-								{/each}
-							{/if}
-							{#each Object.entries(groupedStatusFilterOptions.groups) as [groupName, options], i}
-								<li class="filter-group-header {i === 0 && groupedStatusFilterOptions.ungrouped.length === 0 ? 'first-group-header' : ''} {i > 0 || groupedStatusFilterOptions.ungrouped.length > 0 ? 'has-top-border' : ''}">
-									{groupName}
-								</li>
-								{#each options as opt}
-									<li
-										role="option"
-										aria-selected={selectedStatus === opt.value}
-										tabindex="0"
-										onclick={(e) => selectStatusOption(opt.value, e)}
-										onkeydown={(e) => {
-											if (e.key === 'Enter' || e.key === ' ') {
-												e.preventDefault();
-												selectStatusOption(opt.value, e);
-											}
-										}}
-									>
-										{opt.label}
-									</li>
-								{/each}
-							{/each}
-						{:else}
-							{#each statusFilterOptions as opt}
-								<li
-									role="option"
-									aria-selected={selectedStatus === opt.value}
-									tabindex="0"
-									onclick={(e) => selectStatusOption(opt.value, e)}
-									onkeydown={(e) => {
-										if (e.key === 'Enter' || e.key === ' ') {
-											e.preventDefault();
-											selectStatusOption(opt.value, e);
-										}
-									}}
-								>
-									{opt.label}
-								</li>
-							{/each}
-						{/if}
-					</ul>
-				{/if}
-			</div>
+			<StatusDropdown
+				options={statusFilterOptions}
+				selectedValue={selectedStatus}
+				open={statusDropdownOpen}
+				dropdownClass="w-full lg:w-auto"
+				onToggle={toggleStatusDropdown}
+				onSelect={selectStatusOption}
+				buttonSelector=".status-filter-dropdown button"
+			/>
 		
 			<!-- 정렬 드롭다운 -->
-			<div class="relative group sort-dropdown filter-dropdown w-full lg:w-auto" data-open={sortDropdownOpen ? 'true' : 'false'}>
-				<button
-					type="button"
-					aria-haspopup="listbox"
-					aria-expanded={sortDropdownOpen}
-					class="flex items-center justify-between pl-10 pr-8 py-1.5 w-full lg:w-auto lg:min-w-[140px] bg-surface-1 rounded-[6px] text-text-base transition-all duration-200 cursor-pointer border focus:outline-none"
-					onclick={toggleSortDropdown}
-					tabindex="0"
-				>
-					<!-- 정렬 아이콘 -->
-					<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-						<ArrowUpDown size={16} class="lucide-icon lucide-arrow-up-down transition-colors duration-200" />
-					</div>
-					
-					<!-- 선택된 값 표시 -->
-					<span class="flex-1 text-left truncate">
-						{sortOptions.find(o => o.value === selectedSort)?.label || '정렬'}
-					</span>
-					
-					<!-- 드롭다운 화살표 -->
-					<div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-						<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-text-base transition-colors duration-200">
-							<polyline points="6,9 12,15 18,9"></polyline>
-						</svg>
-					</div>
-				</button>
-				
-				<!-- 드롭다운 리스트 -->
-				{#if sortDropdownOpen}
-					<ul role="listbox" class="absolute left-0 w-full mt-[6px] bg-surface-1 border rounded-[6px] z-[9999] border-border-subtle overflow-hidden shadow-lg pt-0">
-						{#each sortOptions as opt}
-							<li
-								role="option"
-								aria-selected={selectedSort === opt.value}
-								tabindex="0"
-								onclick={(e) => selectSort(opt.value, e)}
-								onkeydown={(e) => {
-									if (e.key === 'Enter' || e.key === ' ') {
-										e.preventDefault();
-										selectSort(opt.value, e);
-									}
-								}}
-							>
-								{opt.label}
-							</li>
-						{/each}
-					</ul>
-				{/if}
-			</div>
+			<SortDropdown
+				options={sortOptions}
+				selectedValue={selectedSort}
+				open={sortDropdownOpen}
+				dropdownClass="w-full lg:w-auto"
+				onToggle={toggleSortDropdown}
+				onSelect={selectSort}
+				buttonSelector=".sort-dropdown button"
+			/>
 		</div>
 		
 		<!-- 결과 개수 표시 -->
@@ -1426,90 +959,18 @@
 
 	<!-- 일괄 작업 바 -->
 	{#if selectedCount > 0}
-		<div class="mb-4 p-4 bg-surface-1 border border-border-subtle rounded-lg flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
-			<div class="flex items-center gap-2">
-				<span class="text-sm font-medium text-text-base">
-					<span class="text-hover-cyan">{selectedCount}</span>개 선택됨
-				</span>
-			</div>
-			<div class="flex flex-wrap items-center gap-2 flex-1">
-				<button
-					onclick={handleBulkDownload}
-					class="action-button inline-flex items-center gap-2 px-3 py-1.5 text-sm border border-border-subtle bg-surface-1 rounded-md transition-colors duration-200"
-					aria-label="선택한 트랙 다운로드"
-				>
-					<Download size={16} class="action-button-icon" />
-					<span class="action-button-text">다운로드</span>
-				</button>
-				<button
-					onclick={handleBulkAssignMember}
-					class="action-button inline-flex items-center gap-2 px-3 py-1.5 text-sm border border-border-subtle bg-surface-1 rounded-md transition-colors duration-200"
-					aria-label="선택한 트랙 멤버 배정"
-				>
-					<UserPlus size={16} class="action-button-icon" />
-					<span class="action-button-text">멤버 배정</span>
-				</button>
-				<div class="relative bulk-action-menu filter-dropdown" data-open={bulkActionMenuOpen ? 'true' : 'false'}>
-					<button
-						type="button"
-						aria-haspopup="listbox"
-						aria-expanded={bulkActionMenuOpen}
-						onclick={() => bulkActionMenuOpen = !bulkActionMenuOpen}
-						onkeydown={(e) => {
-							if (e.key === 'Enter' || e.key === ' ') {
-								e.preventDefault();
-								bulkActionMenuOpen = !bulkActionMenuOpen;
-							}
-						}}
-						class="action-button inline-flex items-center gap-2 px-3 py-1.5 text-sm border border-border-subtle bg-surface-1 rounded-md transition-colors duration-200"
-						aria-label="상태 변경"
-						tabindex="0"
-					>
-						<span class="action-button-text">상태 변경</span>
-						<ChevronDown size={14} class="action-button-icon {bulkActionMenuOpen ? 'rotate-180' : ''}" />
-					</button>
-					{#if bulkActionMenuOpen}
-						<ul role="listbox" class="absolute left-0 w-full mt-[6px] bg-surface-1 border rounded-[6px] z-[9999] border-border-subtle overflow-hidden pt-0">
-							{#each statusFilterOptions.filter(opt => opt.value !== 'all') as opt}
-								<li
-									role="option"
-									aria-selected={false}
-									tabindex="0"
-									onclick={(e) => {
-										handleBulkStatusChange(opt.value);
-										bulkActionMenuOpen = false;
-									}}
-									onkeydown={(e) => {
-										if (e.key === 'Enter' || e.key === ' ') {
-											e.preventDefault();
-											handleBulkStatusChange(opt.value);
-											bulkActionMenuOpen = false;
-										}
-									}}
-								>
-									{opt.label}
-								</li>
-							{/each}
-						</ul>
-					{/if}
-				</div>
-				<button
-					onclick={handleBulkDelete}
-					class="action-button inline-flex items-center gap-2 px-3 py-1.5 text-sm border border-border-subtle bg-surface-1 rounded-md transition-colors duration-200 text-red-500"
-					aria-label="선택한 트랙 삭제"
-				>
-					<Trash2 size={16} class="action-button-icon" />
-					<span class="action-button-text">삭제</span>
-				</button>
-			</div>
-			<button
-				onclick={() => selectedTrackIds = new Set()}
-				class="text-sm text-text-muted hover:text-hover-cyan focus:text-brand-pink focus-visible:text-brand-pink transition-colors duration-200"
-				aria-label="선택 해제"
-			>
-				선택 해제
-			</button>
-		</div>
+		<BulkActionBar
+			selectedCount={selectedCount}
+			statusOptions={statusFilterOptions.filter(opt => opt.value !== 'all').map(opt => ({ label: opt.label, value: opt.value }))}
+			onDownload={handleBulkDownload}
+			onAssignMember={handleBulkAssignMember}
+			onStatusChange={handleBulkStatusChange}
+			onDelete={handleBulkDelete}
+			onDeselect={() => selectedTrackIds = new Set()}
+			menuOpen={bulkActionMenuOpen}
+			onToggleMenu={() => bulkActionMenuOpen = !bulkActionMenuOpen}
+			onCloseMenu={() => bulkActionMenuOpen = false}
+		/>
 	{/if}
 
 	<!-- 트랙 목록 -->
@@ -1590,121 +1051,14 @@
 								<a href="/tracks/{track.id}/edit" class="action-button h-8 w-auto px-3 whitespace-nowrap rounded-md border border-border-subtle bg-surface-1 hover:bg-surface-2 focus-visible:bg-surface-2 text-xs sm:text-sm font-medium transition-colors duration-200 inline-flex items-center justify-center leading-none">
 									<span class="action-button-text flex items-center">편집</span>
 								</a>
-								<div class="relative more-menu-dropdown">
-									<button
-										onclick={(e) => { e.preventDefault(); e.stopPropagation(); toggleMoreMenu(track.id); }}
-										onkeydown={(e) => {
-											if (e.key === 'Enter' || e.key === ' ') {
-												e.preventDefault();
-												e.stopPropagation();
-												toggleMoreMenu(track.id);
-											}
-										}}
-										class="action-button h-8 w-8 inline-flex items-center justify-center rounded-md border border-border-subtle bg-surface-1 hover:bg-surface-2 focus-visible:bg-surface-2 transition-colors duration-200"
-										aria-label="더보기"
-										aria-expanded={moreMenuOpenId === track.id}
-										aria-haspopup="menu"
-										title="더보기"
-										tabindex="0"
-									>
-										<MoreVertical size={16} class="action-button-icon" />
-									</button>
-									
-									{#if moreMenuOpenId === track.id}
-										<div 
-											role="menu"
-											class="absolute right-0 bottom-full mb-1 w-48 bg-surface-1 border border-border-subtle rounded-lg z-50 animate-in fade-in slide-in-from-bottom-2 duration-200"
-										>
-											<div class="py-1">
-												<!-- 섹션 1: 에셋 -->
-												<button 
-													role="menuitem"
-													onclick={(e) => { e.preventDefault(); e.stopPropagation(); handleDownloadAudio(track.id); }}
-													onkeydown={(e) => {
-														if (e.key === 'Enter' || e.key === ' ') {
-															e.preventDefault();
-															e.stopPropagation();
-															handleDownloadAudio(track.id);
-														}
-													}}
-													class="group w-full flex items-center gap-2 px-4 py-2 text-sm text-text-base hover:bg-transparent hover:text-[var(--hover-cyan)] transition-colors duration-200 text-left"
-													aria-label="오디오 다운로드"
-												>
-													<Download size={16} class="text-text-muted group-hover:text-[var(--hover-cyan)] transition-colors duration-200" />
-													오디오 다운로드
-												</button>
-												<button 
-													role="menuitem"
-													onclick={(e) => { e.preventDefault(); e.stopPropagation(); handleDownloadStems(track.id); }}
-													onkeydown={(e) => {
-														if (e.key === 'Enter' || e.key === ' ') {
-															e.preventDefault();
-															e.stopPropagation();
-															handleDownloadStems(track.id);
-														}
-													}}
-													class="group w-full flex items-center gap-2 px-4 py-2 text-sm text-text-base hover:bg-transparent hover:text-[var(--hover-cyan)] transition-colors duration-200 text-left"
-													aria-label="스템(Stems) 다운로드"
-												>
-													<FileAudio size={16} class="text-text-muted group-hover:text-[var(--hover-cyan)] transition-colors duration-200" />
-													스템(Stems) 다운로드
-												</button>
-												<!-- 섹션 2: 협업 -->
-												<div class="border-t border-border-subtle my-1" role="separator"></div>
-												<button 
-													role="menuitem"
-													onclick={(e) => { e.preventDefault(); e.stopPropagation(); handleAssignMember(track.id); }}
-													onkeydown={(e) => {
-														if (e.key === 'Enter' || e.key === ' ') {
-															e.preventDefault();
-															e.stopPropagation();
-															handleAssignMember(track.id);
-														}
-													}}
-													class="group w-full flex items-center gap-2 px-4 py-2 text-sm text-text-base hover:bg-transparent hover:text-[var(--hover-cyan)] transition-colors duration-200 text-left"
-													aria-label="멤버 배정"
-												>
-													<UserPlus size={16} class="text-text-muted group-hover:text-[var(--hover-cyan)] transition-colors duration-200" />
-													멤버 배정
-												</button>
-												<button 
-													role="menuitem"
-													onclick={(e) => { e.preventDefault(); e.stopPropagation(); handleCopyShareLink(track.id); }}
-													onkeydown={(e) => {
-														if (e.key === 'Enter' || e.key === ' ') {
-															e.preventDefault();
-															e.stopPropagation();
-															handleCopyShareLink(track.id);
-														}
-													}}
-													class="group w-full flex items-center gap-2 px-4 py-2 text-sm text-text-base hover:bg-transparent hover:text-[var(--hover-cyan)] transition-colors duration-200 text-left"
-													aria-label="공유 링크 복사"
-												>
-													<Link size={16} class="text-text-muted group-hover:text-[var(--hover-cyan)] transition-colors duration-200" />
-													공유 링크 복사
-												</button>
-												<!-- 섹션 3: 관리 -->
-												<div class="border-t border-border-subtle my-1" role="separator"></div>
-												<button 
-													role="menuitem"
-													onclick={(e) => { e.preventDefault(); e.stopPropagation(); handleDeleteTrack(track.id); }}
-													onkeydown={(e) => {
-														if (e.key === 'Enter' || e.key === ' ') {
-															e.preventDefault();
-															e.stopPropagation();
-															handleDeleteTrack(track.id);
-														}
-													}}
-													class="group w-full flex items-center gap-2 px-4 py-2 text-sm text-red-500 hover:bg-transparent hover:text-red-400 transition-colors duration-200 text-left"
-													aria-label="삭제"
-												>
-													<Trash2 size={16} class="text-red-500 group-hover:text-red-400 transition-colors duration-200" />
-													삭제
-												</button>
-											</div>
-										</div>
-									{/if}
-								</div>
+								<MoreMenuDropdown
+									itemId={track.id}
+									openId={moreMenuOpenId}
+									items={getMoreMenuItems(track.id)}
+									position="top-right"
+									onToggle={toggleMoreMenu}
+									onClose={closeMoreMenu}
+								/>
 							</div>
 						</div>
 						<!-- 나머지 정보를 2열 그리드로 배치 -->
@@ -1779,14 +1133,9 @@
 											<div class="w-2 h-2 bg-brand-pink rounded-sm"></div>
 										{/if}
 									</button>
-									<div class="flex flex-col items-start gap-0 leading-tight">
-										<span class="text-xs font-medium text-text-muted normal-case tracking-normal">
-											전체
-										</span>
-										<span class="text-xs font-medium text-text-muted normal-case tracking-normal">
-											선택
-										</span>
-									</div>
+									<span class="text-xs font-medium text-text-muted normal-case tracking-normal">
+										전체
+									</span>
 								</div>
 							</th>
 							<th class="py-4 text-left text-xs font-medium text-text-muted uppercase tracking-wider" style="width: 22%; padding-left: 3.75rem; padding-right: 1rem;">트랙</th>
@@ -1884,121 +1233,14 @@
 										<a href="/tracks/{track.id}/edit" class="action-button h-8 w-auto px-3 whitespace-nowrap rounded-md border border-border-subtle bg-surface-1 hover:bg-surface-2 focus-visible:bg-surface-2 text-xs sm:text-sm font-medium transition-colors duration-200 inline-flex items-center justify-center leading-none">
 										<span class="action-button-text flex items-center">편집</span>
 									</a>
-									<div class="relative more-menu-dropdown">
-										<button
-											onclick={(e) => { e.preventDefault(); e.stopPropagation(); toggleMoreMenu(track.id); }}
-											onkeydown={(e) => {
-												if (e.key === 'Enter' || e.key === ' ') {
-													e.preventDefault();
-													e.stopPropagation();
-													toggleMoreMenu(track.id);
-												}
-											}}
-											class="action-button h-8 w-8 inline-flex items-center justify-center rounded-md border border-border-subtle bg-surface-1 hover:bg-surface-2 focus-visible:bg-surface-2 transition-colors duration-200"
-											aria-label="더보기"
-											aria-expanded={moreMenuOpenId === track.id}
-											aria-haspopup="menu"
-											title="더보기"
-											tabindex="0"
-										>
-											<MoreVertical size={16} class="action-button-icon" />
-										</button>
-										
-										{#if moreMenuOpenId === track.id}
-											<div 
-												role="menu"
-												class="absolute right-0 bottom-full mb-1 w-48 bg-surface-1 border border-border-subtle rounded-lg z-50 animate-in fade-in slide-in-from-bottom-2 duration-200"
-											>
-												<div class="py-1">
-													<!-- 섹션 1: 에셋 -->
-													<button 
-														role="menuitem"
-														onclick={(e) => { e.preventDefault(); e.stopPropagation(); handleDownloadAudio(track.id); }}
-														onkeydown={(e) => {
-															if (e.key === 'Enter' || e.key === ' ') {
-																e.preventDefault();
-																e.stopPropagation();
-																handleDownloadAudio(track.id);
-															}
-														}}
-														class="group w-full flex items-center gap-2 px-4 py-2 text-sm text-text-base hover:bg-transparent hover:text-[var(--hover-cyan)] transition-colors duration-200 text-left"
-														aria-label="오디오 다운로드"
-													>
-														<Download size={16} class="text-text-muted group-hover:text-[var(--hover-cyan)] transition-colors duration-200" />
-														오디오 다운로드
-													</button>
-													<button 
-														role="menuitem"
-														onclick={(e) => { e.preventDefault(); e.stopPropagation(); handleDownloadStems(track.id); }}
-														onkeydown={(e) => {
-															if (e.key === 'Enter' || e.key === ' ') {
-																e.preventDefault();
-																e.stopPropagation();
-																handleDownloadStems(track.id);
-															}
-														}}
-														class="group w-full flex items-center gap-2 px-4 py-2 text-sm text-text-base hover:bg-transparent hover:text-[var(--hover-cyan)] transition-colors duration-200 text-left"
-														aria-label="스템(Stems) 다운로드"
-													>
-														<FileAudio size={16} class="text-text-muted group-hover:text-[var(--hover-cyan)] transition-colors duration-200" />
-														스템(Stems) 다운로드
-													</button>
-													<!-- 섹션 2: 협업 -->
-													<div class="border-t border-border-subtle my-1" role="separator"></div>
-													<button 
-														role="menuitem"
-														onclick={(e) => { e.preventDefault(); e.stopPropagation(); handleAssignMember(track.id); }}
-														onkeydown={(e) => {
-															if (e.key === 'Enter' || e.key === ' ') {
-																e.preventDefault();
-																e.stopPropagation();
-																handleAssignMember(track.id);
-															}
-														}}
-														class="group w-full flex items-center gap-2 px-4 py-2 text-sm text-text-base hover:bg-transparent hover:text-[var(--hover-cyan)] transition-colors duration-200 text-left"
-														aria-label="멤버 배정"
-													>
-														<UserPlus size={16} class="text-text-muted group-hover:text-[var(--hover-cyan)] transition-colors duration-200" />
-														멤버 배정
-													</button>
-													<button 
-														role="menuitem"
-														onclick={(e) => { e.preventDefault(); e.stopPropagation(); handleCopyShareLink(track.id); }}
-														onkeydown={(e) => {
-															if (e.key === 'Enter' || e.key === ' ') {
-																e.preventDefault();
-																e.stopPropagation();
-																handleCopyShareLink(track.id);
-															}
-														}}
-														class="group w-full flex items-center gap-2 px-4 py-2 text-sm text-text-base hover:bg-transparent hover:text-[var(--hover-cyan)] transition-colors duration-200 text-left"
-														aria-label="공유 링크 복사"
-													>
-														<Link size={16} class="text-text-muted group-hover:text-[var(--hover-cyan)] transition-colors duration-200" />
-														공유 링크 복사
-													</button>
-													<!-- 섹션 3: 관리 -->
-													<div class="border-t border-border-subtle my-1" role="separator"></div>
-													<button 
-														role="menuitem"
-														onclick={(e) => { e.preventDefault(); e.stopPropagation(); handleDeleteTrack(track.id); }}
-														onkeydown={(e) => {
-															if (e.key === 'Enter' || e.key === ' ') {
-																e.preventDefault();
-																e.stopPropagation();
-																handleDeleteTrack(track.id);
-															}
-														}}
-														class="group w-full flex items-center gap-2 px-4 py-2 text-sm text-red-500 hover:bg-transparent hover:text-red-400 transition-colors duration-200 text-left"
-														aria-label="삭제"
-													>
-														<Trash2 size={16} class="text-red-500 group-hover:text-red-400 transition-colors duration-200" />
-														삭제
-													</button>
-												</div>
-											</div>
-										{/if}
-									</div>
+									<MoreMenuDropdown
+										itemId={track.id}
+										openId={moreMenuOpenId}
+										items={getMoreMenuItems(track.id)}
+										position="top-right"
+										onToggle={toggleMoreMenu}
+										onClose={closeMoreMenu}
+									/>
 								</div>
 							</td>
 						</tr>

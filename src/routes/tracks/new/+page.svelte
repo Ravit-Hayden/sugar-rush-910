@@ -5,10 +5,17 @@
 	import PageContent from '$lib/components/PageContent.svelte';
 	import DatePicker from '$lib/components/DatePicker.svelte';
 	import { GENRES } from '$lib/constants/genres';
+	import ArtistSelect from '$lib/components/ArtistSelect.svelte';
+	import AlbumSelect from '$lib/components/AlbumSelect.svelte';
+	import { ALBUMS } from '$lib/constants/albums';
+	import { toast } from '$lib/stores/toast';
 
-	// 현재 날짜 정보
-	const currentDate = new Date();
-	const today = currentDate.toISOString().split('T')[0]; // YYYY-MM-DD 형식
+	// 현재 날짜 정보 (클라이언트 사이드에서만 실행)
+	let today = '';
+	if (typeof window !== 'undefined') {
+		const currentDate = new Date();
+		today = currentDate.toISOString().split('T')[0]; // YYYY-MM-DD 형식
+	}
 
 	// 폼 상태 (빈 데이터로 초기화 - Create Mode)
 	let formData = $state({
@@ -17,13 +24,34 @@
 		album: '',
 		genres: [] as string[],
 		status: 'draft',
-		release_date_kr: today, // 오늘 날짜로 초기화
-		release_date_global: today // 오늘 날짜로 초기화
+		release_date_kr: '', // 클라이언트에서 초기화
+		release_date_global: '' // 클라이언트에서 초기화
+	});
+
+	// 클라이언트 사이드에서 날짜 초기화
+	$effect(() => {
+		if (typeof window !== 'undefined' && !formData.release_date_kr) {
+			const currentDate = new Date();
+			const todayValue = currentDate.toISOString().split('T')[0];
+			formData.release_date_kr = todayValue;
+			formData.release_date_global = todayValue;
+		}
 	});
 
 	// 상태 드롭다운 열림 상태
 	let statusDropdownOpen = $state(false);
 	let genreDropdownOpen = $state(false);
+	
+	// 아티스트 변경 디바운싱을 위한 변수
+	let artistChangeTimeout: ReturnType<typeof setTimeout> | null = null;
+	let lastArtistValue = $state('');
+	
+	// 경고 Toast ID 추적 (중복 방지)
+	let albumArtistMismatchToastId: string | null = null;
+	
+	// 검증 상태
+	let validationErrors = $state<Record<string, string>>({});
+	let isSubmitting = $state(false);
 
 	// 선택 가능한 장르 목록 (선택된 장르 제외)
 	const availableGenres = $derived(GENRES.filter(genre => !formData.genres.includes(genre)));
@@ -62,21 +90,114 @@
 
 	const statusLabel = $derived(statusOptions.find(o => o.value === formData.status)?.label || '선택하세요');
 
-	function handleSubmit() {
-		console.log('트랙 생성:', $state.snapshot(formData));
-		// 실제 저장 로직 구현 예정
-		// 저장 후 생성된 트랙의 상세 페이지로 이동
-		// 임시로 목록 페이지로 이동
-		goto('/tracks');
+	// 검증 함수
+	function validateForm(): boolean {
+		validationErrors = {};
+		
+		// 필수 필드 검증
+		if (!formData.title.trim()) {
+			validationErrors.title = '트랙 제목을 입력해주세요.';
+		}
+		
+		if (!formData.artist.trim()) {
+			validationErrors.artist = '아티스트를 선택하거나 입력해주세요.';
+		}
+		
+		if (!formData.status) {
+			validationErrors.status = '상태를 선택해주세요.';
+		}
+		
+		// 앨범-아티스트 매칭 검증은 실시간으로 처리되므로 여기서는 제외
+		// (이미 경고 Toast가 표시되어 있으면 그대로 유지)
+		
+		return Object.keys(validationErrors).length === 0;
+	}
+	
+	async function handleSubmit() {
+		if (isSubmitting) return;
+		
+		// 최종 검증
+		if (!validateForm()) {
+			toast.add('필수 항목을 모두 입력해주세요.', 'error', 3000);
+			// 첫 번째 에러 필드로 포커스 이동
+			const firstErrorField = Object.keys(validationErrors)[0];
+			if (firstErrorField) {
+				// 약간의 지연 후 포커스 (DOM 업데이트 대기)
+				setTimeout(() => {
+					const field = document.getElementById(firstErrorField);
+					field?.focus();
+					field?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+				}, 100);
+			}
+			return;
+		}
+		
+		isSubmitting = true;
+		
+		try {
+			// 폼 데이터 준비
+			const trackData = {
+				title: formData.title.trim(),
+				artist: formData.artist.trim(),
+				album: formData.album.trim() || null,
+				genres: formData.genres,
+				status: formData.status,
+				release_date_kr: formData.release_date_kr || null,
+				release_date_global: formData.release_date_global || null
+			};
+			
+			console.log('트랙 생성:', trackData);
+			
+			// TODO: 실제 API 호출로 대체
+			// const response = await fetch('/api/tracks', {
+			// 	method: 'POST',
+			// 	headers: { 'Content-Type': 'application/json' },
+			// 	body: JSON.stringify(trackData)
+			// });
+			// if (!response.ok) throw new Error('트랙 생성 실패');
+			
+			// 성공 알림
+			toast.add('트랙이 성공적으로 생성되었습니다.', 'success', 3000);
+			
+			// 목록 페이지로 이동
+			setTimeout(() => {
+				goto('/tracks');
+			}, 1000);
+		} catch (error) {
+			console.error('트랙 생성 오류:', error);
+			const errorMessage = error instanceof Error 
+				? error.message 
+				: '트랙 생성 중 오류가 발생했습니다.';
+			toast.add(errorMessage, 'error', 5000);
+		} finally {
+			isSubmitting = false;
+		}
 	}
 
 	function handleCancel(event: MouseEvent) {
 		const button = event.currentTarget as HTMLButtonElement;
-		if (confirm('작성 중인 내용을 저장하지 않고 나가시겠습니까?')) {
-			goto('/tracks');
+		
+		// 폼에 변경사항이 있는지 확인
+		const hasChanges = formData.title.trim() !== '' || 
+			formData.artist.trim() !== '' || 
+			formData.album.trim() !== '' || 
+			formData.genres.length > 0;
+		
+		if (hasChanges) {
+			if (confirm('작성 중인 내용을 저장하지 않고 나가시겠습니까?')) {
+				// 경고 Toast 정리
+				if (albumArtistMismatchToastId) {
+					toast.remove(albumArtistMismatchToastId);
+					albumArtistMismatchToastId = null;
+				}
+				goto('/tracks');
+			} else {
+				// confirm에서 취소를 선택한 경우 포커스 해제
+				button.blur();
+			}
 		} else {
-			// confirm에서 취소를 선택한 경우 포커스 해제
-			button.blur();
+			// 변경사항이 없으면 바로 나가기
+			goto('/tracks');
 		}
 	}
 
@@ -144,9 +265,16 @@
 						name="title"
 						bind:value={formData.title}
 						required
-						class="w-full h-10 px-4 bg-surface-2 border border-border-subtle rounded-lg text-text-base focus:outline-none focus:border-brand-pink focus:ring-0 transition-colors duration-200"
+						aria-invalid={validationErrors.title ? 'true' : 'false'}
+						aria-describedby={validationErrors.title ? 'title-error' : undefined}
+						class="w-full h-10 px-4 bg-surface-2 border {validationErrors.title ? 'border-danger-fg' : 'border-border-subtle'} rounded-lg text-text-base focus:outline-none focus:border-brand-pink focus:ring-0 transition-colors duration-200"
 						placeholder="트랙 제목을 입력하세요"
 					/>
+					{#if validationErrors.title}
+						<p id="title-error" class="form-error-message" role="alert">
+							{validationErrors.title}
+						</p>
+					{/if}
 				</div>
 
 				<!-- 아티스트 -->
@@ -154,15 +282,100 @@
 					<label for="artist" class="block text-sm font-medium text-text-strong mb-2">
 						아티스트 <Asterisk size={12} class="inline text-brand-pink ml-0" />
 					</label>
-					<input
-						type="text"
-						id="artist"
-						name="artist"
-						bind:value={formData.artist}
-						required
-						class="w-full h-10 px-4 bg-surface-2 border border-border-subtle rounded-lg text-text-base focus:outline-none focus:border-brand-pink focus:ring-0 transition-colors duration-200"
-						placeholder="아티스트 이름을 입력하세요"
-					/>
+					<div class="relative">
+						<ArtistSelect
+							value={formData.artist}
+							onChange={(value) => {
+								// 검증 에러 제거
+								if (validationErrors.artist && value.trim()) {
+									validationErrors = { ...validationErrors };
+									delete validationErrors.artist;
+								}
+							formData.artist = value;
+							
+							// 디바운싱: 이전 타이머 취소
+							if (artistChangeTimeout) {
+								clearTimeout(artistChangeTimeout);
+							}
+							
+							// 아티스트가 변경되면 앨범 필터링이 자동으로 업데이트됨 (filterByArtist prop으로)
+							// 아티스트가 삭제되면 앨범 필터링도 해제됨
+							
+							// 디바운싱: 500ms 후에 경고 체크 (입력 중이 아닐 때만)
+							artistChangeTimeout = setTimeout(() => {
+								// 빈 값이거나 삭제 중일 때는 경고 제거
+								if (!value || value.trim() === '') {
+									if (albumArtistMismatchToastId) {
+										toast.remove(albumArtistMismatchToastId);
+										albumArtistMismatchToastId = null;
+									}
+									lastArtistValue = value;
+									return;
+								}
+								
+								// 이전 값과 동일하면 경고 표시하지 않음
+								if (value === lastArtistValue) {
+									return;
+								}
+								
+								lastArtistValue = value;
+								
+								// 앨범이 이미 선택되어 있고, 새로운 아티스트와 매칭되지 않는 경우 경고
+								if (formData.album && formData.album.trim() !== '') {
+									const selectedAlbum = ALBUMS.find(a => 
+										a.title === formData.album || 
+										a.title.toLowerCase().trim() === formData.album.toLowerCase().trim()
+									);
+									
+									if (selectedAlbum && selectedAlbum.artist && selectedAlbum.artist !== value) {
+										// 기존 경고가 없을 때만 새로 표시 (중복 방지)
+										if (!albumArtistMismatchToastId) {
+											albumArtistMismatchToastId = toast.add(
+												`선택한 앨범 "${formData.album}"은(는) "${selectedAlbum.artist}"의 앨범입니다.`,
+												'warning',
+												0, // 자동으로 사라지지 않음 - 사용자가 선택할 때까지 유지
+												{
+													label: '아티스트 변경',
+													callback: () => {
+														formData.artist = selectedAlbum.artist;
+														albumArtistMismatchToastId = null;
+														toast.add('아티스트가 변경되었습니다.', 'success', 3000);
+													}
+												},
+												{
+													label: '무시',
+													callback: () => {
+														albumArtistMismatchToastId = null;
+													}
+												}
+											);
+										}
+									} else if (selectedAlbum && selectedAlbum.artist && selectedAlbum.artist === value) {
+										// 아티스트가 앨범과 일치하면 경고 제거 (사용자가 수정한 경우)
+										if (albumArtistMismatchToastId) {
+											toast.remove(albumArtistMismatchToastId);
+											albumArtistMismatchToastId = null;
+										}
+									}
+								} else {
+									// 앨범이 없으면 경고 제거
+									if (albumArtistMismatchToastId) {
+										toast.remove(albumArtistMismatchToastId);
+										albumArtistMismatchToastId = null;
+									}
+								}
+							}, 500);
+						}}
+							required
+							placeholder="아티스트를 선택하거나 입력하세요"
+							allowCustom={true}
+						/>
+						{#if validationErrors.artist}
+							<p id="artist-error" class="form-error-message" role="alert">
+								{validationErrors.artist}
+							</p>
+						{/if}
+					</div>
 				</div>
 
 				<!-- 앨범 -->
@@ -170,13 +383,73 @@
 					<label for="album" class="block text-sm font-medium text-text-strong mb-2">
 						앨범
 					</label>
-					<input
-						type="text"
-						id="album"
-						name="album"
-						bind:value={formData.album}
-						class="w-full h-10 px-4 bg-surface-2 border border-border-subtle rounded-lg text-text-base focus:outline-none focus:border-brand-pink focus:ring-0 transition-colors duration-200"
-						placeholder="앨범 이름을 입력하세요"
+					<AlbumSelect
+						value={formData.album}
+						onChange={(value) => {
+							formData.album = value;
+							
+							// 기존 경고 제거 (새로운 앨범 선택 시)
+							if (albumArtistMismatchToastId) {
+								toast.remove(albumArtistMismatchToastId);
+								albumArtistMismatchToastId = null;
+							}
+							
+							// 앨범 선택 시 해당 앨범의 아티스트 자동 적용
+							// 정확한 매칭 또는 대소문자/공백 무시 매칭
+							const selectedAlbum = ALBUMS.find(a => 
+								a.title === value || 
+								a.title.toLowerCase().trim() === value.toLowerCase().trim()
+							);
+							
+							if (selectedAlbum && selectedAlbum.artist) {
+								// 현재 아티스트와 다른 경우 경고 표시 (자동 변경하지 않음)
+								if (formData.artist && formData.artist !== selectedAlbum.artist && formData.artist.trim() !== '') {
+									// 새로운 경고 표시
+									albumArtistMismatchToastId = toast.add(
+										`선택한 앨범 "${value}"은(는) "${selectedAlbum.artist}"의 앨범입니다.`,
+										'warning',
+										0, // 자동으로 사라지지 않음 - 사용자가 선택할 때까지 유지
+										{
+											label: '아티스트 변경',
+											callback: () => {
+												formData.artist = selectedAlbum.artist;
+												albumArtistMismatchToastId = null;
+												toast.add('아티스트가 변경되었습니다.', 'success', 3000);
+											}
+										},
+										{
+											label: '무시',
+											callback: () => {
+												albumArtistMismatchToastId = null;
+											}
+										}
+									);
+								} else {
+									// 아티스트가 일치하거나 비어있으면 자동으로 변경하고 알림
+									if (!formData.artist || formData.artist.trim() === '' || formData.artist === selectedAlbum.artist) {
+										const previousArtist = formData.artist;
+										formData.artist = selectedAlbum.artist;
+										
+										// 아티스트가 실제로 변경된 경우에만 알림 표시
+										if (previousArtist !== selectedAlbum.artist && formData.artist && formData.artist.trim() !== '') {
+											toast.add(
+												`앨범 "${value}"의 아티스트가 "${selectedAlbum.artist}"로 자동 변경되었습니다.`,
+												'success',
+												3000
+											);
+										}
+									}
+								}
+							} else if (value && value.trim() !== '') {
+								// 커스텀 앨범 입력 시 현재 아티스트와 매칭 확인
+								// 커스텀 앨범은 허용하되 경고 표시하지 않음 (유연한 처리)
+							}
+							// 앨범을 삭제한 경우 (빈 문자열) 아티스트는 그대로 유지
+						}}
+						albums={ALBUMS}
+						placeholder="앨범을 선택하거나 입력하세요"
+						allowCustom={true}
+						filterByArtist={formData.artist || undefined}
 					/>
 				</div>
 
@@ -259,6 +532,7 @@
 						상태 <Asterisk size={12} class="inline text-brand-pink ml-0" />
 					</label>
 					<div class="relative w-full status-dropdown" data-open={statusDropdownOpen}>
+						<input type="hidden" name="status" value={formData.status} />
 						<button
 							type="button"
 							id="status"
@@ -305,11 +579,16 @@
 							</ul>
 						{/if}
 					</div>
+					{#if validationErrors.status}
+						<p id="status-error" class="form-error-message" role="alert">
+							{validationErrors.status}
+						</p>
+					{/if}
 				</div>
 			</div>
 
 			<!-- 발매일 정보 -->
-			<div class="-mx-6 px-6 pt-6 border-t border-border-subtle">
+			<div class="pt-6 border-t border-border-subtle">
 				<div class="space-y-4">
 					<h3 class="text-lg font-semibold text-text-strong mb-4">발매일 정보</h3>
 					
@@ -328,7 +607,7 @@
 			</div>
 
 			<!-- 액션 버튼 -->
-			<div class="-mx-6 px-6 flex items-center justify-end gap-3 pt-6 border-t border-border-subtle">
+			<div class="flex items-center justify-end gap-3 pt-6 border-t border-border-subtle">
 				<button
 					type="button"
 					onclick={handleCancel}
@@ -338,9 +617,11 @@
 				</button>
 				<button
 					type="submit"
-					class="px-6 py-2 bg-brand-pink text-white rounded-lg hover:bg-brand-pink/90 focus:bg-brand-pink/90 focus-visible:bg-brand-pink/90 focus:outline-none focus:ring-0 transition-colors duration-200 font-medium"
+					disabled={isSubmitting}
+					class="px-6 py-2 bg-brand-pink text-white rounded-lg hover:bg-brand-pink/90 focus:bg-brand-pink/90 focus-visible:bg-brand-pink/90 focus:outline-none focus:ring-0 transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+					aria-busy={isSubmitting}
 				>
-					생성
+					{isSubmitting ? '생성 중...' : '생성'}
 				</button>
 			</div>
 		</form>
