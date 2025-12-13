@@ -29,8 +29,10 @@ const createToastStore = () => {
 			
 			update((toasts) => [...toasts, toast]);
 			
-			// 자동 제거 (duration > 0일 때만)
-			if (duration > 0) {
+			// 자동 제거 (duration > 0일 때만 실행)
+			// duration이 명시적으로 0이면 무한 지속 (자동으로 사라지지 않음)
+			// duration이 undefined이면 기본값 3000ms로 자동 제거
+			if (duration !== undefined && duration > 0) {
 				setTimeout(() => {
 					update((toasts) => toasts.filter((t) => t.id !== id));
 				}, duration);

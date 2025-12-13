@@ -9,6 +9,7 @@
 	import AlbumSelect from '$lib/components/AlbumSelect.svelte';
 	import { ALBUMS } from '$lib/constants/albums';
 	import { toast } from '$lib/stores/toast';
+	import { clearToast, showAlbumArtistMismatchToast } from '$lib/utils/toastHelpers';
 
 	// 현재 날짜 정보 (클라이언트 사이드에서만 실행)
 	let today = '';
@@ -186,10 +187,7 @@
 		if (hasChanges) {
 			if (confirm('작성 중인 내용을 저장하지 않고 나가시겠습니까?')) {
 				// 경고 Toast 정리
-				if (albumArtistMismatchToastId) {
-					toast.remove(albumArtistMismatchToastId);
-					albumArtistMismatchToastId = null;
-				}
+				albumArtistMismatchToastId = clearToast(albumArtistMismatchToastId);
 				goto('/tracks');
 			} else {
 				// confirm에서 취소를 선택한 경우 포커스 해제
@@ -305,11 +303,10 @@
 							artistChangeTimeout = setTimeout(() => {
 								// 빈 값이거나 삭제 중일 때는 경고 제거
 								if (!value || value.trim() === '') {
-									if (albumArtistMismatchToastId) {
-										toast.remove(albumArtistMismatchToastId);
-										albumArtistMismatchToastId = null;
-									}
+									albumArtistMismatchToastId = clearToast(albumArtistMismatchToastId);
 									lastArtistValue = value;
+									// 앨범도 초기화 (역방향 검증)
+									formData.album = '';
 									return;
 								}
 								
@@ -320,49 +317,47 @@
 								
 								lastArtistValue = value;
 								
-								// 앨범이 이미 선택되어 있고, 새로운 아티스트와 매칭되지 않는 경우 경고
+								// 역방향 검증: 현재 선택된 앨범이 변경된 아티스트의 앨범 목록에 있는지 확인
 								if (formData.album && formData.album.trim() !== '') {
 									const selectedAlbum = ALBUMS.find(a => 
 										a.title === formData.album || 
 										a.title.toLowerCase().trim() === formData.album.toLowerCase().trim()
 									);
 									
+									// 앨범이 변경된 아티스트의 앨범이 아니면 앨범 초기화 및 경고
 									if (selectedAlbum && selectedAlbum.artist && selectedAlbum.artist !== value) {
-										// 기존 경고가 없을 때만 새로 표시 (중복 방지)
-										if (!albumArtistMismatchToastId) {
-											albumArtistMismatchToastId = toast.add(
-												`선택한 앨범 "${formData.album}"은(는) "${selectedAlbum.artist}"의 앨범입니다.`,
-												'warning',
-												0, // 자동으로 사라지지 않음 - 사용자가 선택할 때까지 유지
-												{
-													label: '아티스트 변경',
-													callback: () => {
-														formData.artist = selectedAlbum.artist;
-														albumArtistMismatchToastId = null;
-														toast.add('아티스트가 변경되었습니다.', 'success', 3000);
-													}
-												},
-												{
-													label: '무시',
-													callback: () => {
-														albumArtistMismatchToastId = null;
-													}
-												}
-											);
-										}
+										// 기존 경고가 있으면 제거
+										albumArtistMismatchToastId = clearToast(albumArtistMismatchToastId);
+										
+										// 앨범 초기화
+										formData.album = '';
+										
+										// 경고 Toast 표시
+										albumArtistMismatchToastId = showAlbumArtistMismatchToast(
+											`선택한 앨범은 "${selectedAlbum.artist}"의 앨범입니다. 앨범이 초기화되었습니다.`,
+											'앨범 다시 선택',
+											() => {
+												albumArtistMismatchToastId = clearToast(albumArtistMismatchToastId);
+												// 앨범 필드로 포커스 이동
+												setTimeout(() => {
+													const albumInput = document.querySelector('.album-select-dropdown input') as HTMLInputElement;
+													albumInput?.focus();
+												}, 100);
+											},
+											() => {
+												albumArtistMismatchToastId = clearToast(albumArtistMismatchToastId);
+											}
+										);
 									} else if (selectedAlbum && selectedAlbum.artist && selectedAlbum.artist === value) {
 										// 아티스트가 앨범과 일치하면 경고 제거 (사용자가 수정한 경우)
-										if (albumArtistMismatchToastId) {
-											toast.remove(albumArtistMismatchToastId);
-											albumArtistMismatchToastId = null;
-										}
+										albumArtistMismatchToastId = clearToast(albumArtistMismatchToastId);
+									} else {
+										// 앨범이 상수 목록에 없으면 (커스텀 앨범) 경고 제거
+										albumArtistMismatchToastId = clearToast(albumArtistMismatchToastId);
 									}
 								} else {
 									// 앨범이 없으면 경고 제거
-									if (albumArtistMismatchToastId) {
-										toast.remove(albumArtistMismatchToastId);
-										albumArtistMismatchToastId = null;
-									}
+									albumArtistMismatchToastId = clearToast(albumArtistMismatchToastId);
 								}
 							}, 500);
 						}}
@@ -389,10 +384,7 @@
 							formData.album = value;
 							
 							// 기존 경고 제거 (새로운 앨범 선택 시)
-							if (albumArtistMismatchToastId) {
-								toast.remove(albumArtistMismatchToastId);
-								albumArtistMismatchToastId = null;
-							}
+							albumArtistMismatchToastId = clearToast(albumArtistMismatchToastId);
 							
 							// 앨범 선택 시 해당 앨범의 아티스트 자동 적용
 							// 정확한 매칭 또는 대소문자/공백 무시 매칭
@@ -405,23 +397,16 @@
 								// 현재 아티스트와 다른 경우 경고 표시 (자동 변경하지 않음)
 								if (formData.artist && formData.artist !== selectedAlbum.artist && formData.artist.trim() !== '') {
 									// 새로운 경고 표시
-									albumArtistMismatchToastId = toast.add(
+									albumArtistMismatchToastId = showAlbumArtistMismatchToast(
 										`선택한 앨범 "${value}"은(는) "${selectedAlbum.artist}"의 앨범입니다.`,
-										'warning',
-										0, // 자동으로 사라지지 않음 - 사용자가 선택할 때까지 유지
-										{
-											label: '아티스트 변경',
-											callback: () => {
-												formData.artist = selectedAlbum.artist;
-												albumArtistMismatchToastId = null;
-												toast.add('아티스트가 변경되었습니다.', 'success', 3000);
-											}
+										'아티스트 변경',
+										() => {
+											formData.artist = selectedAlbum.artist;
+											albumArtistMismatchToastId = clearToast(albumArtistMismatchToastId);
+											toast.add('아티스트가 변경되었습니다.', 'success', 3000);
 										},
-										{
-											label: '무시',
-											callback: () => {
-												albumArtistMismatchToastId = null;
-											}
+										() => {
+											albumArtistMismatchToastId = clearToast(albumArtistMismatchToastId);
 										}
 									);
 								} else {

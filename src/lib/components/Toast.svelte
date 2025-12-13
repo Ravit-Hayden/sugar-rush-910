@@ -50,7 +50,9 @@
 
 	onMount(() => {
 		visible = true;
-		if (duration > 0) {
+		// duration이 0이거나 undefined이면 자동으로 닫히지 않음
+		// duration이 명시적으로 0이면 무한 지속
+		if (duration !== undefined && duration > 0) {
 			timeoutId = setTimeout(close, duration);
 		}
 		return () => {
@@ -68,7 +70,7 @@
 		aria-live="polite"
 	>
 		<div class="flex items-start gap-3">
-			<svelte:component this={getIcon()} size={20} style="color: {getColor()}" />
+			<svelte:component this={getIcon()} size={20} style="color: {getColor()}" class="toast-icon" />
 			<div class="flex-1">
 				<p class="text-sm text-text-base">{message}</p>
 				{#if action || dismissAction}
@@ -79,7 +81,7 @@
 									action.callback();
 									close();
 								}}
-								class="px-3 py-1.5 text-xs font-medium bg-brand-pink text-white rounded-md hover:bg-brand-pink/90 transition-colors"
+								class="px-3 py-1.5 text-xs font-medium bg-brand-pink text-white rounded-md hover:bg-brand-pink/90 focus:bg-brand-pink focus-visible:bg-brand-pink focus:outline-none focus:ring-0 transition-colors duration-200"
 							>
 								{action.label}
 							</button>
@@ -92,7 +94,7 @@
 									}
 									close();
 								}}
-								class="px-3 py-1.5 text-xs font-medium bg-surface-2 text-text-base rounded-md border border-border-subtle hover:bg-surface-1 transition-colors"
+								class="toast-dismiss-button px-3 py-1.5 text-xs font-medium bg-surface-2 text-text-base rounded-md border border-border-subtle hover:bg-surface-1 transition-colors duration-200"
 							>
 								{dismissAction.label}
 							</button>

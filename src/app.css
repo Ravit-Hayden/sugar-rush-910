@@ -88,6 +88,7 @@
    --surface-1: #FFF8EF;
    --border-subtle: #B8A896;    /* 더 진하게 (기존 #D9CCBC) */
    --hover-cyan: #8A2BE2;       /* 라이트 모드 전용 보라색 호버 색상 */
+   --warn-fg: #FF7A00;          /* 라이트 모드 전용 오렌지 경고 색상 (노란색 대비 개선) */
   
   /* 라이트 모드 배지 색상 (더 진하고 선명하게) */
   --badge-high-urgent: #FF3DAE; /* 핫핑크 유지 */
@@ -323,6 +324,21 @@ div[class*="panel"] {
 	line-height: 1.5;
 	margin-top: 0.375rem;
 	display: block;
+}
+
+/* 키보드 네비게이션 포커스 스타일 */
+.filter-dropdown [role="option"].keyboard-focused {
+	background-color: var(--brand-pink) !important;
+	color: #fff !important;
+	outline: none;
+}
+
+.filter-dropdown [role="option"].keyboard-focused .text-search-highlight {
+	color: #fff !important;
+}
+
+.filter-dropdown [role="option"].keyboard-focused .album-artist-name {
+	color: rgba(255, 255, 255, 0.9) !important;
 }
 
 /* 폼 필드 에러 상태 */
@@ -3713,4 +3729,44 @@ button[aria-label="고급 검색"]:focus-visible:hover .lucide-icon {
   border-color: var(--brand-pink) !important;
   background-color: var(--surface-2) !important;
   color: var(--brand-pink) !important;
+}
+
+/* Toast "무시" 버튼 호버/포커스 효과 */
+.toast-dismiss-button:hover:not(:focus):not(:focus-visible) {
+  border-color: var(--hover-cyan) !important;
+  background-color: var(--surface-1) !important;
+  color: var(--hover-cyan) !important;
+}
+
+.toast-dismiss-button:focus,
+.toast-dismiss-button:focus-visible {
+  border-color: var(--brand-pink) !important;
+  background-color: var(--surface-2) !important;
+  color: var(--brand-pink) !important;
+  outline: none !important;
+}
+
+.toast-dismiss-button:focus:hover,
+.toast-dismiss-button:focus-visible:hover {
+  border-color: var(--brand-pink) !important;
+  background-color: var(--surface-2) !important;
+  color: var(--brand-pink) !important;
+}
+
+/* 라이트 모드 Toast "무시" 버튼 호버 효과 */
+[data-theme="light"] .toast-dismiss-button:hover:not(:focus):not(:focus-visible) {
+  border-color: var(--hover-cyan) !important;
+  background-color: var(--surface-1) !important;
+  color: var(--hover-cyan) !important;
+}
+
+/* Toast 아이콘 호버 효과 제거 */
+.toast-icon {
+  pointer-events: none;
+}
+
+.toast-icon:hover,
+.toast-icon:focus,
+.toast-icon:focus-visible {
+  color: inherit !important;
 }
