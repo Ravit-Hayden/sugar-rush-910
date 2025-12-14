@@ -41,24 +41,24 @@
 	);
 	let dateRangeStart = $state(savedFilters?.dateRangeStart || '');
 	let dateRangeEnd = $state(savedFilters?.dateRangeEnd || '');
-	// 통계 범위 필터는 빈 문자열이 아니고 유효한 값일 때만 복원
+	// 통계 범위 필터는 빈 문자열이 아니고 유효한 값일 때만 복원 (0 이상의 숫자)
 	let playsMin = $state(
-		(savedFilters?.playsMin && savedFilters.playsMin.trim() !== '' && parseInt(savedFilters.playsMin) > 0) 
+		(savedFilters?.playsMin && savedFilters.playsMin.trim() !== '' && !isNaN(parseInt(savedFilters.playsMin)) && parseInt(savedFilters.playsMin) >= 0) 
 			? savedFilters.playsMin 
 			: ''
 	);
 	let playsMax = $state(
-		(savedFilters?.playsMax && savedFilters.playsMax.trim() !== '' && parseInt(savedFilters.playsMax) > 0) 
+		(savedFilters?.playsMax && savedFilters.playsMax.trim() !== '' && !isNaN(parseInt(savedFilters.playsMax)) && parseInt(savedFilters.playsMax) >= 0) 
 			? savedFilters.playsMax 
 			: ''
 	);
 	let likesMin = $state(
-		(savedFilters?.likesMin && savedFilters.likesMin.trim() !== '' && parseInt(savedFilters.likesMin) > 0) 
+		(savedFilters?.likesMin && savedFilters.likesMin.trim() !== '' && !isNaN(parseInt(savedFilters.likesMin)) && parseInt(savedFilters.likesMin) >= 0) 
 			? savedFilters.likesMin 
 			: ''
 	);
 	let likesMax = $state(
-		(savedFilters?.likesMax && savedFilters.likesMax.trim() !== '' && parseInt(savedFilters.likesMax) > 0) 
+		(savedFilters?.likesMax && savedFilters.likesMax.trim() !== '' && !isNaN(parseInt(savedFilters.likesMax)) && parseInt(savedFilters.likesMax) >= 0) 
 			? savedFilters.likesMax 
 			: ''
 	);
@@ -433,25 +433,25 @@
 		// 통계 범위 필터 적용 (빈 문자열이 아니고 유효한 숫자일 때만)
 		if (playsMin && playsMin.trim() !== '') {
 			const min = parseInt(playsMin);
-			if (!isNaN(min) && min > 0) {
+			if (!isNaN(min) && min >= 0) {
 				filtered = filtered.filter(track => track.plays >= min);
 			}
 		}
 		if (playsMax && playsMax.trim() !== '') {
 			const max = parseInt(playsMax);
-			if (!isNaN(max) && max > 0) {
+			if (!isNaN(max) && max >= 0) {
 				filtered = filtered.filter(track => track.plays <= max);
 			}
 		}
 		if (likesMin && likesMin.trim() !== '') {
 			const min = parseInt(likesMin);
-			if (!isNaN(min) && min > 0) {
+			if (!isNaN(min) && min >= 0) {
 				filtered = filtered.filter(track => track.likes >= min);
 			}
 		}
 		if (likesMax && likesMax.trim() !== '') {
 			const max = parseInt(likesMax);
-			if (!isNaN(max) && max > 0) {
+			if (!isNaN(max) && max >= 0) {
 				filtered = filtered.filter(track => track.likes <= max);
 			}
 		}
@@ -555,11 +555,11 @@
 			} else {
 				selectedGenres = new Set();
 			}
-			// 통계 범위 필터는 빈 문자열이 아니고 유효한 값일 때만 복원
-			playsMin = (saved.playsMin && saved.playsMin.trim() !== '' && parseInt(saved.playsMin) > 0) ? saved.playsMin : '';
-			playsMax = (saved.playsMax && saved.playsMax.trim() !== '' && parseInt(saved.playsMax) > 0) ? saved.playsMax : '';
-			likesMin = (saved.likesMin && saved.likesMin.trim() !== '' && parseInt(saved.likesMin) > 0) ? saved.likesMin : '';
-			likesMax = (saved.likesMax && saved.likesMax.trim() !== '' && parseInt(saved.likesMax) > 0) ? saved.likesMax : '';
+			// 통계 범위 필터는 빈 문자열이 아니고 유효한 값일 때만 복원 (0 이상의 숫자)
+			playsMin = (saved.playsMin && saved.playsMin.trim() !== '' && !isNaN(parseInt(saved.playsMin)) && parseInt(saved.playsMin) >= 0) ? saved.playsMin : '';
+			playsMax = (saved.playsMax && saved.playsMax.trim() !== '' && !isNaN(parseInt(saved.playsMax)) && parseInt(saved.playsMax) >= 0) ? saved.playsMax : '';
+			likesMin = (saved.likesMin && saved.likesMin.trim() !== '' && !isNaN(parseInt(saved.likesMin)) && parseInt(saved.likesMin) >= 0) ? saved.likesMin : '';
+			likesMax = (saved.likesMax && saved.likesMax.trim() !== '' && !isNaN(parseInt(saved.likesMax)) && parseInt(saved.likesMax) >= 0) ? saved.likesMax : '';
 		}
 	});
 
