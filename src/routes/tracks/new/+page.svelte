@@ -147,16 +147,20 @@
 				release_date_global: formData.release_date_global || null
 			};
 			
-			console.log('트랙 생성:', trackData);
-			
-			// TODO: 실제 API 호출로 대체
-			// const response = await fetch('/api/tracks', {
-			// 	method: 'POST',
-			// 	headers: { 'Content-Type': 'application/json' },
-			// 	body: JSON.stringify(trackData)
-			// });
-			// if (!response.ok) throw new Error('트랙 생성 실패');
-			
+			// API 호출
+			const response = await fetch('/api/tracks', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(trackData)
+			});
+
+			const result = await response.json();
+
+			if (!response.ok || !result.ok) {
+				const errorMessage = result.error?.message || '트랙 생성에 실패했습니다.';
+				throw new Error(errorMessage);
+			}
+
 			// 성공 알림
 			toast.add('트랙이 성공적으로 생성되었습니다.', 'success', 3000);
 			

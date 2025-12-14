@@ -6,6 +6,7 @@
 	import DatePicker from '$lib/components/DatePicker.svelte';
 	import { GENRES } from '$lib/constants/genres';
 	import ArtistSelect from '$lib/components/ArtistSelect.svelte';
+	import { toast } from '$lib/stores/toast';
 
 	// 현재 날짜 정보
 	const currentDate = new Date();
@@ -28,6 +29,9 @@
 	let previewUrl = $state<string>('');
 	let fileInput: HTMLInputElement;
 	let isDragging = $state(false);
+
+	// 제출 상태
+	let isSubmitting = $state(false);
 
 	// 상태 드롭다운 열림 상태
 	let statusDropdownOpen = $state(false);
@@ -88,12 +92,70 @@
 		}
 	});
 
-	function handleSubmit() {
-		console.log('앨범 생성:', $state.snapshot(formData));
-		// 실제 저장 로직 구현 예정
-		// 저장 후 생성된 앨범의 상세 페이지로 이동
-		// 임시로 목록 페이지로 이동
-		goto('/albums');
+	async function handleSubmit() {
+		if (isSubmitting) return;
+
+		// 기본 검증
+		if (!formData.title.trim()) {
+			toast.add('앨범 제목을 입력해주세요.', 'error', 3000);
+			return;
+		}
+
+		if (!formData.artist.trim()) {
+			toast.add('아티스트를 선택하거나 입력해주세요.', 'error', 3000);
+			return;
+		}
+
+		if (!formData.status) {
+			toast.add('상태를 선택해주세요.', 'error', 3000);
+			return;
+		}
+
+		isSubmitting = true;
+
+		try {
+			// 폼 데이터 준비
+			const albumData = {
+				title: formData.title.trim(),
+				artist: formData.artist.trim(),
+				year: formData.year,
+				genres: formData.genres,
+				status: formData.status,
+				release_date_kr: formData.release_date_kr || null,
+				release_date_global: formData.release_date_global || null,
+				cover_url: null // 이미지 업로드는 향후 구현
+			};
+
+			// API 호출
+			const response = await fetch('/api/albums', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(albumData)
+			});
+
+			const result = await response.json();
+
+			if (!response.ok || !result.ok) {
+				const errorMessage = result.error?.message || '앨범 생성에 실패했습니다.';
+				throw new Error(errorMessage);
+			}
+
+			// 성공 알림
+			toast.add('앨범이 성공적으로 생성되었습니다.', 'success', 3000);
+
+			// 목록 페이지로 이동
+			setTimeout(() => {
+				goto('/albums');
+			}, 1000);
+		} catch (error) {
+			console.error('앨범 생성 오류:', error);
+			const errorMessage = error instanceof Error 
+				? error.message 
+				: '앨범 생성 중 오류가 발생했습니다.';
+			toast.add(errorMessage, 'error', 5000);
+		} finally {
+			isSubmitting = false;
+		}
 	}
 
 	function handleCancel(event: MouseEvent) {
@@ -500,9 +562,11 @@
 				</button>
 				<button
 					type="submit"
-					class="px-6 py-2 bg-brand-pink text-white rounded-lg hover:bg-brand-pink/90 focus:bg-brand-pink/90 focus-visible:bg-brand-pink/90 focus:outline-none focus:ring-0 transition-colors duration-200 font-medium"
+					disabled={isSubmitting}
+					class="px-6 py-2 bg-brand-pink text-white rounded-lg hover:bg-brand-pink/90 focus:bg-brand-pink/90 focus-visible:bg-brand-pink/90 focus:outline-none focus:ring-0 transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+					aria-busy={isSubmitting}
 				>
-					생성
+					{isSubmitting ? '생성 중...' : '생성'}
 				</button>
 					</div>
 				</div>
