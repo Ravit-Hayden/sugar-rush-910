@@ -6,6 +6,7 @@
 
 	let sidebarWidth = 72; // 기본값: 축소 상태
 	let searchInput: HTMLInputElement;
+	let searchValue = $state('');
 
 	// 메뉴 아이템 정의 (사이드바와 동일)
 	const menuItems = [
@@ -90,10 +91,24 @@
 						type="text"
 						placeholder="검색..."
 						bind:this={searchInput}
+						bind:value={searchValue}
 						aria-label="검색"
 						aria-describedby="search-description"
-						class="pl-10 pr-10 py-1.5 w-full bg-surface-1 border border-border-subtle border-[1px] rounded-md text-text-base placeholder-text-muted focus:outline-none focus:ring-0"
+						class="pl-10 {searchValue.trim() ? 'pr-10' : 'pr-4'} py-1.5 w-full bg-surface-1 border border-border-subtle border-[1px] rounded-md text-text-base placeholder-text-muted focus:outline-none focus:ring-0 transition-colors duration-200"
 					/>
+					{#if searchValue.trim()}
+						<button
+							type="button"
+							onclick={() => {
+								searchValue = '';
+								searchInput?.focus();
+							}}
+							class="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 flex items-center justify-center text-text-muted hover:text-text-strong transition-colors duration-200 bg-transparent hover:bg-transparent focus:bg-transparent focus-visible:bg-transparent"
+							aria-label="검색 초기화"
+						>
+							<X size={16} class="lucide-icon" />
+						</button>
+					{/if}
 					<span id="search-description" class="sr-only">Ctrl+K 또는 Cmd+K를 눌러 검색창에 포커스할 수 있습니다</span>
 				</div>
 			</div>

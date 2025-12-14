@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Search, Filter } from 'lucide-svelte';
+	import { Search, Filter, X } from 'lucide-svelte';
 	
 	export let searchQuery: string = '';
 	export let searchPlaceholder: string = '검색...';
@@ -11,6 +11,13 @@
 	export let noMargin: boolean = false;
 	
 	let dropdownOpen = false;
+	let searchInput: HTMLInputElement;
+
+	function clearSearch() {
+		searchQuery = '';
+		onSearchChange('');
+		searchInput?.focus();
+	}
 	
 	function selectOption(value: string) {
 		selectedFilter = value;
@@ -55,11 +62,22 @@
 		<input 
 			type="text" 
 			placeholder={searchPlaceholder}
+			bind:this={searchInput}
 			bind:value={searchQuery}
 			on:input={(e) => onSearchChange((e.target as HTMLInputElement).value)}
 			aria-label="검색"
-			class="w-full pl-10 pr-4 py-1.5 bg-surface-1 border border-border-subtle border-[1px] rounded-md text-text-base placeholder-text-muted focus:outline-none focus:ring-0"
+			class="w-full pl-10 {searchQuery.trim() ? 'pr-10' : 'pr-4'} py-1.5 bg-surface-1 border border-border-subtle border-[1px] rounded-md text-text-base placeholder-text-muted focus:outline-none focus:ring-0 transition-colors duration-200"
 		/>
+		{#if searchQuery.trim()}
+			<button
+				type="button"
+				onclick={clearSearch}
+				class="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 flex items-center justify-center text-text-muted hover:text-text-strong transition-colors duration-200 bg-transparent hover:bg-transparent focus:bg-transparent focus-visible:bg-transparent"
+				aria-label="검색 초기화"
+			>
+				<X size={16} class="lucide-icon" />
+			</button>
+		{/if}
 	</div>
 	
 	<!-- 필터 선택 - 커스텀 드롭다운 -->

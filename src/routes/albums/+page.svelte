@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { Disc3, Plus, MoreVertical, Play, Edit, ArrowUpDown, Search, Filter, Download, Share2, Trash2, ChevronLeft, ChevronRight, UserPlus, Link } from 'lucide-svelte';
+	import { Disc3, Plus, MoreVertical, Play, Edit, ArrowUpDown, Search, Filter, Download, Share2, Trash2, ChevronLeft, ChevronRight, UserPlus, Link, X } from 'lucide-svelte';
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import PageContent from '$lib/components/PageContent.svelte';
 	import EmptyState from '$lib/components/EmptyState.svelte';
@@ -867,11 +867,25 @@
 						const value = (e.currentTarget as HTMLInputElement).value;
 						searchQuery = value;
 					}}
-					class="w-full pl-10 pr-4 py-1.5 bg-surface-1 border border-border-subtle border-[1px] rounded-md text-text-base placeholder-text-muted focus:outline-none focus:border-brand-pink focus:ring-0 transition-colors duration-200"
+					class="w-full pl-10 {searchQuery.trim() ? 'pr-10' : 'pr-4'} py-1.5 bg-surface-1 border border-border-subtle border-[1px] rounded-md text-text-base placeholder-text-muted focus:outline-none focus:border-brand-pink focus:ring-0 transition-colors duration-200"
 					aria-label="앨범 또는 아티스트 검색"
 					id="album-search"
 					autocomplete="off"
 				/>
+				{#if searchQuery.trim()}
+					<button
+						type="button"
+						onclick={() => {
+							searchQuery = '';
+							const input = document.getElementById('album-search') as HTMLInputElement;
+							input?.focus();
+						}}
+						class="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 flex items-center justify-center text-text-muted hover:text-text-strong transition-colors duration-200 bg-transparent hover:bg-transparent focus:bg-transparent focus-visible:bg-transparent"
+						aria-label="검색 초기화"
+					>
+						<X size={16} class="lucide-icon" />
+					</button>
+				{/if}
 			</div>
 			
 			<!-- 필터 드롭다운 -->

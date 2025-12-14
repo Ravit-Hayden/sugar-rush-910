@@ -812,11 +812,25 @@
 								const value = (e.currentTarget as HTMLInputElement).value;
 								searchQuery = value;
 							}}
-							class="w-full pl-10 pr-4 py-1.5 bg-surface-1 border border-border-subtle border-[1px] rounded-md text-text-base placeholder-text-muted focus:outline-none focus:border-brand-pink focus:ring-0 transition-colors duration-200"
+							class="w-full pl-10 {searchQuery.trim() ? 'pr-10' : 'pr-4'} py-1.5 bg-surface-1 border border-border-subtle border-[1px] rounded-md text-text-base placeholder-text-muted focus:outline-none focus:border-brand-pink focus:ring-0 transition-colors duration-200"
 							aria-label="트랙, 아티스트 또는 앨범 검색"
 							id="track-search"
 							autocomplete="off"
 						/>
+						{#if searchQuery.trim()}
+							<button
+								type="button"
+								onclick={() => {
+									searchQuery = '';
+									const input = document.getElementById('track-search') as HTMLInputElement;
+									input?.focus();
+								}}
+								class="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 flex items-center justify-center text-text-muted hover:text-text-strong transition-colors duration-200 bg-transparent hover:bg-transparent focus:bg-transparent focus-visible:bg-transparent"
+								aria-label="검색 초기화"
+							>
+								<X size={16} class="lucide-icon" />
+							</button>
+						{/if}
 					</div>
 					<button
 						onclick={() => advancedSearchOpen = !advancedSearchOpen}
