@@ -41,10 +41,27 @@
 	);
 	let dateRangeStart = $state(savedFilters?.dateRangeStart || '');
 	let dateRangeEnd = $state(savedFilters?.dateRangeEnd || '');
-	let playsMin = $state(savedFilters?.playsMin || '');
-	let playsMax = $state(savedFilters?.playsMax || '');
-	let likesMin = $state(savedFilters?.likesMin || '');
-	let likesMax = $state(savedFilters?.likesMax || '');
+	// 통계 범위 필터는 빈 문자열이 아니고 유효한 값일 때만 복원
+	let playsMin = $state(
+		(savedFilters?.playsMin && savedFilters.playsMin.trim() !== '' && parseInt(savedFilters.playsMin) > 0) 
+			? savedFilters.playsMin 
+			: ''
+	);
+	let playsMax = $state(
+		(savedFilters?.playsMax && savedFilters.playsMax.trim() !== '' && parseInt(savedFilters.playsMax) > 0) 
+			? savedFilters.playsMax 
+			: ''
+	);
+	let likesMin = $state(
+		(savedFilters?.likesMin && savedFilters.likesMin.trim() !== '' && parseInt(savedFilters.likesMin) > 0) 
+			? savedFilters.likesMin 
+			: ''
+	);
+	let likesMax = $state(
+		(savedFilters?.likesMax && savedFilters.likesMax.trim() !== '' && parseInt(savedFilters.likesMax) > 0) 
+			? savedFilters.likesMax 
+			: ''
+	);
 	
 	// 일괄 선택 상태
 	let selectedTrackIds = $state<Set<string>>(new Set());
@@ -971,7 +988,7 @@
 		
 		<!-- 결과 개수 표시 -->
 		<div class="mt-3 text-xs text-text-muted" aria-live="polite" aria-atomic="true" id="search-results-count">
-			{#if searchQuery.trim() || selectedGenre !== 'all' || selectedStatus !== 'all'}
+			{#if searchQuery.trim() || selectedGenre !== 'all' || selectedStatus !== 'all' || selectedGenres.size > 0 || playsMin || playsMax || likesMin || likesMax}
 				검색 결과: <span class="text-hover-cyan font-medium">{filteredAndSortedTracks.length}</span>개
 				{#if filteredAndSortedTracks.length !== tracks.length}
 					<span class="text-text-muted/70"> (전체 {tracks.length}개 중)</span>
@@ -1315,7 +1332,7 @@
 	{:else}
 		<EmptyState 
 			title="트랙을 찾을 수 없습니다"
-			description={searchQuery.trim() || selectedGenre !== 'all' || selectedStatus !== 'all' ? '검색 조건에 맞는 트랙이 없습니다.' : '아직 트랙이 없습니다.'}
+			description={searchQuery.trim() || selectedGenre !== 'all' || selectedStatus !== 'all' || selectedGenres.size > 0 || playsMin || playsMax || likesMin || likesMax ? '검색 조건에 맞는 트랙이 없습니다.' : '아직 트랙이 없습니다.'}
 			actionLabel="첫 번째 트랙 추가"
 			onAction={handleCreateTrack}
 		/>
