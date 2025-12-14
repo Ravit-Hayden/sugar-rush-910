@@ -986,6 +986,33 @@
 			/>
 		</div>
 		
+		<!-- 선택된 장르 태그 -->
+		{#if selectedGenres.size > 0}
+			<div class="mt-3 flex flex-wrap gap-2 items-center">
+				{#each Array.from(selectedGenres) as genre}
+					<span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-surface-3 text-text-strong rounded-full text-xs">
+						{genre}
+						<button
+							type="button"
+							onclick={() => {
+								const newSet = new Set(selectedGenres);
+								newSet.delete(genre);
+								selectedGenres = newSet;
+								// 모든 장르가 제거되면 단일 장르 선택도 초기화
+								if (newSet.size === 0) {
+									selectedGenre = 'all';
+								}
+							}}
+							class="w-4 h-4 flex items-center justify-center rounded-full hover:bg-surface-1 focus:bg-surface-1 focus:outline-none focus:ring-0 transition-colors duration-200"
+							aria-label="{genre} 제거"
+						>
+							<X size={12} class="text-text-muted hover:text-text-base transition-colors duration-200" />
+						</button>
+					</span>
+				{/each}
+			</div>
+		{/if}
+		
 		<!-- 결과 개수 표시 -->
 		<div class="mt-3 text-xs text-text-muted" aria-live="polite" aria-atomic="true" id="search-results-count">
 			{#if searchQuery.trim() || selectedGenre !== 'all' || selectedStatus !== 'all' || selectedGenres.size > 0 || playsMin || playsMax || likesMin || likesMax}

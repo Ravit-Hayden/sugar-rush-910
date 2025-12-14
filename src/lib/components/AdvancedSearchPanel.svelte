@@ -280,7 +280,7 @@
 			<div class="flex justify-end gap-2 pt-2 border-t border-border-subtle">
 				<button
 					onclick={onReset}
-					class="px-3 py-1.5 text-xs bg-surface-2 hover:bg-surface-3 text-text-base rounded-md transition-colors"
+					class="px-3 py-1.5 text-xs bg-surface-2 text-text-base rounded-md border border-border-subtle hover:border-hover-cyan hover:text-hover-cyan focus:border-brand-pink focus:text-brand-pink focus:outline-none focus:ring-0 transition-colors duration-200"
 				>
 					초기화
 				</button>
