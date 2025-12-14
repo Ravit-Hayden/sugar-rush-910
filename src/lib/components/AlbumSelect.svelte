@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { useClickOutside, useEscapeKey } from '$lib/utils/clickOutside';
-	import { ChevronDown, Disc3 } from 'lucide-svelte';
+	import { ChevronDown, Disc3, X } from 'lucide-svelte';
 
 	interface Album {
 		id: string;
@@ -29,6 +29,8 @@
 	let dropdownOpen = $state(false);
 	let inputValue = $state(value);
 	let containerElement: HTMLDivElement;
+	let focusedIndex = $state(-1); // 키보드 네비게이션용 포커스 인덱스
+	let listElement: HTMLUListElement;
 
 	// value prop이 변경되면 inputValue도 업데이트
 	$effect(() => {
@@ -80,6 +82,7 @@
 	$effect(() => {
 		return useClickOutside('.album-select-dropdown', () => {
 			dropdownOpen = false;
+			focusedIndex = -1; // 외부 클릭 시 포커스 인덱스 초기화
 		}, dropdownOpen);
 	});
 
@@ -87,6 +90,7 @@
 	$effect(() => {
 		return useEscapeKey(() => {
 			dropdownOpen = false;
+			focusedIndex = -1; // Escape 키 시 포커스 인덱스 초기화
 		}, dropdownOpen);
 	});
 
@@ -94,6 +98,7 @@
 		inputValue = albumTitle;
 		onChange(albumTitle);
 		dropdownOpen = false;
+		focusedIndex = -1; // 포커스 인덱스 초기화
 		// 포커스 유지 (키보드 네비게이션 개선)
 		if (typeof window !== 'undefined') {
 			const input = document.querySelector('.album-select-dropdown input') as HTMLInputElement;
@@ -105,10 +110,75 @@
 		const target = e.currentTarget as HTMLInputElement;
 		inputValue = target.value;
 		onChange(target.value);
+		focusedIndex = -1; // 입력 변경 시 포커스 인덱스 초기화
 	}
 
 	function handleInputFocus() {
 		dropdownOpen = true;
+		focusedIndex = -1; // 포커스 인덱스 초기화
+	}
+
+	function handleClear() {
+		inputValue = '';
+		onChange('');
+		dropdownOpen = false;
+		focusedIndex = -1;
+		// 입력 필드로 포커스 이동
+		if (typeof window !== 'undefined') {
+			const input = document.querySelector('.album-select-dropdown input') as HTMLInputElement;
+			input?.focus();
+		}
+	}
+
+	// 키보드 네비게이션 핸들러
+	function handleInputKeydown(e: KeyboardEvent) {
+		if (!dropdownOpen || filteredAlbums.length === 0) {
+			if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+				e.preventDefault();
+				dropdownOpen = true;
+				focusedIndex = e.key === 'ArrowDown' ? 0 : filteredAlbums.length - 1;
+			}
+			return;
+		}
+
+		switch (e.key) {
+			case 'ArrowDown':
+				e.preventDefault();
+				focusedIndex = focusedIndex < filteredAlbums.length - 1 
+					? focusedIndex + 1 
+					: 0; // 순환
+				// 스크롤 처리
+				if (listElement && focusedIndex >= 0) {
+					const item = listElement.children[focusedIndex] as HTMLElement;
+					item?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+				}
+				break;
+			case 'ArrowUp':
+				e.preventDefault();
+				focusedIndex = focusedIndex > 0 
+					? focusedIndex - 1 
+					: filteredAlbums.length - 1; // 순환
+				// 스크롤 처리
+				if (listElement && focusedIndex >= 0) {
+					const item = listElement.children[focusedIndex] as HTMLElement;
+					item?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+				}
+				break;
+			case 'Enter':
+				e.preventDefault();
+				if (focusedIndex >= 0 && focusedIndex < filteredAlbums.length) {
+					handleSelect(filteredAlbums[focusedIndex].title);
+				} else if (filteredAlbums.length === 1) {
+					// 검색 결과가 하나일 때 Enter로 선택
+					handleSelect(filteredAlbums[0].title);
+				}
+				break;
+			case 'Escape':
+				e.preventDefault();
+				dropdownOpen = false;
+				focusedIndex = -1;
+				break;
+		}
 	}
 
 	// 검색어 하이라이트 함수
@@ -156,9 +226,31 @@
 			value={inputValue}
 			oninput={handleInputChange}
 			onfocus={handleInputFocus}
-			class="w-full h-10 pl-10 pr-10 bg-surface-2 border border-border-subtle rounded-lg text-text-base focus:outline-none focus:border-brand-pink focus:ring-0 transition-colors duration-200"
+			onkeydown={handleInputKeydown}
+			class="w-full h-10 pl-10 {inputValue.trim() ? 'pr-20' : 'pr-10'} bg-surface-2 border border-border-subtle rounded-lg text-text-base focus:outline-none focus:border-brand-pink focus:ring-0 transition-colors duration-200"
 			placeholder={placeholder}
 		/>
+		
+		<!-- 클리어 버튼 (입력값이 있을 때만 표시) -->
+		{#if inputValue.trim()}
+			<button
+				type="button"
+				onclick={(e) => {
+					e.stopPropagation();
+					handleClear();
+				}}
+				onkeydown={(e) => {
+					if (e.key === 'Enter' || e.key === ' ') {
+						e.preventDefault();
+						handleClear();
+					}
+				}}
+				class="absolute inset-y-0 right-10 pr-3 flex items-center pointer-events-auto bg-transparent hover:bg-transparent focus:bg-transparent focus-visible:bg-transparent"
+				aria-label="입력 내용 지우기"
+			>
+				<X size={16} class="lucide-icon text-text-muted hover:text-text-base transition-colors duration-200" />
+			</button>
+		{/if}
 		
 		<!-- 드롭다운 버튼 -->
 		<button
@@ -181,7 +273,11 @@
 	
 	<!-- 드롭다운 목록 -->
 	{#if dropdownOpen}
-		<ul role="listbox" class="filter-dropdown absolute left-0 w-full mt-[6px] bg-surface-1 border border-border-subtle rounded-[6px] z-[9999] overflow-hidden pt-0">
+		<ul 
+			bind:this={listElement}
+			role="listbox" 
+			class="filter-dropdown absolute left-0 w-full mt-[6px] bg-surface-1 border border-border-subtle rounded-[6px] z-[9999] overflow-hidden pt-0"
+		>
 			{#if filteredAlbums.length === 0}
 				<li class="px-4 py-2 text-sm text-text-muted text-center">
 					{#if inputValue.trim()}
@@ -191,11 +287,12 @@
 					{/if}
 				</li>
 			{:else}
-				{#each filteredAlbums as album}
+				{#each filteredAlbums as album, index}
 					<li
 						role="option"
 						aria-selected={inputValue === album.title}
-						tabindex="0"
+						tabindex={focusedIndex === index ? 0 : -1}
+						class="{isAlbumMatched(album) ? '' : 'album-unmatched'} {focusedIndex === index ? 'keyboard-focused' : ''}"
 						onclick={() => handleSelect(album.title)}
 						onkeydown={(e) => {
 							if (e.key === 'Enter' || e.key === ' ') {
@@ -203,7 +300,7 @@
 								handleSelect(album.title);
 							}
 						}}
-						class={isAlbumMatched(album) ? '' : 'album-unmatched'}
+						onmouseenter={() => focusedIndex = index}
 					>
 						<div class="flex flex-col">
 							<span>
