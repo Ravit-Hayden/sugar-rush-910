@@ -340,5 +340,6 @@ git diff c729e95 HEAD
 - `src/scripts/ui.js` (중복 이벤트 리스너 제거)
 
 ### 백업 위치
+- `C:\Development\sugar-rush-1213` (최신 백업 폴더)
 - `C:\Development\sugar-rush-1202` (이전 백업 폴더)
 
