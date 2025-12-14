@@ -24,3 +24,7 @@ vite.config.ts.timestamp-*
 
 # SQLite
 *.db
+
+# 임시 파일 및 Git 출력 파일
+tore *
+how *
