@@ -33,7 +33,12 @@
 	
 	// 고급 검색 옵션
 	let advancedSearchOpen = $state(false);
-	let selectedGenres = $state<Set<string>>(savedFilters?.selectedGenres ? new Set(savedFilters.selectedGenres) : new Set());
+	// selectedGenre가 'all'이면 selectedGenres는 초기화
+	let selectedGenres = $state<Set<string>>(
+		(savedFilters?.selectedGenre === 'all' || !savedFilters?.selectedGenres || savedFilters.selectedGenres.length === 0)
+			? new Set()
+			: new Set(savedFilters.selectedGenres)
+	);
 	let dateRangeStart = $state(savedFilters?.dateRangeStart || '');
 	let dateRangeEnd = $state(savedFilters?.dateRangeEnd || '');
 	let playsMin = $state(savedFilters?.playsMin || '');
