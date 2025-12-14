@@ -563,8 +563,11 @@
 
 	function selectGenreOption(value: string, event?: MouseEvent | KeyboardEvent) {
 		selectedGenre = value;
-		// 단일 장르 선택 시 다중 선택 초기화
-		if (value !== 'all') {
+		// "모든 장르" 선택 시 다중 선택 초기화
+		if (value === 'all') {
+			selectedGenres = new Set();
+		} else {
+			// 단일 장르 선택 시 다중 선택 초기화
 			selectedGenres = new Set();
 		}
 		// 클릭한 항목에 포커스 효과를 보여주기 위해 약간의 지연 후 드롭다운 닫기
@@ -825,7 +828,7 @@
 									const input = document.getElementById('track-search') as HTMLInputElement;
 									input?.focus();
 								}}
-								class="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 flex items-center justify-center text-text-muted hover:text-text-strong transition-colors duration-200 bg-transparent hover:bg-transparent focus:bg-transparent focus-visible:bg-transparent"
+								class="search-clear-button absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 flex items-center justify-center bg-transparent hover:bg-transparent focus:bg-transparent focus-visible:bg-transparent"
 								aria-label="검색 초기화"
 							>
 								<X size={16} class="lucide-icon" />

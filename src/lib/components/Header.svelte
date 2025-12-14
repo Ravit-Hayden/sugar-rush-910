@@ -103,7 +103,7 @@
 								searchValue = '';
 								searchInput?.focus();
 							}}
-							class="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 flex items-center justify-center text-text-muted hover:text-text-strong transition-colors duration-200 bg-transparent hover:bg-transparent focus:bg-transparent focus-visible:bg-transparent"
+							class="search-clear-button absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 flex items-center justify-center bg-transparent hover:bg-transparent focus:bg-transparent focus-visible:bg-transparent"
 							aria-label="검색 초기화"
 						>
 							<X size={16} class="lucide-icon" />

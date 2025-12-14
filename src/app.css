@@ -3770,3 +3770,27 @@ button[aria-label="고급 검색"]:focus-visible:hover .lucide-icon {
 .toast-icon:focus-visible {
   color: inherit !important;
 }
+
+/* 검색 X 버튼 색상 스타일 */
+/* 기본: 핫핑크 */
+.search-clear-button .lucide-icon {
+  color: var(--brand-pink) !important;
+  transition: color 0.2s ease;
+}
+
+/* 호버: 호버 색상 (포커스 없을 때만) */
+.search-clear-button:hover:not(:focus):not(:focus-visible) .lucide-icon {
+  color: var(--hover-cyan) !important;
+}
+
+/* 포커스: 핫핑크 */
+.search-clear-button:focus .lucide-icon,
+.search-clear-button:focus-visible .lucide-icon {
+  color: var(--brand-pink) !important;
+}
+
+/* 포커스+호버: 핫핑크 유지 */
+.search-clear-button:focus:hover .lucide-icon,
+.search-clear-button:focus-visible:hover .lucide-icon {
+  color: var(--brand-pink) !important;
+}
