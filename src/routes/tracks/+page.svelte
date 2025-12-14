@@ -525,7 +525,10 @@
 			selectedGenre = saved.selectedGenre || 'all';
 			selectedStatus = saved.selectedStatus || 'all';
 			selectedSort = saved.selectedSort || 'latest';
-			if (saved.selectedGenres && Array.isArray(saved.selectedGenres) && saved.selectedGenres.length > 0) {
+			// selectedGenre가 'all'이면 selectedGenres는 무시하고 초기화
+			if (selectedGenre === 'all') {
+				selectedGenres = new Set();
+			} else if (saved.selectedGenres && Array.isArray(saved.selectedGenres) && saved.selectedGenres.length > 0) {
 				selectedGenres = new Set(saved.selectedGenres);
 			} else {
 				selectedGenres = new Set();
