@@ -1,0 +1,1099 @@
+@import 'tailwindcss';
+
+/* Pretendard 폰트 설정 */
+@font-face {
+  font-family: 'Pretendard Variable';
+  src: url('/fonts/PretendardVariable.woff2') format('woff2');
+  font-weight: 45 920;
+  font-style: normal;
+  font-display: swap;
+}
+
+.font-pretendard {
+  font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+}
+
+/* 브랜드 & 상태 색상 변수 */
+:root {
+  --brand-pink: #FF3DAE;
+  --hover-cyan: #17E1BC;
+  --danger-fg: #FF6B6B;
+  --warn-fg: #fffa00;
+  --ok-fg: #00ddff;
+  --tag-album: #FF3DAE;
+  --tag-track: #68b1ff;
+  --tag-deadline: #7ea59e;
+  --user-el: #00ddff;
+  --user-ot: #FF835C;
+  
+  /* El Otte 브랜드 시그니처 컬러 */
+  --elotte-green: #76a7a9;      /* El 전용 색상 */
+  --elotte-orange: #FF7A00;     /* 형광오렌지 */
+  
+  /* 형광 포인트 컬러 팔레트 */
+  --badge-bg-base: #222222;
+  --badge-high-urgent: #FF008C;      /* 진형광핑크 */
+  --badge-high-red: #FF1900;         /* 레드 */
+  --badge-medium-yellow: #FFD700;    /* 더 진한 노랑 (대조비 향상) */
+  --badge-medium-lemon: #FFB000;     /* 더 진한 레몬 (대조비 향상) */
+  --badge-medium-gold: #FFD600;      /* 골드 */
+  --badge-low-mint: #00FF2E;         /* 형광 민트 */
+  --badge-low-green: #00FF2E;        /* 형광 그린 */
+  --badge-info-cyan: #00DDFF;         /* 팝 블루 */
+  --badge-info-blue: #45ADFF;         /* 팝 블루계열 */
+  --badge-special-purple: #D400FF;    /* 네온 퍼플 */
+  --badge-special-violet: #9800FF;    /* 네온 바이올렛 */
+  
+  /* 다크 모드 색상 변수 (기본값) */
+  --text-base: #888888;
+  --text-strong: #B6B6B6;
+  --text-muted: #6F6F6F;
+  --bg: #000000;
+  --surface-2: #121212;
+  --surface-1: #1A1A1A;
+  --border-subtle: #252528;
+}
+
+/* 라이트 모드 색상 변수 */
+[data-theme="light"] {
+   --text-base: #8B7355;        /* 2단계 진하게 (기존 #D9CCBC) */
+   --text-strong: #6B5B47;      /* 1단계 진하게 (기존 #C5b5A9) */
+   --text-muted: #5C4F3F;       /* 더 진하게 (기존 #A59686) */
+   --bg: #F7F3E9;
+   --surface-2: #F3EBDD;
+   --surface-1: #FFF8EF;
+   --border-subtle: #B8A896;    /* 더 진하게 (기존 #D9CCBC) */
+   --hover-cyan: #8A2BE2;       /* 라이트 모드 전용 보라색 호버 색상 */
+  
+  /* 라이트 모드 배지 색상 (더 진하고 선명하게) */
+  --badge-high-urgent: #FF3DAE; /* 핫핑크 유지 */
+  --badge-high-red: #FF1900;    /* 진한 레드 유지 */
+  --badge-medium-yellow: #FF8C00; /* 오렌지계열 (기존 노랑) */
+  --badge-medium-lemon: #FF7F00;  /* 오렌지계열 (기존 레몬) */
+  --badge-medium-gold: #FF8C00;   /* 오렌지계열 (기존 골드) */
+		--badge-low-mint: #3ABA00;      /* 라이트 모드 전용 민트 그린 */
+		--badge-low-green: #228B22;     /* 맑고 진한 진그린 */
+  --badge-info-cyan: #00BFFF;     /* 진한 시안 */
+  --badge-info-blue: #0066FF;     /* 진한 블루 */
+  --badge-special-purple: #8A2BE2; /* 진한 퍼플 */
+  --badge-special-violet: #8A2BE2; /* 진한 바이올렛 */
+  --elotte-green: #76a7a9;        /* El 전용 색상 (다크/라이트 동일) */
+  --ok-fg: #FF3DAE;               /* 라이트 모드에서 KPI 색상 변경 (핫핑크) */
+}
+
+/* 멤버 컬러 토큰 */
+[data-user="el"] {
+  --user-color: #CFCFD4; /* 다크 모드 */
+}
+[data-user="el"][data-theme="light"] {
+  --user-color: #333434; /* 라이트 모드 */
+}
+[data-user="ot"] {
+  --user-color: #FEFDF6; /* 다크 모드 */
+}
+[data-user="ot"][data-theme="light"] {
+  --user-color: #D7CBBF; /* 라이트 모드 */
+}
+
+/* 사이드바 아이콘 고정 위치 및 정렬 */
+.sidebar-menu-item .lucide-icon {
+  display: block;
+  margin: 0;
+  padding: 0;
+  line-height: 1;
+  vertical-align: middle;
+  position: relative;
+}
+
+/* 아이콘 컨테이너 고정 크기 */
+.sidebar-menu-item > div:first-child {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* 버튼 스타일 */
+.btn-retry {
+  @apply inline-flex items-center justify-center h-[18px] px-2 rounded-full text-[11px] font-semibold leading-none;
+  background: var(--brand-pink);
+  color: #FEFDF6;
+  border: none;
+}
+.btn-retry:hover {
+  background: var(--hover-cyan);
+  color: #000;
+}
+
+/* 기본 스타일 */
+body {
+  background-color: var(--bg);
+  color: var(--text-base);
+  overflow-x: hidden; /* 가로 스크롤바 방지 */
+  margin: 0;
+  padding: 0;
+  font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+}
+
+/* 전체 페이지 가로 스크롤바 방지 */
+html {
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+/* 메인 컨테이너 스크롤 설정 */
+.min-h-screen {
+  overflow-x: hidden;
+}
+
+/* 통일된 메인 영역 스타일 */
+.main-content-area {
+  padding-top: 5rem; /* pt-20 (80px) */
+  padding-bottom: 0.375rem; /* pb-1.5 (6px) */
+  padding-left: 16px; /* 16px + gutter(8px) = 24px 가시적 여백 */
+  padding-right: 16px; /* 16px + gutter(8px) = 24px 가시적 여백 */
+  transition: all 300ms ease-in-out;
+  overflow-x: hidden;
+  overflow-y: auto; /* 스크롤 생성 */
+  background-color: var(--bg);
+  min-height: calc(100vh - 80px);
+  width: 100%;
+  scrollbar-gutter: stable both-edges; /* 양쪽에 균등하게 gutter 공간 확보 */
+  box-sizing: border-box;
+}
+
+/* 모든 페이지 컨텐츠 영역에 일관된 스크롤바 위치 적용 */
+.content-area,
+.page-content,
+.dashboard-body,
+.content-panel,
+main,
+.PageContent,
+.page-wrapper,
+.content-wrapper,
+.app-content,
+.layout-content,
+.container,
+.wrapper,
+div[class*="content"],
+div[class*="page"],
+div[class*="main"],
+div[class*="container"],
+/* 추가 포괄적 선택자 */
+div[class*="wrapper"],
+div[class*="layout"],
+div[class*="app"],
+div[class*="body"],
+div[class*="area"],
+div[class*="panel"] {
+  padding-right: 16px !important; /* 스크롤바 공간 확보 */
+  box-sizing: border-box !important;
+}
+
+/* 파이어폭스 전용 - 스크롤바 오버레이 방식이므로 원래 패딩 유지 */
+@-moz-document url-prefix() {
+  .main-content-area {
+    padding-left: 24px !important; /* 파이어폭스에서는 24px 패딩 */
+    padding-right: 24px !important; /* 파이어폭스에서는 24px 패딩 */
+  }
+  
+  /* 모든 페이지 컨텐츠 영역에도 파이어폭스 전용 패딩 적용 */
+  .content-area,
+  .page-content,
+  .dashboard-body,
+  .content-panel,
+  main,
+  .PageContent,
+  .page-wrapper,
+  .content-wrapper,
+  .app-content,
+  .layout-content,
+  .container,
+  .wrapper,
+  div[class*="content"],
+  div[class*="page"],
+  div[class*="main"],
+  div[class*="container"] {
+    padding-right: 24px !important; /* 파이어폭스에서는 24px 패딩 */
+  }
+}
+
+/* 사이드바 상태에 따른 마진 조정 */
+.main-content-area.sidebar-collapsed {
+  margin-left: 72px;
+  width: calc(100% - 72px);
+}
+
+.main-content-area.sidebar-expanded {
+  margin-left: 250px;
+  width: calc(100% - 250px);
+}
+
+/* 사이드바 애니메이션 통일 */
+.sidebar-text-animation {
+  transition: all 200ms ease-in-out;
+}
+
+.sidebar-text-animation.collapsed {
+  opacity: 0;
+  width: 0;
+  overflow: hidden;
+}
+
+.sidebar-text-animation.expanded {
+  opacity: 1;
+  width: auto;
+}
+
+/* Tailwind CSS 클래스 오버라이드 */
+.bg-bg { background-color: var(--bg); }
+.bg-surface-1 { background-color: var(--surface-1); }
+.bg-surface-2 { background-color: var(--surface-2); }
+.bg-brand-pink { background-color: var(--brand-pink); }
+.bg-hover-cyan { background-color: var(--hover-cyan); }
+.text-text-base { color: var(--text-base); }
+.text-text-strong { color: var(--text-strong); }
+.text-text-muted { color: var(--text-muted); }
+.text-white { color: #FFFFFF; }
+.border-border-subtle { border-color: var(--border-subtle); }
+.text-brand-pink { color: var(--brand-pink); }
+.text-hover-cyan { color: var(--hover-cyan); }
+.text-danger-fg { color: var(--danger-fg); }
+.text-warn-fg { color: var(--warn-fg); }
+.text-ok-fg { color: var(--ok-fg); }
+.focus\:border-brand-pink:focus { border-color: var(--brand-pink); }
+.focus\:ring-0:focus { --tw-ring-width: 0px; --tw-ring-offset-width: 0px; }
+.hover\:border-hover-cyan:hover { border-color: var(--hover-cyan); }
+.border-\[1px\] { border-width: 1px; }
+.focus\:border-\[1px\]:focus { border-width: 1px !important; }
+
+/* 형광 배지 스타일 클래스 */
+.badge-base {
+  background-color: transparent;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem; /* 열림: 3 크기로 변경 (12px) */
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.025em; /* 글자 간격 약간 증가 */
+}
+
+/* 라이트 모드에서 배지 텍스트 그림자 제거 */
+[data-theme="light"] .badge-base {
+  text-shadow: none !important;
+}
+
+/* 라이트 모드에서 호버 색상만 보라색으로 변경 (배경은 그대로) */
+[data-theme="light"] .search-container:hover .lucide-icon {
+  color: var(--hover-cyan) !important;
+}
+
+
+[data-theme="light"] .theme-toggle-button:hover .lucide-icon {
+  color: var(--hover-cyan) !important;
+}
+
+/* 라이트 모드에서 테마 토글 버튼 호버 배경색 변경 방지 */
+[data-theme="light"] .theme-toggle-button:hover {
+  background-color: transparent !important;
+}
+
+[data-theme="light"] .hover\:bg-hover-cyan:hover {
+  color: var(--hover-cyan) !important;
+}
+
+[data-theme="light"] .hover\:text-hover-cyan:hover {
+  color: var(--hover-cyan) !important;
+}
+
+/* 라이트 모드에서 사이드바 버튼 호버 색상 변경 */
+[data-theme="light"] .sidebar-menu-item:hover:not(.active) {
+  background-color: var(--hover-cyan) !important;
+  color: var(--surface-2) !important;
+}
+
+[data-theme="light"] .sidebar-menu-item:hover:not(.active) .lucide-icon {
+  color: var(--surface-2) !important;
+}
+
+[data-theme="light"] aside nav ul li a.sidebar-menu-item:hover:not(.active) {
+  background-color: var(--hover-cyan) !important;
+  color: var(--surface-2) !important;
+}
+
+[data-theme="light"] aside nav ul li a.sidebar-menu-item:hover:not(.active) .lucide-icon {
+  color: var(--surface-2) !important;
+}
+
+/* 라이트 모드에서 일반 링크와 버튼 호버 색상 변경 */
+[data-theme="light"] a:hover {
+  color: var(--hover-cyan) !important;
+}
+
+[data-theme="light"] button:not([class*="bg-"]):hover {
+  color: var(--hover-cyan) !important;
+}
+
+[data-theme="light"] .lucide-icon:hover {
+  color: var(--hover-cyan) !important;
+}
+
+/* 라이트 모드에서 ActionsCard 아이콘 호버 색상 변경 */
+[data-theme="light"] a[href*="/albums/new"]:hover svg,
+[data-theme="light"] a[href*="/tracks/new"]:hover svg,
+[data-theme="light"] a[href*="/files/upload"]:hover svg,
+[data-theme="light"] a[href*="/revenue"]:hover svg {
+  color: var(--hover-cyan) !important;
+}
+
+/* 라이트 모드에서 리스트 항목 호버 테두리 색상 변경 */
+[data-theme="light"] a[href*="/tasks/"]:hover,
+[data-theme="light"] a[href*="/calendar/"]:hover,
+[data-theme="light"] a[href*="/status/"]:hover,
+[data-theme="light"] a[href*="/failures/"]:hover,
+[data-theme="light"] a[href*="/logs/"]:hover,
+[data-theme="light"] a[href*="/releases/"]:hover,
+[data-theme="light"] a[href*="/changes/"]:hover,
+[data-theme="light"] a[href*="/feedback/"]:hover,
+[data-theme="light"] a[href*="/albums/new"]:hover,
+[data-theme="light"] a[href*="/tracks/new"]:hover,
+[data-theme="light"] a[href*="/files/upload"]:hover,
+[data-theme="light"] a[href*="/revenue"]:hover {
+  border-color: var(--hover-cyan) !important;
+}
+
+/* 라이트 모드에서 체크박스 호버 테두리 색상 변경 */
+[data-theme="light"] input[type="checkbox"]:hover {
+  border-color: var(--hover-cyan) !important;
+}
+
+/* 라이트 모드에서 정보 버튼 호버 색상 변경 */
+[data-theme="light"] button[aria-label="정보"]:hover .lucide-icon {
+  color: var(--hover-cyan) !important;
+}
+
+/* 라이트 모드에서 일반 버튼 호버 배경 색상 변경 (테마 토글 버튼 제외) */
+[data-theme="light"] button:hover:not([class*="bg-"]):not(.theme-toggle-button) {
+  background-color: var(--surface-1) !important;
+}
+
+/* 라이트 모드에서 버튼 내부 아이콘 호버 색상 변경 (trending-up 아이콘 제외) */
+[data-theme="light"] button:hover .lucide-icon:not(.lucide-trending-up) {
+  color: var(--hover-cyan) !important;
+}
+
+/* 라이트 모드에서 할일 항목 호버 효과 변경 */
+[data-theme="light"] a[href*="/tasks/"]:hover,
+[data-theme="light"] a[href*="/calendar/"]:hover,
+[data-theme="light"] a[href*="/status/"]:hover,
+[data-theme="light"] a[href*="/failures/"]:hover,
+[data-theme="light"] a[href*="/logs/"]:hover,
+[data-theme="light"] a[href*="/releases/"]:hover,
+[data-theme="light"] a[href*="/changes/"]:hover,
+[data-theme="light"] a[href*="/feedback/"]:hover {
+  border-color: var(--hover-cyan) !important;
+}
+
+/* 라이트 모드에서 할일 항목 내부 체크박스 호버 효과 변경 */
+[data-theme="light"] a[href*="/tasks/"]:hover input[type="checkbox"],
+[data-theme="light"] a[href*="/calendar/"]:hover input[type="checkbox"],
+[data-theme="light"] a[href*="/status/"]:hover input[type="checkbox"],
+[data-theme="light"] a[href*="/failures/"]:hover input[type="checkbox"],
+[data-theme="light"] a[href*="/logs/"]:hover input[type="checkbox"],
+[data-theme="light"] a[href*="/releases/"]:hover input[type="checkbox"],
+[data-theme="light"] a[href*="/changes/"]:hover input[type="checkbox"] {
+  border-color: var(--hover-cyan) !important;
+}
+
+/* 라이트 모드에서 할일 항목 내부 텍스트 호버 효과 변경 */
+[data-theme="light"] a[href*="/tasks/"]:hover .text-text-base,
+[data-theme="light"] a[href*="/calendar/"]:hover .text-text-base,
+[data-theme="light"] a[href*="/status/"]:hover .text-text-base,
+[data-theme="light"] a[href*="/failures/"]:hover .text-text-base,
+[data-theme="light"] a[href*="/logs/"]:hover .text-text-base,
+[data-theme="light"] a[href*="/releases/"]:hover .text-text-base,
+[data-theme="light"] a[href*="/changes/"]:hover .text-text-base,
+[data-theme="light"] a[href*="/feedback/"]:hover .text-text-base {
+  color: var(--hover-cyan) !important;
+}
+
+/* 라이트 모드에서 빠른 액션 버튼 텍스트 호버 효과 변경 */
+[data-theme="light"] a[href*="/albums/new"]:hover .text-text-base,
+[data-theme="light"] a[href*="/tracks/new"]:hover .text-text-base,
+[data-theme="light"] a[href*="/files/upload"]:hover .text-text-base,
+[data-theme="light"] a[href*="/revenue"]:hover .text-text-base {
+  color: var(--hover-cyan) !important;
+}
+
+.badge-high-urgent { color: var(--badge-high-urgent); }
+.badge-high-red { color: var(--badge-high-red); }
+.badge-medium-yellow { color: var(--badge-medium-yellow); }
+.badge-medium-lemon { color: var(--badge-medium-lemon); }
+.badge-medium-gold { color: var(--badge-medium-gold); }
+.badge-low-mint { color: var(--badge-low-mint); }
+.badge-low-green { color: var(--badge-low-green); }
+.badge-info-cyan { color: var(--badge-info-cyan); }
+.badge-info-blue { color: var(--badge-info-blue); }
+.text-elotte-green { color: var(--elotte-green); }
+.text-elotte-orange { color: var(--elotte-orange); }
+
+
+/* input 요소 포커스 스타일 */
+input:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  border-color: var(--brand-pink) !important;
+}
+
+/* 스크롤바 스타일 - README 표준 적용 (8px 고정) */
+::-webkit-scrollbar {
+  width: 8px !important; /* scrollbar-gutter와 일치하도록 고정 */
+  height: 8px !important;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--surface-2);
+  border-radius: 0px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* 파이어폭스 스크롤바 */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface-2) var(--bg);
+}
+
+/* 라이트 테마 스크롤바 */
+[data-theme="light"] ::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+  background: var(--text-muted);
+}
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+  background: var(--text-base);
+}
+[data-theme="light"] * {
+  scrollbar-color: var(--text-muted) var(--bg);
+}
+
+/* 헤더 반응형 정렬 */
+@media (max-width: 767px) {
+  .search-container {
+    margin-left: 0;
+    padding-left: 0;
+    flex: 1;
+  }
+  
+  .search-container .relative {
+    max-width: none;
+  }
+  
+  header {
+    padding-left: 1.5rem !important; /* 24px */
+    padding-right: 1.5rem !important; /* 24px */
+  }
+  
+  header .flex-1.justify-end {
+    justify-content: flex-start;
+  }
+  
+  /* 모바일에서 스크롤바 위치 일관성 보장 */
+  .main-content-area,
+  .content-area,
+  .page-content,
+  .dashboard-body,
+  .content-panel,
+  main,
+  .PageContent,
+  .page-wrapper,
+  .content-wrapper,
+  .app-content,
+  .layout-content,
+  .container,
+  .wrapper,
+  div[class*="content"],
+  div[class*="page"],
+  div[class*="main"],
+  div[class*="container"] {
+    padding-right: 16px !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .search-container {
+    flex: none;
+  }
+  
+  .search-container .relative {
+    max-width: 320px;
+  }
+  
+  header .flex-1.justify-end {
+    justify-content: flex-end;
+  }
+  
+  /* 데스크톱에서 스크롤바 위치 일관성 보장 */
+  .main-content-area,
+  .content-area,
+  .page-content,
+  .dashboard-body,
+  .content-panel,
+  main,
+  .PageContent,
+  .page-wrapper,
+  .content-wrapper,
+  .app-content,
+  .layout-content,
+  .container,
+  .wrapper,
+  div[class*="content"],
+  div[class*="page"],
+  div[class*="main"],
+  div[class*="container"] {
+    padding-right: 16px !important;
+  }
+}
+.sidebar-menu-item {
+  transition: all 200ms ease-in-out;
+}
+
+.sidebar-menu-item:hover:not(.active) {
+  background-color: var(--hover-cyan) !important;
+  color: #000000 !important;
+}
+
+.sidebar-menu-item:hover:not(.active) .lucide-icon {
+  color: #000000 !important;
+}
+
+.sidebar-menu-item.active {
+  background-color: var(--brand-pink) !important;
+  color: #FFFFFF !important;
+}
+
+.sidebar-menu-item.active .lucide-icon {
+  color: #FFFFFF !important;
+}
+
+/* 사이드바 텍스트 페이드 효과 */
+.sidebar-menu-item span {
+  transition: opacity 200ms ease-in-out;
+}
+
+/* 사이드바 전체 애니메이션 최적화 */
+aside {
+  will-change: transform, width;
+}
+
+/* 사이드바 토글 버튼 스타일 */
+aside button[aria-label="사이드바 토글"] {
+  background: none !important;
+  border: none !important;
+}
+
+/* 사이드바 토글 버튼 - 모든 상태에서 배경색과 색상 변화 방지 */
+button[data-action="toggle-sidebar"],
+button[data-action="toggle-sidebar"]:hover,
+button[data-action="toggle-sidebar"]:focus,
+button[data-action="toggle-sidebar"]:focus-visible,
+button[data-action="toggle-sidebar"]:active {
+  background-color: transparent !important;
+  background: none !important;
+  color: inherit !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+button[data-action="toggle-sidebar"] svg,
+button[data-action="toggle-sidebar"]:hover svg,
+button[data-action="toggle-sidebar"]:focus svg,
+button[data-action="toggle-sidebar"]:focus-visible svg,
+button[data-action="toggle-sidebar"]:active svg {
+  color: var(--brand-pink) !important;
+}
+
+/* 라이트 모드에서 사이드바 토글 버튼 배경색 변화 방지 */
+[data-theme="light"] button[data-action="toggle-sidebar"],
+[data-theme="light"] button[data-action="toggle-sidebar"]:hover,
+[data-theme="light"] button[data-action="toggle-sidebar"]:focus,
+[data-theme="light"] button[data-action="toggle-sidebar"]:focus-visible,
+[data-theme="light"] button[data-action="toggle-sidebar"]:active {
+  background-color: transparent !important;
+  background: none !important;
+  color: inherit !important;
+}
+
+/* Tailwind 클래스 오버라이드 - 라이트 모드에서 배경색 변화 방지 */
+[data-theme="light"] button[data-action="toggle-sidebar"].transition-colors:hover {
+  background-color: transparent !important;
+  background: none !important;
+}
+
+/* 모든 가능한 배경색 변화 방지 */
+button[data-action="toggle-sidebar"] * {
+  background-color: transparent !important;
+  background: none !important;
+}
+
+/* 툴팁 제거 */
+button[data-action="toggle-sidebar"][title] {
+  position: relative;
+}
+
+button[data-action="toggle-sidebar"][title]:hover::before,
+button[data-action="toggle-sidebar"][title]:hover::after {
+  display: none !important;
+}
+
+/* 브라우저 기본 툴팁 제거 */
+button[data-action="toggle-sidebar"] {
+  pointer-events: auto;
+}
+
+button[data-action="toggle-sidebar"]:hover {
+  position: relative;
+}
+
+/* 모든 툴팁 관련 스타일 제거 */
+[title]:hover::before,
+[title]:hover::after {
+  display: none !important;
+}
+
+/* 사이드바 전용 테두리 스타일 */
+.sidebar-border-right {
+  border-right: 1px solid var(--border-subtle);
+}
+
+/* 사이드바 호버 시 테두리 색상 변경 방지 */
+aside:hover {
+  border-right: 1px solid var(--border-subtle) !important;
+}
+
+/* 더 강력한 호버 효과를 위한 추가 CSS */
+aside nav ul li a.sidebar-menu-item:hover:not(.active) {
+  background-color: var(--hover-cyan) !important;
+  color: #000000 !important;
+}
+
+aside nav ul li a.sidebar-menu-item:hover:not(.active) .lucide-icon {
+  color: #000000 !important;
+}
+
+aside nav ul li a.sidebar-menu-item.active {
+  background-color: var(--brand-pink) !important;
+  color: #FFFFFF !important;
+}
+
+aside nav ul li a.sidebar-menu-item.active .lucide-icon {
+  color: #FFFFFF !important;
+}
+
+/* 검색창 플레이스홀더 스타일 */
+input::placeholder {
+  color: var(--text-muted) !important;
+  opacity: 1 !important;
+}
+
+input::-webkit-input-placeholder {
+  color: var(--text-muted) !important;
+  opacity: 1 !important;
+}
+
+input::-moz-placeholder {
+  color: var(--text-muted) !important;
+  opacity: 1 !important;
+}
+
+input:-ms-input-placeholder {
+  color: var(--text-muted) !important;
+  opacity: 1 !important;
+}
+
+/* =========================
+   체크박스 커스텀 스타일
+   ========================= */
+input[type="checkbox"]:checked::after {
+  content: "✓";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--brand-pink);
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 1;
+}
+
+/* =========================
+   개별 요소 hover 효과
+   ========================= */
+
+/* 카드 호버 효과 - 메인 영역의 카드/패널에만 적용 (라이트/다크 모드 통합) */
+main.main-content-area .bg-surface-1:hover,
+main.main-content-area .bg-surface-2:hover {
+  border-color: var(--hover-cyan) !important;
+  transition: border-color 0.2s ease;
+}
+
+/* 사이드바는 항상 원래 색 유지 */
+aside.bg-surface-2:hover {
+  border-color: var(--border-subtle) !important;
+}
+
+/* 링크 호버 효과 */
+a:hover {
+  color: #17E1BC !important;
+  transition: color 0.2s ease;
+}
+
+/* 버튼 호버 효과 (배경 없는 텍스트 버튼) */
+button:not([class*="bg-"]):hover {
+  color: #17E1BC !important;
+  transition: color 0.2s ease;
+}
+
+/* 배지 호버 효과 제거 - 배지는 호버 효과 불필요 */
+
+/* 아이콘 호버 효과 */
+.lucide-icon:hover {
+  color: #17E1BC !important;
+  transition: color 0.2s ease;
+}
+
+/* ActionsCard 아이콘 호버 효과 */
+a[href*="/albums/new"]:hover svg,
+a[href*="/tracks/new"]:hover svg,
+a[href*="/files/upload"]:hover svg,
+a[href*="/revenue"]:hover svg {
+  color: #17E1BC !important;
+  transition: color 0.2s ease;
+}
+
+/* 리스트 항목 호버 효과 (할일 카드 등) - 체크박스와 텍스트가 함께 선택됨 */
+a[href*="/tasks/"]:hover,
+a[href*="/calendar/"]:hover,
+a[href*="/status/"]:hover,
+a[href*="/failures/"]:hover,
+a[href*="/logs/"]:hover,
+a[href*="/releases/"]:hover,
+a[href*="/changes/"]:hover,
+a[href*="/feedback/"]:hover,
+a[href*="/albums/new"]:hover,
+a[href*="/tracks/new"]:hover,
+a[href*="/files/upload"]:hover,
+a[href*="/revenue"]:hover {
+  background-color: var(--surface-2) !important;
+  border-color: #17E1BC !important;
+  transition: all 0.2s ease;
+}
+
+/* 리스트 항목 내부 체크박스 호버 효과 */
+a[href*="/tasks/"]:hover input[type="checkbox"],
+a[href*="/calendar/"]:hover input[type="checkbox"],
+a[href*="/status/"]:hover input[type="checkbox"],
+a[href*="/failures/"]:hover input[type="checkbox"],
+a[href*="/logs/"]:hover input[type="checkbox"],
+a[href*="/releases/"]:hover input[type="checkbox"],
+a[href*="/changes/"]:hover input[type="checkbox"] {
+  border-color: #17E1BC !important;
+  transition: border-color 0.2s ease;
+}
+
+/* 리스트 항목 내부 텍스트 호버 효과 */
+a[href*="/tasks/"]:hover .text-text-base,
+a[href*="/calendar/"]:hover .text-text-base,
+a[href*="/status/"]:hover .text-text-base,
+a[href*="/failures/"]:hover .text-text-base,
+a[href*="/logs/"]:hover .text-text-base,
+a[href*="/releases/"]:hover .text-text-base,
+a[href*="/changes/"]:hover .text-text-base,
+a[href*="/feedback/"]:hover .text-text-base,
+a[href*="/albums/new"]:hover .text-text-base,
+a[href*="/tracks/new"]:hover .text-text-base,
+a[href*="/files/upload"]:hover .text-text-base,
+a[href*="/revenue"]:hover .text-text-base {
+  color: #17E1BC !important;
+  transition: color 0.2s ease;
+}
+
+/* 키보드 탐색 사용자에게만 포커스 링 표시 */
+:focus {
+  outline: none;
+}
+:focus-visible {
+  outline: 2px solid var(--brand-pink);
+  outline-offset: 2px;
+}
+
+/* form 요소 자체 box-shadow 제거를 원한다면 일관 처리 */
+input:focus-visible, button:focus-visible {
+  box-shadow: none;
+}
+
+/* 애니메이션 감속(저시력/멀미 보호) */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* 검색창 호버/포커스 효과 */
+.search-container:hover .lucide-icon {
+  color: var(--hover-cyan) !important;
+  transition: color 0.3s ease;
+}
+
+.search-container:hover input {
+  border-color: var(--hover-cyan) !important;
+  transition: border-color 0.3s ease;
+}
+
+.search-container input:focus {
+  border-color: var(--brand-pink) !important;
+  transition: border-color 0.3s ease;
+}
+
+.search-container input:focus + .lucide-icon,
+.search-container:focus-within .lucide-icon {
+  color: var(--brand-pink) !important;
+  transition: color 0.3s ease;
+}
+
+/* 라이트 모드에서 검색 바 포커스 효과는 핫핑크 유지 */
+[data-theme="light"] .search-container input:focus {
+  border-color: var(--brand-pink) !important;
+}
+
+[data-theme="light"] .search-container input:focus + .lucide-icon,
+[data-theme="light"] .search-container:focus-within .lucide-icon {
+  color: var(--brand-pink) !important;
+}
+
+/* 알림 버튼 호버/선택 효과 */
+.notification-button:hover .lucide-icon {
+  color: var(--hover-cyan) !important;
+  transition: color 0.3s ease;
+}
+
+.notification-button:hover .notification-dot {
+  background-color: var(--hover-cyan) !important;
+  transition: background-color 0.3s ease;
+}
+
+/* 알림 페이지에서 호버 효과 비활성화 - 핫핑크 상태 유지 */
+.notification-button .text-brand-pink:hover {
+  color: var(--brand-pink) !important;
+}
+
+/* 알림 페이지에서 벨 아이콘 호버 효과 완전 제거 */
+.notification-button:has(.text-brand-pink):hover .lucide-icon {
+  color: var(--brand-pink) !important;
+}
+
+/* 라이트모드에서 알림 버튼 호버 효과 (핫핑크 상태가 아닐 때만) */
+[data-theme="light"] .notification-button:hover .lucide-icon:not(.text-brand-pink) {
+  color: var(--hover-cyan) !important;
+}
+
+/* 라이트모드에서 알림 페이지 호버 효과 제거 */
+[data-theme="light"] .notification-button:has(.text-brand-pink):hover .lucide-icon {
+  color: var(--brand-pink) !important;
+}
+
+/* 알림 페이지에서 핫핑크 점 숨김은 이미 조건부 렌더링으로 처리됨 */
+
+/* 테마 토글 호버/선택 효과 */
+.theme-toggle-button:hover .lucide-icon {
+  color: var(--hover-cyan) !important;
+  transition: color 0.3s ease;
+}
+
+.theme-toggle-button:active .lucide-icon {
+  color: var(--brand-pink) !important;
+  transition: color 0.1s ease;
+}
+
+/* 현재 data-theme에 맞춰 브라우저 기본 위젯 색 힌트 */
+:root[data-theme="dark"] { color-scheme: dark; }
+:root[data-theme="light"] { color-scheme: light; }
+
+/* 검색창 상태별 스타일링 - 강제 적용 */
+.group .lucide-search,
+.group .lucide-filter {
+  transition: color 0.3s ease !important;
+}
+
+/* 기본 상태 */
+.group .lucide-search,
+.group .lucide-filter {
+  color: var(--text-base) !important;
+}
+
+.group input,
+.group select {
+  border-color: var(--border-subtle) !important;
+  transition: border-color 0.3s ease !important;
+}
+
+/* 호버 상태 (포커스가 아닐 때만) */
+.group:hover:not(:focus-within) .lucide-search,
+.group:hover:not(:focus-within) .lucide-filter {
+  color: var(--hover-cyan) !important;
+}
+
+.group:hover:not(:focus-within) input,
+.group:hover:not(:focus-within) select {
+  border-color: var(--hover-cyan) !important;
+}
+
+/* 포커스 상태 */
+.group:focus-within .lucide-search,
+.group:focus-within .lucide-filter {
+  color: var(--brand-pink) !important;
+}
+
+.group:focus-within input,
+.group:focus-within select {
+  border-color: var(--brand-pink) !important;
+}
+
+/* 포커스+호버: 포커스가 우선 */
+.group:focus-within:hover .lucide-search,
+.group:focus-within:hover .lucide-filter {
+  color: var(--brand-pink) !important;
+}
+
+/* ============================================================
+   Sugar Rush Admin 레이아웃 보정 (최종 안정 + 안전망 버전)
+   ------------------------------------------------------------
+   해결 내역:
+   ✅ 헤더/메인 우측 끝 완전 정렬
+   ✅ 스크롤바 유무와 무관하게 레이아웃 고정
+   ✅ 메인/사이드바 콘텐츠 헤더 겹침 방지
+   ✅ Chrome, Firefox, Edge, Safari 모두 호환
+   ✅ 선택자 안전망 추가 (클래스명이 다를 경우 대비)
+   
+   적용 범위:
+   - 기존 HTML/Svelte/Tailwind 완전 보존
+   - 기존 디자인 완전 유지
+   - CSS만 추가
+   ============================================================ */
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   1단계: CSS 변수 정의
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+:root {
+  --sbw: 8px;              /* 스크롤바 폭 */
+  --pad-right: 16px;       /* 우측 기본 패딩 */
+  --header-height: 80px;   /* 헤더 높이 (h-20 = 80px) */
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   2단계: 전역 박스 모델 통일
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   3단계: 스크롤 기본 설정
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+html,
+body {
+  overflow-x: hidden;
+}
+
+html {
+  scrollbar-gutter: stable; /* 스크롤바 공간 항상 예약 */
+  height: 100%;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   4단계: 구형 브라우저 대응 (IE, Safari 구버전)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+@supports not (scrollbar-gutter: stable) {
+  html {
+    overflow-y: scroll; /* 스크롤바 항상 표시 (레이아웃 고정) */
+  }
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   5단계: 헤더/메인 영역 우측 여백 정렬 + 안전망
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* 기본 선택자: .main-content-area 클래스 */
+header,
+.main-content-area {
+  box-sizing: border-box !important;
+  padding-right: calc(var(--pad-right) + var(--sbw)) !important;
+}
+
+/* 안전망: 다른 메인 래퍼 클래스들도 대비 */
+.page-wrapper,
+.content-wrapper,
+main.main-content,
+[data-main-content] {
+  box-sizing: border-box !important;
+  padding-right: calc(var(--pad-right) + var(--sbw)) !important;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   6단계: 메인 영역 헤더 아래에서 시작 (겹침 방지) + 안전망
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* 기본 선택자 */
+.main-content-area {
+  padding-top: var(--header-height) !important;
+}
+
+/* 안전망: 다른 메인 래퍼들도 대비 */
+.page-wrapper,
+.content-wrapper,
+main.main-content,
+[data-main-content] {
+  padding-top: var(--header-height) !important;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   7단계: 스크롤바 스타일 (시각적 최소화)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+/* Chrome / Edge / Safari */
+*::-webkit-scrollbar {
+  width: var(--sbw);
+  height: var(--sbw);
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 9999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.35);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.35) transparent;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   적용 완료
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */

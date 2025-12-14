@@ -299,7 +299,7 @@
 	}
 </script>
 
-<div class="pt-0 pb-6">
+	<div class="pt-0 pb-6">
 	<div class="max-w-7xl mx-auto">
 		<!-- 헤더 -->
 		<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
@@ -398,7 +398,7 @@
 
 		<!-- 앨범 그리드 -->
 		{#if filteredAndSortedAlbums.length > 0}
-			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+		<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
 				{#each filteredAndSortedAlbums as album (album.id)}
 					<div
 						onclick={() => handleAlbumClick(album.id, album.title)}
@@ -413,12 +413,12 @@
 							}
 						}}
 					>
-						<!-- 앨범 커버 -->
+					<!-- 앨범 커버 -->
 						<div class="relative aspect-square bg-surface-2 overflow-hidden rounded-t-lg">
 							<!-- 기본 이미지 (회색 배경 + 회색 로고) -->
 							<div class="absolute inset-0 flex items-center justify-center bg-surface-2 rounded-t-lg {imageErrorStates.get(album.id) ? '' : (album.cover && album.cover !== '/api/placeholder/300/300' ? 'hidden' : '')}">
 								<Disc3 size={48} class="text-text-muted opacity-30" />
-							</div>
+						</div>
 							<!-- 실제 이미지 (있을 경우) -->
 							{#if album.cover && album.cover !== '/api/placeholder/300/300' && !imageErrorStates.get(album.id)}
 								<img
@@ -433,25 +433,25 @@
 									}}
 								/>
 							{/if}
-							<!-- 플레이 버튼 (호버 시) -->
-							<div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+						<!-- 플레이 버튼 (호버 시) -->
+						<div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
 								<button 
 									onclick={(e) => { e.preventDefault(); e.stopPropagation(); handleAlbumClick(album.id, album.title); }}
 									class="w-12 h-12 bg-brand-pink rounded-full flex items-center justify-center hover:bg-brand-pink/90 transition-colors"
 									aria-label="{album.title} 재생"
 								>
-									<Play size={20} class="text-white ml-1" />
-								</button>
-							</div>
-							<!-- 상태 배지 -->
-							<div class="absolute top-2 right-2">
-								<span class="badge-base {getStatusColor(album.status)} flex-shrink-0 pr-0">
-									{getStatusLabel(album.status)}
-								</span>
-							</div>
+								<Play size={20} class="text-white ml-1" />
+							</button>
 						</div>
+						<!-- 상태 배지 -->
+						<div class="absolute top-2 right-2">
+								<span class="badge-base {getStatusColor(album.status)} flex-shrink-0 pr-0">
+								{getStatusLabel(album.status)}
+							</span>
+						</div>
+					</div>
 
-						<!-- 앨범 정보 -->
+					<!-- 앨범 정보 -->
 						<div class="p-4 relative">
 							<div class="flex items-start justify-between gap-2 mb-0">
 								<h3 class="font-semibold text-text-strong line-clamp-1 flex-1">
@@ -487,7 +487,7 @@
 								{/if}
 								<span class="text-text-muted"> • {album.year}</span>
 							</p>
-							
+						
 							<div class="text-xs text-text-muted mb-4 mt-4 relative">
 								<button 
 									onclick={(e) => { e.preventDefault(); e.stopPropagation(); toggleTrackList(album.id); }}
@@ -549,7 +549,7 @@
 							</div>
 							{/if}
 						</div>
-						
+
 						{#if album.trackList && album.trackList.length === 0}
 							<div class="text-xs text-text-muted/60 mb-4 italic">트랙 정보 없음</div>
 						{/if}
@@ -579,24 +579,24 @@
 										aria-label="편집" 
 										title="편집"
 									>
-										<Edit size={14} class="text-text-muted" />
-									</button>
+									<Edit size={14} class="text-text-muted" />
+								</button>
 									<button 
 										onclick={(e) => { e.preventDefault(); e.stopPropagation(); handleMoreOptions(album.id); }}
 										class="w-8 h-8 inline-flex items-end justify-center rounded-md hover:bg-surface-2 focus-visible:bg-surface-2 transition-colors duration-200 -ml-1 pb-0.5" 
 										aria-label="더보기" 
 										title="더보기"
 									>
-										<MoreVertical size={14} class="text-text-muted" />
-									</button>
-								</div>
+									<MoreVertical size={14} class="text-text-muted" />
+								</button>
 							</div>
 						</div>
 					</div>
-				{/each}
-			</div>
+				</div>
+			{/each}
+		</div>
 		{:else}
-			<!-- 빈 상태 -->
+		<!-- 빈 상태 -->
 			<div class="text-center py-12">
 				<Disc3 size={48} class="text-text-muted mx-auto mb-4" />
 				<h3 class="text-lg font-semibold text-text-strong mb-2">앨범을 찾을 수 없습니다</h3>
