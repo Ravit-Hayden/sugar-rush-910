@@ -93,11 +93,34 @@
 	let formData = $state({
 		title: '',
 		artist: '',
-		year: 2024,
 		status: 'draft',
 		genres: [] as string[],
 		release_date_kr: '' as string, // ISO YYYY-MM-DD
 		release_date_global: '' as string // ISO YYYY-MM-DD
+	});
+
+	// 현재 날짜 정보
+	const currentDate = new Date();
+	const currentYear = currentDate.getFullYear();
+
+	// 발매일에서 연도 자동 계산
+	const releaseYear = $derived.by(() => {
+		// 국내 발매일이 있으면 해당 연도 사용
+		if (formData.release_date_kr) {
+			const date = new Date(formData.release_date_kr);
+			if (!isNaN(date.getTime())) {
+				return date.getFullYear();
+			}
+		}
+		// 국내 발매일이 없고 해외 발매일이 있으면 해외 발매일의 연도 사용
+		if (formData.release_date_global) {
+			const date = new Date(formData.release_date_global);
+			if (!isNaN(date.getTime())) {
+				return date.getFullYear();
+			}
+		}
+		// 둘 다 없으면 현재 연도 사용
+		return currentYear;
 	});
 
 	// 이미지 업로드 상태
@@ -110,16 +133,15 @@
 	let statusDropdownOpen = $state(false);
 	let genreDropdownOpen = $state(false);
 
-	// 앨범 데이터가 변경되면 폼 데이터 업데이트
-	$effect(() => {
-		if (album) {
-			formData.title = album.title;
-			formData.artist = album.artist;
-			formData.year = album.year;
-			formData.status = album.status;
-			formData.genres = (album as any).genres || [];
-			formData.release_date_kr = album.release_date_kr || '';
-			formData.release_date_global = album.release_date_global || '';
+		// 앨범 데이터가 변경되면 폼 데이터 업데이트
+		$effect(() => {
+			if (album) {
+				formData.title = album.title;
+				formData.artist = album.artist;
+				formData.status = album.status;
+				formData.genres = (album as any).genres || [];
+				formData.release_date_kr = album.release_date_kr || '';
+				formData.release_date_global = album.release_date_global || '';
 			// 기존 앨범 커버 이미지가 있으면 미리보기 URL 설정
 			if (album.cover && album.cover !== '/api/placeholder/300/300' && !previewUrl) {
 				previewUrl = album.cover;
@@ -164,23 +186,6 @@
 
 	const statusLabel = $derived(statusOptions.find(o => o.value === formData.status)?.label || '선택하세요');
 
-	// 발매일 변경 시 연도 자동 업데이트
-	$effect(() => {
-		// 국내 발매일이 있으면 해당 연도로 업데이트
-		if (formData.release_date_kr) {
-			const date = new Date(formData.release_date_kr);
-			if (!isNaN(date.getTime())) {
-				formData.year = date.getFullYear();
-			}
-		}
-		// 국내 발매일이 없고 해외 발매일이 있으면 해외 발매일의 연도로 업데이트
-		else if (formData.release_date_global) {
-			const date = new Date(formData.release_date_global);
-			if (!isNaN(date.getTime())) {
-				formData.year = date.getFullYear();
-			}
-		}
-	});
 
 	function handleSubmit() {
 		console.log('앨범 수정:', albumId, $state.snapshot(formData));
@@ -403,55 +408,6 @@
 							class="w-full h-10 px-4 bg-surface-2 border border-border-subtle rounded-lg text-text-base focus:outline-none focus:border-brand-pink focus:ring-0 transition-colors duration-200"
 							placeholder="아티스트 이름을 입력하세요"
 						/>
-					</div>
-
-					<!-- 발매 연도 -->
-					<div class="w-full">
-						<label for="year" class="block text-sm font-medium text-text-strong mb-2">
-							발매 연도 <Asterisk size={12} class="inline text-brand-pink ml-0" />
-						</label>
-						<div class="relative w-full">
-							<input
-								type="number"
-								id="year"
-								name="year"
-								bind:value={formData.year}
-								required
-								min="1900"
-								max="2100"
-								class="w-full h-10 px-4 pr-[2.625rem] bg-surface-2 border border-border-subtle rounded-lg text-text-base focus:outline-none focus:border-brand-pink focus:ring-0 transition-colors duration-200 number-input-custom"
-								placeholder="2024"
-							/>
-							<!-- 오른쪽 아이콘 래퍼: 통일된 패턴 -->
-							<div class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center">
-								<div class="flex flex-col gap-0.5">
-									<button
-										type="button"
-										onclick={(e) => {
-											e.preventDefault();
-											e.stopPropagation();
-											if (formData.year < 2100) formData.year += 1;
-										}}
-										class="pointer-events-auto flex h-4 w-4 items-center justify-center rounded-sm hover:bg-surface-1 transition-colors duration-200"
-										aria-label="연도 증가"
-									>
-										<ChevronUp size={12} class="text-text-muted" />
-									</button>
-									<button
-										type="button"
-										onclick={(e) => {
-											e.preventDefault();
-											e.stopPropagation();
-											if (formData.year > 1900) formData.year -= 1;
-										}}
-										class="pointer-events-auto flex h-4 w-4 items-center justify-center rounded-sm hover:bg-surface-1 transition-colors duration-200"
-										aria-label="연도 감소"
-									>
-										<ChevronDown size={12} class="text-text-muted" />
-									</button>
-								</div>
-							</div>
-						</div>
 					</div>
 
 					<!-- 장르 -->

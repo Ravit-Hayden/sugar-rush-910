@@ -3794,3 +3794,96 @@ button[aria-label="고급 검색"]:focus-visible:hover .lucide-icon {
 .search-clear-button:focus-visible:hover .lucide-icon {
   color: var(--brand-pink) !important;
 }
+
+/* 장르 선택 해제 버튼 */
+.genre-clear-button {
+  color: var(--brand-pink) !important;
+}
+
+/* 호버 효과 */
+.genre-clear-button:hover:not(:focus):not(:focus-visible) {
+  color: var(--hover-cyan) !important;
+}
+
+/* 포커스 효과 */
+.genre-clear-button:focus,
+.genre-clear-button:focus-visible {
+  color: var(--brand-pink) !important;
+  outline: none !important;
+}
+
+/* 포커스+호버 */
+.genre-clear-button:focus:hover,
+.genre-clear-button:focus-visible:hover {
+  color: var(--brand-pink) !important;
+}
+
+/* 아티스트 등록 폼 - 포커스 outline 제거 및 호버/포커스 규칙 */
+#artist-name:focus,
+#artist-description:focus,
+#artist-photo-url:focus,
+#artist-website:focus,
+#artist-email:focus,
+#artist-instagram:focus,
+#artist-twitter:focus,
+#artist-youtube:focus,
+#artist-genre:focus,
+#artist-debut-date:focus,
+#artist-agency:focus,
+#artist-country:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* 아티스트 등록 폼 버튼 - 포커스 outline 제거 */
+button[type="button"]:focus,
+button[type="button"]:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* 아티스트 등록 폼 입력 필드 호버/포커스 규칙 */
+#artist-name:hover:not(:focus):not(:focus-visible),
+#artist-description:hover:not(:focus):not(:focus-visible),
+#artist-photo-url:hover:not(:focus):not(:focus-visible),
+#artist-website:hover:not(:focus):not(:focus-visible),
+#artist-email:hover:not(:focus):not(:focus-visible),
+#artist-instagram:hover:not(:focus):not(:focus-visible),
+#artist-twitter:hover:not(:focus):not(:focus-visible),
+#artist-youtube:hover:not(:focus):not(:focus-visible),
+#artist-genre:hover:not(:focus):not(:focus-visible),
+#artist-debut-date:hover:not(:focus):not(:focus-visible),
+#artist-agency:hover:not(:focus):not(:focus-visible),
+#artist-country:hover:not(:focus):not(:focus-visible) {
+  border-color: var(--hover-cyan) !important;
+}
+
+#artist-name:focus,
+#artist-description:focus,
+#artist-photo-url:focus,
+#artist-website:focus,
+#artist-email:focus,
+#artist-instagram:focus,
+#artist-twitter:focus,
+#artist-youtube:focus,
+#artist-genre:focus,
+#artist-debut-date:focus,
+#artist-agency:focus,
+#artist-country:focus {
+  border-color: var(--brand-pink) !important;
+}
+
+#artist-name:focus:hover,
+#artist-description:focus:hover,
+#artist-photo-url:focus:hover,
+#artist-website:focus:hover,
+#artist-email:focus:hover,
+#artist-instagram:focus:hover,
+#artist-twitter:focus:hover,
+#artist-youtube:focus:hover,
+#artist-genre:focus:hover,
+#artist-debut-date:focus:hover,
+#artist-agency:focus:hover,
+#artist-country:focus:hover {
+  border-color: var(--brand-pink) !important;
+}

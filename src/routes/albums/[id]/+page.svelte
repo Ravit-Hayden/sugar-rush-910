@@ -419,7 +419,24 @@
 	<PageContent>
 		<PageHeader 
 			title={album.title}
-			description="{album.artist} • {album.year}"
+			description="{album.artist} • {(() => {
+				// 국내 발매일이 있으면 해당 연도 사용
+				if (album.release_date_kr) {
+					const date = new Date(album.release_date_kr);
+					if (!isNaN(date.getTime())) {
+						return date.getFullYear();
+					}
+				}
+				// 국내 발매일이 없고 해외 발매일이 있으면 해외 발매일의 연도 사용
+				if (album.release_date_global) {
+					const date = new Date(album.release_date_global);
+					if (!isNaN(date.getTime())) {
+						return date.getFullYear();
+					}
+				}
+				// 둘 다 없으면 앨범의 year 필드 사용 (하위 호환성)
+				return album.year || new Date().getFullYear();
+			})()}"
 			actions={[
 				{
 					icon: Play,
@@ -469,7 +486,24 @@
 								</span>
 							</div>
 							<p class="text-base text-text-muted leading-snug truncate">{album.artist}</p>
-							<p class="text-xs text-text-muted leading-snug">{album.year}</p>
+							<p class="text-xs text-text-muted leading-snug">{(() => {
+								// 국내 발매일이 있으면 해당 연도 사용
+								if (album.release_date_kr) {
+									const date = new Date(album.release_date_kr);
+									if (!isNaN(date.getTime())) {
+										return date.getFullYear();
+									}
+								}
+								// 국내 발매일이 없고 해외 발매일이 있으면 해외 발매일의 연도 사용
+								if (album.release_date_global) {
+									const date = new Date(album.release_date_global);
+									if (!isNaN(date.getTime())) {
+										return date.getFullYear();
+									}
+								}
+								// 둘 다 없으면 앨범의 year 필드 사용 (하위 호환성)
+								return album.year || new Date().getFullYear();
+							})()}</p>
 						</div>
 						
 						<div class="relative more-menu-dropdown -ml-1 flex items-start">

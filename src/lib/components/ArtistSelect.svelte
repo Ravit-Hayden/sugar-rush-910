@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { useClickOutside, useEscapeKey } from '$lib/utils/clickOutside';
 	import { ChevronDown, User, X } from 'lucide-svelte';
-	import { ARTISTS, getArtistNames } from '$lib/constants/artists';
+	import { getArtistNames, getArtistNamesAsync } from '$lib/constants/artists';
 
 	interface Props {
 		value: string;
@@ -24,6 +24,14 @@
 	let containerElement: HTMLDivElement;
 	let focusedIndex = $state(-1); // 키보드 네비게이션용 포커스 인덱스
 	let listElement: HTMLUListElement;
+	let artistNames = $state<string[]>([]);
+
+	// 컴포넌트 마운트 시 아티스트 목록 로드
+	$effect(() => {
+		(async () => {
+			artistNames = await getArtistNamesAsync();
+		})();
+	});
 
 	// value prop이 변경되면 inputValue도 업데이트
 	$effect(() => {
@@ -32,7 +40,6 @@
 
 	// 입력한 텍스트로 아티스트 목록 필터링
 	const filteredArtistNames = $derived.by(() => {
-		const artistNames = getArtistNames();
 		if (!inputValue.trim()) {
 			return artistNames;
 		}

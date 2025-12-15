@@ -32,12 +32,13 @@
 
 	function handleSelect(value: string, event?: MouseEvent | KeyboardEvent) {
 		onSelect(value, event);
-		// 포커스 효과를 보여주기 위해 약간의 지연 후 드롭다운 닫기
+		// 드롭다운 즉시 닫기
+		onToggle();
+		// 클릭한 항목에 포커스 효과를 보여주기 위해 약간의 지연 후 버튼에 포커스 반환
 		if (event && event.currentTarget) {
 			(event.currentTarget as HTMLElement).focus();
 		}
 		setTimeout(() => {
-			onToggle();
 			// 버튼에 포커스 반환
 			if (buttonSelector) {
 				const button = document.querySelector(buttonSelector) as HTMLButtonElement;

@@ -569,17 +569,7 @@
 
 	function selectSort(value: string, event?: MouseEvent | KeyboardEvent) {
 		selectedSort = value;
-		// 클릭한 항목에 포커스 효과를 보여주기 위해 약간의 지연 후 드롭다운 닫기
-		if (event && event.currentTarget) {
-			(event.currentTarget as HTMLElement).focus();
-		}
-		setTimeout(() => {
-			sortDropdownOpen = false;
-			const button = document.querySelector('.sort-dropdown button') as HTMLButtonElement;
-			if (button) {
-				button.focus();
-			}
-		}, 150);
+		// 드롭다운은 SortDropdown 컴포넌트에서 처리
 	}
 
 	function toggleGenreDropdown() {
@@ -595,12 +585,13 @@
 			// 단일 장르 선택 시 다중 선택 초기화
 			selectedGenres = new Set();
 		}
-		// 클릭한 항목에 포커스 효과를 보여주기 위해 약간의 지연 후 드롭다운 닫기
+		// 드롭다운 즉시 닫기
+		genreDropdownOpen = false;
+		// 클릭한 항목에 포커스 효과를 보여주기 위해 약간의 지연 후 버튼에 포커스 반환
 		if (event && event.currentTarget) {
 			(event.currentTarget as HTMLElement).focus();
 		}
 		setTimeout(() => {
-			genreDropdownOpen = false;
 			const button = document.querySelector('.genre-filter-dropdown button') as HTMLButtonElement;
 			if (button) {
 				button.focus();
@@ -614,17 +605,7 @@
 
 	function selectStatusOption(value: string, event?: MouseEvent | KeyboardEvent) {
 		selectedStatus = value;
-		// 클릭한 항목에 포커스 효과를 보여주기 위해 약간의 지연 후 드롭다운 닫기
-		if (event && event.currentTarget) {
-			(event.currentTarget as HTMLElement).focus();
-		}
-		setTimeout(() => {
-			statusDropdownOpen = false;
-			const button = document.querySelector('.status-filter-dropdown button') as HTMLButtonElement;
-			if (button) {
-				button.focus();
-			}
-		}, 150);
+		// 드롭다운은 StatusDropdown 컴포넌트에서 처리
 	}
 
 	function handleCreateTrack() {
@@ -1014,7 +995,7 @@
 		{/if}
 		
 		<!-- 결과 개수 표시 -->
-		<div class="mt-3 text-xs text-text-muted" aria-live="polite" aria-atomic="true" id="search-results-count">
+		<div class="mt-8 text-xs text-text-muted" aria-live="polite" aria-atomic="true" id="search-results-count">
 			{#if searchQuery.trim() || selectedGenre !== 'all' || selectedStatus !== 'all' || selectedGenres.size > 0 || playsMin || playsMax || likesMin || likesMax}
 				검색 결과: <span class="text-hover-cyan font-medium">{filteredAndSortedTracks.length}</span>개
 				{#if filteredAndSortedTracks.length !== tracks.length}

@@ -76,7 +76,20 @@
 		<div class="space-y-4">
 			<!-- 여러 장르 선택 -->
 			<div>
-				<label class="block text-xs font-medium text-text-muted mb-2">장르 (여러 개 선택 가능)</label>
+				<div class="flex items-center justify-between mb-2">
+					<label class="block text-xs font-medium text-text-muted">장르 (여러 개 선택 가능)</label>
+					{#if selectedGenres.size > 0}
+						<div class="flex items-center gap-3">
+							<span class="text-xs text-hover-cyan font-medium">{selectedGenres.size}개 선택됨</span>
+							<button
+								onclick={onGenreClear}
+								class="genre-clear-button text-xs text-brand-pink hover:text-hover-cyan focus:text-brand-pink transition-colors duration-200 font-semibold"
+							>
+								선택 해제
+							</button>
+						</div>
+					{/if}
+				</div>
 				<div class="max-h-48 overflow-y-auto custom-list-scrollbar border border-border-subtle rounded-md p-2">
 					<div class="flex flex-wrap gap-2">
 						{#each GENRES as genre}
@@ -90,14 +103,6 @@
 						{/each}
 					</div>
 				</div>
-				{#if selectedGenres.size > 0}
-					<button
-						onclick={onGenreClear}
-						class="mt-2 text-xs text-text-muted hover:text-text-base transition-colors"
-					>
-						선택 해제
-					</button>
-				{/if}
 			</div>
 			
 			<!-- 통계 범위 -->

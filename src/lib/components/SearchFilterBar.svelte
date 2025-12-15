@@ -64,7 +64,7 @@
 			placeholder={searchPlaceholder}
 			bind:this={searchInput}
 			bind:value={searchQuery}
-			on:input={(e) => onSearchChange((e.target as HTMLInputElement).value)}
+			oninput={(e) => onSearchChange((e.target as HTMLInputElement).value)}
 			aria-label="검색"
 			class="w-full pl-10 {searchQuery.trim() ? 'pr-10' : 'pr-4'} py-1.5 bg-surface-1 border border-border-subtle border-[1px] rounded-md text-text-base placeholder-text-muted focus:outline-none focus:ring-0 transition-colors duration-200"
 		/>
@@ -89,7 +89,7 @@
 				aria-haspopup="listbox"
 				aria-expanded={dropdownOpen}
 				class="flex items-center pl-10 pr-8 py-1.5 w-full sm:w-auto sm:min-w-[140px] bg-surface-1 rounded-[6px] text-text-base transition-all duration-200 cursor-pointer border focus:outline-none"
-				on:click={toggleDropdown}
+				onclick={toggleDropdown}
 				tabindex="0"
 			>
 				<!-- 필터 아이콘 -->
@@ -121,8 +121,8 @@
 									role="option"
 									aria-selected={selectedFilter === opt.value}
 									tabindex="0"
-									on:click={() => selectOption(opt.value)}
-									on:keydown={(e) => {
+									onclick={() => selectOption(opt.value)}
+									onkeydown={(e) => {
 										if (e.key === 'Enter' || e.key === ' ') {
 											e.preventDefault();
 											selectOption(opt.value);
@@ -145,8 +145,8 @@
 									role="option"
 									aria-selected={selectedFilter === opt.value}
 									tabindex="0"
-									on:click={() => selectOption(opt.value)}
-									on:keydown={(e) => {
+									onclick={() => selectOption(opt.value)}
+									onkeydown={(e) => {
 										if (e.key === 'Enter' || e.key === ' ') {
 											e.preventDefault();
 											selectOption(opt.value);
@@ -164,8 +164,8 @@
 							role="option"
 							aria-selected={selectedFilter === opt.value}
 							tabindex="0"
-							on:click={() => selectOption(opt.value)}
-							on:keydown={(e) => {
+							onclick={() => selectOption(opt.value)}
+							onkeydown={(e) => {
 								if (e.key === 'Enter' || e.key === ' ') {
 									e.preventDefault();
 									selectOption(opt.value);

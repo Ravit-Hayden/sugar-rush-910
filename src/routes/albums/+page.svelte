@@ -622,6 +622,10 @@
 
 
 	function toggleSortDropdown() {
+		// 다른 드롭다운 닫기
+		if (filterDropdownOpen) {
+			filterDropdownOpen = false;
+		}
 		sortDropdownOpen = !sortDropdownOpen;
 	}
 
@@ -718,6 +722,72 @@
 		};
 	});
 
+	// 외부 클릭 시 정렬 드롭다운 닫기
+	$effect(() => {
+		if (!sortDropdownOpen) return;
+
+		function handleClickOutside(event: MouseEvent) {
+			const target = event.target as HTMLElement;
+			// 정렬 드롭다운 내부를 클릭한 경우는 무시
+			if (target.closest('.sort-dropdown')) {
+				return;
+			}
+			// 외부 클릭 시 정렬 드롭다운 닫기
+			sortDropdownOpen = false;
+		}
+
+		const timeoutId = setTimeout(() => {
+			document.addEventListener('click', handleClickOutside, true);
+		}, 0);
+
+		return () => {
+			clearTimeout(timeoutId);
+			document.removeEventListener('click', handleClickOutside, true);
+		};
+	});
+
+	// 외부 클릭 시 필터 드롭다운 닫기
+	$effect(() => {
+		if (!filterDropdownOpen) return;
+
+		function handleClickOutside(event: MouseEvent) {
+			const target = event.target as HTMLElement;
+			// 필터 드롭다운 내부를 클릭한 경우는 무시
+			if (target.closest('.filter-dropdown')) {
+				return;
+			}
+			// 외부 클릭 시 필터 드롭다운 닫기
+			filterDropdownOpen = false;
+		}
+
+		const timeoutId = setTimeout(() => {
+			document.addEventListener('click', handleClickOutside, true);
+		}, 0);
+
+		return () => {
+			clearTimeout(timeoutId);
+			document.removeEventListener('click', handleClickOutside, true);
+		};
+	});
+
+	// Escape 키로 드롭다운 닫기
+	$effect(() => {
+		const anyOpen = sortDropdownOpen || filterDropdownOpen;
+		if (!anyOpen) return;
+
+		function handleEscape(e: KeyboardEvent) {
+			if (e.key === 'Escape') {
+				sortDropdownOpen = false;
+				filterDropdownOpen = false;
+			}
+		}
+
+		document.addEventListener('keydown', handleEscape);
+		return () => {
+			document.removeEventListener('keydown', handleEscape);
+		};
+	});
+
 	function handlePlayAlbum(albumId: string) {
 		// 앨범 전체 재생 로직
 		console.log('앨범 재생:', albumId);
@@ -766,6 +836,10 @@
 	}
 
 	function toggleFilterDropdown() {
+		// 다른 드롭다운 닫기
+		if (sortDropdownOpen) {
+			sortDropdownOpen = false;
+		}
 		filterDropdownOpen = !filterDropdownOpen;
 	}
 
@@ -1122,7 +1196,24 @@
 							{:else}
 								{album.artist}
 							{/if}
-							<span class="text-text-muted"> • {album.year}</span>
+							<span class="text-text-muted"> • {(() => {
+								// 국내 발매일이 있으면 해당 연도 사용
+								if (album.release_date_kr) {
+									const date = new Date(album.release_date_kr);
+									if (!isNaN(date.getTime())) {
+										return date.getFullYear();
+									}
+								}
+								// 국내 발매일이 없고 해외 발매일이 있으면 해외 발매일의 연도 사용
+								if (album.release_date_global) {
+									const date = new Date(album.release_date_global);
+									if (!isNaN(date.getTime())) {
+										return date.getFullYear();
+									}
+								}
+								// 둘 다 없으면 앨범의 year 필드 사용 (하위 호환성)
+								return album.year || new Date().getFullYear();
+							})()}</span>
 						</p>
 						
 						<div class="text-xs text-text-muted mb-4 mt-4 relative">
