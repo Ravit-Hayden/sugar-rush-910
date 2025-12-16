@@ -79,12 +79,10 @@
 
 	function handleUploadCharacter() {
 		// 캐릭터 업로드 로직
-		console.log('캐릭터 업로드');
 	}
 
 	function handleUploadAsset() {
 		// 에셋 업로드 로직
-		console.log('에셋 업로드');
 	}
 </script>
 

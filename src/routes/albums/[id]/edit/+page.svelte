@@ -188,7 +188,6 @@
 
 
 	function handleSubmit() {
-		console.log('앨범 수정:', albumId, $state.snapshot(formData));
 		// 실제 저장 로직 구현 예정
 		// 저장 후 상세 페이지로 이동
 		goto(`/albums/${albumId}`);

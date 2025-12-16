@@ -648,10 +648,6 @@
 		const wasOpen = selectedAlbumId === albumId;
 		selectedAlbumId = wasOpen ? null : albumId;
 		const album = albums.find(a => a.id === albumId);
-		console.log('트랙 목록 토글:', {
-			albumId,
-			albumTitle: album?.title,
-			isOpen: !wasOpen,
 			trackCount: album?.trackList?.length || 0
 		});
 	}
@@ -790,7 +786,6 @@
 
 	function handlePlayAlbum(albumId: string) {
 		// 앨범 전체 재생 로직
-		console.log('앨범 재생:', albumId);
 		const album = albums.find(a => a.id === albumId);
 		alert(`앨범 재생\n제목: ${album?.title || '알 수 없음'}\nID: ${albumId}\n트랙 수: ${album?.tracks || 0}곡\n\n(재생 기능은 추후 구현 예정)`);
 	}
@@ -807,20 +802,17 @@
 	function handleDelete(albumId: string) {
 		const album = albums.find(a => a.id === albumId);
 		if (confirm(`정말 "${album?.title || '앨범'}" 앨범을 삭제하시겠습니까?`)) {
-			console.log('앨범 삭제:', albumId);
 			// 실제 삭제 로직 구현 예정
 			moreMenuOpenId = null;
 		}
 	}
 
 	function handleDownload(albumId: string) {
-		console.log('앨범 다운로드:', albumId);
 		// 실제 다운로드 로직 구현 예정
 		moreMenuOpenId = null;
 	}
 
 	function handleShare(albumId: string) {
-		console.log('앨범 공유:', albumId);
 		// 실제 공유 로직 구현 예정
 		moreMenuOpenId = null;
 	}

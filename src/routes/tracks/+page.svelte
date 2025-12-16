@@ -625,7 +625,6 @@
 	function handleDownloadAudio(trackId: string) {
 		const track = tracks.find(t => t.id === trackId);
 		// 오디오 다운로드 로직 (추후 구현)
-		console.log('오디오 다운로드:', trackId);
 		toast.add(`${track?.title || '트랙'} 오디오 다운로드를 시작합니다.`, 'success');
 		closeMoreMenu();
 	}
@@ -633,7 +632,6 @@
 	function handleDownloadStems(trackId: string) {
 		const track = tracks.find(t => t.id === trackId);
 		// 스템 다운로드 로직 (추후 구현)
-		console.log('스템 다운로드:', trackId);
 		toast.add(`${track?.title || '트랙'} 스템 다운로드를 시작합니다.`, 'success');
 		closeMoreMenu();
 	}
@@ -641,7 +639,6 @@
 	function handleAssignMember(trackId: string) {
 		const track = tracks.find(t => t.id === trackId);
 		// 멤버 배정 로직 (추후 구현)
-		console.log('멤버 배정:', trackId);
 		toast.add(`${track?.title || '트랙'} 멤버 배정 기능은 곧 제공될 예정입니다.`, 'warning');
 		closeMoreMenu();
 	}
@@ -660,7 +657,6 @@
 		const track = tracks.find(t => t.id === trackId);
 		// 삭제 확인 및 로직 (추후 구현)
 		if (confirm(`정말 "${track?.title || '트랙'}" 트랙을 삭제하시겠습니까?`)) {
-			console.log('삭제:', trackId);
 			toast.add(`${track?.title || '트랙'}이(가) 삭제되었습니다.`, 'success');
 			closeMoreMenu();
 		}
@@ -710,7 +706,6 @@
 		const count = selectedTrackIds.size;
 		if (confirm(`선택한 ${count}개의 트랙을 삭제하시겠습니까?`)) {
 			// 실제 삭제 로직 (추후 구현)
-			console.log('일괄 삭제:', Array.from(selectedTrackIds));
 			toast.add(`${count}개의 트랙이 삭제되었습니다.`, 'success');
 			selectedTrackIds = new Set();
 			bulkActionMenuOpen = false;
@@ -722,7 +717,6 @@
 		const count = selectedTrackIds.size;
 		const statusLabel = statusFilterOptions.find(opt => opt.value === newStatus)?.label || newStatus;
 		// 실제 상태 변경 로직 (추후 구현)
-		console.log('일괄 상태 변경:', Array.from(selectedTrackIds), newStatus);
 		toast.add(`${count}개의 트랙 상태가 "${statusLabel}"로 변경되었습니다.`, 'success');
 		selectedTrackIds = new Set();
 		bulkActionMenuOpen = false;
@@ -732,7 +726,6 @@
 		if (selectedTrackIds.size === 0) return;
 		const count = selectedTrackIds.size;
 		// 실제 멤버 배정 로직 (추후 구현)
-		console.log('일괄 멤버 배정:', Array.from(selectedTrackIds));
 		toast.add(`${count}개의 트랙 멤버 배정 기능은 곧 제공될 예정입니다.`, 'warning');
 		bulkActionMenuOpen = false;
 	}
@@ -741,7 +734,6 @@
 		if (selectedTrackIds.size === 0) return;
 		const count = selectedTrackIds.size;
 		// 실제 다운로드 로직 (추후 구현)
-		console.log('일괄 다운로드:', Array.from(selectedTrackIds));
 		toast.add(`${count}개의 트랙 다운로드를 시작합니다.`, 'success');
 		bulkActionMenuOpen = false;
 	}
