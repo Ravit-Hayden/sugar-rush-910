@@ -1,10 +1,9 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import { Search, Bell, X } from 'lucide-svelte';
 	import ThemeToggle from './ThemeToggle.svelte';
 
-	let sidebarWidth = 72; // 기본값: 축소 상태
+	let sidebarWidth = $state(72); // 기본값: 축소 상태
 	let searchInput: HTMLInputElement;
 	let searchValue = $state('');
 
@@ -24,28 +23,44 @@
 		{ href: '/settings', label: '설정' }
 	];
 
-	// 현재 페이지 제목 가져오기
-	function getCurrentPageTitle(): string {
-		const currentPath = $page.url.pathname;
-		const exactMatch = menuItems.find(item => item.href === currentPath);
+	// 현재 페이지 제목 가져오기 (함수로 변경)
+	function getPageTitle(pathname: string): string {
+		const exactMatch = menuItems.find(item => item.href === pathname);
 		if (exactMatch) return exactMatch.label;
 		
 		const partialMatch = menuItems.find(item => 
-			item.href !== '/' && currentPath.startsWith(item.href)
+			item.href !== '/' && pathname.startsWith(item.href)
 		);
 		if (partialMatch) return partialMatch.label;
 		
 		return '대시보드';
 	}
 
-	onMount(() => {
+	// 사이드바 너비 변경 이벤트 처리
+	$effect(() => {
+		if (typeof window === 'undefined') {
+			return () => {}; // SSR 시 빈 cleanup 함수 반환
+		}
+
 		const handleSidebarWidthChange = (event: CustomEvent) => {
 			sidebarWidth = event.detail.width;
 		};
 
 		window.addEventListener('sidebar-width-change', handleSidebarWidthChange as EventListener);
 
-		// 키보드 단축키: Ctrl+K 또는 Cmd+K로 검색창 포커스
+		return () => {
+			if (typeof window !== 'undefined') {
+				window.removeEventListener('sidebar-width-change', handleSidebarWidthChange as EventListener);
+			}
+		};
+	});
+
+	// 키보드 단축키: Ctrl+K 또는 Cmd+K로 검색창 포커스
+	$effect(() => {
+		if (typeof window === 'undefined') {
+			return () => {}; // SSR 시 빈 cleanup 함수 반환
+		}
+
 		function handleKeyDown(e: KeyboardEvent) {
 			// Ctrl+K (Windows/Linux) 또는 Cmd+K (Mac)
 			if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
@@ -64,7 +79,6 @@
 		document.addEventListener('keydown', handleKeyDown);
 
 		return () => {
-			window.removeEventListener('sidebar-width-change', handleSidebarWidthChange as EventListener);
 			document.removeEventListener('keydown', handleKeyDown);
 		};
 	});
@@ -76,7 +90,7 @@
 		<div class="flex items-center gap-4">
 			<div class="hidden md:flex items-center flex-shrink-0">
 				<h2 class="text-sm sm:text-base font-semibold truncate" style="color: var(--brand-pink);">
-					{getCurrentPageTitle()}
+					{getPageTitle($page.url.pathname)}
 				</h2>
 			</div>
 		</div>

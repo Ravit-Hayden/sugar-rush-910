@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
+	import { browser } from '$app/environment';
 	import {
 		LayoutGrid, Disc3, Music, FolderOpen, Heart, Rocket,
 		DollarSign, Calendar, MessageSquare, Shield, Settings,
@@ -13,6 +13,7 @@
 	let sidebarToggleHovered = $state(false);
 	let sidebarToggleClicked = $state(false);
 	let isMobile = $state(false); // 모바일 화면 크기 추적
+	let mounted = $state(false); // 마운트 상태 추적
 
 	// 화면 크기 감지 함수
 	function checkScreenSize() {
@@ -105,16 +106,19 @@
 	}
 
 	// 컴포넌트 마운트 시 초기화
-	onMount(() => {
+	$effect(() => {
+		if (!browser) return;
+		
+		// 마운트됨으로 표시
+		mounted = true;
+		
 		// 초기 화면 크기 확인
 		checkScreenSize();
 		
 		// 초기 사이드바 상태를 헤더에 알림
-		if (typeof window !== 'undefined') {
-			window.dispatchEvent(new CustomEvent('sidebar-width-change', {
-				detail: { width: sidebarCollapsed ? 72 : 250 }
-			}));
-		}
+		window.dispatchEvent(new CustomEvent('sidebar-width-change', {
+			detail: { width: sidebarCollapsed ? 72 : 250 }
+		}));
 		
 		// 리사이즈 이벤트 리스너
 		const handleResize = () => {
@@ -122,7 +126,7 @@
 		};
 		
 		// ui.js에서 발생하는 사이드바 토글 이벤트 수신
-		const handleSidebarToggle = (event: CustomEvent) => {
+		const handleSidebarToggleEvent = (event: CustomEvent) => {
 			const newState = event.detail.state;
 			sidebarCollapsed = newState === 'collapsed';
 			
@@ -132,16 +136,12 @@
 			}));
 		};
 		
-		if (typeof window !== 'undefined') {
-			window.addEventListener('resize', handleResize);
-			window.addEventListener('sidebar-toggle', handleSidebarToggle as EventListener);
-		}
+		window.addEventListener('resize', handleResize);
+		window.addEventListener('sidebar-toggle', handleSidebarToggleEvent as EventListener);
 		
 		return () => {
-			if (typeof window !== 'undefined') {
-				window.removeEventListener('resize', handleResize);
-				window.removeEventListener('sidebar-toggle', handleSidebarToggle as EventListener);
-			}
+			window.removeEventListener('resize', handleResize);
+			window.removeEventListener('sidebar-toggle', handleSidebarToggleEvent as EventListener);
 		};
 	});
 </script>
@@ -155,38 +155,38 @@
 		<nav class="h-full flex flex-col">
 			<!-- 상단 토글 버튼과 로고 -->
 			<div class="flex items-center h-20 border-b border-border-subtle flex-shrink-0 px-6">
-				<!-- 상태 표시 아이콘 (클릭 불가, 호버 효과 완전 차단) -->
-				{#if isMobile}
-					<div class="flex-shrink-0 w-6 h-6 inline-flex items-center justify-center pointer-events-none" style="color: var(--brand-pink) !important;">
-						<PanelsTopLeft 
+				<!-- 상태 표시 아이콘 (모바일) / 토글 버튼 (데스크톱) -->
+				<!-- SSR 시에는 항상 데스크톱 버전을 렌더링하고, 마운트 후 조건부 표시 -->
+				<div class="flex-shrink-0 w-6 h-6 inline-flex items-center justify-center pointer-events-none" 
+					 style="color: var(--brand-pink) !important; display: {mounted && isMobile ? 'flex' : 'none'};">
+					<PanelsTopLeft 
+						size={20} 
+						style="color: var(--brand-pink) !important; pointer-events: none;"
+					/>
+				</div>
+				<!-- 토글 버튼 (클릭 가능) - 모바일이 아닐 때 또는 마운트 전에 표시 -->
+				<button
+					onclick={handleSidebarToggle}
+					onmouseenter={() => sidebarToggleHovered = true}
+					onmouseleave={() => sidebarToggleHovered = false}
+					class="flex-shrink-0 w-6 h-6 inline-flex items-center justify-center rounded-md transition-colors duration-200 ease-in-out focus:outline-none focus:ring-0 cursor-pointer"
+					style="display: {mounted && isMobile ? 'none' : 'flex'};"
+					aria-label="사이드바 토글"
+					type="button"
+					data-action="toggle-sidebar"
+				>
+					{#if sidebarCollapsed}
+						<PanelLeftOpen 
 							size={20} 
-							style="color: var(--brand-pink) !important; pointer-events: none;"
+							class="transition-colors duration-200 ease-in-out {sidebarToggleClicked ? 'text-brand-pink' : sidebarToggleHovered ? 'text-hover-cyan' : 'text-brand-pink'}" 
 						/>
-					</div>
-				{:else}
-					<!-- 토글 버튼 (클릭 가능) -->
-					<button
-						onclick={handleSidebarToggle}
-						onmouseenter={() => sidebarToggleHovered = true}
-						onmouseleave={() => sidebarToggleHovered = false}
-						class="flex-shrink-0 w-6 h-6 inline-flex items-center justify-center rounded-md transition-colors duration-200 ease-in-out focus:outline-none focus:ring-0 cursor-pointer"
-						aria-label="사이드바 토글"
-						type="button"
-						data-action="toggle-sidebar"
-					>
-						{#if sidebarCollapsed}
-							<PanelLeftOpen 
-								size={20} 
-								class="transition-colors duration-200 ease-in-out {sidebarToggleClicked ? 'text-brand-pink' : sidebarToggleHovered ? 'text-hover-cyan' : 'text-brand-pink'}" 
-							/>
-						{:else}
-							<PanelLeftClose 
-								size={20} 
-								class="transition-colors duration-200 ease-in-out {sidebarToggleClicked ? 'text-brand-pink' : sidebarToggleHovered ? 'text-hover-cyan' : 'text-brand-pink'}" 
-							/>
-						{/if}
-					</button>
-				{/if}
+					{:else}
+						<PanelLeftClose 
+							size={20} 
+							class="transition-colors duration-200 ease-in-out {sidebarToggleClicked ? 'text-brand-pink' : sidebarToggleHovered ? 'text-hover-cyan' : 'text-brand-pink'}" 
+						/>
+					{/if}
+				</button>
 				
 				<!-- 로고 -->
 				<div class="sidebar-text-animation ml-3 {sidebarCollapsed ? 'collapsed' : 'expanded'}">

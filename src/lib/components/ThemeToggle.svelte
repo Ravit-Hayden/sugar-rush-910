@@ -1,19 +1,21 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { browser } from '$app/environment';
 	import { Eclipse } from 'lucide-svelte';
 
-	let theme = 'dark';
+	let theme = $state('dark');
+	let mounted = $state(false);
 
-	onMount(() => {
-		if (typeof window !== 'undefined') {
+	$effect(() => {
+		if (browser) {
 			const savedTheme = localStorage.getItem('sr_theme') || 'dark';
 			theme = savedTheme;
 			document.documentElement.setAttribute('data-theme', theme);
+			mounted = true;
 		}
 	});
 
 	function toggleTheme() {
-		if (typeof window !== 'undefined') {
+		if (browser) {
 			theme = theme === 'dark' ? 'light' : 'dark';
 			localStorage.setItem('sr_theme', theme);
 			document.documentElement.setAttribute('data-theme', theme);

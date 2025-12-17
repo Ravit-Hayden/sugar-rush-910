@@ -54,7 +54,7 @@
 	}
 
 	function handleCreateRelease() {
-		console.log('새 발매 생성');
+		// 새 발매 생성 로직
 	}
 
 	const statusOptions = [

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import '../app.css';
 	import Header from '$lib/components/Header.svelte';
 	import Sidebar from '$lib/components/Sidebar.svelte';
@@ -9,13 +8,18 @@
 	let sidebarCollapsed = $state(true); // 기본값: 축소 상태
 	let sidebarOpen = $state(false);
 
-	onMount(() => {
+	// 사이드바 이벤트 처리
+	$effect(() => {
+		if (typeof window === 'undefined') {
+			return () => {}; // SSR 시 빈 cleanup 함수 반환
+		}
+
 		const handleSidebarCollapseChange = (event: CustomEvent) => {
 			sidebarCollapsed = event.detail.collapsed;
 		};
 
 		const handleSidebarToggle = (event: CustomEvent) => {
-			if (typeof window !== 'undefined' && window.innerWidth < 768) {
+			if (window.innerWidth < 768) {
 				sidebarOpen = !sidebarOpen;
 			}
 		};
@@ -26,11 +30,9 @@
 			sidebarCollapsed = newState === 'collapsed';
 		};
 
-		if (typeof window !== 'undefined') {
-			window.addEventListener('sidebar-collapse-change', handleSidebarCollapseChange as EventListener);
-			window.addEventListener('sidebar-toggle', handleSidebarToggle as EventListener);
-			window.addEventListener('sidebar-toggle', handleUISidebarToggle as EventListener);
-		}
+		window.addEventListener('sidebar-collapse-change', handleSidebarCollapseChange as EventListener);
+		window.addEventListener('sidebar-toggle', handleSidebarToggle as EventListener);
+		window.addEventListener('sidebar-toggle', handleUISidebarToggle as EventListener);
 		
 		return () => {
 			if (typeof window !== 'undefined') {
@@ -52,7 +54,7 @@
 	<Sidebar />
 	
 	<main class="main-content-area {sidebarCollapsed ? 'sidebar-collapsed' : 'sidebar-expanded'}">
-		{@render children?.()}
+		{@render children()}
 	</main>
 	
 	<ToastContainer />
