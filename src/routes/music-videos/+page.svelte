@@ -983,14 +983,17 @@
 
 	function handleCreateVideo() {
 		// 뮤직비디오 생성 로직
+		console.log('새 뮤직비디오 생성');
 	}
 
 	function handleCreateCharacter() {
 		// 캐릭터 생성 로직
+		console.log('새 캐릭터 생성');
 	}
 
 	function handleUploadAsset() {
 		// 에셋 업로드 로직
+		console.log('새 에셋 업로드');
 	}
 </script>
 
@@ -1177,9 +1180,10 @@
 								class="character-image-button relative w-16 h-16 bg-surface-2 rounded-lg flex items-center justify-center border border-border-subtle overflow-hidden focus-visible:border-brand-pink transition-colors duration-200"
 								onclick={() => {
 									// 이미지 확대 로직 (이미지가 있을 때만)
-								if (character.image && character.image !== '/api/placeholder/200/200') {
-									// 이미지 확대 모달 열기
-								}
+									if (character.image && character.image !== '/api/placeholder/200/200') {
+										// 이미지 확대 모달 열기
+										console.log('이미지 확대:', character.image);
+									}
 								}}
 								disabled={!character.image || character.image === '/api/placeholder/200/200'}
 							>

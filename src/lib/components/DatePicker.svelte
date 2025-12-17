@@ -259,7 +259,7 @@
           viewDate = new Date(value);
         }
       }}
-      class="w-full h-10 px-4 {inputValue.trim() ? 'pr-20' : 'pr-[2.625rem]'} bg-surface-2 border border-border-subtle rounded-lg text-text-base focus:outline-none focus:ring-0 transition-colors duration-200 datepicker-input"
+      class="w-full h-10 px-4 {inputValue.trim() ? 'pr-[2.625rem]' : 'pr-[2.625rem]'} bg-surface-2 border border-border-subtle rounded-lg text-base text-text-base placeholder:text-text-muted focus:outline-none focus:border-brand-pink focus:ring-0 transition-colors duration-200 datepicker-input"
       tabindex="0"
     />
     
@@ -288,7 +288,8 @@
     <button 
       type="button" 
       onclick={(e) => {
-        toggleCalendar(e);
+        e.stopPropagation();
+        toggleCalendar();
       }}
       onkeydown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
@@ -296,11 +297,13 @@
           toggleCalendar();
         }
       }}
-      class="absolute inset-y-0 right-2.5 flex items-center justify-center text-text-muted transition-colors duration-200 datepicker-icon pointer-events-auto bg-transparent hover:bg-transparent focus:bg-transparent focus-visible:bg-transparent" 
+      class="absolute inset-y-0 right-2.5 flex items-center pointer-events-auto bg-transparent hover:bg-transparent focus:bg-transparent focus-visible:bg-transparent" 
       aria-label="캘린더 열기"
       aria-expanded={isOpen}
     >
-      <Calendar size={16} />
+      <span class="flex h-4 w-4 items-center justify-center">
+        <Calendar size={16} class="lucide-icon text-text-muted transition-colors duration-200" />
+      </span>
     </button>
   </div>
 

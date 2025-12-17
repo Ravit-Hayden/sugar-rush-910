@@ -122,7 +122,6 @@
 				artist: formData.artist.trim(),
 				genres: formData.genres,
 				status: formData.status,
-				year: releaseYear, // 발매일에서 자동 계산된 연도
 				release_date_kr: formData.release_date_kr || null,
 				release_date_global: formData.release_date_global || null,
 				cover_url: null // 이미지 업로드는 향후 구현
@@ -332,27 +331,15 @@
 					<label for="title" class="block text-sm font-medium text-text-strong mb-2">
 						앨범 제목 <Asterisk size={12} class="inline text-brand-pink ml-0" />
 					</label>
-					<div class="relative">
-						<input
-							type="text"
-							id="title"
-							name="title"
-							bind:value={formData.title}
-							required
-							class="w-full h-10 px-4 {formData.title.trim() ? 'pr-10' : 'pr-4'} bg-surface-2 border border-border-subtle rounded-lg text-text-base focus:outline-none focus:border-brand-pink focus:ring-0 transition-colors duration-200"
-							placeholder="앨범 제목을 입력하세요"
-						/>
-						{#if formData.title.trim()}
-							<button
-								type="button"
-								onclick={() => formData.title = ''}
-								class="absolute inset-y-0 right-2 flex items-center pointer-events-auto bg-transparent hover:bg-transparent focus:bg-transparent focus-visible:bg-transparent"
-								aria-label="입력 내용 지우기"
-							>
-								<X size={16} class="lucide-icon text-text-muted hover:text-text-base transition-colors duration-200" />
-							</button>
-						{/if}
-					</div>
+					<input
+						type="text"
+						id="title"
+						name="title"
+						bind:value={formData.title}
+						required
+						class="w-full h-10 px-4 bg-surface-2 border border-border-subtle rounded-lg text-text-base focus:outline-none focus:border-brand-pink focus:ring-0 transition-colors duration-200"
+						placeholder="앨범 제목을 입력하세요"
+					/>
 				</div>
 
 				<!-- 아티스트 -->

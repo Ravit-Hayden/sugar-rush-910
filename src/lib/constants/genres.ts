@@ -48,8 +48,7 @@ export const GENRES = [
 	'Techno',
 	'Trap',
 	'Trance',
-	'World',
-	'기타'
+	'World'
 ] as const;
 
 /**

@@ -250,11 +250,11 @@
 	/>
 
 	<!-- 생성 폼 -->
-	<div class="bg-surface-1 rounded-lg border border-border-subtle p-6">
-		<form onsubmit={(e) => { e.preventDefault(); handleSubmit(); }} class="space-y-6">
+	<div class="bg-surface-1 rounded-lg border border-border-subtle overflow-hidden">
+		<form onsubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
 			<!-- 기본 정보 -->
-			<div class="space-y-4">
-				<h3 class="text-lg font-semibold text-text-strong mb-4">기본 정보</h3>
+			<div class="p-6 space-y-4">
+				<h3 class="text-lg font-semibold text-text-strong">기본 정보</h3>
 				
 				<!-- 트랙 제목 -->
 				<div class="w-full">
@@ -270,22 +270,24 @@
 							required
 							aria-invalid={validationErrors.title ? 'true' : 'false'}
 							aria-describedby={validationErrors.title ? 'title-error' : undefined}
-							class="w-full h-10 px-4 {formData.title.trim() ? 'pr-10' : 'pr-4'} bg-surface-2 border {validationErrors.title ? 'border-danger-fg' : 'border-border-subtle'} rounded-lg text-text-base focus:outline-none focus:border-brand-pink focus:ring-0 transition-colors duration-200"
+							class="w-full h-10 px-4 {formData.title.trim() ? 'pr-[2.625rem]' : 'pr-[2.625rem]'} bg-surface-2 border {validationErrors.title ? 'border-danger-fg' : 'border-border-subtle'} rounded-lg text-base text-text-base placeholder:text-text-muted focus:outline-none focus:border-brand-pink focus:ring-0 transition-colors duration-200"
 							placeholder="트랙 제목을 입력하세요"
 						/>
 						{#if formData.title.trim()}
 							<button
 								type="button"
 								onclick={() => formData.title = ''}
-								class="absolute inset-y-0 right-2 flex items-center pointer-events-auto bg-transparent hover:bg-transparent focus:bg-transparent focus-visible:bg-transparent"
+								class="absolute inset-y-0 right-[2.625rem] flex items-center pointer-events-auto bg-transparent hover:bg-transparent focus:bg-transparent focus-visible:bg-transparent"
 								aria-label="입력 내용 지우기"
 							>
-								<X size={16} class="lucide-icon text-text-muted hover:text-text-base transition-colors duration-200" />
+								<span class="flex h-4 w-4 items-center justify-center">
+									<X size={16} class="lucide-icon text-text-muted hover:text-text-base transition-colors duration-200" />
+								</span>
 							</button>
 						{/if}
 					</div>
 					{#if validationErrors.title}
-						<p id="title-error" class="form-error-message" role="alert">
+						<p id="title-error" class="mt-1.5 text-sm text-danger-fg" role="alert">
 							{validationErrors.title}
 						</p>
 					{/if}
@@ -382,7 +384,7 @@
 							allowCustom={true}
 						/>
 						{#if validationErrors.artist}
-							<p id="artist-error" class="form-error-message" role="alert">
+							<p id="artist-error" class="mt-1.5 text-sm text-danger-fg" role="alert">
 								{validationErrors.artist}
 							</p>
 						{/if}
@@ -469,7 +471,7 @@
 									toggleGenreDropdown();
 								}
 							}}
-							class="w-full min-h-10 px-4 pr-10 py-1.5 bg-surface-2 border border-border-subtle rounded-lg text-text-base transition-colors duration-200 flex flex-wrap gap-2 items-center cursor-pointer hover:border-[var(--hover-cyan)] hover:text-[var(--hover-cyan)] focus-within:border-brand-pink focus-within:text-brand-pink focus-within:outline-none focus-within:ring-0"
+							class="w-full min-h-10 px-4 pr-[2.625rem] py-2 bg-surface-2 border border-border-subtle rounded-lg text-base text-text-base transition-colors duration-200 flex flex-wrap gap-2 items-center cursor-pointer hover:border-[var(--hover-cyan)] hover:text-[var(--hover-cyan)] focus-within:border-brand-pink focus-within:text-brand-pink focus-within:outline-none focus-within:ring-0"
 							role="button"
 							aria-haspopup="listbox"
 							aria-expanded={genreDropdownOpen}
@@ -496,8 +498,10 @@
 								{/each}
 							{/if}
 						</div>
-						<div class="pointer-events-none absolute top-3 right-3 flex items-center">
-							<ChevronDownIcon size={16} class="lucide-icon text-text-muted transition-colors duration-200" />
+						<div class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center">
+							<span class="flex h-4 w-4 items-center justify-center">
+								<ChevronDownIcon size={16} class="lucide-icon text-text-muted transition-colors duration-200" />
+							</span>
 						</div>
 						{#if genreDropdownOpen}
 							<ul role="listbox" class="absolute left-0 w-full mt-[6px] bg-surface-1 border rounded-[6px] z-10 border-border-subtle shadow-lg max-h-60 overflow-y-auto">
@@ -538,7 +542,7 @@
 							type="button"
 							id="status"
 							name="status"
-							class="w-full h-10 px-4 pr-[2.625rem] bg-surface-2 border border-border-subtle rounded-lg text-text-base text-left focus:outline-none focus:border-brand-pink focus:ring-0 transition-colors duration-200"
+							class="w-full h-10 px-4 pr-[2.625rem] bg-surface-2 border border-border-subtle rounded-lg text-base text-text-base text-left focus:outline-none focus:border-brand-pink focus:ring-0 transition-colors duration-200"
 							onclick={toggleStatusDropdown}
 							onkeydown={(e) => {
 								if (e.key === 'Enter' || e.key === ' ') {
@@ -581,7 +585,7 @@
 						{/if}
 					</div>
 					{#if validationErrors.status}
-						<p id="status-error" class="form-error-message" role="alert">
+						<p id="status-error" class="mt-1.5 text-sm text-danger-fg" role="alert">
 							{validationErrors.status}
 						</p>
 					{/if}
@@ -589,9 +593,9 @@
 			</div>
 
 			<!-- 발매일 정보 -->
-			<div class="pt-6 border-t border-border-subtle">
-				<div class="space-y-4">
-					<h3 class="text-lg font-semibold text-text-strong mb-4">발매일 정보</h3>
+			<div class="border-t border-border-subtle">
+				<div class="p-6 space-y-4">
+					<h3 class="text-lg font-semibold text-text-strong">발매일 정보</h3>
 					
 					<!-- 국내 발매일 -->
 					<div class="w-full">
@@ -608,7 +612,8 @@
 			</div>
 
 			<!-- 액션 버튼 -->
-			<div class="flex items-center justify-end gap-3 pt-6 border-t border-border-subtle">
+			<div class="border-t border-border-subtle p-6">
+				<div class="flex items-center justify-end gap-3">
 				<button
 					type="button"
 					onclick={handleCancel}
@@ -624,6 +629,7 @@
 				>
 					{isSubmitting ? '생성 중...' : '생성'}
 				</button>
+				</div>
 			</div>
 		</form>
 	</div>

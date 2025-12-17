@@ -370,6 +370,7 @@
 	});
 
 	function handlePlayAlbum() {
+		console.log('앨범 재생:', albumId);
 		// 실제 재생 로직 구현 예정
 	}
 
@@ -379,16 +380,19 @@
 
 	function handleDelete() {
 		if (confirm(`정말 "${album?.title}" 앨범을 삭제하시겠습니까?`)) {
+			console.log('앨범 삭제:', albumId);
 			// 실제 삭제 로직 구현 예정
 			goto('/albums');
 		}
 	}
 
 	function handleDownload() {
+		console.log('앨범 다운로드:', albumId);
 		// 실제 다운로드 로직 구현 예정
 	}
 
 	function handleShare() {
+		console.log('앨범 공유:', albumId);
 		// 실제 공유 로직 구현 예정
 	}
 
@@ -397,6 +401,7 @@
 	}
 
 	function handlePlayTrack(trackId: string, trackTitle: string) {
+		console.log('트랙 재생:', { albumId, trackId, trackTitle });
 		// 실제 재생 로직 구현 예정
 	}
 </script>

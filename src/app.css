@@ -829,52 +829,6 @@ input#year:focus-visible:hover {
   border-color: var(--brand-pink) !important;
 }
 
-/* textarea 요소 포커스 스타일 */
-textarea:focus,
-textarea:focus-visible {
-  outline: none !important;
-  box-shadow: none !important;
-  border-color: var(--brand-pink) !important;
-}
-
-/* textarea 요소 호버 효과 (포커스가 아닐 때만) */
-textarea:hover:not(:focus):not(:focus-visible) {
-  border-color: var(--hover-cyan) !important;
-}
-
-/* textarea 요소 포커스 시 호버 효과 무시 (포커스가 우선) */
-textarea:focus:hover,
-textarea:focus-visible:hover,
-textarea:focus:hover:focus,
-textarea:focus-visible:hover:focus-visible {
-  outline: none !important;
-  box-shadow: none !important;
-  border-color: var(--brand-pink) !important;
-}
-
-/* select 요소 포커스 스타일 */
-select:focus,
-select:focus-visible {
-  outline: none !important;
-  box-shadow: none !important;
-  border-color: var(--brand-pink) !important;
-}
-
-/* select 요소 호버 효과 (포커스가 아닐 때만) */
-select:hover:not(:focus):not(:focus-visible) {
-  border-color: var(--hover-cyan) !important;
-}
-
-/* select 요소 포커스 시 호버 효과 무시 (포커스가 우선) */
-select:focus:hover,
-select:focus-visible:hover,
-select:focus:hover:focus,
-select:focus-visible:hover:focus-visible {
-  outline: none !important;
-  box-shadow: none !important;
-  border-color: var(--brand-pink) !important;
-}
-
 /* button 요소 포커스 시 호버 효과 무시 (status 드롭다운 버튼 포함) */
 button:focus:hover,
 button:focus-visible:hover,
@@ -1423,9 +1377,8 @@ input[type="checkbox"]:checked::after {
    ========================= */
 
 /* 카드 호버 효과 - 메인 영역의 카드/패널에만 적용 (라이트/다크 모드 통합) */
-/* 아티스트 관리 카드와 데이터 관리 카드는 제외 */
-main.main-content-area .bg-surface-1:hover:not(.artist-card):not(.data-management-card),
-main.main-content-area .bg-surface-2:hover:not(.artist-card):not(.data-management-card) {
+main.main-content-area .bg-surface-1:hover,
+main.main-content-area .bg-surface-2:hover {
   border-color: var(--hover-cyan) !important;
   transition: border-color 0.2s ease;
 }
@@ -1532,28 +1485,15 @@ a:focus-visible:hover {
   color: var(--brand-pink) !important;
 }
 
-/* 라이트 모드 링크 포커스 효과 */
-[data-theme="light"] a:focus,
-[data-theme="light"] a:focus-visible {
-  color: var(--brand-pink) !important;
-}
-
-[data-theme="light"] a:focus:hover,
-[data-theme="light"] a:focus-visible:hover {
-  color: var(--brand-pink) !important;
-}
-
 /* 버튼 포커스 효과 (배경 없는 텍스트 버튼, 호버보다 우선) */
 button:not([class*="bg-"]):focus,
 button:not([class*="bg-"]):focus-visible {
   color: var(--brand-pink) !important;
-  background-color: transparent !important;
 }
 
 button:not([class*="bg-"]):focus:hover,
 button:not([class*="bg-"]):focus-visible:hover {
   color: var(--brand-pink) !important;
-  background-color: transparent !important;
 }
 
 /* 아이콘 포커스 효과 (호버보다 우선) */
@@ -1820,58 +1760,6 @@ input:focus-visible, button:focus-visible {
   border-color: var(--brand-pink) !important;
 }
 
-/* ============================================================
-   DatePicker 포커스/호버 규칙 (아이콘과 라인 세트 적용)
-   ============================================================ */
-
-/* DatePicker 호버 효과 (포커스가 아닐 때만) */
-.datepicker-container:hover:not(:focus-within) .datepicker-icon {
-  color: var(--hover-cyan) !important;
-  transition: color 0.3s ease;
-}
-
-.datepicker-container:hover:not(:focus-within) .datepicker-input {
-  border-color: var(--hover-cyan) !important;
-  transition: border-color 0.3s ease;
-}
-
-/* DatePicker 포커스 효과 (호버와 무관하게 항상 적용) */
-.datepicker-container:focus-within .datepicker-input {
-  border-color: var(--brand-pink) !important;
-  transition: border-color 0.3s ease;
-}
-
-.datepicker-container:focus-within .datepicker-icon {
-  color: var(--brand-pink) !important;
-  transition: color 0.3s ease;
-}
-
-/* 포커스+호버: 포커스가 우선 (호버 효과 완전 무시) */
-.datepicker-container:focus-within:hover .datepicker-icon {
-  color: var(--brand-pink) !important;
-}
-
-.datepicker-container:focus-within:hover .datepicker-input {
-  border-color: var(--brand-pink) !important;
-}
-
-/* 라이트 모드에서 DatePicker 포커스 효과는 핫핑크 유지 */
-[data-theme="light"] .datepicker-container:focus-within .datepicker-input {
-  border-color: var(--brand-pink) !important;
-}
-
-[data-theme="light"] .datepicker-container:focus-within .datepicker-icon {
-  color: var(--brand-pink) !important;
-}
-
-[data-theme="light"] .datepicker-container:focus-within:hover .datepicker-icon {
-  color: var(--brand-pink) !important;
-}
-
-[data-theme="light"] .datepicker-container:focus-within:hover .datepicker-input {
-  border-color: var(--brand-pink) !important;
-}
-
 /* 알림 버튼 호버/선택 효과 */
 .notification-button:hover .lucide-icon {
   color: var(--hover-cyan) !important;
@@ -1971,37 +1859,6 @@ input:focus-visible, button:focus-visible {
   border-color: var(--brand-pink) !important;
 }
 
-/* 라이트 모드 group:not(.filter-dropdown) 규칙 */
-[data-theme="light"] .group:not(.filter-dropdown):hover:not(:focus-within) .lucide-search,
-[data-theme="light"] .group:not(.filter-dropdown):hover:not(:focus-within) .lucide-filter {
-  color: var(--hover-cyan) !important;
-}
-
-[data-theme="light"] .group:not(.filter-dropdown):hover:not(:focus-within) input,
-[data-theme="light"] .group:not(.filter-dropdown):hover:not(:focus-within) select {
-  border-color: var(--hover-cyan) !important;
-}
-
-[data-theme="light"] .group:not(.filter-dropdown):focus-within .lucide-search,
-[data-theme="light"] .group:not(.filter-dropdown):focus-within .lucide-filter {
-  color: var(--brand-pink) !important;
-}
-
-[data-theme="light"] .group:not(.filter-dropdown):focus-within input,
-[data-theme="light"] .group:not(.filter-dropdown):focus-within select {
-  border-color: var(--brand-pink) !important;
-}
-
-[data-theme="light"] .group:not(.filter-dropdown):focus-within:hover .lucide-search,
-[data-theme="light"] .group:not(.filter-dropdown):focus-within:hover .lucide-filter {
-  color: var(--brand-pink) !important;
-}
-
-[data-theme="light"] .group:not(.filter-dropdown):focus-within:hover input,
-[data-theme="light"] .group:not(.filter-dropdown):focus-within:hover select {
-  border-color: var(--brand-pink) !important;
-}
-
 /* 편집/더보기 버튼 호버/포커스 효과 (검색창과 동일) */
 .action-button-text,
 .action-button-icon {
@@ -2026,7 +1883,7 @@ input:focus-visible, button:focus-visible {
 .action-button:focus,
 .action-button:focus-visible {
   border-color: var(--brand-pink) !important;
-  background-color: transparent !important;
+  background-color: var(--surface-2) !important;
   transition: border-color 0.3s ease, background-color 0.3s ease;
 }
 
@@ -2044,38 +1901,11 @@ input:focus-visible, button:focus-visible {
   color: var(--hover-cyan) !important;
 }
 
-/* 라이트 모드 액션 버튼 포커스 효과 */
-[data-theme="light"] .action-button:focus,
-[data-theme="light"] .action-button:focus-visible {
-  border-color: var(--brand-pink) !important;
-  background-color: transparent !important;
-}
-
-[data-theme="light"] .action-button:focus .action-button-text,
-[data-theme="light"] .action-button:focus .action-button-icon,
-[data-theme="light"] .action-button:focus-visible .action-button-text,
-[data-theme="light"] .action-button:focus-visible .action-button-icon {
-  color: var(--brand-pink) !important;
-}
-
-[data-theme="light"] .action-button:focus:hover,
-[data-theme="light"] .action-button:focus-visible:hover {
-  border-color: var(--brand-pink) !important;
-  background-color: transparent !important;
-}
-
-[data-theme="light"] .action-button:focus:hover .action-button-text,
-[data-theme="light"] .action-button:focus:hover .action-button-icon,
-[data-theme="light"] .action-button:focus-visible:hover .action-button-text,
-[data-theme="light"] .action-button:focus-visible:hover .action-button-icon {
-  color: var(--brand-pink) !important;
-}
-
 /* 포커스+호버: 포커스가 우선 (호버 효과 완전 무시, 더 구체적인 선택자로 우선순위 확보) */
 .action-button.action-button:focus:hover,
 .action-button.action-button:focus-visible:hover {
   border-color: var(--brand-pink) !important;
-  background-color: transparent !important;
+  background-color: var(--surface-2) !important;
 }
 
 .action-button.action-button:focus:hover .action-button-text,
@@ -2720,13 +2550,11 @@ main.main-content,
 }
 
 .sort-dropdown [role="option"][aria-selected="true"] { background-color: var(--brand-pink) !important; color: #fff !important }
-.sort-dropdown [role="option"]:hover:not([aria-selected="true"]):not(:focus-visible):not(:focus) { background-color: var(--hover-cyan) !important; color: #000 !important }
+.sort-dropdown [role="option"]:hover:not([aria-selected="true"]) { background-color: var(--hover-cyan) !important; color: #000 !important }
 .sort-dropdown [role="option"]:focus-visible:not([aria-selected="true"]) { background-color: var(--brand-pink) !important; color: #fff !important; outline: none }
-.sort-dropdown [role="option"]:focus:not([aria-selected="true"]) { background-color: var(--brand-pink) !important; color: #fff !important; outline: none }
 
-[data-theme="light"] .sort-dropdown [role="option"]:hover:not([aria-selected="true"]):not(:focus-visible):not(:focus) { background-color: var(--hover-cyan) !important; color: var(--surface-2) !important }
+[data-theme="light"] .sort-dropdown [role="option"]:hover:not([aria-selected="true"]) { background-color: var(--hover-cyan) !important; color: var(--surface-2) !important }
 [data-theme="light"] .sort-dropdown [role="option"]:focus-visible:not([aria-selected="true"]) { background-color: var(--brand-pink) !important; color: #fff !important }
-[data-theme="light"] .sort-dropdown [role="option"]:focus:not([aria-selected="true"]) { background-color: var(--brand-pink) !important; color: #fff !important }
 
 .sort-dropdown [role="option"][aria-selected="true"]:hover,
 .sort-dropdown [role="option"][aria-selected="true"]:focus,
@@ -2735,18 +2563,9 @@ main.main-content,
   color: #fff !important;
 }
 
-.sort-dropdown [role="option"]:focus-visible:not([aria-selected="true"]):hover,
-.sort-dropdown [role="option"]:focus:not([aria-selected="true"]):hover {
+.sort-dropdown [role="option"]:focus-visible:not([aria-selected="true"]):hover {
   background-color: var(--brand-pink) !important;
   color: #fff !important;
-  outline: none;
-}
-
-[data-theme="light"] .sort-dropdown [role="option"]:focus-visible:not([aria-selected="true"]):hover,
-[data-theme="light"] .sort-dropdown [role="option"]:focus:not([aria-selected="true"]):hover {
-  background-color: var(--brand-pink) !important;
-  color: #fff !important;
-  outline: none;
 }
 
 .sort-dropdown *:focus,
@@ -3489,7 +3308,7 @@ input[type="number"].number-input-custom + div button:focus-visible .lucide-icon
   color: #000 !important;
 }
 
-[data-theme="light"] .status-dropdown [role="option"]:hover:not([aria-selected="true"]):not(:focus-visible):not(:focus) {
+[data-theme="light"] .status-dropdown [role="option"]:hover:not([aria-selected="true"]) {
   background-color: var(--hover-cyan) !important;
   color: var(--surface-2) !important;
 }
@@ -3505,17 +3324,6 @@ input[type="number"].number-input-custom + div button:focus-visible .lucide-icon
   color: #fff !important;
 }
 
-[data-theme="light"] .status-dropdown [role="option"]:focus:not([aria-selected="true"]) {
-  background-color: var(--brand-pink) !important;
-  color: #fff !important;
-}
-
-.status-dropdown [role="option"]:focus:not([aria-selected="true"]) {
-  background-color: var(--brand-pink) !important;
-  color: #fff !important;
-  outline: none;
-}
-
 .status-dropdown [role="option"][aria-selected="true"]:hover,
 .status-dropdown [role="option"][aria-selected="true"]:focus,
 .status-dropdown [role="option"][aria-selected="true"]:focus-visible {
@@ -3523,18 +3331,9 @@ input[type="number"].number-input-custom + div button:focus-visible .lucide-icon
   color: #fff !important;
 }
 
-.status-dropdown [role="option"]:focus-visible:not([aria-selected="true"]):hover,
-.status-dropdown [role="option"]:focus:not([aria-selected="true"]):hover {
+.status-dropdown [role="option"]:focus-visible:not([aria-selected="true"]):hover {
   background-color: var(--brand-pink) !important;
   color: #fff !important;
-  outline: none;
-}
-
-[data-theme="light"] .status-dropdown [role="option"]:focus-visible:not([aria-selected="true"]):hover,
-[data-theme="light"] .status-dropdown [role="option"]:focus:not([aria-selected="true"]):hover {
-  background-color: var(--brand-pink) !important;
-  color: #fff !important;
-  outline: none;
 }
 
 .status-dropdown *:focus,

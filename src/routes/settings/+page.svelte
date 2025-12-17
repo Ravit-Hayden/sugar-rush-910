@@ -2,12 +2,11 @@
 	import { Settings, User, Bell, Shield, Palette, Database, Music, Plus, X, Upload, Image as ImageIcon, Link as LinkIcon, Edit2, Trash2 } from 'lucide-svelte';
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import PageContent from '$lib/components/PageContent.svelte';
-	import DatePicker from '$lib/components/DatePicker.svelte';
 	import type { Artist } from '../api/artists/+server';
 	import { invalidateArtistsCache } from '$lib/constants/artists';
 
 	let activeTab = $state('general');
-	let settings = $state({
+	let settings = {
 		notifications: {
 			email: true,
 			push: false,
@@ -21,7 +20,7 @@
 			theme: 'dark',
 			language: 'ko'
 		}
-	});
+	};
 
 	// 아티스트 관리
 	let artists: Artist[] = $state([]);
@@ -47,9 +46,6 @@
 	let isDragging = $state(false);
 	let imageInputMethod: 'file' | 'url' = $state('file');
 	let fileInput: HTMLInputElement;
-
-	// 이미지 확대 보기
-	let enlargedImageUrl: string | null = $state(null);
 
 	// 아티스트 목록 로드
 	async function loadArtists() {
@@ -313,10 +309,7 @@
 							class="w-full flex items-center gap-3 px-3 py-2 text-left rounded-md transition-colors duration-200 {activeTab === tab.id ? 'bg-brand-pink text-white' : 'text-text-muted hover:bg-surface-2 hover:text-text-strong'}"
 							type="button"
 						>
-							<IconComponent 
-								size={16} 
-								class={tab.id === 'data' ? 'text-brand-pink' : ''}
-							/>
+							<IconComponent size={16} />
 							<span class="text-sm font-medium">{tab.label}</span>
 						</button>
 					{/each}
@@ -459,7 +452,7 @@
 						</h3>
 						<div class="space-y-6">
 							<!-- 아티스트 관리 -->
-							<div class="bg-surface-2 rounded-lg p-4 border border-border-subtle data-management-card">
+							<div class="bg-surface-2 rounded-lg p-4 border border-border-subtle">
 								<div class="flex items-center justify-between mb-4">
 									<div class="flex items-center gap-2">
 										<Music size={16} class="text-brand-pink" />
@@ -486,54 +479,30 @@
 												
 												<div>
 													<label for="artist-name" class="block text-xs font-medium text-text-strong mb-1.5">아티스트 이름 <span class="text-brand-pink">*</span></label>
-													<div class="relative">
-														<input
-															id="artist-name"
-															type="text"
-															bind:value={newArtistName}
-															placeholder="예: Sugar Rush"
-															class="w-full px-3 {newArtistName.trim() ? 'pr-8' : 'pr-3'} py-1.5 text-sm bg-surface-2 border border-border-subtle rounded-md text-text-strong focus:outline-none transition-colors duration-200"
-															onkeydown={(e) => {
-																if (e.key === 'Escape') resetForm();
-															}}
-														/>
-														{#if newArtistName.trim()}
-															<button
-																type="button"
-																onclick={() => newArtistName = ''}
-																class="absolute inset-y-0 right-2 flex items-center pointer-events-auto bg-transparent hover:bg-transparent focus:bg-transparent focus-visible:bg-transparent"
-																aria-label="입력 내용 지우기"
-															>
-																<X size={16} class="lucide-icon text-text-muted hover:text-text-base transition-colors duration-200" />
-															</button>
-														{/if}
-													</div>
+													<input
+														id="artist-name"
+														type="text"
+														bind:value={newArtistName}
+														placeholder="예: Sugar Rush"
+														class="w-full px-3 py-1.5 text-sm bg-surface-2 border border-border-subtle rounded-md text-text-strong focus:outline-none focus:border-brand-pink transition-colors duration-200"
+														onkeydown={(e) => {
+															if (e.key === 'Escape') resetForm();
+														}}
+													/>
 												</div>
 
 												<div>
 													<label for="artist-description" class="block text-xs font-medium text-text-strong mb-1.5">아티스트 소개</label>
-													<div class="relative">
-														<textarea
-															id="artist-description"
-															bind:value={newArtistDescription}
-															placeholder="아티스트에 대한 상세한 소개를 입력하세요..."
-															rows="4"
-															class="w-full px-3 {newArtistDescription.trim() ? 'pr-8' : 'pr-3'} py-1.5 text-sm bg-surface-2 border border-border-subtle rounded-md text-text-strong focus:outline-none transition-colors duration-200 resize-none"
-															onkeydown={(e) => {
-																if (e.key === 'Escape') resetForm();
-															}}
-														></textarea>
-														{#if newArtistDescription.trim()}
-															<button
-																type="button"
-																onclick={() => newArtistDescription = ''}
-																class="absolute top-2 right-2 flex items-center pointer-events-auto bg-transparent hover:bg-transparent focus:bg-transparent focus-visible:bg-transparent"
-																aria-label="입력 내용 지우기"
-															>
-																<X size={16} class="lucide-icon text-text-muted hover:text-text-base transition-colors duration-200" />
-															</button>
-														{/if}
-													</div>
+													<textarea
+														id="artist-description"
+														bind:value={newArtistDescription}
+														placeholder="아티스트에 대한 상세한 소개를 입력하세요..."
+														rows="4"
+														class="w-full px-3 py-1.5 text-sm bg-surface-2 border border-border-subtle rounded-md text-text-strong focus:outline-none focus:border-brand-pink transition-colors duration-200 resize-none"
+														onkeydown={(e) => {
+															if (e.key === 'Escape') resetForm();
+														}}
+													></textarea>
 												</div>
 											</div>
 
@@ -546,14 +515,14 @@
 													<button
 														type="button"
 														onclick={() => imageInputMethod = 'file'}
-														class="flex-1 px-3 py-1.5 text-xs rounded-md transition-colors duration-200 font-medium {imageInputMethod === 'file' ? 'bg-brand-pink text-white' : 'bg-surface-2 text-text-base hover:text-hover-cyan'}"
+														class="flex-1 px-3 py-1.5 text-xs rounded-md border transition-colors duration-200 font-medium {imageInputMethod === 'file' ? 'bg-brand-pink text-white border-brand-pink' : 'bg-surface-2 text-text-base border-border-subtle hover:border-hover-cyan hover:text-hover-cyan'}"
 													>
 														파일 선택
 													</button>
 													<button
 														type="button"
 														onclick={() => imageInputMethod = 'url'}
-														class="flex-1 px-3 py-1.5 text-xs rounded-md transition-colors duration-200 font-medium {imageInputMethod === 'url' ? 'bg-brand-pink text-white' : 'bg-surface-2 text-text-base hover:text-hover-cyan'}"
+														class="flex-1 px-3 py-1.5 text-xs rounded-md border transition-colors duration-200 font-medium {imageInputMethod === 'url' ? 'bg-brand-pink text-white border-brand-pink' : 'bg-surface-2 text-text-base border-border-subtle hover:border-hover-cyan hover:text-hover-cyan'}"
 													>
 														URL 입력
 													</button>
@@ -562,7 +531,7 @@
 												{#if imageInputMethod === 'file'}
 													<!-- 드래그 앤 드롭 영역 -->
 													<div
-														class="relative border-2 border-dashed rounded-md p-4 transition-colors duration-200 {isDragging ? 'border-brand-pink bg-brand-pink/5' : 'border-border-subtle'}"
+														class="relative border-2 border-dashed rounded-md p-4 transition-colors duration-200 {isDragging ? 'border-brand-pink bg-brand-pink/5' : 'border-border-subtle hover:border-hover-cyan'}"
 														ondragover={handleDragOver}
 														ondragleave={handleDragLeave}
 														ondrop={handleDrop}
@@ -585,7 +554,7 @@
 														/>
 														{#if previewUrl}
 															<div class="relative">
-																<img src={previewUrl} alt="미리보기" class="w-full h-48 object-contain bg-surface-2 rounded-md" />
+																<img src={previewUrl} alt="미리보기" class="w-full h-48 object-cover rounded-md" />
 																<button
 																	type="button"
 																	onclick={(e) => {
@@ -615,34 +584,19 @@
 												{:else}
 													<!-- URL 입력 -->
 													<div>
-														<div class="relative">
-															<input
-																id="artist-photo-url"
-																type="url"
-																bind:value={newArtistPhotoUrl}
-																placeholder="https://example.com/photo.jpg"
-																class="w-full px-3 {newArtistPhotoUrl.trim() ? 'pr-8' : 'pr-3'} py-1.5 text-sm bg-surface-2 border border-border-subtle rounded-md text-text-strong focus:outline-none transition-colors duration-200"
-																onkeydown={(e) => {
-																	if (e.key === 'Escape') resetForm();
-																}}
-															/>
-															{#if newArtistPhotoUrl.trim()}
-																<button
-																	type="button"
-																	onclick={() => {
-																		newArtistPhotoUrl = '';
-																		previewUrl = null;
-																	}}
-																	class="absolute inset-y-0 right-2 flex items-center pointer-events-auto bg-transparent hover:bg-transparent focus:bg-transparent focus-visible:bg-transparent"
-																	aria-label="입력 내용 지우기"
-																>
-																	<X size={16} class="lucide-icon text-text-muted hover:text-text-base transition-colors duration-200" />
-																</button>
-															{/if}
-														</div>
+														<input
+															id="artist-photo-url"
+															type="url"
+															bind:value={newArtistPhotoUrl}
+															placeholder="https://example.com/photo.jpg"
+															class="w-full px-3 py-1.5 text-sm bg-surface-2 border border-border-subtle rounded-md text-text-strong focus:outline-none focus:border-brand-pink transition-colors duration-200"
+															onkeydown={(e) => {
+																if (e.key === 'Escape') resetForm();
+															}}
+														/>
 														{#if newArtistPhotoUrl}
 															<div class="mt-2 relative">
-																<img src={newArtistPhotoUrl} alt="미리보기" class="w-full h-48 object-contain bg-surface-2 rounded-md" onerror={(e) => {
+																<img src={newArtistPhotoUrl} alt="미리보기" class="w-full h-48 object-cover rounded-md" onerror={(e) => {
 																	(e.target as HTMLImageElement).style.display = 'none';
 																}} />
 																<button
@@ -669,53 +623,29 @@
 												<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
 													<div>
 														<label for="artist-website" class="block text-xs font-medium text-text-strong mb-1.5">웹사이트</label>
-														<div class="relative">
-															<input
-																id="artist-website"
-																type="url"
-																bind:value={newArtistWebsite}
-																placeholder="https://example.com"
-																class="w-full px-3 {newArtistWebsite.trim() ? 'pr-8' : 'pr-3'} py-1.5 text-sm bg-surface-2 border border-border-subtle rounded-md text-text-strong focus:outline-none transition-colors duration-200"
-																onkeydown={(e) => {
-																	if (e.key === 'Escape') resetForm();
-																}}
-															/>
-															{#if newArtistWebsite.trim()}
-																<button
-																	type="button"
-																	onclick={() => newArtistWebsite = ''}
-																	class="absolute inset-y-0 right-2 flex items-center pointer-events-auto bg-transparent hover:bg-transparent focus:bg-transparent focus-visible:bg-transparent"
-																	aria-label="입력 내용 지우기"
-																>
-																	<X size={16} class="lucide-icon text-text-muted hover:text-text-base transition-colors duration-200" />
-																</button>
-															{/if}
-														</div>
+														<input
+															id="artist-website"
+															type="url"
+															bind:value={newArtistWebsite}
+															placeholder="https://example.com"
+															class="w-full px-3 py-1.5 text-sm bg-surface-2 border border-border-subtle rounded-md text-text-strong focus:outline-none focus:border-brand-pink transition-colors duration-200"
+															onkeydown={(e) => {
+																if (e.key === 'Escape') resetForm();
+															}}
+														/>
 													</div>
 													<div>
 														<label for="artist-email" class="block text-xs font-medium text-text-strong mb-1.5">이메일</label>
-														<div class="relative">
-															<input
-																id="artist-email"
-																type="email"
-																bind:value={newArtistEmail}
-																placeholder="artist@example.com"
-																class="w-full px-3 {newArtistEmail.trim() ? 'pr-8' : 'pr-3'} py-1.5 text-sm bg-surface-2 border border-border-subtle rounded-md text-text-strong focus:outline-none transition-colors duration-200"
-																onkeydown={(e) => {
-																	if (e.key === 'Escape') resetForm();
-																}}
-															/>
-															{#if newArtistEmail.trim()}
-																<button
-																	type="button"
-																	onclick={() => newArtistEmail = ''}
-																	class="absolute inset-y-0 right-2 flex items-center pointer-events-auto bg-transparent hover:bg-transparent focus:bg-transparent focus-visible:bg-transparent"
-																	aria-label="입력 내용 지우기"
-																>
-																	<X size={16} class="lucide-icon text-text-muted hover:text-text-base transition-colors duration-200" />
-																</button>
-															{/if}
-														</div>
+														<input
+															id="artist-email"
+															type="email"
+															bind:value={newArtistEmail}
+															placeholder="artist@example.com"
+															class="w-full px-3 py-1.5 text-sm bg-surface-2 border border-border-subtle rounded-md text-text-strong focus:outline-none focus:border-brand-pink transition-colors duration-200"
+															onkeydown={(e) => {
+																if (e.key === 'Escape') resetForm();
+															}}
+														/>
 													</div>
 												</div>
 											</div>
@@ -727,78 +657,42 @@
 												<div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
 													<div>
 														<label for="artist-instagram" class="block text-xs font-medium text-text-strong mb-1.5">Instagram</label>
-														<div class="relative">
-															<input
-																id="artist-instagram"
-																type="url"
-																bind:value={newArtistInstagram}
-																placeholder="https://instagram.com/..."
-																class="w-full px-3 {newArtistInstagram.trim() ? 'pr-8' : 'pr-3'} py-1.5 text-sm bg-surface-2 border border-border-subtle rounded-md text-text-strong focus:outline-none transition-colors duration-200"
-																onkeydown={(e) => {
-																	if (e.key === 'Escape') resetForm();
-																}}
-															/>
-															{#if newArtistInstagram.trim()}
-																<button
-																	type="button"
-																	onclick={() => newArtistInstagram = ''}
-																	class="absolute inset-y-0 right-2 flex items-center pointer-events-auto bg-transparent hover:bg-transparent focus:bg-transparent focus-visible:bg-transparent"
-																	aria-label="입력 내용 지우기"
-																>
-																	<X size={16} class="lucide-icon text-text-muted hover:text-text-base transition-colors duration-200" />
-																</button>
-															{/if}
-														</div>
+														<input
+															id="artist-instagram"
+															type="url"
+															bind:value={newArtistInstagram}
+															placeholder="https://instagram.com/..."
+															class="w-full px-3 py-1.5 text-sm bg-surface-2 border border-border-subtle rounded-md text-text-strong focus:outline-none focus:border-brand-pink transition-colors duration-200"
+															onkeydown={(e) => {
+																if (e.key === 'Escape') resetForm();
+															}}
+														/>
 													</div>
 													<div>
 														<label for="artist-twitter" class="block text-xs font-medium text-text-strong mb-1.5">Twitter</label>
-														<div class="relative">
-															<input
-																id="artist-twitter"
-																type="url"
-																bind:value={newArtistTwitter}
-																placeholder="https://twitter.com/..."
-																class="w-full px-3 {newArtistTwitter.trim() ? 'pr-8' : 'pr-3'} py-1.5 text-sm bg-surface-2 border border-border-subtle rounded-md text-text-strong focus:outline-none transition-colors duration-200"
-																onkeydown={(e) => {
-																	if (e.key === 'Escape') resetForm();
-																}}
-															/>
-															{#if newArtistTwitter.trim()}
-																<button
-																	type="button"
-																	onclick={() => newArtistTwitter = ''}
-																	class="absolute inset-y-0 right-2 flex items-center pointer-events-auto bg-transparent hover:bg-transparent focus:bg-transparent focus-visible:bg-transparent"
-																	aria-label="입력 내용 지우기"
-																>
-																	<X size={16} class="lucide-icon text-text-muted hover:text-text-base transition-colors duration-200" />
-																</button>
-															{/if}
-														</div>
+														<input
+															id="artist-twitter"
+															type="url"
+															bind:value={newArtistTwitter}
+															placeholder="https://twitter.com/..."
+															class="w-full px-3 py-1.5 text-sm bg-surface-2 border border-border-subtle rounded-md text-text-strong focus:outline-none focus:border-brand-pink transition-colors duration-200"
+															onkeydown={(e) => {
+																if (e.key === 'Escape') resetForm();
+															}}
+														/>
 													</div>
 													<div>
 														<label for="artist-youtube" class="block text-xs font-medium text-text-strong mb-1.5">YouTube</label>
-														<div class="relative">
-															<input
-																id="artist-youtube"
-																type="url"
-																bind:value={newArtistYoutube}
-																placeholder="https://youtube.com/..."
-																class="w-full px-3 {newArtistYoutube.trim() ? 'pr-8' : 'pr-3'} py-1.5 text-sm bg-surface-2 border border-border-subtle rounded-md text-text-strong focus:outline-none transition-colors duration-200"
-																onkeydown={(e) => {
-																	if (e.key === 'Escape') resetForm();
-																}}
-															/>
-															{#if newArtistYoutube.trim()}
-																<button
-																	type="button"
-																	onclick={() => newArtistYoutube = ''}
-																	class="absolute inset-y-0 right-2 flex items-center pointer-events-auto bg-transparent hover:bg-transparent focus:bg-transparent focus-visible:bg-transparent"
-																	aria-label="입력 내용 지우기"
-																>
-																	<X size={16} class="lucide-icon text-text-muted hover:text-text-base transition-colors duration-200" />
-																</button>
-															{/if}
-														</div>
+														<input
+															id="artist-youtube"
+															type="url"
+															bind:value={newArtistYoutube}
+															placeholder="https://youtube.com/..."
+															class="w-full px-3 py-1.5 text-sm bg-surface-2 border border-border-subtle rounded-md text-text-strong focus:outline-none focus:border-brand-pink transition-colors duration-200"
+															onkeydown={(e) => {
+																if (e.key === 'Escape') resetForm();
+															}}
+														/>
 													</div>
 												</div>
 											</div>
@@ -810,87 +704,54 @@
 												<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
 													<div>
 														<label for="artist-genre" class="block text-xs font-medium text-text-strong mb-1.5">장르</label>
-														<div class="relative">
-															<input
-																id="artist-genre"
-																type="text"
-																bind:value={newArtistGenre}
-																placeholder="예: Pop, R&B, Hip-Hop"
-																class="w-full px-3 {newArtistGenre.trim() ? 'pr-8' : 'pr-3'} py-1.5 text-sm bg-surface-2 border border-border-subtle rounded-md text-text-strong focus:outline-none transition-colors duration-200"
-																onkeydown={(e) => {
-																	if (e.key === 'Escape') resetForm();
-																}}
-															/>
-															{#if newArtistGenre.trim()}
-																<button
-																	type="button"
-																	onclick={() => newArtistGenre = ''}
-																	class="absolute inset-y-0 right-2 flex items-center pointer-events-auto bg-transparent hover:bg-transparent focus:bg-transparent focus-visible:bg-transparent"
-																	aria-label="입력 내용 지우기"
-																>
-																	<X size={16} class="lucide-icon text-text-muted hover:text-text-base transition-colors duration-200" />
-																</button>
-															{/if}
-														</div>
+														<input
+															id="artist-genre"
+															type="text"
+															bind:value={newArtistGenre}
+															placeholder="예: Pop, R&B, Hip-Hop"
+															class="w-full px-3 py-1.5 text-sm bg-surface-2 border border-border-subtle rounded-md text-text-strong focus:outline-none focus:border-brand-pink transition-colors duration-200"
+															onkeydown={(e) => {
+																if (e.key === 'Escape') resetForm();
+															}}
+														/>
 													</div>
 													<div>
 														<label for="artist-debut-date" class="block text-xs font-medium text-text-strong mb-1.5">데뷔일</label>
-														<DatePicker
+														<input
 															id="artist-debut-date"
-															name="artist-debut-date"
+															type="date"
 															bind:value={newArtistDebutDate}
-															placeholder="YYYY. MM. DD."
+															class="w-full px-3 py-1.5 text-sm bg-surface-2 border border-border-subtle rounded-md text-text-strong focus:outline-none focus:border-brand-pink transition-colors duration-200"
+															onkeydown={(e) => {
+																if (e.key === 'Escape') resetForm();
+															}}
 														/>
 													</div>
 													<div>
 														<label for="artist-agency" class="block text-xs font-medium text-text-strong mb-1.5">소속사</label>
-														<div class="relative">
-															<input
-																id="artist-agency"
-																type="text"
-																bind:value={newArtistAgency}
-																placeholder="소속사명"
-																class="w-full px-3 {newArtistAgency.trim() ? 'pr-8' : 'pr-3'} py-1.5 text-sm bg-surface-2 border border-border-subtle rounded-md text-text-strong focus:outline-none transition-colors duration-200"
-																onkeydown={(e) => {
-																	if (e.key === 'Escape') resetForm();
-																}}
-															/>
-															{#if newArtistAgency.trim()}
-																<button
-																	type="button"
-																	onclick={() => newArtistAgency = ''}
-																	class="absolute inset-y-0 right-2 flex items-center pointer-events-auto bg-transparent hover:bg-transparent focus:bg-transparent focus-visible:bg-transparent"
-																	aria-label="입력 내용 지우기"
-																>
-																	<X size={16} class="lucide-icon text-text-muted hover:text-text-base transition-colors duration-200" />
-																</button>
-															{/if}
-														</div>
+														<input
+															id="artist-agency"
+															type="text"
+															bind:value={newArtistAgency}
+															placeholder="소속사명"
+															class="w-full px-3 py-1.5 text-sm bg-surface-2 border border-border-subtle rounded-md text-text-strong focus:outline-none focus:border-brand-pink transition-colors duration-200"
+															onkeydown={(e) => {
+																if (e.key === 'Escape') resetForm();
+															}}
+														/>
 													</div>
 													<div>
 														<label for="artist-country" class="block text-xs font-medium text-text-strong mb-1.5">국가/지역</label>
-														<div class="relative">
-															<input
-																id="artist-country"
-																type="text"
-																bind:value={newArtistCountry}
-																placeholder="예: 대한민국, USA"
-																class="w-full px-3 {newArtistCountry.trim() ? 'pr-8' : 'pr-3'} py-1.5 text-sm bg-surface-2 border border-border-subtle rounded-md text-text-strong focus:outline-none transition-colors duration-200"
-																onkeydown={(e) => {
-																	if (e.key === 'Escape') resetForm();
-																}}
-															/>
-															{#if newArtistCountry.trim()}
-																<button
-																	type="button"
-																	onclick={() => newArtistCountry = ''}
-																	class="absolute inset-y-0 right-2 flex items-center pointer-events-auto bg-transparent hover:bg-transparent focus:bg-transparent focus-visible:bg-transparent"
-																	aria-label="입력 내용 지우기"
-																>
-																	<X size={16} class="lucide-icon text-text-muted hover:text-text-base transition-colors duration-200" />
-																</button>
-															{/if}
-														</div>
+														<input
+															id="artist-country"
+															type="text"
+															bind:value={newArtistCountry}
+															placeholder="예: 대한민국, USA"
+															class="w-full px-3 py-1.5 text-sm bg-surface-2 border border-border-subtle rounded-md text-text-strong focus:outline-none focus:border-brand-pink transition-colors duration-200"
+															onkeydown={(e) => {
+																if (e.key === 'Escape') resetForm();
+															}}
+														/>
 													</div>
 												</div>
 											</div>
@@ -922,27 +783,20 @@
 								{:else if artists.length === 0}
 									<div class="text-sm text-text-muted text-center py-4">등록된 아티스트가 없습니다.</div>
 								{:else}
-									<div class="space-y-3">
+									<div class="space-y-2">
 										{#each artists as artist (artist.id)}
-											<div class="p-3 bg-surface-1 rounded-md border border-border-subtle h-32 flex items-start artist-card">
-												<div class="flex items-start gap-3 w-full">
+											<div class="p-3 bg-surface-1 rounded-md border border-border-subtle">
+												<div class="flex items-start gap-3">
 													{#if artist.photo_url}
-														<button
-															type="button"
-															onclick={() => enlargedImageUrl = artist.photo_url || null}
-															class="w-16 h-16 rounded-md overflow-hidden bg-surface-2 flex-shrink-0 cursor-pointer hover:opacity-90 transition-opacity duration-200 focus:outline-none focus:ring-2 focus:ring-brand-pink focus:ring-offset-2 focus:ring-offset-surface-1"
-															aria-label="이미지 확대"
-														>
-															<img src={artist.photo_url} alt={artist.name} class="w-full h-full object-contain" />
-														</button>
+														<img src={artist.photo_url} alt={artist.name} class="w-16 h-16 rounded-md object-cover flex-shrink-0" />
 													{:else}
-														<div class="w-16 h-16 rounded-md bg-surface-2 flex items-center justify-center flex-shrink-0 pointer-events-none">
+														<div class="w-16 h-16 rounded-md bg-surface-2 flex items-center justify-center flex-shrink-0">
 															<Music size={20} class="text-text-muted" />
 														</div>
 													{/if}
-													<div class="flex-1 min-w-0 h-full flex flex-col">
+													<div class="flex-1 min-w-0">
 														<div class="flex items-center justify-between gap-2 mb-1">
-															<div class="text-sm font-semibold text-text-strong truncate select-none pointer-events-none">{artist.name}</div>
+															<div class="text-sm font-semibold text-text-strong truncate">{artist.name}</div>
 															<div class="flex items-center gap-1.5 flex-shrink-0">
 																<button
 																	onclick={() => startEdit(artist)}
@@ -962,51 +816,49 @@
 																</button>
 															</div>
 														</div>
-														<div class="flex-1 overflow-hidden">
-															{#if artist.description}
-																<div class="text-xs text-text-muted line-clamp-2 select-none pointer-events-none">{artist.description}</div>
+														{#if artist.description}
+															<div class="text-xs text-text-muted mt-1.5 line-clamp-2">{artist.description}</div>
+														{/if}
+														<div class="flex flex-wrap gap-x-4 gap-y-1.5 mt-2.5">
+															{#if artist.genre}
+																<span class="text-xs text-text-muted">장르: {artist.genre}</span>
 															{/if}
-															<div class="flex flex-wrap gap-x-4 gap-y-1.5 mt-1.5">
-																{#if artist.genre}
-																	<span class="text-xs text-text-muted select-none pointer-events-none">장르: {artist.genre}</span>
-																{/if}
-																{#if artist.debut_date}
-																	<span class="text-xs text-text-muted select-none pointer-events-none">데뷔: {artist.debut_date}</span>
-																{/if}
-																{#if artist.agency}
-																	<span class="text-xs text-text-muted select-none pointer-events-none">소속: {artist.agency}</span>
-																{/if}
-																{#if artist.country}
-																	<span class="text-xs text-text-muted select-none pointer-events-none">{artist.country}</span>
-																{/if}
-															</div>
-															<div class="flex flex-wrap gap-x-3 gap-y-1 mt-1.5">
-																{#if artist.website}
-																	<a href={artist.website} target="_blank" rel="noopener noreferrer" class="text-xs text-hover-cyan hover:underline truncate max-w-[200px] focus:outline-none focus:text-brand-pink">
-																		웹사이트
-																	</a>
-																{/if}
-																{#if artist.email}
-																	<a href="mailto:{artist.email}" class="text-xs text-hover-cyan hover:underline truncate max-w-[200px] focus:outline-none focus:text-brand-pink">
-																		{artist.email}
-																	</a>
-																{/if}
-																{#if artist.instagram}
-																	<a href={artist.instagram} target="_blank" rel="noopener noreferrer" class="text-xs text-hover-cyan hover:underline truncate max-w-[200px] focus:outline-none focus:text-brand-pink">
-																		Instagram
-																	</a>
-																{/if}
-																{#if artist.twitter}
-																	<a href={artist.twitter} target="_blank" rel="noopener noreferrer" class="text-xs text-hover-cyan hover:underline truncate max-w-[200px] focus:outline-none focus:text-brand-pink">
-																		Twitter
-																	</a>
-																{/if}
-																{#if artist.youtube}
-																	<a href={artist.youtube} target="_blank" rel="noopener noreferrer" class="text-xs text-hover-cyan hover:underline truncate max-w-[200px] focus:outline-none focus:text-brand-pink">
-																		YouTube
-																	</a>
-																{/if}
-															</div>
+															{#if artist.debut_date}
+																<span class="text-xs text-text-muted">데뷔: {artist.debut_date}</span>
+															{/if}
+															{#if artist.agency}
+																<span class="text-xs text-text-muted">소속: {artist.agency}</span>
+															{/if}
+															{#if artist.country}
+																<span class="text-xs text-text-muted">{artist.country}</span>
+															{/if}
+														</div>
+														<div class="flex flex-wrap gap-x-3 gap-y-1 mt-2">
+															{#if artist.website}
+																<a href={artist.website} target="_blank" rel="noopener noreferrer" class="text-xs text-hover-cyan hover:underline truncate max-w-[200px] focus:outline-none focus:text-brand-pink">
+																	웹사이트
+																</a>
+															{/if}
+															{#if artist.email}
+																<a href="mailto:{artist.email}" class="text-xs text-hover-cyan hover:underline truncate max-w-[200px] focus:outline-none focus:text-brand-pink">
+																	{artist.email}
+																</a>
+															{/if}
+															{#if artist.instagram}
+																<a href={artist.instagram} target="_blank" rel="noopener noreferrer" class="text-xs text-hover-cyan hover:underline truncate max-w-[200px] focus:outline-none focus:text-brand-pink">
+																	Instagram
+																</a>
+															{/if}
+															{#if artist.twitter}
+																<a href={artist.twitter} target="_blank" rel="noopener noreferrer" class="text-xs text-hover-cyan hover:underline truncate max-w-[200px] focus:outline-none focus:text-brand-pink">
+																	Twitter
+																</a>
+															{/if}
+															{#if artist.youtube}
+																<a href={artist.youtube} target="_blank" rel="noopener noreferrer" class="text-xs text-hover-cyan hover:underline truncate max-w-[200px] focus:outline-none focus:text-brand-pink">
+																	YouTube
+																</a>
+															{/if}
 														</div>
 													</div>
 												</div>
@@ -1016,14 +868,14 @@
 								{/if}
 							</div>
 
-							<div class="bg-surface-2 rounded-lg p-4 border border-border-subtle data-management-card">
+							<div class="bg-surface-2 rounded-lg p-4 border border-border-subtle">
 								<h4 class="text-sm font-medium text-text-strong mb-2">데이터 내보내기</h4>
 								<p class="text-xs text-text-muted mb-3">계정 데이터를 JSON 파일로 다운로드할 수 있습니다.</p>
 								<button class="inline-flex items-center gap-2 px-4 py-2 bg-brand-pink text-white rounded-lg hover:bg-brand-pink/90 transition-colors duration-200 font-medium text-sm" type="button">
 									데이터 내보내기
 								</button>
 							</div>
-							<div class="bg-surface-2 rounded-lg p-4 border border-border-subtle data-management-card">
+							<div class="bg-surface-2 rounded-lg p-4 border border-border-subtle">
 								<h4 class="text-sm font-medium text-text-strong mb-2">계정 삭제</h4>
 								<p class="text-xs text-text-muted mb-3">계정과 모든 데이터를 영구적으로 삭제합니다.</p>
 								<button class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors duration-200 text-sm font-medium" type="button">
@@ -1037,38 +889,3 @@
 		</div>
 	</div>
 </PageContent>
-
-<!-- 이미지 확대 모달 -->
-{#if enlargedImageUrl}
-	<div
-		class="fixed inset-0 z-[100] flex items-center justify-center bg-black/90"
-		onclick={() => enlargedImageUrl = null}
-		role="dialog"
-		aria-modal="true"
-		aria-label="이미지 확대 보기"
-		onkeydown={(e) => {
-			if (e.key === 'Escape') {
-				enlargedImageUrl = null;
-			}
-		}}
-		tabindex="-1"
-	>
-		<div class="relative max-w-[90vw] max-h-[90vh] flex flex-col items-end" onclick={(e) => e.stopPropagation()}>
-			<div class="relative">
-				<button
-					type="button"
-					onclick={() => enlargedImageUrl = null}
-					class="absolute -top-10 -right-10 w-10 h-10 flex items-center justify-center bg-black/80 hover:bg-black text-white rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-brand-pink z-10"
-					aria-label="닫기"
-				>
-					<X size={20} />
-				</button>
-				<img
-					src={enlargedImageUrl}
-					alt="확대된 이미지"
-					class="max-w-full max-h-[90vh] object-contain"
-				/>
-			</div>
-		</div>
-	</div>
-{/if}

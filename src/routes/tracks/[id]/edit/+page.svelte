@@ -96,6 +96,7 @@
 	const statusLabel = $derived(statusOptions.find(o => o.value === formData.status)?.label || '선택하세요');
 
 	function handleSubmit() {
+		console.log('트랙 수정:', trackId, $state.snapshot(formData));
 		// 실제 저장 로직 구현 예정
 		// 저장 후 상세 페이지로 이동
 		goto(`/tracks/${trackId}`);

@@ -54,7 +54,7 @@
 	}
 
 	function handleAddEvent() {
-		// 새 일정 추가 로직
+		console.log('새 일정 추가');
 	}
 
 	const typeOptions = [

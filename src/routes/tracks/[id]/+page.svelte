@@ -80,6 +80,7 @@
 	});
 
 	function handlePlay() {
+		console.log('트랙 재생:', trackId);
 		// 실제 재생 로직 구현 예정
 	}
 
@@ -89,6 +90,7 @@
 
 	function handleDelete() {
 		if (confirm(`정말 "${track?.title || '트랙'}" 트랙을 삭제하시겠습니까?`)) {
+			console.log('트랙 삭제:', trackId);
 			// 실제 삭제 로직 구현 예정
 			toast.add(`${track?.title || '트랙'}이(가) 삭제되었습니다.`, 'success');
 			goto('/tracks');
@@ -96,18 +98,21 @@
 	}
 
 	function handleDownloadAudio() {
+		console.log('오디오 다운로드:', trackId);
 		// 실제 다운로드 로직 구현 예정
 		toast.add(`${track?.title || '트랙'} 오디오 다운로드를 시작합니다.`, 'success');
 		moreMenuOpen = false;
 	}
 
 	function handleDownloadStems() {
+		console.log('스템 다운로드:', trackId);
 		// 실제 스템 다운로드 로직 구현 예정
 		toast.add(`${track?.title || '트랙'} 스템 다운로드를 시작합니다.`, 'success');
 		moreMenuOpen = false;
 	}
 
 	function handleAssignMember() {
+		console.log('멤버 배정:', trackId);
 		// 실제 멤버 배정 로직 구현 예정
 		toast.add(`${track?.title || '트랙'} 멤버 배정 기능은 곧 제공될 예정입니다.`, 'warning');
 		moreMenuOpen = false;
