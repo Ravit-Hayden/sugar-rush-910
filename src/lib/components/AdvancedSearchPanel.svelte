@@ -61,7 +61,7 @@
 </script>
 
 {#if open}
-	<div class="advanced-search-panel absolute top-full left-0 right-0 mt-2 p-4 bg-surface-1 border border-border-subtle rounded-lg shadow-lg z-[9999]">
+	<div class="advanced-search-panel absolute top-full left-0 right-0 mt-2 p-4 bg-surface-1 border border-border-subtle rounded-lg z-[9999]">
 		<div class="flex items-center justify-between mb-4">
 			<h3 class="text-sm font-semibold text-text-base">고급 검색</h3>
 			<button

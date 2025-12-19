@@ -112,7 +112,7 @@
 			
 			<!-- 드롭다운 리스트 -->
 			{#if dropdownOpen}
-				<ul role="listbox" class="absolute left-0 w-full mt-[6px] bg-surface-1 border rounded-[6px] z-10 border-border-subtle overflow-hidden shadow-lg">
+				<ul role="listbox" class="absolute left-0 w-full mt-[6px] bg-surface-1 border rounded-[6px] z-10 border-border-subtle overflow-hidden">
 					{#if groupedOptions}
 						<!-- 그룹 없는 옵션들 (맨 위에 표시) -->
 						{#if groupedOptions.ungrouped.length > 0}

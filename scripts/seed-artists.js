@@ -74,3 +74,7 @@ async function seedArtists() {
 // 스크립트 실행
 seedArtists().catch(console.error);
 
+
+
+
+

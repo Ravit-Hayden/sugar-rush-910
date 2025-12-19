@@ -3,24 +3,21 @@
   import { Calendar, ChevronLeft, ChevronRight, X } from 'lucide-svelte';
   import { getHolidayName } from '$lib/utils/holidays';
 
-  interface Props {
-    value?: string; // YYYY-MM-DD
-    placeholder?: string;
-    id?: string;
-    name?: string;
-  }
-
+  // [중요] 외부에서 들어오는 모든 속성(id, name, required, disabled 등)을 받음
   let {
     value = $bindable(''),
     placeholder = 'YYYY. MM. DD.',
-    id = '',
-    name = ''
-  }: Props = $props();
+    id = undefined,
+    name = undefined,
+    class: className = '',
+    ...restProps
+  } = $props();
   
   let isOpen = $state(false);
   let viewDate = $state(new Date());
   let wrapperElement: HTMLDivElement | undefined;
   let inputValue = $state(''); // 직접 입력값
+  let instanceId = $state(Math.random().toString(36).substring(7)); // 고유 인스턴스 ID
 
   // value prop이 변경되면 inputValue도 업데이트
   $effect(() => {
@@ -36,6 +33,22 @@
     if (value && !isNaN(new Date(value).getTime())) {
       viewDate = new Date(value);
     }
+  });
+
+  // 다른 DatePicker가 열릴 때 이 인스턴스 닫기
+  $effect(() => {
+    if (typeof window === 'undefined') return;
+
+    function handleCloseAll(event: CustomEvent) {
+      if (event.detail?.except !== instanceId && isOpen) {
+        isOpen = false;
+      }
+    }
+
+    window.addEventListener('datepicker:close-all', handleCloseAll as EventListener);
+    return () => {
+      window.removeEventListener('datepicker:close-all', handleCloseAll as EventListener);
+    };
   });
 
   const days = $derived(generateCalendar(viewDate));
@@ -136,8 +149,16 @@
   }
 
   function toggleCalendar() {
-    if (!isOpen && value) viewDate = new Date(value);
-    isOpen = !isOpen;
+    if (!isOpen) {
+      // 다른 DatePicker가 열려있으면 모두 닫기
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('datepicker:close-all', { detail: { except: instanceId } }));
+      }
+      if (value) viewDate = new Date(value);
+      isOpen = true;
+    } else {
+      isOpen = false;
+    }
   }
 
   function handleClickOutside(event: MouseEvent) {
@@ -242,73 +263,74 @@
 
 <svelte:window onclick={handleClickOutside} onkeydown={(e) => e.key === 'Escape' && (isOpen = false)} />
 
-<div class="relative w-full datepicker-container" bind:this={wrapperElement}>
-  <div 
-    class="relative w-full"
-  >
-    <input 
-      type="text" 
-      {id} 
-      {name} 
-      {placeholder} 
-      bind:value={inputValue}
-      oninput={handleInputChange}
-      onblur={handleInputBlur}
-      onfocus={() => {
-        if (inputValue && value) {
-          viewDate = new Date(value);
-        }
-      }}
-      class="w-full h-10 px-4 {inputValue.trim() ? 'pr-[2.625rem]' : 'pr-[2.625rem]'} bg-surface-2 border border-border-subtle rounded-lg text-base text-text-base placeholder:text-text-muted focus:outline-none focus:border-brand-pink focus:ring-0 transition-colors duration-200 datepicker-input"
-      tabindex="0"
-    />
+<div class="relative w-full {className}" bind:this={wrapperElement}>
+  <input 
+    type="text" 
+    {id}
+    {name}
+    {placeholder}
+    bind:value={inputValue}
+    oninput={handleInputChange}
+    onblur={handleInputBlur}
+    onfocus={() => {
+      if (inputValue && value) {
+        viewDate = new Date(value);
+      }
+    }}
+    onclick={(e) => {
+      e.stopPropagation();
+      toggleCalendar();
+    }}
+    onkeydown={handleKeydown}
+    class="w-full h-10 px-4 {inputValue.trim() ? 'pr-[4.5rem]' : 'pr-[2.625rem]'} bg-surface-2 border border-border-subtle rounded-lg text-base text-text-base placeholder:text-text-muted hover:border-[var(--hover-cyan)] focus:outline-none focus:border-brand-pink focus:ring-0 transition-colors duration-200 cursor-pointer box-border datepicker-input"
+    {...Object.fromEntries(Object.entries(restProps).filter(([key]) => key !== 'tabindex' && key !== 'list'))}
+  />
     
-    <!-- 클리어 버튼 (입력값이 있을 때만 표시) -->
-    {#if inputValue.trim()}
-      <button
-        type="button"
-        onclick={(e) => {
-          e.stopPropagation();
-          handleClear();
-        }}
-        onkeydown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            handleClear();
-          }
-        }}
-        class="absolute inset-y-0 right-[2.625rem] pr-3 flex items-center pointer-events-auto bg-transparent hover:bg-transparent focus:bg-transparent focus-visible:bg-transparent"
-        aria-label="입력 내용 지우기"
-      >
-        <X size={16} class="lucide-icon text-text-muted hover:text-text-base transition-colors duration-200" />
-      </button>
-    {/if}
-    
-    <!-- 캘린더 버튼 -->
-    <button 
-      type="button" 
-      onclick={(e) => {
-        e.stopPropagation();
-        toggleCalendar();
-      }}
-      onkeydown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          toggleCalendar();
-        }
-      }}
-      class="absolute inset-y-0 right-2.5 flex items-center pointer-events-auto bg-transparent hover:bg-transparent focus:bg-transparent focus-visible:bg-transparent" 
-      aria-label="캘린더 열기"
-      aria-expanded={isOpen}
-    >
-      <span class="flex h-4 w-4 items-center justify-center">
-        <Calendar size={16} class="lucide-icon text-text-muted transition-colors duration-200" />
-      </span>
-    </button>
-  </div>
+              <!-- 클리어 버튼 (입력값이 있을 때만 표시) -->
+              {#if inputValue.trim()}
+                <button
+                  type="button"
+                  onclick={(e) => {
+                    e.stopPropagation();
+                    handleClear();
+                  }}
+                  onkeydown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleClear();
+                    }
+                  }}
+                  class="btn-icon absolute inset-y-0 right-[2.625rem] flex items-center pointer-events-auto"
+                  aria-label="입력 내용 지우기"
+                >
+                  <X size={16} class="lucide-icon text-text-muted" />
+                </button>
+              {/if}
+              
+              <!-- 캘린더 버튼 -->
+              <button 
+                type="button" 
+                onclick={(e) => {
+                  e.stopPropagation();
+                  toggleCalendar();
+                }}
+                onkeydown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    toggleCalendar();
+                  }
+                }}
+                class="btn-icon absolute inset-y-0 right-2.5 flex items-center pointer-events-auto" 
+                aria-label="캘린더 열기"
+                aria-expanded={isOpen}
+              >
+                <span class="flex h-4 w-4 items-center justify-center">
+                  <Calendar size={16} class="lucide-icon text-text-muted" />
+                </span>
+              </button>
 
   {#if isOpen}
-    <div class="calendar-dropdown absolute bottom-full right-0 mb-2 w-[18rem] bg-surface-1 border border-border-subtle rounded-xl shadow-lg p-4 z-50" transition:fade={{ duration: 100 }} onclick={(e) => e.stopPropagation()}>
+    <div class="calendar-dropdown absolute bottom-full right-0 mb-2 w-[18rem] bg-surface-1 border border-border-subtle rounded-xl p-4 z-50" transition:fade={{ duration: 100 }} onclick={(e) => e.stopPropagation()}>
       <div class="flex items-center justify-between mb-4 px-1">
         <button type="button" onclick={(e) => { e.stopPropagation(); changeMonth(-1); }} class="p-1 hover:bg-surface-2 rounded-md text-text-muted"><ChevronLeft size={16} /></button>
         <span class="text-sm font-semibold text-text-strong w-28 text-center tabular-nums">

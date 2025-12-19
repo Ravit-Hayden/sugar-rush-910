@@ -199,9 +199,8 @@
 			onfocus={handleInputFocus}
 			onkeydown={handleInputKeydown}
 			required={required}
-			class="w-full h-10 pl-10 {inputValue.trim() ? 'pr-[2.625rem]' : 'pr-[2.625rem]'} bg-surface-2 border border-border-subtle rounded-lg text-base text-text-base placeholder:text-text-muted focus:outline-none focus:border-brand-pink focus:ring-0 transition-colors duration-200"
+			class="w-full h-10 pl-10 {inputValue.trim() ? 'pr-[2.625rem]' : 'pr-[2.625rem]'} bg-surface-2 border border-border-subtle rounded-lg text-base text-text-base placeholder:text-text-muted hover:border-[var(--hover-cyan)] focus:outline-none focus:border-brand-pink focus:ring-0 transition-colors duration-200"
 			placeholder={placeholder}
-			list="artist-options"
 		/>
 		
 		<!-- 클리어 버튼 (입력값이 있을 때만 표시) -->
@@ -218,11 +217,11 @@
 						handleClear();
 					}
 				}}
-				class="absolute inset-y-0 right-[2.625rem] flex items-center pointer-events-auto bg-transparent hover:bg-transparent focus:bg-transparent focus-visible:bg-transparent"
+				class="btn-icon absolute inset-y-0 right-[2.625rem] flex items-center pointer-events-auto"
 				aria-label="입력 내용 지우기"
 			>
 				<span class="flex h-4 w-4 items-center justify-center">
-					<X size={16} class="lucide-icon text-text-muted hover:text-text-base transition-colors duration-200" />
+					<X size={16} class="lucide-icon text-text-muted" />
 				</span>
 			</button>
 		{/if}
@@ -237,13 +236,13 @@
 					dropdownOpen = !dropdownOpen;
 				}
 			}}
-			class="absolute inset-y-0 right-2.5 flex items-center pointer-events-auto bg-transparent hover:bg-transparent focus:bg-transparent focus-visible:bg-transparent"
+			class="btn-icon absolute inset-y-0 right-2.5 flex items-center pointer-events-auto"
 			aria-label="아티스트 목록 열기"
 			aria-expanded={dropdownOpen}
 			aria-haspopup="listbox"
 		>
 			<span class="flex h-4 w-4 items-center justify-center">
-				<ChevronDown size={16} class="lucide-icon text-text-muted transition-colors duration-200 {dropdownOpen ? 'rotate-180' : ''}" />
+				<ChevronDown size={16} class="lucide-icon text-text-muted {dropdownOpen ? 'rotate-180' : ''}" />
 			</span>
 		</button>
 	</div>

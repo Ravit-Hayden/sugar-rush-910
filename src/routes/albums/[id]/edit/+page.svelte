@@ -338,7 +338,8 @@
 							ondragover={handleDragOver}
 							ondragleave={handleDragLeave}
 							ondrop={handleDrop}
-							class="w-full aspect-square bg-surface-1 rounded-xl border-2 border-dashed cursor-pointer flex items-center justify-center transition-colors duration-200 overflow-hidden {isDragging ? 'border-brand-pink bg-surface-2/50' : 'border-border-subtle hover:border-brand-pink hover:bg-surface-2'}"
+							class="upload-zone w-full aspect-square bg-surface-1 rounded-xl border-2 cursor-pointer flex items-center justify-center overflow-hidden {isDragging ? 'border-brand-pink bg-surface-2/50' : ''}"
+							data-dragging={isDragging}
 							role="button"
 							tabindex="0"
 							onkeydown={(e) => {
@@ -434,7 +435,7 @@
 									<span class="text-text-muted">장르를 선택하세요</span>
 								{:else}
 									{#each formData.genres as genre}
-										<span class="bg-surface-3 text-text-strong rounded-full px-2 py-0.5 text-xs flex items-center gap-1">
+										<span class="tag-chip">
 											{genre}
 											<button
 												type="button"
@@ -442,11 +443,11 @@
 													e.stopPropagation();
 													removeGenre(genre);
 												}}
-												class="ml-1 hover:bg-transparent hover:text-danger-fg transition-colors duration-200 focus:outline-none"
-												aria-label="{genre} 제거"
-											>
-												<X size={12} />
-											</button>
+											class="btn-icon ml-1 focus:outline-none"
+											aria-label="{genre} 제거"
+										>
+											<X size={12} />
+										</button>
 										</span>
 									{/each}
 								{/if}
@@ -455,7 +456,7 @@
 								<ChevronDownIcon size={16} class="lucide-icon text-text-muted transition-colors duration-200" />
 							</div>
 							{#if genreDropdownOpen}
-								<ul role="listbox" class="absolute left-0 w-full mt-[6px] bg-surface-1 border rounded-[6px] z-10 border-border-subtle shadow-lg max-h-60 overflow-y-auto">
+								<ul role="listbox" class="absolute left-0 w-full mt-[6px] bg-surface-1 border rounded-[6px] z-10 border-border-subtle max-h-60 overflow-y-auto">
 									{#if availableGenres.length === 0}
 										<li class="px-4 py-2 text-sm text-text-muted text-center">모든 장르가 선택되었습니다</li>
 									{:else}
@@ -513,7 +514,7 @@
 								</span>
 							</div>
 							{#if statusDropdownOpen}
-								<ul role="listbox" class="absolute left-0 w-full mt-[6px] bg-surface-1 border rounded-[6px] z-10 border-border-subtle shadow-lg max-h-60 overflow-y-auto">
+								<ul role="listbox" class="absolute left-0 w-full mt-[6px] bg-surface-1 border rounded-[6px] z-10 border-border-subtle max-h-60 overflow-y-auto">
 									{#each statusOptions as option}
 										<li
 											role="option"

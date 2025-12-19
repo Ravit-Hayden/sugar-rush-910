@@ -65,7 +65,7 @@
 
 {#if visible}
 	<div 
-		class="bg-surface-2 border border-border-subtle rounded-lg p-4 shadow-lg max-w-sm animate-in fade-in slide-in-from-right-2 duration-200"
+		class="bg-surface-2 border border-border-subtle rounded-lg p-4 max-w-sm animate-in fade-in slide-in-from-right-2 duration-200"
 		role="alert"
 		aria-live="polite"
 	>

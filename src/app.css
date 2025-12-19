@@ -17,6 +17,8 @@
 :root {
   --brand-pink: #FF3DAE;
   --hover-cyan: #17E1BC;
+  --hover-point: #17E1BC;        /* 호버 포인트 컬러 (다크 모드: Cyan) */
+  --text-on-hover: #000000;       /* 호버 시 텍스트 컬러 (다크 모드: Black) */
   --danger-fg: #FF6B6B;
   --warn-fg: #fffa00;
   --ok-fg: #00ddff;
@@ -87,7 +89,9 @@
    --surface-2: #F3EBDD;
    --surface-1: #FFF8EF;
    --border-subtle: #B8A896;    /* 더 진하게 (기존 #D9CCBC) */
-   --hover-cyan: #8A2BE2;       /* 라이트 모드 전용 보라색 호버 색상 */
+   --hover-cyan: #8A2BE2;       /* 호환성 유지 (deprecated: --hover-point 사용 권장) */
+   --hover-point: #8A2BE2;      /* 호버 포인트 컬러 (라이트 모드: Purple) */
+   --text-on-hover: #FFFFFF;    /* 호버 시 텍스트 컬러 (라이트 모드: White) */
    --warn-fg: #FF7A00;          /* 라이트 모드 전용 오렌지 경고 색상 (노란색 대비 개선) */
   
   /* 라이트 모드 배지 색상 (더 진하고 선명하게) */
@@ -145,6 +149,212 @@
   --user-color: #D7CBBF; /* 라이트 모드 */
 }
 
+/* 글로벌 입력 요소 스타일 (Input, Textarea, Select) */
+input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+textarea,
+select {
+  border-color: var(--border-subtle);
+  transition: border-color 0.2s;
+}
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):hover:not(:focus):not(:focus-visible),
+textarea:hover:not(:focus):not(:focus-visible),
+select:hover:not(:focus):not(:focus-visible) {
+  border-color: var(--hover-point);
+}
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):focus,
+input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):focus-visible,
+textarea:focus,
+textarea:focus-visible,
+select:focus,
+select:focus-visible {
+  border-color: var(--brand-pink);
+  outline: none;
+}
+
+/* 버튼 유틸리티 클래스 */
+.btn-ghost {
+  background: transparent;
+  border: none;
+  transition: color 0.2s;
+}
+
+.btn-ghost:hover:not(:focus):not(:focus-visible) {
+  color: var(--hover-point);
+}
+
+.btn-ghost:focus,
+.btn-ghost:focus-visible {
+  color: var(--brand-pink);
+  outline: none;
+}
+
+.btn-icon {
+  background: transparent;
+  border: none;
+  transition: color 0.2s;
+}
+
+.btn-icon:hover:not(:focus):not(:focus-visible) {
+  color: var(--hover-point);
+}
+
+.btn-icon:focus,
+.btn-icon:focus-visible {
+  color: var(--brand-pink);
+  outline: none;
+}
+
+.btn-icon .lucide-icon:not([class*="text-"]) {
+  transition: color 0.2s;
+}
+
+.btn-icon:hover:not(:focus):not(:focus-visible) .lucide-icon:not([class*="text-"]) {
+  color: var(--hover-point);
+}
+
+.btn-icon:focus .lucide-icon:not([class*="text-"]),
+.btn-icon:focus-visible .lucide-icon:not([class*="text-"]) {
+  color: var(--brand-pink);
+}
+
+/* 미디어 업로드 영역 스타일 */
+.upload-zone {
+  border-style: dashed;
+  border-color: var(--border-subtle);
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.upload-zone:hover,
+.upload-zone[data-dragging="true"] {
+  border-color: var(--hover-point);
+  background-color: color-mix(in srgb, var(--hover-point) 5%, transparent);
+}
+
+/* 카드 UI 스타일 */
+.card-base {
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.card-base:hover {
+  border-color: var(--hover-point);
+}
+
+.card-base.card-interactive {
+  cursor: pointer;
+}
+
+.card-base.card-interactive:hover {
+  transform: translateY(-2px);
+}
+
+/* 드래그 가능한 리스트 아이템 스타일 */
+.draggable-item {
+  cursor: grab;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.draggable-item:active {
+  cursor: grabbing;
+  border-color: var(--brand-pink);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.draggable-item[data-dragging="true"] {
+  border-color: var(--brand-pink);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.draggable-item[data-drop-target="true"] {
+  background-color: color-mix(in srgb, var(--hover-point) 10%, transparent);
+}
+
+/* 데이터 테이블 스타일 */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table tbody tr {
+  transition: background-color 0.2s;
+}
+
+/* 다크 모드: 행 호버 시 surface-2보다 살짝 밝게 */
+.data-table tbody tr:hover {
+  background-color: color-mix(in srgb, var(--surface-2) 100%, white 5%);
+}
+
+/* 라이트 모드: 행 호버 시 surface-1보다 살짝 어둡게 */
+[data-theme="light"] .data-table tbody tr:hover {
+  background-color: color-mix(in srgb, var(--surface-1) 100%, black 3%);
+}
+
+/* 숫자 데이터 셀 스타일 */
+.data-table td[data-type="number"] {
+  transition: font-weight 0.2s, color 0.2s;
+}
+
+.data-table td[data-type="number"]:hover {
+  font-weight: 700;
+  color: var(--hover-point);
+}
+
+/* 태그/칩 스타일 */
+.tag-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  border: 1px solid var(--border-subtle);
+  background-color: var(--surface-2);
+  color: var(--text-base);
+  font-size: 0.875rem;
+  transition: border-color 0.2s, color 0.2s, background-color 0.2s;
+}
+
+.tag-chip:hover {
+  border-color: var(--hover-point);
+  color: var(--hover-point);
+}
+
+.tag-chip[data-selected="true"],
+.tag-chip.selected {
+  background-color: var(--brand-pink);
+  color: white;
+  border-color: var(--brand-pink);
+}
+
+/* 텍스트 선택 강조 */
+::selection {
+  background-color: color-mix(in srgb, var(--brand-pink) 30%, transparent);
+  color: white;
+}
+
+[data-theme="light"] ::selection {
+  background-color: color-mix(in srgb, var(--brand-pink) 30%, transparent);
+  color: black;
+}
+
+/* 링크 스타일 - 본문 링크에만 적용 (.text-link 클래스 사용) */
+.text-link {
+  color: var(--text-base);
+  text-decoration: none;
+  transition: color 0.2s, text-decoration 0.2s;
+}
+
+.text-link:hover:not(:focus):not(:focus-visible) {
+  color: var(--hover-point);
+  text-decoration: underline;
+}
+
+.text-link:focus,
+.text-link:focus-visible {
+  color: var(--brand-pink);
+  text-decoration: underline;
+  outline: none;
+}
+
 /* 사이드바 아이콘 고정 위치 및 정렬 */
 .sidebar-menu-item .lucide-icon {
   display: block;
@@ -173,8 +383,8 @@
   border: none;
 }
 .btn-retry:hover {
-  background: var(--hover-cyan);
-  color: #000;
+  background: var(--hover-point);
+  color: var(--text-on-hover);
 }
 
 /* 기본 스타일 */
@@ -303,14 +513,14 @@ div[class*="panel"] {
 .bg-surface-1 { background-color: var(--surface-1); }
 .bg-surface-2 { background-color: var(--surface-2); }
 .bg-brand-pink { background-color: var(--brand-pink); }
-.bg-hover-cyan { background-color: var(--hover-cyan); }
+.bg-hover-cyan { background-color: var(--hover-point); }
 .text-text-base { color: var(--text-base); }
 .text-text-strong { color: var(--text-strong); }
 .text-text-muted { color: var(--text-muted); }
 .text-white { color: #FFFFFF; }
 .border-border-subtle { border-color: var(--border-subtle); }
 .text-brand-pink { color: var(--brand-pink); }
-.text-hover-cyan { color: var(--hover-cyan); }
+.text-hover-cyan { color: var(--hover-point); }
 .text-danger-fg { color: var(--danger-fg); }
 .text-warn-fg { color: var(--warn-fg); }
 .text-ok-fg { color: var(--ok-fg); }
@@ -356,7 +566,7 @@ textarea[aria-invalid="true"]:focus {
 }
 .focus\:border-brand-pink:focus { border-color: var(--brand-pink); }
 .focus\:ring-0:focus { --tw-ring-width: 0px; --tw-ring-offset-width: 0px; }
-.hover\:border-hover-cyan:hover { border-color: var(--hover-cyan); }
+.hover\:border-hover-cyan:hover { border-color: var(--hover-point); }
 .border-\[1px\] { border-width: 1px; }
 .focus\:border-\[1px\]:focus { border-width: 1px !important; }
 
@@ -418,7 +628,7 @@ textarea[aria-invalid="true"]:focus {
 
 /* 카드 호버 효과 (재생 버튼 포커스가 아닐 때만) */
 .album-card:hover:not(:has(.play-button:focus)):not(:has(.play-button:focus-visible)) {
-  border-color: var(--hover-cyan) !important;
+  border-color: var(--hover-point) !important;
 }
 
 /* 포커스+호버: 포커스가 우선 (호버 효과 완전 무시) */
@@ -458,58 +668,34 @@ textarea[aria-invalid="true"]:focus {
 }
 
 /* 호버 효과 (포커스가 아닐 때만) - 카드 호버 시에도 적용 */
-/* 재생 버튼 - 다크 모드 호버 (기본 모드) */
-.album-card:hover .play-button:not(:focus):not(:focus-visible),
-[data-theme="dark"] .album-card:hover .play-button:not(:focus):not(:focus-visible) {
-  background-color: #17E1BC !important;
+/* 재생 버튼 - 호버 */
+.album-card:hover .play-button:not(:focus):not(:focus-visible) {
+  background-color: var(--hover-point) !important;
   transition: background-color 0.3s ease;
 }
 
-.album-card:hover .play-button:not(:focus):not(:focus-visible) .play-button-icon,
-[data-theme="dark"] .album-card:hover .play-button:not(:focus):not(:focus-visible) .play-button-icon {
-  color: #000000 !important;
+.album-card:hover .play-button:not(:focus):not(:focus-visible) .play-button-icon {
+  color: var(--text-on-hover) !important;
   transition: color 0.3s ease;
 }
 
-/* 재생 버튼 - 라이트 모드 호버 */
-[data-theme="light"] .album-card:hover .play-button:not(:focus):not(:focus-visible) {
-  background-color: #8A2BE2 !important;
-  transition: background-color 0.3s ease;
+/* 재생 버튼 직접 호버 (카드 호버 없이 버튼에 직접 호버) */
+.play-button:hover:not(:focus):not(:focus-visible) {
+  background-color: var(--hover-point) !important;
 }
 
-[data-theme="light"] .album-card:hover .play-button:not(:focus):not(:focus-visible) .play-button-icon {
-  color: #FFFFFF !important;
-  transition: color 0.3s ease;
+.play-button:hover:not(:focus):not(:focus-visible) .play-button-icon {
+  color: var(--text-on-hover) !important;
 }
 
-/* 재생 버튼 직접 호버 (카드 호버 없이 버튼에 직접 호버) - 다크 모드 */
-.play-button:hover:not(:focus):not(:focus-visible),
-[data-theme="dark"] .play-button:hover:not(:focus):not(:focus-visible) {
-  background-color: #17E1BC !important;
-}
-
-.play-button:hover:not(:focus):not(:focus-visible) .play-button-icon,
-[data-theme="dark"] .play-button:hover:not(:focus):not(:focus-visible) .play-button-icon {
-  color: #000000 !important;
-}
-
-/* 재생 버튼 직접 호버 (카드 호버 없이 버튼에 직접 호버) - 라이트 모드 */
-[data-theme="light"] .play-button:hover:not(:focus):not(:focus-visible) {
-  background-color: #8A2BE2 !important;
-}
-
-[data-theme="light"] .play-button:hover:not(:focus):not(:focus-visible) .play-button-icon {
-  color: #FFFFFF !important;
-}
-
-/* 라이트 모드에서 호버 색상만 보라색으로 변경 (배경은 그대로) */
+/* 라이트 모드에서 호버 색상만 호버 포인트로 변경 (배경은 그대로) */
 [data-theme="light"] .search-container:hover .lucide-icon {
-  color: var(--hover-cyan) !important;
+  color: var(--hover-point) !important;
 }
 
 
 [data-theme="light"] .theme-toggle-button:hover .lucide-icon {
-  color: var(--hover-cyan) !important;
+  color: var(--hover-point) !important;
 }
 
 /* 라이트 모드에서 테마 토글 버튼 호버 배경색 변경 방지 */
@@ -518,16 +704,16 @@ textarea[aria-invalid="true"]:focus {
 }
 
 [data-theme="light"] .hover\:bg-hover-cyan:hover {
-  color: var(--hover-cyan) !important;
+  color: var(--hover-point) !important;
 }
 
 [data-theme="light"] .hover\:text-hover-cyan:hover {
-  color: var(--hover-cyan) !important;
+  color: var(--hover-point) !important;
 }
 
 /* 라이트 모드에서 사이드바 버튼 호버 색상 변경 */
 [data-theme="light"] .sidebar-menu-item:hover:not(.active):not(:focus):not(:focus-visible) {
-  background-color: var(--hover-cyan) !important;
+  background-color: var(--hover-point) !important;
   color: var(--surface-2) !important;
 }
 
@@ -536,7 +722,7 @@ textarea[aria-invalid="true"]:focus {
 }
 
 [data-theme="light"] aside nav ul li a.sidebar-menu-item:hover:not(.active):not(:focus):not(:focus-visible) {
-  background-color: var(--hover-cyan) !important;
+  background-color: var(--hover-point) !important;
   color: var(--surface-2) !important;
 }
 
@@ -610,25 +796,14 @@ textarea[aria-invalid="true"]:focus {
   color: #FFFFFF !important;
 }
 
-/* 라이트 모드에서 일반 링크와 버튼 호버 색상 변경 (포커스가 아닐 때만) */
-[data-theme="light"] a:hover:not(:focus):not(:focus-visible) {
-  color: var(--hover-cyan) !important;
-}
-
-[data-theme="light"] button:not([class*="bg-"]):not([data-action="toggle-sidebar"]):hover:not(:focus):not(:focus-visible) {
-  color: var(--hover-cyan) !important;
-}
-
-[data-theme="light"] .lucide-icon:hover:not(:focus):not(:focus-visible) {
-  color: var(--hover-cyan) !important;
-}
+/* 라이트 모드 전역 스타일 제거됨 - 클래스 기반으로 통합 */
 
 /* 라이트 모드에서 ActionsCard 아이콘 호버 색상 변경 (포커스가 아닐 때만) */
 [data-theme="light"] a[href*="/albums/new"]:hover:not(:focus):not(:focus-visible) svg,
 [data-theme="light"] a[href*="/tracks/new"]:hover:not(:focus):not(:focus-visible) svg,
 [data-theme="light"] a[href*="/files/upload"]:hover:not(:focus):not(:focus-visible) svg,
 [data-theme="light"] a[href*="/revenue"]:hover:not(:focus):not(:focus-visible) svg {
-  color: var(--hover-cyan) !important;
+  color: var(--hover-point) !important;
 }
 
 /* 라이트 모드에서 리스트 항목 호버 테두리 색상 변경 (포커스가 아닐 때만) */
@@ -644,17 +819,17 @@ textarea[aria-invalid="true"]:focus {
 [data-theme="light"] a[href*="/tracks/new"]:hover:not(:focus):not(:focus-visible),
 [data-theme="light"] a[href*="/files/upload"]:hover:not(:focus):not(:focus-visible),
 [data-theme="light"] a[href*="/revenue"]:hover:not(:focus):not(:focus-visible) {
-  border-color: var(--hover-cyan) !important;
+  border-color: var(--hover-point) !important;
 }
 
 /* 라이트 모드에서 체크박스 호버 테두리 색상 변경 (포커스가 아닐 때만) */
 [data-theme="light"] input[type="checkbox"]:hover:not(:focus):not(:focus-visible) {
-  border-color: var(--hover-cyan) !important;
+  border-color: var(--hover-point) !important;
 }
 
 /* 라이트 모드에서 정보 버튼 호버 색상 변경 (포커스가 아닐 때만) */
 [data-theme="light"] button[aria-label="정보"]:hover:not(:focus):not(:focus-visible) .lucide-icon {
-  color: var(--hover-cyan) !important;
+  color: var(--hover-point) !important;
 }
 
 /* 라이트 모드에서 일반 버튼 호버 배경 색상 변경 (테마 토글 버튼, 아티스트/앨범 선택 드롭다운 버튼 제외, 포커스가 아닐 때만) */
@@ -671,13 +846,13 @@ textarea[aria-invalid="true"]:focus {
 
 /* 라이트 모드에서 버튼 내부 아이콘 호버 색상 변경 (trending-up 아이콘 제외, 포커스가 아닐 때만) */
 [data-theme="light"] button:hover:not(:focus):not(:focus-visible) .lucide-icon:not(.lucide-trending-up) {
-  color: var(--hover-cyan) !important;
+  color: var(--hover-point) !important;
 }
 
 /* 아티스트/앨범 선택 드롭다운 버튼 아이콘은 별도 규칙 적용 */
 [data-theme="light"] .artist-select-dropdown button:hover:not(:focus):not(:focus-visible) .lucide-icon,
 [data-theme="light"] .album-select-dropdown button:hover:not(:focus):not(:focus-visible) .lucide-icon {
-  color: var(--hover-cyan) !important;
+  color: var(--hover-point) !important;
 }
 
 /* 라이트 모드에서 할일 항목 호버 효과 변경 (포커스가 아닐 때만) */
@@ -689,7 +864,7 @@ textarea[aria-invalid="true"]:focus {
 [data-theme="light"] a[href*="/releases/"]:hover:not(:focus):not(:focus-visible),
 [data-theme="light"] a[href*="/changes/"]:hover:not(:focus):not(:focus-visible),
 [data-theme="light"] a[href*="/feedback/"]:hover:not(:focus):not(:focus-visible) {
-  border-color: var(--hover-cyan) !important;
+  border-color: var(--hover-point) !important;
 }
 
 /* 라이트 모드에서 할일 항목 내부 체크박스 호버 효과 변경 (포커스가 아닐 때만) */
@@ -700,7 +875,7 @@ textarea[aria-invalid="true"]:focus {
 [data-theme="light"] a[href*="/logs/"]:hover:not(:focus):not(:focus-visible) input[type="checkbox"],
 [data-theme="light"] a[href*="/releases/"]:hover:not(:focus):not(:focus-visible) input[type="checkbox"],
 [data-theme="light"] a[href*="/changes/"]:hover:not(:focus):not(:focus-visible) input[type="checkbox"] {
-  border-color: var(--hover-cyan) !important;
+  border-color: var(--hover-point) !important;
 }
 
 /* 라이트 모드에서 할일 항목 내부 텍스트 호버 효과 변경 (포커스가 아닐 때만) */
@@ -712,7 +887,7 @@ textarea[aria-invalid="true"]:focus {
 [data-theme="light"] a[href*="/releases/"]:hover:not(:focus):not(:focus-visible) .text-text-base,
 [data-theme="light"] a[href*="/changes/"]:hover:not(:focus):not(:focus-visible) .text-text-base,
 [data-theme="light"] a[href*="/feedback/"]:hover:not(:focus):not(:focus-visible) .text-text-base {
-  color: var(--hover-cyan) !important;
+  color: var(--hover-point) !important;
 }
 
 /* 라이트 모드에서 빠른 액션 버튼 텍스트 호버 효과 변경 (포커스가 아닐 때만) */
@@ -721,7 +896,7 @@ textarea[aria-invalid="true"]:focus {
 [data-theme="light"] a[href*="/tracks/new"]:not(.page-header-primary-button):not(.page-header-edit-button):hover:not(:focus):not(:focus-visible) .text-text-base,
 [data-theme="light"] a[href*="/files/upload"]:hover:not(:focus):not(:focus-visible) .text-text-base,
 [data-theme="light"] a[href*="/revenue"]:hover:not(:focus):not(:focus-visible) .text-text-base {
-  color: var(--hover-cyan) !important;
+  color: var(--hover-point) !important;
 }
 
 .badge-high-urgent { color: var(--badge-high-urgent); }
@@ -763,125 +938,7 @@ textarea[aria-invalid="true"]:focus {
 .style-mysterious { color: var(--style-mysterious); }
 
 
-/* input 요소 포커스 스타일 */
-input:focus,
-input:focus-visible {
-  outline: none !important;
-  box-shadow: none !important;
-  border-color: var(--brand-pink) !important;
-}
-
-/* input 요소 호버 효과 (포커스가 아닐 때만) */
-input:hover:not(:focus):not(:focus-visible) {
-  border-color: var(--hover-cyan) !important;
-}
-
-/* input 요소 포커스 시 호버 효과 무시 (포커스가 우선) - 최고 우선순위 */
-/* 포커스된 상태에서 호버해도 포커스 색상 유지 */
-input:focus:hover,
-input:focus-visible:hover,
-input:focus:focus:hover,
-input:focus-visible:focus-visible:hover,
-input:focus:hover:focus,
-input:focus-visible:hover:focus-visible {
-  outline: none !important;
-  box-shadow: none !important;
-  border-color: var(--brand-pink) !important;
-}
-
-/* 모든 input 타입에 대해 포커스 시 호버 무시 - 더 구체적인 선택자로 우선순위 높임 */
-input[type="text"]:focus:hover,
-input[type="text"]:focus-visible:hover,
-input[type="text"]:focus:hover:focus,
-input[type="text"]:focus-visible:hover:focus-visible,
-input[type="number"]:focus:hover,
-input[type="number"]:focus-visible:hover,
-input[type="number"]:focus:hover:focus,
-input[type="number"]:focus-visible:hover:focus-visible,
-input[type="email"]:focus:hover,
-input[type="email"]:focus-visible:hover,
-input[type="email"]:focus:hover:focus,
-input[type="email"]:focus-visible:hover:focus-visible,
-input[type="password"]:focus:hover,
-input[type="password"]:focus-visible:hover,
-input[type="password"]:focus:hover:focus,
-input[type="password"]:focus-visible:hover:focus-visible,
-input[type="date"]:focus:hover,
-input[type="date"]:focus-visible:hover,
-input[type="date"]:focus:hover:focus,
-input[type="date"]:focus-visible:hover:focus-visible,
-input[type="search"]:focus:hover,
-input[type="search"]:focus-visible:hover,
-input[type="search"]:focus:hover:focus,
-input[type="search"]:focus-visible:hover:focus-visible,
-input.datepicker-input:focus:hover,
-input.datepicker-input:focus-visible:hover,
-input.datepicker-input:focus:hover:focus,
-input.datepicker-input:focus-visible:hover:focus-visible,
-input#title:focus:hover,
-input#title:focus-visible:hover,
-input#artist:focus:hover,
-input#artist:focus-visible:hover,
-input#year:focus:hover,
-input#year:focus-visible:hover {
-  outline: none !important;
-  box-shadow: none !important;
-  border-color: var(--brand-pink) !important;
-}
-
-/* textarea 요소 포커스 스타일 */
-textarea:focus,
-textarea:focus-visible {
-  outline: none !important;
-  box-shadow: none !important;
-  border-color: var(--brand-pink) !important;
-}
-
-/* textarea 요소 호버 효과 (포커스가 아닐 때만) */
-textarea:hover:not(:focus):not(:focus-visible) {
-  border-color: var(--hover-cyan) !important;
-}
-
-/* textarea 요소 포커스 시 호버 효과 무시 (포커스가 우선) */
-textarea:focus:hover,
-textarea:focus-visible:hover,
-textarea:focus:hover:focus,
-textarea:focus-visible:hover:focus-visible {
-  outline: none !important;
-  box-shadow: none !important;
-  border-color: var(--brand-pink) !important;
-}
-
-/* select 요소 포커스 스타일 */
-select:focus,
-select:focus-visible {
-  outline: none !important;
-  box-shadow: none !important;
-  border-color: var(--brand-pink) !important;
-}
-
-/* select 요소 호버 효과 (포커스가 아닐 때만) */
-select:hover:not(:focus):not(:focus-visible) {
-  border-color: var(--hover-cyan) !important;
-}
-
-/* select 요소 포커스 시 호버 효과 무시 (포커스가 우선) */
-select:focus:hover,
-select:focus-visible:hover,
-select:focus:hover:focus,
-select:focus-visible:hover:focus-visible {
-  outline: none !important;
-  box-shadow: none !important;
-  border-color: var(--brand-pink) !important;
-}
-
-/* button 요소 포커스 시 호버 효과 무시 (status 드롭다운 버튼 포함) */
-button:focus:hover,
-button:focus-visible:hover,
-button#status:focus:hover,
-button#status:focus-visible:hover {
-  border-color: var(--brand-pink) !important;
-}
+/* 중복 스타일 제거됨 - Phase 2의 글로벌 스타일이 적용됩니다 */
 
 /* 스크롤바 스타일 - README 표준 적용 (8px 고정) */
 ::-webkit-scrollbar {
@@ -1006,7 +1063,7 @@ button#status:focus-visible:hover {
 }
 
 .sidebar-menu-item:hover:not(.active):not(:focus):not(:focus-visible) {
-  background-color: var(--hover-cyan) !important;
+  background-color: var(--hover-point) !important;
   color: #000000 !important;
 }
 
@@ -1150,7 +1207,7 @@ button[data-action="toggle-sidebar"]:active svg {
 /* 라이트 모드에서 사이드바 토글 버튼 호버 시 보라색 (포커스가 아닐 때만) */
 [data-theme="light"] button[data-action="toggle-sidebar"]:hover:not(:focus):not(:focus-visible) svg,
 [data-theme="light"] button[data-action="toggle-sidebar"]:hover:not(:focus):not(:focus-visible) .lucide-icon {
-  color: #8A2BE2 !important; /* 보라색 */
+  color: var(--hover-point) !important;
 }
 
 /* 라이트 모드 기본 상태는 브랜드 핑크 유지 */
@@ -1163,7 +1220,7 @@ button[data-action="toggle-sidebar"]:active svg {
 
 /* 라이트 모드에서 text-hover-cyan 클래스 오버라이드 (포커스가 아닐 때만) */
 [data-theme="light"] button[data-action="toggle-sidebar"]:hover:not(:focus):not(:focus-visible) .text-hover-cyan {
-  color: #8A2BE2 !important; /* 보라색 */
+  color: var(--hover-point) !important;
 }
 
 /* 라이트 모드에서 포커스 시 text-hover-cyan 클래스도 흰색 */
@@ -1227,14 +1284,14 @@ button[data-action="toggle-sidebar"] * {
 }
 
 /* 더보기 팝업 메뉴 항목 호버/포커스 스타일 */
-/* 다크 모드: 호버 시 시안색 (#17E1BC) */
+/* 다크 모드: 호버 시 호버 포인트 색상 */
 .more-menu-dropdown .group:hover:not(:focus):not(:focus-visible) {
-  color: #17E1BC !important;
+  color: var(--hover-point) !important;
 }
 
 .more-menu-dropdown .group:hover:not(:focus):not(:focus-visible) svg,
 .more-menu-dropdown .group:hover:not(:focus):not(:focus-visible) .lucide-icon {
-  color: #17E1BC !important;
+  color: var(--hover-point) !important;
 }
 
 /* 포커스 시 브랜드 핑크 (다크/라이트 공통) */
@@ -1262,14 +1319,14 @@ button[data-action="toggle-sidebar"] * {
   color: var(--brand-pink) !important;
 }
 
-/* 라이트 모드: 호버 시 보라색 (#8A2BE2) */
+/* 라이트 모드: 호버 시 호버 포인트 색상 */
 [data-theme="light"] .more-menu-dropdown .group:hover:not(:focus):not(:focus-visible) {
-  color: #8A2BE2 !important;
+  color: var(--hover-point) !important;
 }
 
 [data-theme="light"] .more-menu-dropdown .group:hover:not(:focus):not(:focus-visible) svg,
 [data-theme="light"] .more-menu-dropdown .group:hover:not(:focus):not(:focus-visible) .lucide-icon {
-  color: #8A2BE2 !important;
+  color: var(--hover-point) !important;
 }
 
 /* 툴팁 제거 */
@@ -1309,8 +1366,8 @@ aside:hover {
 
 /* 더 강력한 호버 효과를 위한 추가 CSS */
 aside nav ul li a.sidebar-menu-item:hover:not(.active):not(:focus):not(:focus-visible) {
-  background-color: var(--hover-cyan) !important;
-  color: #000000 !important;
+  background-color: var(--hover-point) !important;
+  color: var(--text-on-hover) !important;
 }
 
 aside nav ul li a.sidebar-menu-item:hover:not(.active):not(:focus):not(:focus-visible) .lucide-icon {
@@ -1426,7 +1483,7 @@ input[type="checkbox"]:checked::after {
 /* 아티스트 관리 카드와 데이터 관리 카드는 제외 */
 main.main-content-area .bg-surface-1:hover:not(.artist-card):not(.data-management-card),
 main.main-content-area .bg-surface-2:hover:not(.artist-card):not(.data-management-card) {
-  border-color: var(--hover-cyan) !important;
+  border-color: var(--hover-point) !important;
   transition: border-color 0.2s ease;
 }
 
@@ -1435,23 +1492,13 @@ aside.bg-surface-2:hover {
   border-color: var(--border-subtle) !important;
 }
 
-/* 링크 호버 효과 (포커스가 아닐 때만) */
-a:hover:not(:focus):not(:focus-visible) {
-  color: #17E1BC !important;
-  transition: color 0.2s ease;
-}
-
-/* 버튼 호버 효과 (배경 없는 텍스트 버튼, 포커스가 아닐 때만) */
-button:not([class*="bg-"]):hover:not(:focus):not(:focus-visible) {
-  color: #17E1BC !important;
-  transition: color 0.2s ease;
-}
+/* 전역 링크/버튼 스타일 제거됨 - .text-link, .btn-ghost, .btn-icon 클래스 사용 */
 
 /* 배지 호버 효과 제거 - 배지는 호버 효과 불필요 */
 
 /* 아이콘 호버 효과 (포커스가 아닐 때만) */
 .lucide-icon:hover:not(:focus):not(:focus-visible) {
-  color: #17E1BC !important;
+  color: var(--hover-point) !important;
   transition: color 0.2s ease;
 }
 
@@ -1460,7 +1507,7 @@ a[href*="/albums/new"]:not(.page-header-primary-button):not(.page-header-edit-bu
 a[href*="/tracks/new"]:not(.page-header-primary-button):not(.page-header-edit-button):hover:not(:focus):not(:focus-visible) svg,
 a[href*="/files/upload"]:hover:not(:focus):not(:focus-visible) svg,
 a[href*="/revenue"]:hover:not(:focus):not(:focus-visible) svg {
-  color: #17E1BC !important;
+  color: var(--hover-point) !important;
   transition: color 0.2s ease;
 }
 
@@ -1479,7 +1526,7 @@ a[href*="/tracks/new"]:not(.page-header-primary-button):not(.page-header-edit-bu
 a[href*="/files/upload"]:hover:not(:focus):not(:focus-visible),
 a[href*="/revenue"]:hover:not(:focus):not(:focus-visible) {
   background-color: var(--surface-2) !important;
-  border-color: #17E1BC !important;
+  border-color: var(--hover-point) !important;
   transition: all 0.2s ease;
 }
 
@@ -1491,7 +1538,7 @@ a[href*="/failures/"]:hover:not(:focus):not(:focus-visible) input[type="checkbox
 a[href*="/logs/"]:hover:not(:focus):not(:focus-visible) input[type="checkbox"],
 a[href*="/releases/"]:hover:not(:focus):not(:focus-visible) input[type="checkbox"],
 a[href*="/changes/"]:hover:not(:focus):not(:focus-visible) input[type="checkbox"] {
-  border-color: #17E1BC !important;
+  border-color: var(--hover-point) !important;
   transition: border-color 0.2s ease;
 }
 
@@ -1509,7 +1556,7 @@ a[href*="/albums/new"]:not(.page-header-primary-button):not(.page-header-edit-bu
 a[href*="/tracks/new"]:not(.page-header-primary-button):not(.page-header-edit-button):hover:not(:focus):not(:focus-visible) .text-text-base,
 a[href*="/files/upload"]:hover:not(:focus):not(:focus-visible) .text-text-base,
 a[href*="/revenue"]:hover:not(:focus):not(:focus-visible) .text-text-base {
-  color: #17E1BC !important;
+  color: var(--hover-point) !important;
   transition: color 0.2s ease;
 }
 
@@ -1521,40 +1568,7 @@ a[href*="/revenue"]:hover:not(:focus):not(:focus-visible) .text-text-base {
   outline: none;
 }
 
-/* 링크 포커스 효과 (호버보다 우선) */
-a:focus,
-a:focus-visible {
-  color: var(--brand-pink) !important;
-}
-
-a:focus:hover,
-a:focus-visible:hover {
-  color: var(--brand-pink) !important;
-}
-
-/* 라이트 모드 링크 포커스 효과 */
-[data-theme="light"] a:focus,
-[data-theme="light"] a:focus-visible {
-  color: var(--brand-pink) !important;
-}
-
-[data-theme="light"] a:focus:hover,
-[data-theme="light"] a:focus-visible:hover {
-  color: var(--brand-pink) !important;
-}
-
-/* 버튼 포커스 효과 (배경 없는 텍스트 버튼, 호버보다 우선) */
-button:not([class*="bg-"]):focus,
-button:not([class*="bg-"]):focus-visible {
-  color: var(--brand-pink) !important;
-  background-color: transparent !important;
-}
-
-button:not([class*="bg-"]):focus:hover,
-button:not([class*="bg-"]):focus-visible:hover {
-  color: var(--brand-pink) !important;
-  background-color: transparent !important;
-}
+/* 전역 링크/버튼 포커스 스타일 제거됨 - .text-link, .btn-ghost, .btn-icon 클래스 사용 */
 
 /* 아이콘 포커스 효과 (호버보다 우선) */
 .lucide-icon:focus,
@@ -1770,12 +1784,12 @@ input:focus-visible, button:focus-visible {
 
 /* 검색창 호버 효과 (포커스가 아닐 때만) */
 .search-container:hover:not(:focus-within) .lucide-icon {
-  color: var(--hover-cyan) !important;
+  color: var(--hover-point) !important;
   transition: color 0.3s ease;
 }
 
 .search-container:hover:not(:focus-within) input {
-  border-color: var(--hover-cyan) !important;
+  border-color: var(--hover-point) !important;
   transition: border-color 0.3s ease;
 }
 
@@ -1826,12 +1840,12 @@ input:focus-visible, button:focus-visible {
 
 /* DatePicker 호버 효과 (포커스가 아닐 때만) */
 .datepicker-container:hover:not(:focus-within) .datepicker-icon {
-  color: var(--hover-cyan) !important;
+  color: var(--hover-point) !important;
   transition: color 0.3s ease;
 }
 
 .datepicker-container:hover:not(:focus-within) .datepicker-input {
-  border-color: var(--hover-cyan) !important;
+  border-color: var(--hover-point) !important;
   transition: border-color 0.3s ease;
 }
 
@@ -1874,12 +1888,12 @@ input:focus-visible, button:focus-visible {
 
 /* 알림 버튼 호버/선택 효과 */
 .notification-button:hover .lucide-icon {
-  color: var(--hover-cyan) !important;
+  color: var(--hover-point) !important;
   transition: color 0.3s ease;
 }
 
 .notification-button:hover .notification-dot {
-  background-color: var(--hover-cyan) !important;
+  background-color: var(--hover-point) !important;
   transition: background-color 0.3s ease;
 }
 
@@ -1895,7 +1909,7 @@ input:focus-visible, button:focus-visible {
 
 /* 라이트모드에서 알림 버튼 호버 효과 (핫핑크 상태가 아닐 때만) */
 [data-theme="light"] .notification-button:hover .lucide-icon:not(.text-brand-pink) {
-  color: var(--hover-cyan) !important;
+  color: var(--hover-point) !important;
 }
 
 /* 라이트모드에서 알림 페이지 호버 효과 제거 */
@@ -1907,7 +1921,7 @@ input:focus-visible, button:focus-visible {
 
 /* 테마 토글 호버/선택 효과 */
 .theme-toggle-button:hover .lucide-icon {
-  color: var(--hover-cyan) !important;
+  color: var(--hover-point) !important;
   transition: color 0.3s ease;
 }
 
@@ -1941,12 +1955,12 @@ input:focus-visible, button:focus-visible {
 /* 호버 상태 (포커스가 아닐 때만) */
 .group:not(.filter-dropdown):hover:not(:focus-within) .lucide-search,
 .group:not(.filter-dropdown):hover:not(:focus-within) .lucide-filter {
-  color: var(--hover-cyan) !important;
+  color: var(--hover-point) !important;
 }
 
 .group:not(.filter-dropdown):hover:not(:focus-within) input,
 .group:not(.filter-dropdown):hover:not(:focus-within) select {
-  border-color: var(--hover-cyan) !important;
+  border-color: var(--hover-point) !important;
 }
 
 /* 포커스 상태 */
@@ -1974,12 +1988,12 @@ input:focus-visible, button:focus-visible {
 /* 라이트 모드 group:not(.filter-dropdown) 규칙 */
 [data-theme="light"] .group:not(.filter-dropdown):hover:not(:focus-within) .lucide-search,
 [data-theme="light"] .group:not(.filter-dropdown):hover:not(:focus-within) .lucide-filter {
-  color: var(--hover-cyan) !important;
+  color: var(--hover-point) !important;
 }
 
 [data-theme="light"] .group:not(.filter-dropdown):hover:not(:focus-within) input,
 [data-theme="light"] .group:not(.filter-dropdown):hover:not(:focus-within) select {
-  border-color: var(--hover-cyan) !important;
+  border-color: var(--hover-point) !important;
 }
 
 [data-theme="light"] .group:not(.filter-dropdown):focus-within .lucide-search,
@@ -2011,14 +2025,14 @@ input:focus-visible, button:focus-visible {
 
 /* 호버 효과 (포커스가 아닐 때만) */
 .action-button:hover:not(:focus):not(:focus-visible) {
-  border-color: var(--hover-cyan) !important;
+  border-color: var(--hover-point) !important;
   background-color: var(--surface-3) !important;
   transition: border-color 0.3s ease, background-color 0.3s ease;
 }
 
 .action-button:hover:not(:focus):not(:focus-visible) .action-button-text,
 .action-button:hover:not(:focus):not(:focus-visible) .action-button-icon {
-  color: var(--hover-cyan) !important;
+  color: var(--hover-point) !important;
   transition: color 0.3s ease;
 }
 
@@ -2041,7 +2055,7 @@ input:focus-visible, button:focus-visible {
 /* 라이트 모드 액션 버튼 호버 색상 (보라색) */
 [data-theme="light"] .action-button:hover:not(:focus):not(:focus-visible) .action-button-text,
 [data-theme="light"] .action-button:hover:not(:focus):not(:focus-visible) .action-button-icon {
-  color: var(--hover-cyan) !important;
+  color: var(--hover-point) !important;
 }
 
 /* 라이트 모드 액션 버튼 포커스 효과 */
@@ -2091,7 +2105,7 @@ input:focus-visible, button:focus-visible {
   color: #FF6B6B !important;
 }
 .action-button.text-red-500:hover:not(:focus):not(:focus-visible) {
-  border-color: var(--hover-cyan) !important;
+  border-color: var(--hover-point) !important;
   background-color: rgba(255, 107, 107, 0.1) !important;
 }
 .action-button.text-red-500:hover:not(:focus):not(:focus-visible) .action-button-text,
@@ -2315,9 +2329,9 @@ main.main-content,
 .filter-dropdown .lucide-filter { color: var(--text-base) !important; transition: color .2s ease }
 .filter-dropdown button svg { color: var(--text-base) !important; transition: color .2s ease }
 
-.filter-dropdown:hover:not(:focus-within) button { border-color: var(--hover-cyan) !important }
-.filter-dropdown:hover:not(:focus-within) .lucide-filter { color: var(--hover-cyan) !important }
-.filter-dropdown:hover:not(:focus-within) button svg { color: var(--hover-cyan) !important }
+.filter-dropdown:hover:not(:focus-within) button { border-color: var(--hover-point) !important }
+.filter-dropdown:hover:not(:focus-within) .lucide-filter { color: var(--hover-point) !important }
+.filter-dropdown:hover:not(:focus-within) button svg { color: var(--hover-point) !important }
 
 .filter-dropdown:focus-within button { border-color: var(--brand-pink) !important }
 .filter-dropdown:focus-within .lucide-filter,
@@ -2334,8 +2348,8 @@ main.main-content,
 [data-theme="light"] .filter-dropdown .lucide-filter { color: var(--text-base) !important }
 [data-theme="light"] .filter-dropdown button svg { color: var(--text-base) !important }
 
-[data-theme="light"] .filter-dropdown:hover:not(:focus-within) .lucide-filter { color: var(--hover-cyan) !important }
-[data-theme="light"] .filter-dropdown:hover:not(:focus-within) button svg { color: var(--hover-cyan) !important }
+[data-theme="light"] .filter-dropdown:hover:not(:focus-within) .lucide-filter { color: var(--hover-point) !important }
+[data-theme="light"] .filter-dropdown:hover:not(:focus-within) button svg { color: var(--hover-point) !important }
 
 [data-theme="light"] .filter-dropdown:focus-within .lucide-filter,
 [data-theme="light"] .filter-dropdown[data-open="true"] .lucide-filter { color: var(--brand-pink) !important }
@@ -2383,13 +2397,13 @@ main.main-content,
 
 .filter-dropdown [role="option"][aria-selected="true"] { background-color: var(--brand-pink) !important; color: #fff !important }
 .filter-dropdown [role="option"][aria-selected="true"] .text-search-highlight { color: #fff !important }
-.filter-dropdown [role="option"]:hover:not([aria-selected="true"]):not(:focus-visible):not(:focus) { background-color: var(--hover-cyan) !important; color: #000 !important }
+.filter-dropdown [role="option"]:hover:not([aria-selected="true"]):not(:focus-visible):not(:focus) { background-color: var(--hover-point) !important; color: var(--text-on-hover) !important }
 .filter-dropdown [role="option"]:focus:not([aria-selected="true"]),
 .filter-dropdown [role="option"]:focus-visible:not([aria-selected="true"]) { background-color: var(--brand-pink) !important; color: #fff !important; outline: none }
 .filter-dropdown [role="option"]:focus:not([aria-selected="true"]):hover,
 .filter-dropdown [role="option"]:focus-visible:not([aria-selected="true"]):hover { background-color: var(--brand-pink) !important; color: #fff !important; outline: none }
 
-[data-theme="light"] .filter-dropdown [role="option"]:hover:not([aria-selected="true"]):not(:focus-visible):not(:focus) { background-color: var(--hover-cyan) !important; color: var(--surface-2) !important }
+[data-theme="light"] .filter-dropdown [role="option"]:hover:not([aria-selected="true"]):not(:focus-visible):not(:focus) { background-color: var(--hover-point) !important; color: var(--text-on-hover) !important }
 [data-theme="light"] .filter-dropdown [role="option"]:focus:not([aria-selected="true"]),
 [data-theme="light"] .filter-dropdown [role="option"]:focus-visible:not([aria-selected="true"]) { background-color: var(--brand-pink) !important; color: #fff !important }
 [data-theme="light"] .filter-dropdown [role="option"]:focus:not([aria-selected="true"]):hover,
@@ -2422,7 +2436,7 @@ main.main-content,
 }
 
 .filter-dropdown [role="option"]:hover:not([aria-selected="true"]):not(:focus-visible):not(:focus) {
-  background-color: var(--hover-cyan) !important;
+  background-color: var(--hover-point) !important;
 }
 .filter-dropdown [role="option"]:focus:not([aria-selected="true"]),
 .filter-dropdown [role="option"]:focus-visible:not([aria-selected="true"]) {
@@ -2559,7 +2573,7 @@ main.main-content,
 
 /* 라이트 모드에서 헤더 색상을 보라색으로 */
 [data-theme="light"] .filter-dropdown .filter-group-header {
-  color: var(--hover-cyan);
+  color: var(--hover-point);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -2672,9 +2686,9 @@ main.main-content,
 .sort-dropdown button svg { color: var(--text-base) !important; transition: color .2s ease }
 
 /* 호버 효과 (포커스가 아닐 때만) */
-.sort-dropdown:hover:not(:focus-within) button { border-color: var(--hover-cyan) !important }
-.sort-dropdown:hover:not(:focus-within) .lucide-arrow-up-down { color: var(--hover-cyan) !important }
-.sort-dropdown:hover:not(:focus-within) button svg { color: var(--hover-cyan) !important }
+.sort-dropdown:hover:not(:focus-within) button { border-color: var(--hover-point) !important }
+.sort-dropdown:hover:not(:focus-within) .lucide-arrow-up-down { color: var(--hover-point) !important }
+.sort-dropdown:hover:not(:focus-within) button svg { color: var(--hover-point) !important }
 
 /* 포커스 효과 (호버보다 우선) */
 .sort-dropdown:focus-within button { border-color: var(--brand-pink) !important }
@@ -2694,8 +2708,8 @@ main.main-content,
 [data-theme="light"] .sort-dropdown .lucide-arrow-up-down { color: var(--text-base) !important }
 [data-theme="light"] .sort-dropdown button svg { color: var(--text-base) !important }
 
-[data-theme="light"] .sort-dropdown:hover:not(:focus-within) .lucide-arrow-up-down { color: var(--hover-cyan) !important }
-[data-theme="light"] .sort-dropdown:hover:not(:focus-within) button svg { color: var(--hover-cyan) !important }
+[data-theme="light"] .sort-dropdown:hover:not(:focus-within) .lucide-arrow-up-down { color: var(--hover-point) !important }
+[data-theme="light"] .sort-dropdown:hover:not(:focus-within) button svg { color: var(--hover-point) !important }
 
 [data-theme="light"] .sort-dropdown:focus-within .lucide-arrow-up-down,
 [data-theme="light"] .sort-dropdown[data-open="true"] .lucide-arrow-up-down { color: var(--brand-pink) !important }
@@ -2720,11 +2734,11 @@ main.main-content,
 }
 
 .sort-dropdown [role="option"][aria-selected="true"] { background-color: var(--brand-pink) !important; color: #fff !important }
-.sort-dropdown [role="option"]:hover:not([aria-selected="true"]):not(:focus-visible):not(:focus) { background-color: var(--hover-cyan) !important; color: #000 !important }
+.sort-dropdown [role="option"]:hover:not([aria-selected="true"]):not(:focus-visible):not(:focus) { background-color: var(--hover-point) !important; color: var(--text-on-hover) !important }
 .sort-dropdown [role="option"]:focus-visible:not([aria-selected="true"]) { background-color: var(--brand-pink) !important; color: #fff !important; outline: none }
 .sort-dropdown [role="option"]:focus:not([aria-selected="true"]) { background-color: var(--brand-pink) !important; color: #fff !important; outline: none }
 
-[data-theme="light"] .sort-dropdown [role="option"]:hover:not([aria-selected="true"]):not(:focus-visible):not(:focus) { background-color: var(--hover-cyan) !important; color: var(--surface-2) !important }
+[data-theme="light"] .sort-dropdown [role="option"]:hover:not([aria-selected="true"]):not(:focus-visible):not(:focus) { background-color: var(--hover-point) !important; color: var(--text-on-hover) !important }
 [data-theme="light"] .sort-dropdown [role="option"]:focus-visible:not([aria-selected="true"]) { background-color: var(--brand-pink) !important; color: #fff !important }
 [data-theme="light"] .sort-dropdown [role="option"]:focus:not([aria-selected="true"]) { background-color: var(--brand-pink) !important; color: #fff !important }
 
@@ -2868,23 +2882,23 @@ main.main-content,
 /* 입력 필드 호버 시 아이콘 색상 변경 (포커스가 아닐 때만) */
 .artist-select-dropdown:hover:not(:focus-within) .lucide-icon,
 .album-select-dropdown:hover:not(:focus-within) .lucide-icon {
-	color: var(--hover-cyan) !important;
+	color: var(--hover-point) !important;
 }
 
 .artist-select-dropdown:hover:not(:focus-within) button .lucide-icon,
 .album-select-dropdown:hover:not(:focus-within) button .lucide-icon {
-	color: var(--hover-cyan) !important;
+	color: var(--hover-point) !important;
 }
 
 /* 라이트 모드 - 입력 필드 호버 시 아이콘 색상 변경 (포커스가 아닐 때만) */
 [data-theme="light"] .artist-select-dropdown:hover:not(:focus-within) .lucide-icon,
 [data-theme="light"] .album-select-dropdown:hover:not(:focus-within) .lucide-icon {
-	color: var(--hover-cyan) !important;
+	color: var(--hover-point) !important;
 }
 
 [data-theme="light"] .artist-select-dropdown:hover:not(:focus-within) button .lucide-icon,
 [data-theme="light"] .album-select-dropdown:hover:not(:focus-within) button .lucide-icon {
-	color: var(--hover-cyan) !important;
+	color: var(--hover-point) !important;
 }
 
 /* 앨범 선택 드롭다운 - 아티스트 이름 색상 (기본) */
@@ -2967,7 +2981,7 @@ main.main-content,
 }
 
 .track-toggle-btn:hover:not(:focus):not(:focus-visible) {
-  color: var(--hover-cyan) !important;
+  color: var(--hover-point) !important;
 }
 
 .track-toggle-btn:focus,
@@ -2984,7 +2998,7 @@ main.main-content,
 
 /* 라이트 모드에서 트랙 토글 버튼 호버 색상 */
 [data-theme="light"] .track-toggle-btn:hover:not(:focus):not(:focus-visible) {
-  color: var(--hover-cyan) !important;
+  color: var(--hover-point) !important;
 }
 
 /* ============================================================
@@ -2996,13 +3010,13 @@ main.main-content,
 
 /* 호버 효과 (포커스가 아닐 때만) - 배경색 없이 폰트 색상만 */
 .track-item:hover:not(:focus):not(:focus-visible) {
-  color: var(--hover-cyan) !important;
+  color: var(--hover-point) !important;
 }
 
 .track-item:hover:not(:focus):not(:focus-visible) .track-number,
 .track-item:hover:not(:focus):not(:focus-visible) .track-title,
 .track-item:hover:not(:focus):not(:focus-visible) .track-duration {
-  color: var(--hover-cyan) !important;
+  color: var(--hover-point) !important;
 }
 
 .track-item:hover:not(:focus):not(:focus-visible) .track-title {
@@ -3053,13 +3067,13 @@ main.main-content,
 
 /* 라이트 모드에서 트랙 아이템 호버 색상 */
 [data-theme="light"] .track-item:hover:not(:focus):not(:focus-visible) {
-  color: var(--hover-cyan) !important;
+  color: var(--hover-point) !important;
 }
 
 [data-theme="light"] .track-item:hover:not(:focus):not(:focus-visible) .track-number,
 [data-theme="light"] .track-item:hover:not(:focus):not(:focus-visible) .track-title,
 [data-theme="light"] .track-item:hover:not(:focus):not(:focus-visible) .track-duration {
-  color: var(--hover-cyan) !important;
+  color: var(--hover-point) !important;
 }
 
 /* ============================================================
@@ -3070,7 +3084,7 @@ main.main-content,
 button.bg-brand-pink:hover:not(:focus):not(:focus-visible),
 button[class*="bg-brand-pink"]:hover:not(:focus):not(:focus-visible),
 button.hover\:bg-brand-pink\/90:hover:not(:focus):not(:focus-visible) {
-  background-color: var(--hover-cyan) !important;
+  background-color: var(--hover-point) !important;
   color: #000000 !important;
   transition: background-color 0.2s ease, color 0.2s ease;
 }
@@ -3130,7 +3144,7 @@ button.hover\:bg-brand-pink\/90:focus-visible:hover .lucide-icon {
 [data-theme="light"] button.bg-brand-pink:hover:not(:focus):not(:focus-visible),
 [data-theme="light"] button[class*="bg-brand-pink"]:hover:not(:focus):not(:focus-visible),
 [data-theme="light"] button.hover\:bg-brand-pink\/90:hover:not(:focus):not(:focus-visible) {
-  background-color: var(--hover-cyan) !important;
+  background-color: var(--hover-point) !important;
   color: var(--surface-2) !important;
 }
 
@@ -3194,7 +3208,7 @@ button.hover\:bg-brand-pink\/90:focus-visible:hover .lucide-icon {
   transition: border-color 0.3s ease;
 }
 .character-image-button:hover:not(:disabled) {
-  border-color: var(--hover-cyan) !important;
+  border-color: var(--hover-point) !important;
 }
 .character-image-button:focus,
 .character-image-button:focus-visible {
@@ -3207,7 +3221,7 @@ button.hover\:bg-brand-pink\/90:focus-visible:hover .lucide-icon {
 
 /* 버튼 내부 아이콘 호버/포커스 효과 (버튼이 포커스/호버될 때) */
 button:hover:not(:focus):not(:focus-visible) .lucide-icon {
-  color: #17E1BC !important;
+  color: var(--hover-point) !important;
   transition: color 0.2s ease;
 }
 /* bg-brand-pink 버튼은 제외 (아이콘 색상 유지) */
@@ -3236,11 +3250,11 @@ input[type="number"].number-input-custom::-webkit-inner-spin-button {
 
 /* Number input 커스텀 스피너 버튼 호버/포커스 효과 */
 input[type="number"].number-input-custom + div button:hover .lucide-icon {
-  color: var(--hover-cyan) !important;
+  color: var(--hover-point) !important;
 }
 
 [data-theme="light"] input[type="number"].number-input-custom + div button:hover .lucide-icon {
-  color: var(--hover-cyan) !important;
+  color: var(--hover-point) !important;
 }
 
 input[type="number"].number-input-custom + div button:focus .lucide-icon,
@@ -3255,12 +3269,12 @@ input[type="number"].number-input-custom + div button:focus-visible .lucide-icon
 
 .status-dropdown button:hover:not(:focus):not(:focus-visible) svg,
 .status-dropdown button:hover:not(:focus):not(:focus-visible) .lucide-icon {
-  color: var(--hover-cyan) !important;
+  color: var(--hover-point) !important;
 }
 
 [data-theme="light"] .status-dropdown button:hover:not(:focus):not(:focus-visible) svg,
 [data-theme="light"] .status-dropdown button:hover:not(:focus):not(:focus-visible) .lucide-icon {
-  color: var(--hover-cyan) !important;
+  color: var(--hover-point) !important;
 }
 
 .status-dropdown button:focus svg,
@@ -3409,11 +3423,11 @@ input[type="number"].number-input-custom + div button:focus-visible .lucide-icon
 }
 
 .custom-calendar .lucide-icon:hover {
-  color: var(--hover-cyan) !important;
+  color: var(--hover-point) !important;
 }
 
 [data-theme="light"] .custom-calendar .lucide-icon:hover {
-  color: var(--hover-cyan) !important;
+  color: var(--hover-point) !important;
 }
 
 /* 선택된 날짜 핫핑크 색상 강제 */
@@ -3432,11 +3446,11 @@ input[type="number"].number-input-custom + div button:focus-visible .lucide-icon
 }
 
 .calendar-nav-btn:hover .lucide-icon {
-  color: var(--hover-cyan) !important;
+  color: var(--hover-point) !important;
 }
 
 [data-theme="light"] .calendar-nav-btn:hover .lucide-icon {
-  color: var(--hover-cyan) !important;
+  color: var(--hover-point) !important;
 }
 
 .calendar-nav-btn:focus .lucide-icon,
@@ -3454,11 +3468,11 @@ input[type="number"].number-input-custom + div button:focus-visible .lucide-icon
 }
 
 .calendar-icon-btn:hover .lucide-icon {
-  color: var(--hover-cyan) !important;
+  color: var(--hover-point) !important;
 }
 
 [data-theme="light"] .calendar-icon-btn:hover .lucide-icon {
-  color: var(--hover-cyan) !important;
+  color: var(--hover-point) !important;
 }
 
 .calendar-icon-btn:focus .lucide-icon,
@@ -3485,12 +3499,12 @@ input[type="number"].number-input-custom + div button:focus-visible .lucide-icon
 }
 
 .status-dropdown [role="option"]:hover:not([aria-selected="true"]):not(:focus-visible) {
-  background-color: var(--hover-cyan) !important;
+  background-color: var(--hover-point) !important;
   color: #000 !important;
 }
 
 [data-theme="light"] .status-dropdown [role="option"]:hover:not([aria-selected="true"]):not(:focus-visible):not(:focus) {
-  background-color: var(--hover-cyan) !important;
+  background-color: var(--hover-point) !important;
   color: var(--surface-2) !important;
 }
 
@@ -3565,8 +3579,8 @@ input[type="number"].number-input-custom + div button:focus-visible .lucide-icon
 
 .cancel-button:hover:not(:focus):not(:focus-visible) {
   background-color: transparent !important;
-  color: var(--hover-cyan) !important;
-  border-color: var(--hover-cyan) !important;
+  color: var(--hover-point) !important;
+  border-color: var(--hover-point) !important;
 }
 
 .cancel-button:focus,
@@ -3592,20 +3606,14 @@ input[type="number"].number-input-custom + div button:focus-visible .lucide-icon
 /* 취소 버튼 내부 아이콘 색상 변경 */
 .cancel-button:hover:not(:focus):not(:focus-visible) svg,
 .cancel-button:hover:not(:focus):not(:focus-visible) .lucide-icon {
-  color: var(--hover-cyan) !important;
+  color: var(--hover-point) !important;
 }
 
 /* 장르 드롭다운 아이템 호버 스타일 */
-/* 다크 모드: 시안색 배경 + 검은색 텍스트 */
-[data-theme="dark"] .genre-dropdown-item:hover {
-  background-color: #17E1BC !important;
-  color: #000000 !important;
-}
-
-/* 라이트 모드: 보라색 배경 + 흰색 텍스트 */
-[data-theme="light"] .genre-dropdown-item:hover {
-  background-color: #8A2BE2 !important;
-  color: #FFFFFF !important;
+/* 다크/라이트 모드: 호버 포인트 배경 + 텍스트 색상 */
+.genre-dropdown-item:hover {
+  background-color: var(--hover-point) !important;
+  color: var(--text-on-hover) !important;
 }
 
 .cancel-button:focus svg,
@@ -3626,9 +3634,9 @@ input[type="number"].number-input-custom + div button:focus-visible .lucide-icon
    PageHeader 액션 버튼 호버/포커스 효과
    ============================================================ */
 
-/* 기본 버튼 (bg-brand-pink) - 기본 상태 (핫핑크 배경, 흰 텍스트) */
+/* 기본 버튼 (bg-brand-pink) - 기본 상태 */
 .page-header-primary-button {
-  background-color: #FF3DAE !important;
+  background-color: var(--brand-pink) !important;
   color: #FFFFFF !important;
 }
 
@@ -3637,36 +3645,22 @@ input[type="number"].number-input-custom + div button:focus-visible .lucide-icon
   color: #FFFFFF !important;
 }
 
-/* 기본 버튼 (bg-brand-pink) - 다크 모드 호버 (기본 모드) */
-.page-header-primary-button:hover:not(:focus):not(:focus-visible),
-[data-theme="dark"] .page-header-primary-button:hover:not(:focus):not(:focus-visible) {
-  background-color: #17E1BC !important;
-  color: #000000 !important;
-  border-color: #17E1BC !important;
+/* 기본 버튼 (bg-brand-pink) - 호버 */
+.page-header-primary-button:hover:not(:focus):not(:focus-visible) {
+  background-color: var(--hover-point) !important;
+  color: var(--text-on-hover) !important;
+  border-color: var(--hover-point) !important;
 }
 
 .page-header-primary-button:hover:not(:focus):not(:focus-visible) svg,
-.page-header-primary-button:hover:not(:focus):not(:focus-visible) .lucide-icon,
-[data-theme="dark"] .page-header-primary-button:hover:not(:focus):not(:focus-visible) svg,
-[data-theme="dark"] .page-header-primary-button:hover:not(:focus):not(:focus-visible) .lucide-icon {
-  color: #000000 !important;
-}
-
-/* 기본 버튼 (bg-brand-pink) - 라이트 모드 호버 */
-[data-theme="light"] .page-header-primary-button:hover:not(:focus):not(:focus-visible) {
-  background-color: #8A2BE2 !important;
-  color: #FFFFFF !important;
-}
-
-[data-theme="light"] .page-header-primary-button:hover:not(:focus):not(:focus-visible) svg,
-[data-theme="light"] .page-header-primary-button:hover:not(:focus):not(:focus-visible) .lucide-icon {
-  color: #FFFFFF !important;
+.page-header-primary-button:hover:not(:focus):not(:focus-visible) .lucide-icon {
+  color: var(--text-on-hover) !important;
 }
 
 /* 기본 버튼 (bg-brand-pink) - 포커스 */
 .page-header-primary-button:focus,
 .page-header-primary-button:focus-visible {
-  background-color: #FF3DAE !important;
+  background-color: var(--brand-pink) !important;
   color: #FFFFFF !important;
 }
 
@@ -3680,7 +3674,7 @@ input[type="number"].number-input-custom + div button:focus-visible .lucide-icon
 /* 기본 버튼 (bg-brand-pink) - 포커스+호버 */
 .page-header-primary-button:focus:hover,
 .page-header-primary-button:focus-visible:hover {
-  background-color: #FF3DAE !important;
+  background-color: var(--brand-pink) !important;
   color: #FFFFFF !important;
 }
 
@@ -3691,33 +3685,22 @@ input[type="number"].number-input-custom + div button:focus-visible .lucide-icon
   color: #FFFFFF !important;
 }
 
-/* 편집 버튼 (테두리만) - 다크 모드 호버 */
+/* 편집 버튼 (테두리만) - 호버 */
 .page-header-edit-button:hover:not(:focus):not(:focus-visible) {
-  border-color: #17E1BC !important;
-  color: #17E1BC !important;
+  border-color: var(--hover-point) !important;
+  color: var(--hover-point) !important;
 }
 
 .page-header-edit-button:hover:not(:focus):not(:focus-visible) svg,
 .page-header-edit-button:hover:not(:focus):not(:focus-visible) .lucide-icon {
-  color: #17E1BC !important;
-}
-
-/* 편집 버튼 (테두리만) - 라이트 모드 호버 */
-[data-theme="light"] .page-header-edit-button:hover:not(:focus):not(:focus-visible) {
-  border-color: #8A2BE2 !important;
-  color: #8A2BE2 !important;
-}
-
-[data-theme="light"] .page-header-edit-button:hover:not(:focus):not(:focus-visible) svg,
-[data-theme="light"] .page-header-edit-button:hover:not(:focus):not(:focus-visible) .lucide-icon {
-  color: #8A2BE2 !important;
+  color: var(--hover-point) !important;
 }
 
 /* 편집 버튼 (테두리만) - 포커스 */
 .page-header-edit-button:focus,
 .page-header-edit-button:focus-visible {
-  background-color: #FF3DAE !important;
-  border-color: #FF3DAE !important;
+  background-color: var(--brand-pink) !important;
+  border-color: var(--brand-pink) !important;
   color: #FFFFFF !important;
 }
 
@@ -3731,8 +3714,8 @@ input[type="number"].number-input-custom + div button:focus-visible .lucide-icon
 /* 편집 버튼 (테두리만) - 포커스+호버 */
 .page-header-edit-button:focus:hover,
 .page-header-edit-button:focus-visible:hover {
-  background-color: #FF3DAE !important;
-  border-color: #FF3DAE !important;
+  background-color: var(--brand-pink) !important;
+  border-color: var(--brand-pink) !important;
   color: #FFFFFF !important;
 }
 
@@ -3750,7 +3733,7 @@ input[type="number"].number-input-custom + div button:focus-visible .lucide-icon
 .custom-list-scrollbar {
   overflow-y: scroll !important; /* 항상 스크롤바 영역 확보 */
   scrollbar-width: thin !important; /* Firefox: thin으로 최소화 (호버 시 두꺼워짐 최소화) */
-  scrollbar-color: rgba(23, 225, 188, 0.3) transparent !important; /* Firefox (Dark) */
+  scrollbar-color: color-mix(in srgb, var(--hover-point) 30%, transparent) transparent !important; /* Firefox (Dark) */
   scrollbar-gutter: stable; /* 스크롤바 공간을 미리 확보하여 레이아웃 시프트 방지 */
 }
 
@@ -3780,24 +3763,24 @@ input[type="number"].number-input-custom + div button:focus-visible .lucide-icon
 
 /* 5. 썸 (막대) - 브랜드 포인트 스타일 (Dark Mode) */
 .custom-list-scrollbar::-webkit-scrollbar-thumb {
-  background-color: rgba(23, 225, 188, 0.3) !important; /* 투명한 시안 */
+  background-color: color-mix(in srgb, var(--hover-point) 30%, transparent) !important;
   border: 2px solid transparent !important; /* 여백 효과 */
   background-clip: padding-box !important;
   border-radius: 4px !important;
 }
 .custom-list-scrollbar::-webkit-scrollbar-thumb:hover {
-  background-color: #17E1BC !important; /* 쨍한 시안 */
+  background-color: var(--hover-point) !important;
 }
 
 /* 6. 라이트 모드 오버라이드 (Light Mode) */
 [data-theme="light"] .custom-list-scrollbar {
-  scrollbar-color: rgba(138, 43, 226, 0.3) transparent !important; /* Firefox (Light) */
+  scrollbar-color: color-mix(in srgb, var(--hover-point) 30%, transparent) transparent !important; /* Firefox (Light) */
 }
 [data-theme="light"] .custom-list-scrollbar::-webkit-scrollbar-thumb {
-  background-color: rgba(138, 43, 226, 0.3) !important; /* 투명한 보라 */
+  background-color: color-mix(in srgb, var(--hover-point) 30%, transparent) !important;
 }
 [data-theme="light"] .custom-list-scrollbar::-webkit-scrollbar-thumb:hover {
-  background-color: #8A2BE2 !important; /* 쨍한 보라 */
+  background-color: var(--hover-point) !important;
 }
 
 /* ============================================================
@@ -3805,17 +3788,17 @@ input[type="number"].number-input-custom + div button:focus-visible .lucide-icon
    ============================================================ */
 /* input 포커스 시 아이콘 색상 변경 */
 .relative:has(input:focus) button.text-text-muted {
-  color: var(--hover-cyan) !important;
+  color: var(--hover-point) !important;
 }
 
 /* input 포커스 시 아이콘 색상 변경 (더 구체적인 선택자) */
 .relative:has(input[type="number"]:focus) .pointer-events-auto.text-text-muted {
-  color: var(--hover-cyan) !important;
+  color: var(--hover-point) !important;
 }
 
 /* 포커스된 input의 형제 버튼 아이콘 색상 변경 */
 .relative:focus-within .pointer-events-auto.text-text-muted {
-  color: var(--hover-cyan) !important;
+  color: var(--hover-point) !important;
 }
 
 /* ============================================================
@@ -3832,11 +3815,11 @@ button[aria-label="고급 검색"][aria-expanded="true"] .lucide-icon {
 
 /* 고급 검색 버튼 - 호버만 있을 때 (포커스 없음, 패널 닫혀있을 때만) */
 button[aria-label="고급 검색"]:hover:not(:focus):not(:focus-visible):not([aria-expanded="true"]) {
-  border-color: var(--hover-cyan) !important;
+  border-color: var(--hover-point) !important;
 }
 button[aria-label="고급 검색"]:hover:not(:focus):not(:focus-visible):not([aria-expanded="true"]) svg,
 button[aria-label="고급 검색"]:hover:not(:focus):not(:focus-visible):not([aria-expanded="true"]) .lucide-icon {
-  color: var(--hover-cyan) !important;
+  color: var(--hover-point) !important;
 }
 
 /* 고급 검색 버튼 - 포커스 시 (호버와 관계없이) */
@@ -3848,7 +3831,7 @@ button[aria-label="고급 검색"]:focus svg,
 button[aria-label="고급 검색"]:focus-visible svg,
 button[aria-label="고급 검색"]:focus .lucide-icon,
 button[aria-label="고급 검색"]:focus-visible .lucide-icon {
-  color: var(--hover-cyan) !important;
+  color: var(--hover-point) !important;
 }
 
 /* 고급 검색 버튼 - 포커스 + 호버 (포커스 우선) */
@@ -3860,7 +3843,7 @@ button[aria-label="고급 검색"]:focus:hover svg,
 button[aria-label="고급 검색"]:focus-visible:hover svg,
 button[aria-label="고급 검색"]:focus:hover .lucide-icon,
 button[aria-label="고급 검색"]:focus-visible:hover .lucide-icon {
-  color: var(--hover-cyan) !important;
+  color: var(--hover-point) !important;
 }
 
 /* 고급 검색 장르 태그 - 선택된 항목 테두리 (다크 모드) */
@@ -3875,7 +3858,7 @@ button[aria-label="고급 검색"]:focus-visible:hover .lucide-icon {
 
 /* 고급 검색 장르 태그 - 호버 효과 (포커스 없을 때만, 선택 안 된 항목만) */
 .advanced-search-panel button[aria-pressed="false"]:hover:not(:focus):not(:focus-visible):not([aria-pressed="true"]) {
-  border-color: var(--hover-cyan) !important;
+  border-color: var(--hover-point) !important;
   background-color: var(--surface-3) !important;
 }
 
@@ -3913,7 +3896,7 @@ button[aria-label="고급 검색"]:focus-visible:hover .lucide-icon {
 
 /* 라이트 모드 - 고급 검색 장르 태그 호버 효과 (포커스 없을 때만, 선택 안 된 항목만) */
 [data-theme="light"] .advanced-search-panel button[aria-pressed="false"]:hover:not(:focus):not(:focus-visible):not([aria-pressed="true"]) {
-  border-color: var(--hover-cyan) !important;
+  border-color: var(--hover-point) !important;
 }
 
 /* 라이트 모드 - 고급 검색 장르 태그 포커스 효과 */
@@ -3934,9 +3917,9 @@ button[aria-label="고급 검색"]:focus-visible:hover .lucide-icon {
 
 /* Toast "무시" 버튼 호버/포커스 효과 */
 .toast-dismiss-button:hover:not(:focus):not(:focus-visible) {
-  border-color: var(--hover-cyan) !important;
+  border-color: var(--hover-point) !important;
   background-color: var(--surface-1) !important;
-  color: var(--hover-cyan) !important;
+  color: var(--hover-point) !important;
 }
 
 .toast-dismiss-button:focus,
@@ -3956,9 +3939,9 @@ button[aria-label="고급 검색"]:focus-visible:hover .lucide-icon {
 
 /* 라이트 모드 Toast "무시" 버튼 호버 효과 */
 [data-theme="light"] .toast-dismiss-button:hover:not(:focus):not(:focus-visible) {
-  border-color: var(--hover-cyan) !important;
+  border-color: var(--hover-point) !important;
   background-color: var(--surface-1) !important;
-  color: var(--hover-cyan) !important;
+  color: var(--hover-point) !important;
 }
 
 /* Toast 아이콘 호버 효과 제거 */
@@ -3981,7 +3964,7 @@ button[aria-label="고급 검색"]:focus-visible:hover .lucide-icon {
 
 /* 호버: 호버 색상 (포커스 없을 때만) */
 .search-clear-button:hover:not(:focus):not(:focus-visible) .lucide-icon {
-  color: var(--hover-cyan) !important;
+  color: var(--hover-point) !important;
 }
 
 /* 포커스: 핫핑크 */
@@ -4003,7 +3986,7 @@ button[aria-label="고급 검색"]:focus-visible:hover .lucide-icon {
 
 /* 호버 효과 */
 .genre-clear-button:hover:not(:focus):not(:focus-visible) {
-  color: var(--hover-cyan) !important;
+  color: var(--hover-point) !important;
 }
 
 /* 포커스 효과 */
@@ -4056,7 +4039,7 @@ button[type="button"]:focus-visible {
 #artist-debut-date:hover:not(:focus):not(:focus-visible),
 #artist-agency:hover:not(:focus):not(:focus-visible),
 #artist-country:hover:not(:focus):not(:focus-visible) {
-  border-color: var(--hover-cyan) !important;
+  border-color: var(--hover-point) !important;
 }
 
 #artist-name:focus,

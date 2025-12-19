@@ -270,6 +270,10 @@
 	});
 </script>
 
+<svelte:head>
+	<title>새 앨범 만들기</title>
+</svelte:head>
+
 <PageContent>
 	<PageHeader 
 		title="새 앨범 만들기"
@@ -277,10 +281,10 @@
 	/>
 
 	<!-- 생성 폼 -->
-	<div class="bg-surface-1 rounded-lg border border-border-subtle p-6">
+	<div class="bg-surface-1 rounded-lg border border-border-subtle overflow-hidden">
 		<form onsubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
 			<!-- 좌우 배치 컨테이너 -->
-			<div class="flex flex-col lg:flex-row gap-10">
+			<div class="flex flex-col lg:flex-row gap-10 p-6">
 				<!-- [좌측] 이미지 업로드 영역 -->
 				<div class="w-full lg:w-80 flex-shrink-0">
 					<div
@@ -288,7 +292,8 @@
 						ondragover={handleDragOver}
 						ondragleave={handleDragLeave}
 						ondrop={handleDrop}
-						class="w-full aspect-square bg-surface-1 rounded-xl border-2 border-dashed cursor-pointer flex items-center justify-center transition-colors duration-200 overflow-hidden {isDragging ? 'border-brand-pink bg-surface-2/50' : 'border-border-subtle hover:border-brand-pink hover:bg-surface-2'}"
+						class="upload-zone w-full aspect-square bg-surface-1 rounded-xl border-2 cursor-pointer flex items-center justify-center overflow-hidden {isDragging ? 'border-brand-pink bg-surface-2/50' : ''}"
+						data-dragging={isDragging}
 						role="button"
 						tabindex="0"
 						onkeydown={(e) => {
@@ -322,10 +327,10 @@
 				</div>
 
 				<!-- [우측] 입력 필드 영역 -->
-				<div class="flex-1 space-y-6">
+				<div class="flex-1 space-y-4">
 			<!-- 기본 정보 -->
 			<div class="space-y-4">
-				<h3 class="text-lg font-semibold text-text-strong mb-4">기본 정보</h3>
+				<h3 class="text-lg font-semibold text-text-strong">기본 정보</h3>
 				
 				<!-- 앨범 제목 -->
 				<div class="w-full">
@@ -339,17 +344,19 @@
 							name="title"
 							bind:value={formData.title}
 							required
-							class="w-full h-10 px-4 {formData.title.trim() ? 'pr-10' : 'pr-4'} bg-surface-2 border border-border-subtle rounded-lg text-text-base focus:outline-none focus:border-brand-pink focus:ring-0 transition-colors duration-200"
+							class="w-full h-10 px-4 {formData.title.trim() ? 'pr-10' : 'pr-4'} bg-surface-2 border border-border-subtle rounded-lg text-base text-text-base placeholder:text-text-muted hover:border-[var(--hover-cyan)] focus:outline-none focus:border-brand-pink focus:ring-0 transition-colors duration-200"
 							placeholder="앨범 제목을 입력하세요"
 						/>
 						{#if formData.title.trim()}
 							<button
 								type="button"
 								onclick={() => formData.title = ''}
-								class="absolute inset-y-0 right-2 flex items-center pointer-events-auto bg-transparent hover:bg-transparent focus:bg-transparent focus-visible:bg-transparent"
+								class="btn-icon absolute inset-y-0 right-2.5 flex items-center pointer-events-auto"
 								aria-label="입력 내용 지우기"
 							>
-								<X size={16} class="lucide-icon text-text-muted hover:text-text-base transition-colors duration-200" />
+								<span class="flex h-4 w-4 items-center justify-center">
+									<X size={16} class="lucide-icon text-text-muted" />
+								</span>
 							</button>
 						{/if}
 					</div>
@@ -385,7 +392,7 @@
 									toggleGenreDropdown();
 								}
 							}}
-							class="w-full min-h-10 px-4 pr-10 py-1.5 bg-surface-2 border border-border-subtle rounded-lg text-text-base transition-colors duration-200 flex flex-wrap gap-2 items-center cursor-pointer hover:border-[var(--hover-cyan)] hover:text-[var(--hover-cyan)] focus-within:border-brand-pink focus-within:text-brand-pink focus-within:outline-none focus-within:ring-0"
+							class="w-full min-h-10 px-4 pr-[2.625rem] py-2 bg-surface-2 border border-border-subtle rounded-lg text-base text-text-base transition-colors duration-200 flex flex-wrap gap-2 items-center cursor-pointer hover:border-[var(--hover-cyan)] hover:text-[var(--hover-cyan)] focus-within:border-brand-pink focus-within:text-brand-pink focus-within:outline-none focus-within:ring-0"
 							role="button"
 							aria-haspopup="listbox"
 							aria-expanded={genreDropdownOpen}
@@ -395,7 +402,7 @@
 								<span class="text-text-muted">장르를 선택하세요</span>
 							{:else}
 								{#each formData.genres as genre}
-									<span class="bg-surface-3 text-text-strong rounded-full px-2 py-0.5 text-xs flex items-center gap-1">
+									<span class="tag-chip">
 										{genre}
 										<button
 											type="button"
@@ -403,7 +410,7 @@
 												e.stopPropagation();
 												removeGenre(genre);
 											}}
-											class="ml-1 hover:bg-transparent hover:text-danger-fg transition-colors duration-200 focus:outline-none"
+											class="btn-icon ml-1 focus:outline-none"
 											aria-label="{genre} 제거"
 										>
 											<X size={12} />
@@ -412,11 +419,13 @@
 								{/each}
 							{/if}
 						</div>
-						<div class="pointer-events-none absolute top-3 right-3 flex items-center">
-							<ChevronDownIcon size={16} class="lucide-icon text-text-muted transition-colors duration-200" />
+						<div class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center">
+							<span class="flex h-4 w-4 items-center justify-center">
+								<ChevronDownIcon size={16} class="lucide-icon text-text-muted transition-colors duration-200" />
+							</span>
 						</div>
 						{#if genreDropdownOpen}
-							<ul role="listbox" class="absolute left-0 w-full mt-[6px] bg-surface-1 border rounded-[6px] z-10 border-border-subtle shadow-lg max-h-60 overflow-y-auto">
+							<ul role="listbox" class="absolute left-0 w-full mt-[6px] bg-surface-1 border rounded-[6px] z-10 border-border-subtle max-h-60 overflow-y-auto">
 								{#if availableGenres.length === 0}
 									<li class="px-4 py-2 text-sm text-text-muted text-center">모든 장르가 선택되었습니다</li>
 								{:else}
@@ -449,11 +458,12 @@
 						상태 <Asterisk size={12} class="inline text-brand-pink ml-0" />
 					</label>
 					<div class="relative w-full status-dropdown" data-open={statusDropdownOpen}>
+						<input type="hidden" name="status" value={formData.status} />
 						<button
 							type="button"
 							id="status"
 							name="status"
-							class="w-full h-10 px-4 pr-[2.625rem] bg-surface-2 border border-border-subtle rounded-lg text-text-base text-left focus:outline-none focus:border-brand-pink focus:ring-0 transition-colors duration-200"
+							class="w-full h-10 px-4 pr-[2.625rem] bg-surface-2 border border-border-subtle rounded-lg text-base text-text-base text-left hover:border-[var(--hover-cyan)] focus:outline-none focus:border-brand-pink focus:ring-0 transition-colors duration-200"
 							onclick={toggleStatusDropdown}
 							onkeydown={(e) => {
 								if (e.key === 'Enter' || e.key === ' ') {
@@ -474,7 +484,7 @@
 							</span>
 						</div>
 						{#if statusDropdownOpen}
-							<ul role="listbox" class="absolute left-0 w-full mt-[6px] bg-surface-1 border rounded-[6px] z-10 border-border-subtle shadow-lg max-h-60 overflow-y-auto">
+							<ul role="listbox" class="absolute left-0 w-full mt-[6px] bg-surface-1 border rounded-[6px] z-10 border-border-subtle max-h-60 overflow-y-auto">
 								{#each statusOptions as option}
 									<li
 										role="option"
@@ -498,10 +508,13 @@
 				</div>
 			</div>
 
+			</div>
+			</div>
+
 			<!-- 발매일 정보 -->
-					<div class="-mx-4 sm:-mx-6 lg:-mx-8 pt-6 border-t border-border-subtle px-4 sm:px-6 lg:px-8">
-				<div class="space-y-4">
-					<h3 class="text-lg font-semibold text-text-strong mb-4">발매일 정보</h3>
+			<div class="border-t border-border-subtle">
+				<div class="p-6 space-y-4">
+					<h3 class="text-lg font-semibold text-text-strong">발매일 정보</h3>
 					
 					<!-- 국내 발매일 -->
 					<div class="w-full">
@@ -518,7 +531,8 @@
 			</div>
 
 			<!-- 액션 버튼 -->
-					<div class="-mx-4 sm:-mx-6 lg:-mx-8 flex items-center justify-end gap-3 pt-6 border-t border-border-subtle px-4 sm:px-6 lg:px-8">
+			<div class="border-t border-border-subtle p-6">
+				<div class="flex items-center justify-end gap-3">
 				<button
 					type="button"
 					onclick={handleCancel}
@@ -534,7 +548,6 @@
 				>
 					{isSubmitting ? '생성 중...' : '생성'}
 				</button>
-					</div>
 				</div>
 			</div>
 		</form>

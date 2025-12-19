@@ -200,7 +200,7 @@
 	});
 </script>
 
-<div class="w-[280px] bg-surface-1 border border-border-subtle rounded-lg shadow-xl z-50 custom-calendar">
+<div class="w-[280px] bg-surface-1 border border-border-subtle rounded-lg z-50 custom-calendar">
 	<div class="p-3">
 		<!-- 월 네비게이션 -->
 		<div class="flex items-center justify-between mb-3">

@@ -277,11 +277,11 @@
 							<button
 								type="button"
 								onclick={() => formData.title = ''}
-								class="absolute inset-y-0 right-[2.625rem] flex items-center pointer-events-auto bg-transparent hover:bg-transparent focus:bg-transparent focus-visible:bg-transparent"
+								class="btn-icon absolute inset-y-0 right-[2.625rem] flex items-center pointer-events-auto"
 								aria-label="입력 내용 지우기"
 							>
 								<span class="flex h-4 w-4 items-center justify-center">
-									<X size={16} class="lucide-icon text-text-muted hover:text-text-base transition-colors duration-200" />
+									<X size={16} class="lucide-icon text-text-muted" />
 								</span>
 							</button>
 						{/if}
@@ -481,7 +481,7 @@
 								<span class="text-text-muted">장르를 선택하세요</span>
 							{:else}
 								{#each formData.genres as genre}
-									<span class="bg-surface-3 text-text-strong rounded-full px-2 py-0.5 text-xs flex items-center gap-1">
+									<span class="tag-chip">
 										{genre}
 										<button
 											type="button"
@@ -489,7 +489,7 @@
 												e.stopPropagation();
 												removeGenre(genre);
 											}}
-											class="ml-1 hover:bg-transparent hover:text-danger-fg transition-colors duration-200 focus:outline-none"
+											class="btn-icon ml-1 focus:outline-none"
 											aria-label="{genre} 제거"
 										>
 											<X size={12} />
@@ -504,7 +504,7 @@
 							</span>
 						</div>
 						{#if genreDropdownOpen}
-							<ul role="listbox" class="absolute left-0 w-full mt-[6px] bg-surface-1 border rounded-[6px] z-10 border-border-subtle shadow-lg max-h-60 overflow-y-auto">
+							<ul role="listbox" class="absolute left-0 w-full mt-[6px] bg-surface-1 border rounded-[6px] z-10 border-border-subtle max-h-60 overflow-y-auto">
 								{#if availableGenres.length === 0}
 									<li class="px-4 py-2 text-sm text-text-muted text-center">모든 장르가 선택되었습니다</li>
 								{:else}
@@ -563,7 +563,7 @@
 							</span>
 						</div>
 						{#if statusDropdownOpen}
-							<ul role="listbox" class="absolute left-0 w-full mt-[6px] bg-surface-1 border rounded-[6px] z-10 border-border-subtle shadow-lg max-h-60 overflow-y-auto">
+							<ul role="listbox" class="absolute left-0 w-full mt-[6px] bg-surface-1 border rounded-[6px] z-10 border-border-subtle max-h-60 overflow-y-auto">
 								{#each statusOptions as option}
 									<li
 										role="option"

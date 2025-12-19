@@ -60,7 +60,8 @@
 	<!-- 업로드 영역 -->
 	<div class="mb-8">
 		<div 
-			class="border-2 border-dashed border-border-subtle rounded-lg p-12 text-center transition-colors duration-200 {dragOver ? 'border-brand-pink bg-brand-pink/5' : 'hover:border-hover-cyan'}"
+			class="upload-zone border-2 rounded-lg p-12 text-center {dragOver ? 'border-brand-pink bg-brand-pink/5' : ''}"
+			data-dragging={dragOver}
 			role="button"
 			tabindex="0"
 			ondragover={handleDragOver}
@@ -119,7 +120,7 @@
 
 	<!-- 통계 카드들 -->
 	<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-		<div class="bg-surface-1 rounded-lg p-6 border border-border-subtle">
+		<div class="card-base bg-surface-1 rounded-lg p-6 border border-border-subtle">
 			<div class="flex items-center gap-3 mb-4">
 				<FileText size={20} class="text-brand-pink" />
 				<h3 class="font-semibold text-text-strong">최근 업로드</h3>
@@ -140,7 +141,7 @@
 			</div>
 		</div>
 
-		<div class="bg-surface-1 rounded-lg p-6 border border-border-subtle">
+		<div class="card-base bg-surface-1 rounded-lg p-6 border border-border-subtle">
 			<div class="flex items-center gap-3 mb-4">
 				<CheckCircle size={20} class="text-green-500" />
 				<h3 class="font-semibold text-text-strong">검증 상태</h3>
@@ -161,7 +162,7 @@
 			</div>
 		</div>
 
-		<div class="bg-surface-1 rounded-lg p-6 border border-border-subtle">
+		<div class="card-base bg-surface-1 rounded-lg p-6 border border-border-subtle">
 			<div class="flex items-center gap-3 mb-4">
 				<Upload size={20} class="text-brand-pink" />
 				<h3 class="font-semibold text-text-strong">업로드 통계</h3>

@@ -100,7 +100,7 @@
 				handleToggle(e);
 			}
 		}}
-		class="action-button h-8 w-8 inline-flex items-center justify-center rounded-md border border-border-subtle bg-surface-1 hover:bg-surface-2 focus-visible:bg-surface-2 transition-colors duration-200 {buttonClass}"
+		class="btn-icon action-button h-8 w-8 inline-flex items-center justify-center rounded-md border border-border-subtle bg-surface-1 {buttonClass}"
 		aria-label="더보기"
 		aria-expanded={isOpen}
 		aria-haspopup="menu"
@@ -128,11 +128,11 @@
 								handleItemClick(item, e);
 							}
 						}}
-						class="group w-full flex items-center gap-2 px-4 py-2 text-sm {item.danger ? 'text-red-500 hover:bg-transparent hover:text-red-400' : 'text-text-base hover:bg-transparent hover:text-[var(--hover-cyan)]'} transition-colors duration-200 text-left"
+						class="btn-ghost group w-full flex items-center gap-2 px-4 py-2 text-sm {item.danger ? 'text-red-500' : 'text-text-base'} text-left"
 						aria-label={item.ariaLabel || item.label}
 					>
 						{#if item.icon}
-							<svelte:component this={item.icon} size={16} class="{item.danger ? 'text-red-500 group-hover:text-red-400' : 'text-text-muted group-hover:text-[var(--hover-cyan)]'} transition-colors duration-200" />
+							<svelte:component this={item.icon} size={16} class="{item.danger ? 'text-red-500' : 'text-text-muted'}" />
 						{/if}
 						{item.label}
 					</button>

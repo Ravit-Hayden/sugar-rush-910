@@ -1131,13 +1131,13 @@
 									{/each}
 								</div>
 								<div class="flex items-center gap-1">
-									<button class="w-8 h-8 inline-flex items-center justify-center rounded-md hover:bg-surface-2 focus-visible:bg-surface-2 transition-colors duration-200" title="편집" aria-label="편집">
+									<button class="btn-icon w-8 h-8 inline-flex items-center justify-center rounded-md" title="편집" aria-label="편집">
 										<Edit size={14} class="text-text-muted" />
 									</button>
-									<button class="w-8 h-8 inline-flex items-center justify-center rounded-md hover:bg-surface-2 focus-visible:bg-surface-2 transition-colors duration-200" title="다운로드" aria-label="다운로드">
+									<button class="btn-icon w-8 h-8 inline-flex items-center justify-center rounded-md" title="다운로드" aria-label="다운로드">
 										<Download size={14} class="text-text-muted" />
 									</button>
-									<button class="w-8 h-8 inline-flex items-center justify-center rounded-md hover:bg-surface-2 focus-visible:bg-surface-2 transition-colors duration-200" title="공유" aria-label="공유">
+									<button class="btn-icon w-8 h-8 inline-flex items-center justify-center rounded-md" title="공유" aria-label="공유">
 										<Share size={14} class="text-text-muted" />
 									</button>
 								</div>
@@ -1229,7 +1229,7 @@
 								<span class="text-xs text-text-muted">{character.created_at}</span>
 								<div class="flex items-center gap-1">
 									<button
-										class="w-8 h-8 inline-flex items-center justify-center rounded-md bg-transparent border-transparent hover:bg-surface-2 focus-visible:bg-surface-2 transition-colors duration-200"
+										class="btn-icon w-8 h-8 inline-flex items-center justify-center rounded-md"
 										title="편집"
 										onclick={(e: Event) => {
 											e.stopPropagation();
@@ -1239,7 +1239,7 @@
 										<Edit size={14} class="lucide-icon text-text-muted" />
 									</button>
 									<button
-										class="w-8 h-8 inline-flex items-center justify-center rounded-md bg-transparent border-transparent hover:bg-surface-2 focus-visible:bg-surface-2 transition-colors duration-200"
+										class="btn-icon w-8 h-8 inline-flex items-center justify-center rounded-md"
 										title="설정"
 										onclick={(e: Event) => {
 											e.stopPropagation();
@@ -1316,10 +1316,10 @@
 							<div class="flex items-center justify-between">
 								<span class="text-xs text-text-muted">{asset.usage_count}회 사용</span>
 								<div class="flex items-center gap-1">
-									<button class="w-8 h-8 inline-flex items-center justify-center rounded-md hover:bg-surface-2 focus-visible:bg-surface-2 transition-colors duration-200" title="편집" aria-label="편집">
+									<button class="btn-icon w-8 h-8 inline-flex items-center justify-center rounded-md" title="편집" aria-label="편집">
 										<Edit size={14} class="text-text-muted" />
 									</button>
-									<button class="w-8 h-8 inline-flex items-center justify-center rounded-md hover:bg-surface-2 focus-visible:bg-surface-2 transition-colors duration-200" title="다운로드" aria-label="다운로드">
+									<button class="btn-icon w-8 h-8 inline-flex items-center justify-center rounded-md" title="다운로드" aria-label="다운로드">
 										<Download size={14} class="text-text-muted" />
 									</button>
 								</div>

@@ -501,10 +501,10 @@
 															<button
 																type="button"
 																onclick={() => newArtistName = ''}
-																class="absolute inset-y-0 right-2 flex items-center pointer-events-auto bg-transparent hover:bg-transparent focus:bg-transparent focus-visible:bg-transparent"
+																class="btn-icon absolute inset-y-0 right-2 flex items-center pointer-events-auto"
 																aria-label="입력 내용 지우기"
 															>
-																<X size={16} class="lucide-icon text-text-muted hover:text-text-base transition-colors duration-200" />
+																<X size={16} class="lucide-icon text-text-muted" />
 															</button>
 														{/if}
 													</div>
@@ -527,10 +527,10 @@
 															<button
 																type="button"
 																onclick={() => newArtistDescription = ''}
-																class="absolute top-2 right-2 flex items-center pointer-events-auto bg-transparent hover:bg-transparent focus:bg-transparent focus-visible:bg-transparent"
+																class="btn-icon absolute top-2 right-2 flex items-center pointer-events-auto"
 																aria-label="입력 내용 지우기"
 															>
-																<X size={16} class="lucide-icon text-text-muted hover:text-text-base transition-colors duration-200" />
+																<X size={16} class="lucide-icon text-text-muted" />
 															</button>
 														{/if}
 													</div>
@@ -633,10 +633,10 @@
 																		newArtistPhotoUrl = '';
 																		previewUrl = null;
 																	}}
-																	class="absolute inset-y-0 right-2 flex items-center pointer-events-auto bg-transparent hover:bg-transparent focus:bg-transparent focus-visible:bg-transparent"
+																	class="btn-icon absolute inset-y-0 right-2 flex items-center pointer-events-auto"
 																	aria-label="입력 내용 지우기"
 																>
-																	<X size={16} class="lucide-icon text-text-muted hover:text-text-base transition-colors duration-200" />
+																	<X size={16} class="lucide-icon text-text-muted" />
 																</button>
 															{/if}
 														</div>
@@ -684,10 +684,10 @@
 																<button
 																	type="button"
 																	onclick={() => newArtistWebsite = ''}
-																	class="absolute inset-y-0 right-2 flex items-center pointer-events-auto bg-transparent hover:bg-transparent focus:bg-transparent focus-visible:bg-transparent"
+																	class="btn-icon absolute inset-y-0 right-2 flex items-center pointer-events-auto"
 																	aria-label="입력 내용 지우기"
 																>
-																	<X size={16} class="lucide-icon text-text-muted hover:text-text-base transition-colors duration-200" />
+																	<X size={16} class="lucide-icon text-text-muted" />
 																</button>
 															{/if}
 														</div>
@@ -709,10 +709,10 @@
 																<button
 																	type="button"
 																	onclick={() => newArtistEmail = ''}
-																	class="absolute inset-y-0 right-2 flex items-center pointer-events-auto bg-transparent hover:bg-transparent focus:bg-transparent focus-visible:bg-transparent"
+																	class="btn-icon absolute inset-y-0 right-2 flex items-center pointer-events-auto"
 																	aria-label="입력 내용 지우기"
 																>
-																	<X size={16} class="lucide-icon text-text-muted hover:text-text-base transition-colors duration-200" />
+																	<X size={16} class="lucide-icon text-text-muted" />
 																</button>
 															{/if}
 														</div>
@@ -742,10 +742,10 @@
 																<button
 																	type="button"
 																	onclick={() => newArtistInstagram = ''}
-																	class="absolute inset-y-0 right-2 flex items-center pointer-events-auto bg-transparent hover:bg-transparent focus:bg-transparent focus-visible:bg-transparent"
+																	class="btn-icon absolute inset-y-0 right-2 flex items-center pointer-events-auto"
 																	aria-label="입력 내용 지우기"
 																>
-																	<X size={16} class="lucide-icon text-text-muted hover:text-text-base transition-colors duration-200" />
+																	<X size={16} class="lucide-icon text-text-muted" />
 																</button>
 															{/if}
 														</div>
@@ -767,10 +767,10 @@
 																<button
 																	type="button"
 																	onclick={() => newArtistTwitter = ''}
-																	class="absolute inset-y-0 right-2 flex items-center pointer-events-auto bg-transparent hover:bg-transparent focus:bg-transparent focus-visible:bg-transparent"
+																	class="btn-icon absolute inset-y-0 right-2 flex items-center pointer-events-auto"
 																	aria-label="입력 내용 지우기"
 																>
-																	<X size={16} class="lucide-icon text-text-muted hover:text-text-base transition-colors duration-200" />
+																	<X size={16} class="lucide-icon text-text-muted" />
 																</button>
 															{/if}
 														</div>
@@ -792,10 +792,10 @@
 																<button
 																	type="button"
 																	onclick={() => newArtistYoutube = ''}
-																	class="absolute inset-y-0 right-2 flex items-center pointer-events-auto bg-transparent hover:bg-transparent focus:bg-transparent focus-visible:bg-transparent"
+																	class="btn-icon absolute inset-y-0 right-2 flex items-center pointer-events-auto"
 																	aria-label="입력 내용 지우기"
 																>
-																	<X size={16} class="lucide-icon text-text-muted hover:text-text-base transition-colors duration-200" />
+																	<X size={16} class="lucide-icon text-text-muted" />
 																</button>
 															{/if}
 														</div>
@@ -825,10 +825,10 @@
 																<button
 																	type="button"
 																	onclick={() => newArtistGenre = ''}
-																	class="absolute inset-y-0 right-2 flex items-center pointer-events-auto bg-transparent hover:bg-transparent focus:bg-transparent focus-visible:bg-transparent"
+																	class="btn-icon absolute inset-y-0 right-2 flex items-center pointer-events-auto"
 																	aria-label="입력 내용 지우기"
 																>
-																	<X size={16} class="lucide-icon text-text-muted hover:text-text-base transition-colors duration-200" />
+																	<X size={16} class="lucide-icon text-text-muted" />
 																</button>
 															{/if}
 														</div>
@@ -859,10 +859,10 @@
 																<button
 																	type="button"
 																	onclick={() => newArtistAgency = ''}
-																	class="absolute inset-y-0 right-2 flex items-center pointer-events-auto bg-transparent hover:bg-transparent focus:bg-transparent focus-visible:bg-transparent"
+																	class="btn-icon absolute inset-y-0 right-2 flex items-center pointer-events-auto"
 																	aria-label="입력 내용 지우기"
 																>
-																	<X size={16} class="lucide-icon text-text-muted hover:text-text-base transition-colors duration-200" />
+																	<X size={16} class="lucide-icon text-text-muted" />
 																</button>
 															{/if}
 														</div>
@@ -884,10 +884,10 @@
 																<button
 																	type="button"
 																	onclick={() => newArtistCountry = ''}
-																	class="absolute inset-y-0 right-2 flex items-center pointer-events-auto bg-transparent hover:bg-transparent focus:bg-transparent focus-visible:bg-transparent"
+																	class="btn-icon absolute inset-y-0 right-2 flex items-center pointer-events-auto"
 																	aria-label="입력 내용 지우기"
 																>
-																	<X size={16} class="lucide-icon text-text-muted hover:text-text-base transition-colors duration-200" />
+																	<X size={16} class="lucide-icon text-text-muted" />
 																</button>
 															{/if}
 														</div>
@@ -982,27 +982,27 @@
 															</div>
 															<div class="flex flex-wrap gap-x-3 gap-y-1 mt-1.5">
 																{#if artist.website}
-																	<a href={artist.website} target="_blank" rel="noopener noreferrer" class="text-xs text-hover-cyan hover:underline truncate max-w-[200px] focus:outline-none focus:text-brand-pink">
+																	<a href={artist.website} target="_blank" rel="noopener noreferrer" class="text-link text-xs truncate max-w-[200px]">
 																		웹사이트
 																	</a>
 																{/if}
 																{#if artist.email}
-																	<a href="mailto:{artist.email}" class="text-xs text-hover-cyan hover:underline truncate max-w-[200px] focus:outline-none focus:text-brand-pink">
+																	<a href="mailto:{artist.email}" class="text-link text-xs truncate max-w-[200px]">
 																		{artist.email}
 																	</a>
 																{/if}
 																{#if artist.instagram}
-																	<a href={artist.instagram} target="_blank" rel="noopener noreferrer" class="text-xs text-hover-cyan hover:underline truncate max-w-[200px] focus:outline-none focus:text-brand-pink">
+																	<a href={artist.instagram} target="_blank" rel="noopener noreferrer" class="text-link text-xs truncate max-w-[200px]">
 																		Instagram
 																	</a>
 																{/if}
 																{#if artist.twitter}
-																	<a href={artist.twitter} target="_blank" rel="noopener noreferrer" class="text-xs text-hover-cyan hover:underline truncate max-w-[200px] focus:outline-none focus:text-brand-pink">
+																	<a href={artist.twitter} target="_blank" rel="noopener noreferrer" class="text-link text-xs truncate max-w-[200px]">
 																		Twitter
 																	</a>
 																{/if}
 																{#if artist.youtube}
-																	<a href={artist.youtube} target="_blank" rel="noopener noreferrer" class="text-xs text-hover-cyan hover:underline truncate max-w-[200px] focus:outline-none focus:text-brand-pink">
+																	<a href={artist.youtube} target="_blank" rel="noopener noreferrer" class="text-link text-xs truncate max-w-[200px]">
 																		YouTube
 																	</a>
 																{/if}

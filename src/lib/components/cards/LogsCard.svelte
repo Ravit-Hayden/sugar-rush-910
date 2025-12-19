@@ -14,7 +14,7 @@
 	const displayLogs = logs.length > 0 ? logs : defaultLogs;
 </script>
 
-<div class="h-[396px] flex flex-col justify-between p-5 rounded-lg bg-surface-2 border border-border-subtle overflow-hidden pt-[24px]">
+<div class="card-base h-[396px] flex flex-col justify-between p-5 rounded-lg bg-surface-2 border border-border-subtle overflow-hidden pt-[24px]">
 	<div>
 		<!-- 상단 타이틀영역 -->
 		<div class="flex items-center justify-between mb-4">

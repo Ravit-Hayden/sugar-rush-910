@@ -943,7 +943,7 @@
 							const input = document.getElementById('album-search') as HTMLInputElement;
 							input?.focus();
 						}}
-						class="search-clear-button absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 flex items-center justify-center bg-transparent hover:bg-transparent focus:bg-transparent focus-visible:bg-transparent"
+						class="btn-icon search-clear-button absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 flex items-center justify-center"
 						aria-label="검색 초기화"
 					>
 						<X size={16} class="lucide-icon" />
@@ -974,7 +974,7 @@
 					</div>
 				</button>
 				{#if filterDropdownOpen}
-					<ul role="listbox" class="absolute left-0 w-full mt-[6px] bg-surface-1 border rounded-[6px] z-10 border-border-subtle overflow-hidden shadow-lg">
+					<ul role="listbox" class="absolute left-0 w-full mt-[6px] bg-surface-1 border rounded-[6px] z-10 border-border-subtle overflow-hidden">
 						{#if groupedFilterOptions}
 							{#if groupedFilterOptions.ungrouped.length > 0}
 								{#each groupedFilterOptions.ungrouped as opt}
@@ -1108,7 +1108,7 @@
 			{#each paginatedAlbums as album (album.id)}
 				<div 
 					onclick={() => handleAlbumClick(album.id, album.title)}
-					class="album-card bg-surface-1 rounded-lg hover:bg-surface-2 transition-colors duration-200 group border border-border-subtle cursor-pointer focus-visible:border-brand-pink"
+					class="card-base card-interactive album-card bg-surface-1 rounded-lg hover:bg-surface-2 transition-colors duration-200 group border border-border-subtle cursor-pointer focus-visible:border-brand-pink"
 					role="button"
 					tabindex="0"
 					aria-label="{album.title} 앨범 상세 보기"
@@ -1231,7 +1231,7 @@
 							
 							<!-- 트랙 목록 (오버레이로 표시) -->
 							{#if selectedAlbumId === album.id && album.trackList && album.trackList.length > 0}
-								<div class="track-list-overlay absolute left-0 right-0 top-full mt-1 bg-surface-1 border border-border-subtle rounded-lg shadow-xl z-[100] animate-in fade-in slide-in-from-top-2 duration-200">
+								<div class="track-list-overlay absolute left-0 right-0 top-full mt-1 bg-surface-1 border border-border-subtle rounded-lg z-[100] animate-in fade-in slide-in-from-top-2 duration-200">
 								<div class="p-3">
 									<div class="text-xs text-text-muted mb-2 font-medium">트랙 목록 ({album.trackList.length}곡)</div>
 									<div class="space-y-1 max-h-48 overflow-y-auto track-list-scroll pr-1">
@@ -1293,7 +1293,7 @@
 								<button 
 									onclick={(e) => { e.preventDefault(); e.stopPropagation(); handleEdit(album.id); }}
 									onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') e.stopPropagation(); }}
-									class="w-8 h-8 inline-flex items-end justify-center rounded-md hover:bg-surface-2 focus-visible:bg-surface-2 transition-colors duration-200 pb-0.5 action-button" 
+									class="btn-icon w-8 h-8 inline-flex items-end justify-center rounded-md pb-0.5 action-button" 
 									aria-label="편집" 
 									title="편집"
 								>
@@ -1301,7 +1301,7 @@
 								</button>
 								<div class="relative more-menu-dropdown -ml-1 flex items-end">
 									<button
-										class="w-8 h-8 inline-flex items-end justify-center rounded-md hover:bg-transparent focus-visible:bg-transparent hover:text-text-strong focus-visible:text-text-strong transition-colors duration-200 pb-0.5 action-button"
+										class="btn-icon w-8 h-8 inline-flex items-end justify-center rounded-md pb-0.5 action-button"
 										aria-label="더보기"
 										aria-expanded={moreMenuOpenId === album.id}
 										aria-haspopup="menu"
@@ -1327,7 +1327,7 @@
 											<div class="py-1">
 												<button 
 													role="menuitem"
-													class="group w-full flex items-center gap-2 px-4 py-2 text-sm text-text-base hover:bg-transparent hover:text-[var(--hover-cyan)] transition-colors duration-200 text-left" 
+													class="btn-ghost group w-full flex items-center gap-2 px-4 py-2 text-sm text-text-base text-left" 
 													aria-label="다운로드"
 													onclick={(e) => { e.preventDefault(); e.stopPropagation(); handleDownload(album.id); }}
 													onkeydown={(e) => {
@@ -1338,13 +1338,13 @@
 														}
 													}}
 												>
-													<Download size={16} class="text-text-muted group-hover:text-[var(--hover-cyan)] transition-colors duration-200" />
+													<Download size={16} class="text-text-muted" />
 													다운로드
 												</button>
 												
 												<button 
 													role="menuitem"
-													class="group w-full flex items-center gap-2 px-4 py-2 text-sm text-text-base hover:bg-transparent hover:text-[var(--hover-cyan)] transition-colors duration-200 text-left" 
+													class="btn-ghost group w-full flex items-center gap-2 px-4 py-2 text-sm text-text-base text-left" 
 													aria-label="멤버 배정"
 													onclick={(e) => { e.preventDefault(); e.stopPropagation(); handleAssignMember(album.id); }}
 													onkeydown={(e) => {
@@ -1355,12 +1355,12 @@
 														}
 													}}
 												>
-													<UserPlus size={16} class="text-text-muted group-hover:text-[var(--hover-cyan)] transition-colors duration-200" />
+													<UserPlus size={16} class="text-text-muted" />
 													멤버 배정
 												</button>
 												<button 
 													role="menuitem"
-													class="group w-full flex items-center gap-2 px-4 py-2 text-sm text-text-base hover:bg-transparent hover:text-[var(--hover-cyan)] transition-colors duration-200 text-left" 
+													class="btn-ghost group w-full flex items-center gap-2 px-4 py-2 text-sm text-text-base text-left" 
 													aria-label="공유 링크 복사"
 													onclick={(e) => { e.preventDefault(); e.stopPropagation(); handleCopyShareLink(album.id); }}
 													onkeydown={(e) => {
@@ -1371,7 +1371,7 @@
 														}
 													}}
 												>
-													<Link size={16} class="text-text-muted group-hover:text-[var(--hover-cyan)] transition-colors duration-200" />
+													<Link size={16} class="text-text-muted" />
 													공유 링크 복사
 												</button>
 												
@@ -1379,7 +1379,7 @@
 												
 												<button 
 													role="menuitem"
-													class="group w-full flex items-center gap-2 px-4 py-2 text-sm text-danger-fg hover:bg-transparent hover:text-danger-fg/80 transition-colors duration-200 text-left" 
+													class="btn-ghost group w-full flex items-center gap-2 px-4 py-2 text-sm text-danger-fg text-left" 
 													aria-label="삭제"
 													onclick={(e) => { e.preventDefault(); e.stopPropagation(); handleDelete(album.id); }}
 													onkeydown={(e) => {

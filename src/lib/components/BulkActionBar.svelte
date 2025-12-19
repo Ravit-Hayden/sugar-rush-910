@@ -131,11 +131,14 @@
 	</div>
 	<button
 		onclick={onDeselect}
-		class="text-sm text-text-muted hover:text-hover-cyan focus:text-brand-pink focus-visible:text-brand-pink transition-colors duration-200"
+		class="btn-ghost text-sm text-text-muted"
 		aria-label="선택 해제"
 	>
 		선택 해제
 	</button>
 </div>
+
+
+
 
 

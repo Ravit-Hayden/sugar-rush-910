@@ -253,10 +253,10 @@
 													moreMenuOpen = false;
 												}
 											}}
-											class="group w-full flex items-center gap-2 px-4 py-2 text-sm text-text-base hover:bg-transparent hover:text-[var(--hover-cyan)] transition-colors duration-200 text-left"
+											class="btn-ghost group w-full flex items-center gap-2 px-4 py-2 text-sm text-text-base text-left"
 											aria-label="오디오 다운로드"
 										>
-											<Download size={16} class="text-text-muted group-hover:text-[var(--hover-cyan)] transition-colors duration-200" />
+											<Download size={16} class="text-text-muted" />
 											오디오 다운로드
 										</button>
 										<button
@@ -269,10 +269,10 @@
 													moreMenuOpen = false;
 												}
 											}}
-											class="group w-full flex items-center gap-2 px-4 py-2 text-sm text-text-base hover:bg-transparent hover:text-[var(--hover-cyan)] transition-colors duration-200 text-left"
+											class="btn-ghost group w-full flex items-center gap-2 px-4 py-2 text-sm text-text-base text-left"
 											aria-label="스템 다운로드"
 										>
-											<FileAudio size={16} class="text-text-muted group-hover:text-[var(--hover-cyan)] transition-colors duration-200" />
+											<FileAudio size={16} class="text-text-muted" />
 											스템(Stems) 다운로드
 										</button>
 										<div class="border-t border-border-subtle my-1" role="separator"></div>
@@ -287,10 +287,10 @@
 													moreMenuOpen = false;
 												}
 											}}
-											class="group w-full flex items-center gap-2 px-4 py-2 text-sm text-text-base hover:bg-transparent hover:text-[var(--hover-cyan)] transition-colors duration-200 text-left"
+											class="btn-ghost group w-full flex items-center gap-2 px-4 py-2 text-sm text-text-base text-left"
 											aria-label="멤버 배정"
 										>
-											<UserPlus size={16} class="text-text-muted group-hover:text-[var(--hover-cyan)] transition-colors duration-200" />
+											<UserPlus size={16} class="text-text-muted" />
 											멤버 배정
 										</button>
 										<button
@@ -303,10 +303,10 @@
 													moreMenuOpen = false;
 												}
 											}}
-											class="group w-full flex items-center gap-2 px-4 py-2 text-sm text-text-base hover:bg-transparent hover:text-[var(--hover-cyan)] transition-colors duration-200 text-left"
+											class="btn-ghost group w-full flex items-center gap-2 px-4 py-2 text-sm text-text-base text-left"
 											aria-label="공유 링크 복사"
 										>
-											<Link size={16} class="text-text-muted group-hover:text-[var(--hover-cyan)] transition-colors duration-200" />
+											<Link size={16} class="text-text-muted" />
 											공유 링크 복사
 										</button>
 										<div class="border-t border-border-subtle my-1" role="separator"></div>
@@ -321,7 +321,7 @@
 													moreMenuOpen = false;
 												}
 											}}
-											class="group w-full flex items-center gap-2 px-4 py-2 text-sm text-danger-fg hover:bg-transparent hover:text-danger-fg/80 transition-colors duration-200 text-left"
+											class="btn-ghost group w-full flex items-center gap-2 px-4 py-2 text-sm text-danger-fg text-left"
 											aria-label="삭제"
 										>
 											<Trash2 size={16} class="text-danger-fg group-hover:text-danger-fg/80" />

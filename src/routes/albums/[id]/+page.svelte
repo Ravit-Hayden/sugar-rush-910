@@ -510,7 +510,7 @@
 										moreMenuOpen = !moreMenuOpen;
 									}
 								}}
-								class="w-7 h-7 inline-flex items-center justify-center rounded-md hover:bg-transparent focus-visible:bg-transparent hover:text-text-strong focus-visible:text-text-strong transition-colors duration-200 action-button"
+								class="btn-icon w-7 h-7 inline-flex items-center justify-center rounded-md action-button"
 								aria-label="더보기"
 								aria-expanded={moreMenuOpen}
 								aria-haspopup="menu"
@@ -536,10 +536,10 @@
 													moreMenuOpen = false;
 												}
 											}}
-											class="group w-full flex items-center gap-2 px-4 py-2 text-sm text-text-base hover:bg-transparent hover:text-[var(--hover-cyan)] transition-colors duration-200 text-left"
+											class="btn-ghost group w-full flex items-center gap-2 px-4 py-2 text-sm text-text-base text-left"
 											aria-label="다운로드"
 										>
-											<Download size={16} class="text-text-muted group-hover:text-[var(--hover-cyan)] transition-colors duration-200" />
+											<Download size={16} class="text-text-muted" />
 											다운로드
 										</button>
 										<button
@@ -552,10 +552,10 @@
 													moreMenuOpen = false;
 												}
 											}}
-											class="group w-full flex items-center gap-2 px-4 py-2 text-sm text-text-base hover:bg-transparent hover:text-[var(--hover-cyan)] transition-colors duration-200 text-left"
+											class="btn-ghost group w-full flex items-center gap-2 px-4 py-2 text-sm text-text-base text-left"
 											aria-label="공유"
 										>
-											<Share2 size={16} class="text-text-muted group-hover:text-[var(--hover-cyan)] transition-colors duration-200" />
+											<Share2 size={16} class="text-text-muted" />
 											공유
 										</button>
 										<div class="border-t border-border-subtle my-1" role="separator"></div>
@@ -569,10 +569,10 @@
 													moreMenuOpen = false;
 												}
 											}}
-											class="group w-full flex items-center gap-2 px-4 py-2 text-sm text-danger-fg hover:bg-transparent hover:text-danger-fg/80 transition-colors duration-200 text-left"
+											class="btn-ghost group w-full flex items-center gap-2 px-4 py-2 text-sm text-danger-fg text-left"
 											aria-label="삭제"
 										>
-											<Trash2 size={16} class="text-danger-fg group-hover:text-danger-fg/80" />
+											<Trash2 size={16} class="text-danger-fg" />
 											삭제
 										</button>
 									</div>
@@ -636,13 +636,13 @@
 
 											{#if isGenreOpen}
 												<div 
-													class="absolute left-0 bottom-full mb-2 w-48 p-3 bg-surface-2 border border-border-subtle rounded-lg shadow-xl z-50 flex flex-wrap gap-1.5"
+													class="absolute left-0 bottom-full mb-2 w-48 p-3 bg-surface-2 border border-border-subtle rounded-lg z-50 flex flex-wrap gap-1.5"
 													role="tooltip"
 													aria-live="polite"
 													transition:fade={{ duration: 100 }}
 												>
 													{#each (album as any).genres.slice(2) as hiddenGenre}
-														<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-surface-3 text-text-base border border-transparent">
+														<span class="tag-chip">
 															{hiddenGenre}
 														</span>
 													{/each}
