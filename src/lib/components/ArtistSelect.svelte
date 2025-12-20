@@ -199,7 +199,7 @@
 			onfocus={handleInputFocus}
 			onkeydown={handleInputKeydown}
 			required={required}
-			class="w-full h-10 pl-10 {inputValue.trim() ? 'pr-[2.625rem]' : 'pr-[2.625rem]'} bg-surface-2 border border-border-subtle rounded-lg text-base text-text-base placeholder:text-text-muted hover:border-[var(--hover-cyan)] focus:outline-none focus:border-brand-pink focus:ring-0 transition-colors duration-200"
+			class="input-base w-full h-10 pl-10 {inputValue.trim() ? 'pr-[4.5rem]' : 'pr-[2.625rem]'} text-base placeholder:text-text-muted"
 			placeholder={placeholder}
 		/>
 		

@@ -904,7 +904,7 @@
 		actions={[
 			{
 				icon: Plus,
-				label: '새 앨범 만들기',
+				label: '앨범 추가',
 				href: '/albums/new'
 			}
 		]}
@@ -1444,7 +1444,7 @@
 		<EmptyState 
 			title="앨범을 찾을 수 없습니다"
 			description={searchQuery ? '검색 조건에 맞는 앨범이 없습니다.' : '아직 앨범이 없습니다.'}
-			actionLabel="첫 번째 앨범 만들기"
+			actionLabel="첫 번째 앨범 추가"
 			onAction={handleCreateAlbum}
 		/>
 	{/if}

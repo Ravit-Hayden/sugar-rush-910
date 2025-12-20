@@ -785,7 +785,7 @@
 		actions={[
 			{
 				icon: Plus,
-				label: '새 트랙 만들기',
+				label: '트랙 추가',
 				href: '/tracks/new'
 			}
 		]}

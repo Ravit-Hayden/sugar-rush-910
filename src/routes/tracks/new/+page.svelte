@@ -53,6 +53,9 @@
 	// 검증 상태
 	let validationErrors = $state<Record<string, string>>({});
 	let isSubmitting = $state(false);
+	
+	// 입력 필드 참조
+	let titleInput: HTMLInputElement;
 
 	// 선택 가능한 장르 목록 (선택된 장르 제외)
 	const availableGenres = $derived(GENRES.filter(genre => !formData.genres.includes(genre)));
@@ -157,22 +160,22 @@
 			const result = await response.json();
 
 			if (!response.ok || !result.ok) {
-				const errorMessage = result.error?.message || '트랙 생성에 실패했습니다.';
+				const errorMessage = result.error?.message || '트랙 추가에 실패했습니다.';
 				throw new Error(errorMessage);
 			}
 
 			// 성공 알림
-			toast.add('트랙이 성공적으로 생성되었습니다.', 'success', 3000);
+			toast.add('트랙이 성공적으로 추가되었습니다.', 'success', 3000);
 			
 			// 목록 페이지로 이동
 			setTimeout(() => {
 				goto('/tracks');
 			}, 1000);
 		} catch (error) {
-			console.error('트랙 생성 오류:', error);
+			console.error('트랙 추가 오류:', error);
 			const errorMessage = error instanceof Error 
 				? error.message 
-				: '트랙 생성 중 오류가 발생했습니다.';
+				: '트랙 추가 중 오류가 발생했습니다.';
 			toast.add(errorMessage, 'error', 5000);
 		} finally {
 			isSubmitting = false;
@@ -243,13 +246,17 @@
 	});
 </script>
 
+<svelte:head>
+	<title>트랙 추가</title>
+</svelte:head>
+
 <PageContent>
 	<PageHeader 
-		title="새 트랙 만들기"
-		description="새로운 트랙을 만듭니다"
+		title="트랙 추가"
+		description="새로운 트랙을 추가합니다"
 	/>
 
-	<!-- 생성 폼 -->
+			<!-- 추가 폼 -->
 	<div class="bg-surface-1 rounded-lg border border-border-subtle overflow-hidden">
 		<form onsubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
 			<!-- 기본 정보 -->
@@ -266,18 +273,22 @@
 							type="text"
 							id="title"
 							name="title"
+							bind:this={titleInput}
 							bind:value={formData.title}
 							required
 							aria-invalid={validationErrors.title ? 'true' : 'false'}
 							aria-describedby={validationErrors.title ? 'title-error' : undefined}
-							class="w-full h-10 px-4 {formData.title.trim() ? 'pr-[2.625rem]' : 'pr-[2.625rem]'} bg-surface-2 border {validationErrors.title ? 'border-danger-fg' : 'border-border-subtle'} rounded-lg text-base text-text-base placeholder:text-text-muted focus:outline-none focus:border-brand-pink focus:ring-0 transition-colors duration-200"
+							class="input-base w-full h-10 px-4 {formData.title.trim() ? 'pr-10' : 'pr-4'} text-base placeholder:text-text-muted {validationErrors.title ? 'border-danger-fg' : ''}"
 							placeholder="트랙 제목을 입력하세요"
 						/>
 						{#if formData.title.trim()}
 							<button
 								type="button"
-								onclick={() => formData.title = ''}
-								class="btn-icon absolute inset-y-0 right-[2.625rem] flex items-center pointer-events-auto"
+								onclick={() => {
+									formData.title = '';
+									titleInput?.focus();
+								}}
+								class="btn-icon absolute inset-y-0 right-2.5 flex items-center pointer-events-auto"
 								aria-label="입력 내용 지우기"
 							>
 								<span class="flex h-4 w-4 items-center justify-center">
@@ -627,7 +638,7 @@
 					class="px-6 py-2 bg-brand-pink text-white rounded-lg hover:bg-brand-pink/90 focus:bg-brand-pink/90 focus-visible:bg-brand-pink/90 focus:outline-none focus:ring-0 transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
 					aria-busy={isSubmitting}
 				>
-					{isSubmitting ? '생성 중...' : '생성'}
+					{isSubmitting ? '추가 중...' : '추가'}
 				</button>
 				</div>
 			</div>

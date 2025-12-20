@@ -47,6 +47,9 @@
 	let isDragging = $state(false);
 	let imageInputMethod: 'file' | 'url' = $state('file');
 	let fileInput: HTMLInputElement;
+	
+	// 입력 필드 참조
+	let artistNameInput: HTMLInputElement;
 
 	// 이미지 확대 보기
 	let enlargedImageUrl: string | null = $state(null);
@@ -490,9 +493,10 @@
 														<input
 															id="artist-name"
 															type="text"
+															bind:this={artistNameInput}
 															bind:value={newArtistName}
 															placeholder="예: Sugar Rush"
-															class="w-full px-3 {newArtistName.trim() ? 'pr-8' : 'pr-3'} py-1.5 text-sm bg-surface-2 border border-border-subtle rounded-md text-text-strong focus:outline-none transition-colors duration-200"
+															class="input-base w-full px-3 py-1.5 text-sm {newArtistName.trim() ? 'pr-8' : 'pr-3'}"
 															onkeydown={(e) => {
 																if (e.key === 'Escape') resetForm();
 															}}
@@ -500,7 +504,10 @@
 														{#if newArtistName.trim()}
 															<button
 																type="button"
-																onclick={() => newArtistName = ''}
+																onclick={() => {
+																	newArtistName = '';
+																	artistNameInput?.focus();
+																}}
 																class="btn-icon absolute inset-y-0 right-2 flex items-center pointer-events-auto"
 																aria-label="입력 내용 지우기"
 															>

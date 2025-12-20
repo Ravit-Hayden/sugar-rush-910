@@ -267,10 +267,10 @@
 													removeGenre(genre);
 												}}
 											class="btn-icon ml-1 focus:outline-none"
-											aria-label="{genre} 제거"
-										>
-											<X size={12} />
-										</button>
+												aria-label="{genre} 제거"
+											>
+												<X size={12} />
+											</button>
 										</span>
 									{/each}
 								{/if}

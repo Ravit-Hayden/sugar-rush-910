@@ -149,74 +149,93 @@
   --user-color: #D7CBBF; /* 라이트 모드 */
 }
 
-/* 글로벌 입력 요소 스타일 (Input, Textarea, Select) */
-input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
-textarea,
-select {
-  border-color: var(--border-subtle);
-  transition: border-color 0.2s;
-}
+@layer components {
+  /* 1. 공통 입력 필드 (Focus 우선순위 적용) */
+  .input-base {
+    @apply border rounded-lg transition-colors duration-200;
+    /* 커스텀 변수는 표준 CSS로 적용하여 에러 방지 */
+    border-color: var(--border-subtle);
+    background-color: var(--surface-2);
+    color: var(--text-base);
+  }
+  /* Hover: 포커스가 없을 때만 작동 */
+  .input-base:hover:not(:focus):not(:focus-within) {
+    border-color: var(--hover-point);
+  }
+  /* Focus: 최우선 순위 (Brand Pink) */
+  .input-base:focus, 
+  .input-base:focus-within {
+    border-color: var(--brand-pink) !important;
+    outline: none;
+  }
 
-input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):hover:not(:focus):not(:focus-visible),
-textarea:hover:not(:focus):not(:focus-visible),
-select:hover:not(:focus):not(:focus-visible) {
-  border-color: var(--hover-point);
-}
+  /* 2. 아이콘 버튼 (배경 투명, 아이콘 색상 변경) */
+  .btn-icon {
+    @apply bg-transparent border-none cursor-pointer flex items-center justify-center transition-colors duration-200;
+    color: var(--text-muted);
+  }
+  .btn-icon:hover:not(:focus):not(:focus-visible) {
+    color: var(--hover-point); /* 모드에 따라 Cyan/Purple */
+  }
+  .btn-icon:focus, .btn-icon:focus-visible {
+    color: var(--brand-pink); /* Focus는 무조건 Pink */
+    outline: none;
+  }
+  .btn-icon .lucide-icon:not([class*="text-"]) {
+    transition: color 0.2s;
+  }
+  .btn-icon:hover:not(:focus):not(:focus-visible) .lucide-icon:not([class*="text-"]) {
+    color: var(--hover-point);
+  }
+  .btn-icon:focus .lucide-icon:not([class*="text-"]),
+  .btn-icon:focus-visible .lucide-icon:not([class*="text-"]) {
+    color: var(--brand-pink);
+  }
 
-input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):focus,
-input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):focus-visible,
-textarea:focus,
-textarea:focus-visible,
-select:focus,
-select:focus-visible {
-  border-color: var(--brand-pink);
-  outline: none;
-}
+  /* 3. 고스트 버튼 (텍스트 메뉴 등) */
+  .btn-ghost {
+    @apply bg-transparent border-none cursor-pointer transition-colors duration-200 flex items-center gap-2;
+    color: var(--text-base);
+  }
+  .btn-ghost:hover:not(:focus):not(:focus-visible) {
+    color: var(--hover-point);
+  }
+  .btn-ghost:focus, .btn-ghost:focus-visible {
+    color: var(--brand-pink);
+    outline: none;
+  }
 
-/* 버튼 유틸리티 클래스 */
-.btn-ghost {
-  background: transparent;
-  border: none;
-  transition: color 0.2s;
-}
-
-.btn-ghost:hover:not(:focus):not(:focus-visible) {
-  color: var(--hover-point);
-}
-
-.btn-ghost:focus,
-.btn-ghost:focus-visible {
-  color: var(--brand-pink);
-  outline: none;
-}
-
-.btn-icon {
-  background: transparent;
-  border: none;
-  transition: color 0.2s;
-}
-
-.btn-icon:hover:not(:focus):not(:focus-visible) {
-  color: var(--hover-point);
-}
-
-.btn-icon:focus,
-.btn-icon:focus-visible {
-  color: var(--brand-pink);
-  outline: none;
-}
-
-.btn-icon .lucide-icon:not([class*="text-"]) {
-  transition: color 0.2s;
-}
-
-.btn-icon:hover:not(:focus):not(:focus-visible) .lucide-icon:not([class*="text-"]) {
-  color: var(--hover-point);
-}
-
-.btn-icon:focus .lucide-icon:not([class*="text-"]),
-.btn-icon:focus-visible .lucide-icon:not([class*="text-"]) {
-  color: var(--brand-pink);
+  /* 4. 링크 스타일 (본문용) */
+  .text-link {
+    @apply no-underline transition-colors duration-200 cursor-pointer;
+    color: var(--text-base);
+  }
+  .text-link:hover:not(:focus):not(:focus-visible) {
+    color: var(--hover-point);
+    text-decoration: underline;
+  }
+  .text-link:focus,
+  .text-link:focus-visible {
+    color: var(--brand-pink);
+    text-decoration: underline;
+    outline: none;
+  }
+  
+  /* 5. 카드 스타일 */
+  .card-base {
+    @apply border rounded-lg transition-all duration-200;
+    border-color: var(--border-subtle);
+    background-color: var(--surface-2);
+  }
+  .card-base:hover {
+    border-color: var(--hover-point);
+  }
+  .card-base.card-interactive {
+    cursor: pointer;
+  }
+  .card-base.card-interactive:hover {
+    transform: translateY(-2px);
+  }
 }
 
 /* 미디어 업로드 영역 스타일 */
@@ -336,24 +355,7 @@ select:focus-visible {
   color: black;
 }
 
-/* 링크 스타일 - 본문 링크에만 적용 (.text-link 클래스 사용) */
-.text-link {
-  color: var(--text-base);
-  text-decoration: none;
-  transition: color 0.2s, text-decoration 0.2s;
-}
-
-.text-link:hover:not(:focus):not(:focus-visible) {
-  color: var(--hover-point);
-  text-decoration: underline;
-}
-
-.text-link:focus,
-.text-link:focus-visible {
-  color: var(--brand-pink);
-  text-decoration: underline;
-  outline: none;
-}
+/* 링크 스타일은 @layer components에 정의됨 */
 
 /* 사이드바 아이콘 고정 위치 및 정렬 */
 .sidebar-menu-item .lucide-icon {

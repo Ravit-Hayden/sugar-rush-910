@@ -264,70 +264,70 @@
 <svelte:window onclick={handleClickOutside} onkeydown={(e) => e.key === 'Escape' && (isOpen = false)} />
 
 <div class="relative w-full {className}" bind:this={wrapperElement}>
-  <input 
-    type="text" 
-    {id}
-    {name}
-    {placeholder}
-    bind:value={inputValue}
-    oninput={handleInputChange}
-    onblur={handleInputBlur}
-    onfocus={() => {
-      if (inputValue && value) {
-        viewDate = new Date(value);
-      }
-    }}
+    <input 
+      type="text" 
+      {id} 
+      {name} 
+      {placeholder} 
+      bind:value={inputValue}
+      oninput={handleInputChange}
+      onblur={handleInputBlur}
+      onfocus={() => {
+        if (inputValue && value) {
+          viewDate = new Date(value);
+        }
+      }}
     onclick={(e) => {
       e.stopPropagation();
       toggleCalendar();
     }}
     onkeydown={handleKeydown}
-    class="w-full h-10 px-4 {inputValue.trim() ? 'pr-[4.5rem]' : 'pr-[2.625rem]'} bg-surface-2 border border-border-subtle rounded-lg text-base text-text-base placeholder:text-text-muted hover:border-[var(--hover-cyan)] focus:outline-none focus:border-brand-pink focus:ring-0 transition-colors duration-200 cursor-pointer box-border datepicker-input"
+    class="input-base w-full h-10 px-4 {inputValue.trim() ? 'pr-[4.5rem]' : 'pr-[2.625rem]'} text-base placeholder:text-text-muted cursor-pointer box-border datepicker-input"
     {...Object.fromEntries(Object.entries(restProps).filter(([key]) => key !== 'tabindex' && key !== 'list'))}
-  />
+    />
     
-              <!-- 클리어 버튼 (입력값이 있을 때만 표시) -->
-              {#if inputValue.trim()}
-                <button
-                  type="button"
-                  onclick={(e) => {
-                    e.stopPropagation();
-                    handleClear();
-                  }}
-                  onkeydown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      handleClear();
-                    }
-                  }}
+    <!-- 클리어 버튼 (입력값이 있을 때만 표시) -->
+    {#if inputValue.trim()}
+      <button
+        type="button"
+        onclick={(e) => {
+          e.stopPropagation();
+          handleClear();
+        }}
+        onkeydown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleClear();
+          }
+        }}
                   class="btn-icon absolute inset-y-0 right-[2.625rem] flex items-center pointer-events-auto"
-                  aria-label="입력 내용 지우기"
-                >
+        aria-label="입력 내용 지우기"
+      >
                   <X size={16} class="lucide-icon text-text-muted" />
-                </button>
-              {/if}
-              
-              <!-- 캘린더 버튼 -->
-              <button 
-                type="button" 
-                onclick={(e) => {
-                  e.stopPropagation();
-                  toggleCalendar();
-                }}
-                onkeydown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    toggleCalendar();
-                  }
-                }}
+      </button>
+    {/if}
+    
+    <!-- 캘린더 버튼 -->
+    <button 
+      type="button" 
+      onclick={(e) => {
+        e.stopPropagation();
+        toggleCalendar();
+      }}
+      onkeydown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          toggleCalendar();
+        }
+      }}
                 class="btn-icon absolute inset-y-0 right-2.5 flex items-center pointer-events-auto" 
-                aria-label="캘린더 열기"
-                aria-expanded={isOpen}
-              >
-                <span class="flex h-4 w-4 items-center justify-center">
+      aria-label="캘린더 열기"
+      aria-expanded={isOpen}
+    >
+      <span class="flex h-4 w-4 items-center justify-center">
                   <Calendar size={16} class="lucide-icon text-text-muted" />
-                </span>
-              </button>
+      </span>
+    </button>
 
   {#if isOpen}
     <div class="calendar-dropdown absolute bottom-full right-0 mb-2 w-[18rem] bg-surface-1 border border-border-subtle rounded-xl p-4 z-50" transition:fade={{ duration: 100 }} onclick={(e) => e.stopPropagation()}>
