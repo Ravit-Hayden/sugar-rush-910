@@ -1,7 +1,9 @@
 <script lang="ts">
-	import { Heart, Users, MessageSquare, Calendar, CheckCircle, Clock, AlertCircle } from 'lucide-svelte';
+	import { Heart, Users, MessageSquare, Calendar, CheckCircle, Clock, AlertCircle, Edit, Trash2 } from 'lucide-svelte';
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import PageContent from '$lib/components/PageContent.svelte';
+	import MoreMenuDropdown from '$lib/components/MoreMenuDropdown.svelte';
+	import { toast } from '$lib/stores/toast';
 
 	// 프로젝트 데이터 (향후 API 연동)
 	let projects = $state([
@@ -37,6 +39,9 @@
 	// 코멘트 데이터
 	let comments = $state<any[]>([]);
 	let commentsLoading = $state(true);
+	let moreMenuOpenId = $state<string | null>(null);
+	let editingCommentId = $state<string | null>(null);
+	let editingContent = $state('');
 
 	// 코멘트 데이터 로드
 	$effect(() => {
@@ -72,6 +77,95 @@
 			case 'review': return '검토 중';
 			case 'completed': return '완료';
 			default: return '알 수 없음';
+		}
+	}
+
+	// 더보기 메뉴 토글
+	function handleMoreMenuToggle(id: string) {
+		moreMenuOpenId = moreMenuOpenId === id ? null : id;
+	}
+
+	function handleMoreMenuClose() {
+		moreMenuOpenId = null;
+	}
+
+	// 코멘트 수정 시작
+	function handleEditStart(comment: any) {
+		editingCommentId = comment.id;
+		editingContent = comment.content;
+		moreMenuOpenId = null;
+	}
+
+	// 코멘트 수정 취소
+	function handleEditCancel() {
+		editingCommentId = null;
+		editingContent = '';
+	}
+
+	// 코멘트 수정 저장
+	async function handleEditSave(commentId: string) {
+		if (!editingContent.trim()) {
+			toast.add('코멘트 내용을 입력해주세요.', 'error', 3000);
+			return;
+		}
+
+		try {
+			// TODO: API PUT 구현 후 활성화
+			// const response = await fetch('/api/comments', {
+			// 	method: 'PUT',
+			// 	headers: { 'Content-Type': 'application/json' },
+			// 	body: JSON.stringify({ id: commentId, content: editingContent.trim() })
+			// });
+			// const result = await response.json();
+			// if (!response.ok || !result.ok) {
+			// 	throw new Error(result.error?.message || '코멘트 수정에 실패했습니다.');
+			// }
+
+			// 임시: 로컬 상태 업데이트
+			comments = comments.map(c => 
+				c.id === commentId 
+					? { ...c, content: editingContent.trim() }
+					: c
+			);
+			toast.add('코멘트가 수정되었습니다. (API 구현 대기 중)', 'success', 3000);
+			editingCommentId = null;
+			editingContent = '';
+		} catch (error) {
+			console.error('코멘트 수정 오류:', error);
+			const errorMessage = error instanceof Error 
+				? error.message 
+				: '코멘트 수정 중 오류가 발생했습니다.';
+			toast.add(errorMessage, 'error', 5000);
+		}
+	}
+
+	// 코멘트 삭제
+	async function handleDelete(commentId: string) {
+		if (!confirm('이 코멘트를 삭제하시겠습니까?')) {
+			return;
+		}
+
+		try {
+			// TODO: API DELETE 구현 후 활성화
+			// const response = await fetch(`/api/comments`, {
+			// 	method: 'DELETE',
+			// 	headers: { 'Content-Type': 'application/json' },
+			// 	body: JSON.stringify({ id: commentId })
+			// });
+			// const result = await response.json();
+			// if (!response.ok || !result.ok) {
+			// 	throw new Error(result.error?.message || '코멘트 삭제에 실패했습니다.');
+			// }
+
+			// 임시: 목록에서 제거
+			comments = comments.filter(c => c.id !== commentId);
+			toast.add('코멘트가 삭제되었습니다.', 'success', 3000);
+		} catch (error) {
+			console.error('코멘트 삭제 오류:', error);
+			const errorMessage = error instanceof Error 
+				? error.message 
+				: '코멘트 삭제 중 오류가 발생했습니다.';
+			toast.add(errorMessage, 'error', 5000);
 		}
 	}
 </script>
@@ -149,17 +243,70 @@
 								<MessageSquare size={16} class="text-brand-pink" />
 							</div>
 							<div class="flex-1">
-								<p class="text-sm text-text-strong">{comment.content}</p>
-								<p class="text-xs text-text-muted">
-									{new Date(comment.created_at).toLocaleString('ko-KR', { 
-										year: 'numeric', 
-										month: 'short', 
-										day: 'numeric',
-										hour: '2-digit',
-										minute: '2-digit'
-									})} • {comment.user_name || 'Unknown'}
-								</p>
+								{#if editingCommentId === comment.id}
+									<!-- 수정 모드 -->
+									<textarea
+										bind:value={editingContent}
+										rows="3"
+										class="input-base w-full px-3 py-2 text-sm resize-none mb-2"
+										placeholder="코멘트 내용을 입력하세요"
+									></textarea>
+									<div class="flex items-center gap-2">
+										<button
+											type="button"
+											onclick={() => handleEditSave(comment.id)}
+											class="px-3 py-1 text-xs bg-brand-pink text-white rounded-md hover:opacity-90 transition-opacity"
+										>
+											저장
+										</button>
+										<button
+											type="button"
+											onclick={handleEditCancel}
+											class="px-3 py-1 text-xs bg-surface-2 text-text-base rounded-md border border-border-subtle hover:bg-surface-1 transition-colors"
+										>
+											취소
+										</button>
+									</div>
+								{:else}
+									<!-- 보기 모드 -->
+									<p class="text-sm text-text-strong">{comment.content}</p>
+									<p class="text-xs text-text-muted">
+										{new Date(comment.created_at).toLocaleString('ko-KR', { 
+											year: 'numeric', 
+											month: 'short', 
+											day: 'numeric',
+											hour: '2-digit',
+											minute: '2-digit'
+										})} • {comment.user_name || 'Unknown'}
+									</p>
+								{/if}
 							</div>
+							{#if editingCommentId !== comment.id}
+								<div class="flex-shrink-0">
+									<MoreMenuDropdown
+										itemId={comment.id}
+										openId={moreMenuOpenId}
+										items={[
+											{
+												label: '수정',
+												icon: Edit,
+												onClick: () => handleEditStart(comment),
+												ariaLabel: '코멘트 수정'
+											},
+											{
+												label: '삭제',
+												icon: Trash2,
+												onClick: () => handleDelete(comment.id),
+												ariaLabel: '코멘트 삭제',
+												danger: true,
+												separator: true
+											}
+										]}
+										onToggle={handleMoreMenuToggle}
+										onClose={handleMoreMenuClose}
+									/>
+								</div>
+							{/if}
 						</div>
 					{/each}
 				</div>
