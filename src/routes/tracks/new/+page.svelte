@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { Asterisk, ChevronDown, ChevronDown as ChevronDownIcon, X } from 'lucide-svelte';
+	import { Asterisk, ChevronDown, ChevronDown as ChevronDownIcon, X, Upload, Music } from 'lucide-svelte';
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import PageContent from '$lib/components/PageContent.svelte';
 	import DatePicker from '$lib/components/DatePicker.svelte';
@@ -57,6 +57,14 @@
 	
 	// 입력 필드 참조
 	let titleInput: HTMLInputElement;
+	
+	// 음원 파일 업로드 상태
+	let audioFile = $state<File | null>(null);
+	let audioFileUrl = $state<string | null>(null);
+	let uploadProgress = $state(0);
+	let isUploading = $state(false);
+	let audioFileInput: HTMLInputElement;
+	let isDraggingAudio = $state(false);
 
 	// 선택 가능한 장르 목록 (선택된 장르 제외)
 	const availableGenres = $derived(GENRES.filter(genre => !formData.genres.includes(genre)));
@@ -118,6 +126,124 @@
 		return Object.keys(validationErrors).length === 0;
 	}
 	
+	// 음원 파일 선택 핸들러
+	function handleAudioFileSelect(event: Event) {
+		const target = event.target as HTMLInputElement;
+		const file = target.files?.[0];
+		if (file) {
+			handleAudioFile(file);
+		}
+	}
+
+	// 음원 파일 드래그 앤 드롭 핸들러
+	function handleAudioDragOver(event: DragEvent) {
+		event.preventDefault();
+		isDraggingAudio = true;
+	}
+
+	function handleAudioDragLeave(event: DragEvent) {
+		event.preventDefault();
+		isDraggingAudio = false;
+	}
+
+	function handleAudioDrop(event: DragEvent) {
+		event.preventDefault();
+		isDraggingAudio = false;
+		
+		const file = event.dataTransfer?.files[0];
+		if (file && file.type.startsWith('audio/')) {
+			handleAudioFile(file);
+		} else {
+			toast.add('오디오 파일만 업로드 가능합니다.', 'error', 3000);
+		}
+	}
+
+	// 음원 파일 처리
+	function handleAudioFile(file: File) {
+		// 파일 타입 검증
+		if (!file.type.startsWith('audio/')) {
+			toast.add('오디오 파일만 업로드 가능합니다.', 'error', 3000);
+			return;
+		}
+
+		// 파일 크기 검증 (100MB)
+		const maxSize = 100 * 1024 * 1024;
+		if (file.size > maxSize) {
+			toast.add('파일 크기는 100MB를 초과할 수 없습니다.', 'error', 3000);
+			return;
+		}
+
+		audioFile = file;
+		audioFileUrl = null;
+		uploadProgress = 0;
+	}
+
+	// 음원 파일 업로드
+	async function uploadAudioFile(): Promise<string | null> {
+		if (!audioFile) return null;
+
+		isUploading = true;
+		uploadProgress = 0;
+
+		try {
+			const formData = new FormData();
+			formData.append('audioFile', audioFile);
+
+			// XMLHttpRequest를 사용하여 업로드 진행률 추적
+			return new Promise((resolve, reject) => {
+				const xhr = new XMLHttpRequest();
+
+				xhr.upload.addEventListener('progress', (e) => {
+					if (e.lengthComputable) {
+						uploadProgress = Math.round((e.loaded / e.total) * 100);
+					}
+				});
+
+				xhr.addEventListener('load', () => {
+					if (xhr.status === 200) {
+						try {
+							const result = JSON.parse(xhr.responseText);
+							if (result.ok) {
+								audioFileUrl = result.data.fileUrl;
+								resolve(result.data.fileUrl);
+							} else {
+								reject(new Error(result.error?.message || '업로드 실패'));
+							}
+						} catch (error) {
+							reject(new Error('응답 파싱 오류'));
+						}
+					} else {
+						reject(new Error(`업로드 실패: ${xhr.status}`));
+					}
+				});
+
+				xhr.addEventListener('error', () => {
+					reject(new Error('네트워크 오류'));
+				});
+
+				xhr.open('POST', '/api/upload/audio');
+				xhr.send(formData);
+			});
+		} catch (error) {
+			console.error('Audio upload error:', error);
+			const errorMessage = error instanceof Error ? error.message : '업로드 중 오류가 발생했습니다.';
+			toast.add(errorMessage, 'error', 5000);
+			return null;
+		} finally {
+			isUploading = false;
+		}
+	}
+
+	// 음원 파일 제거
+	function removeAudioFile() {
+		audioFile = null;
+		audioFileUrl = null;
+		uploadProgress = 0;
+		if (audioFileInput) {
+			audioFileInput.value = '';
+		}
+	}
+
 	async function handleSubmit() {
 		if (isSubmitting) return;
 		
@@ -140,6 +266,17 @@
 		isSubmitting = true;
 		
 		try {
+			// 음원 파일이 있으면 먼저 업로드
+			let uploadedFileUrl: string | null = null;
+			if (audioFile) {
+				uploadedFileUrl = await uploadAudioFile();
+				if (!uploadedFileUrl) {
+					toast.add('음원 파일 업로드에 실패했습니다.', 'error', 5000);
+					isSubmitting = false;
+					return;
+				}
+			}
+			
 			// 폼 데이터 준비
 			const trackData = {
 				title: formData.title.trim(),
@@ -148,7 +285,8 @@
 				genres: formData.genres,
 				status: formData.status,
 				release_date_kr: formData.release_date_kr || null,
-				release_date_global: formData.release_date_global || null
+				release_date_global: formData.release_date_global || null,
+				audio_file_url: uploadedFileUrl || null
 			};
 			
 			// API 호출
@@ -599,6 +737,97 @@
 							{validationErrors.status}
 						</p>
 					{/if}
+				</div>
+			</div>
+
+			<!-- 음원 파일 업로드 -->
+			<div class="border-t border-border-subtle">
+				<div class="p-6 space-y-4">
+					<h3 class="text-lg font-semibold text-text-strong">음원 파일</h3>
+					
+					<div class="w-full">
+						<label for="audioFile" class="block text-sm font-medium text-text-strong mb-2">
+							음원 파일
+						</label>
+						
+						{#if !audioFile && !audioFileUrl}
+							<!-- 파일 선택 영역 -->
+							<div
+								class="relative border-2 border-dashed border-border-subtle rounded-lg p-8 text-center transition-colors duration-200 {isDraggingAudio ? 'border-brand-pink bg-surface-2' : 'hover:border-border-base'}"
+								ondragover={handleAudioDragOver}
+								ondragleave={handleAudioDragLeave}
+								ondrop={handleAudioDrop}
+							>
+								<input
+									type="file"
+									id="audioFile"
+									name="audioFile"
+									accept="audio/*"
+									bind:this={audioFileInput}
+									onchange={handleAudioFileSelect}
+									class="hidden"
+								/>
+								<div class="flex flex-col items-center gap-4">
+									<Music size={48} class="text-text-muted" />
+									<div>
+										<p class="text-sm text-text-base mb-1">
+											파일을 드래그하거나 클릭하여 업로드
+										</p>
+										<p class="text-xs text-text-muted">
+											MP3, WAV, M4A, FLAC 등 (최대 100MB)
+										</p>
+									</div>
+									<button
+										type="button"
+										onclick={() => audioFileInput?.click()}
+										class="inline-flex items-center gap-2 px-4 py-2 bg-surface-2 text-text-base rounded-lg border border-border-subtle transition-colors duration-200 font-medium hover:bg-surface-1 focus:outline-none focus:ring-0"
+									>
+										<Upload size={16} />
+										파일 선택
+									</button>
+								</div>
+							</div>
+						{:else}
+							<!-- 업로드된 파일 정보 -->
+							<div class="flex items-center justify-between p-4 bg-surface-2 rounded-lg border border-border-subtle">
+								<div class="flex items-center gap-3 flex-1 min-w-0">
+									<Music size={24} class="text-text-muted flex-shrink-0" />
+									<div class="flex-1 min-w-0">
+										<p class="text-sm font-medium text-text-base truncate">
+											{audioFile?.name || '업로드된 파일'}
+										</p>
+										{#if audioFile}
+											<p class="text-xs text-text-muted">
+												{(audioFile.size / 1024 / 1024).toFixed(2)} MB
+											</p>
+										{/if}
+									</div>
+								</div>
+								{#if isUploading}
+									<div class="flex items-center gap-2 flex-shrink-0">
+										<div class="w-32 h-2 bg-surface-1 rounded-full overflow-hidden">
+											<div 
+												class="h-full bg-brand-pink transition-all duration-300"
+												style="width: {uploadProgress}%"
+											></div>
+										</div>
+										<span class="text-xs text-text-muted w-10 text-right">
+											{uploadProgress}%
+										</span>
+									</div>
+								{:else}
+									<button
+										type="button"
+										onclick={removeAudioFile}
+										class="btn-icon flex-shrink-0"
+										aria-label="파일 제거"
+									>
+										<X size={16} />
+									</button>
+								{/if}
+							</div>
+						{/if}
+					</div>
 				</div>
 			</div>
 

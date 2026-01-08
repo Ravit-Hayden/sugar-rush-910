@@ -150,9 +150,9 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 					.prepare(`
 						INSERT INTO tracks (
 							id, title, artist, album, genres, status,
-							release_date_kr, release_date_global,
+							release_date_kr, release_date_global, audio_file_url,
 							created_at, updated_at
-						) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+						) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 					`)
 					.bind(
 						trackId,
@@ -163,6 +163,7 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 						trackData.status,
 						trackData.release_date_kr || null,
 						trackData.release_date_global || null,
+						trackData.audio_file_url || null,
 						new Date().toISOString(),
 						new Date().toISOString()
 					)
@@ -190,6 +191,7 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 					status: trackData.status,
 					release_date_kr: trackData.release_date_kr || null,
 					release_date_global: trackData.release_date_global || null,
+					audio_file_url: trackData.audio_file_url || null,
 					created_at: new Date().toISOString(),
 					updated_at: new Date().toISOString()
 				};
@@ -205,6 +207,7 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 				status: trackData.status,
 				release_date_kr: trackData.release_date_kr || null,
 				release_date_global: trackData.release_date_global || null,
+				audio_file_url: trackData.audio_file_url || null,
 				created_at: new Date().toISOString(),
 				updated_at: new Date().toISOString()
 			};
