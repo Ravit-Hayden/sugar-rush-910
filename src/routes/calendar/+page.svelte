@@ -8,32 +8,28 @@
 	let searchQuery = '';
 	let selectedFilter = 'all';
 
-	let events = [
-		{
-			id: '1',
-			title: 'Sugar Rush Vol.1 발매',
-			date: '2024-12-31',
-			time: '14:00',
-			type: 'release',
-			status: 'upcoming'
-		},
-		{
-			id: '2',
-			title: '마스터링 세션',
-			date: '2024-10-15',
-			time: '10:00',
-			type: 'session',
-			status: 'completed'
-		},
-		{
-			id: '3',
-			title: '팀 미팅',
-			date: '2024-10-20',
-			time: '15:00',
-			type: 'meeting',
-			status: 'upcoming'
-		}
-	];
+	// 이벤트 데이터
+	let events = $state<any[]>([]);
+	let loading = $state(true);
+
+	// 이벤트 데이터 로드
+	$effect(() => {
+		(async () => {
+			try {
+				loading = true;
+				const response = await fetch('/api/calendar?limit=1000');
+				const data = await response.json();
+				if (data.ok) {
+					events = data.data || [];
+				}
+			} catch (error) {
+				console.error('Failed to load calendar events:', error);
+			} finally {
+				loading = false;
+			}
+		})();
+		return () => {};
+	});
 
 	function getTypeColor(type: string) {
 		switch (type) {
@@ -54,7 +50,8 @@
 	}
 
 	function handleAddEvent() {
-		// 새 일정 추가 로직
+		// 새 일정 추가 페이지로 이동 (향후 구현)
+		// goto('/calendar/new');
 	}
 
 	const typeOptions = [
@@ -98,7 +95,11 @@
 		<div class="lg:col-span-2">
 			<div class="bg-surface-1 rounded-lg p-6 border border-border-subtle">
 				<h3 class="text-lg font-semibold text-text-strong mb-6">다가오는 일정</h3>
-				{#if filteredEvents.length > 0}
+				{#if loading}
+					<div class="flex items-center justify-center py-8">
+						<p class="text-text-muted">로딩 중...</p>
+					</div>
+				{:else if filteredEvents.length > 0}
 					<div class="space-y-4">
 						{#each filteredEvents as event (event.id)}
 						<div class="flex items-center gap-4 p-4 bg-surface-2 rounded-lg hover:bg-surface-1 transition-colors duration-200 border border-border-subtle">

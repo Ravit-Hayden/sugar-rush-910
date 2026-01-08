@@ -3,7 +3,8 @@
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import PageContent from '$lib/components/PageContent.svelte';
 
-	let projects = [
+	// 프로젝트 데이터 (향후 API 연동)
+	let projects = $state([
 		{
 			id: '1',
 			name: 'Sugar Rush Vol.1',
@@ -31,7 +32,30 @@
 			progress: 100,
 			deadline: '2024-09-30'
 		}
-	];
+	]);
+
+	// 코멘트 데이터
+	let comments = $state<any[]>([]);
+	let commentsLoading = $state(true);
+
+	// 코멘트 데이터 로드
+	$effect(() => {
+		(async () => {
+			try {
+				commentsLoading = true;
+				const response = await fetch('/api/comments?limit=10');
+				const data = await response.json();
+				if (data.ok) {
+					comments = data.data || [];
+				}
+			} catch (error) {
+				console.error('Failed to load comments:', error);
+			} finally {
+				commentsLoading = false;
+			}
+		})();
+		return () => {};
+	});
 
 	function getStatusColor(status: string) {
 		switch (status) {
@@ -111,37 +135,37 @@
 		<div class="bg-surface-1 rounded-lg p-6 border border-border-subtle">
 			<h3 class="text-lg font-semibold text-text-strong mb-4 flex items-center gap-2">
 				<MessageSquare size={20} class="text-brand-pink" />
-				최근 활동
+				최근 코멘트
 			</h3>
-			<div class="space-y-4">
-				<div class="flex items-start gap-3">
-					<div class="w-8 h-8 bg-surface-2 rounded-full flex items-center justify-center border border-border-subtle">
-						<CheckCircle size={16} class="text-brand-pink" />
-					</div>
-					<div class="flex-1">
-						<p class="text-sm text-text-strong">Sugar Rush Vol.1 마스터링 완료</p>
-						<p class="text-xs text-text-muted">2시간 전 • El</p>
-					</div>
+			{#if commentsLoading}
+				<div class="flex items-center justify-center py-8">
+					<p class="text-text-muted">로딩 중...</p>
 				</div>
-				<div class="flex items-start gap-3">
-					<div class="w-8 h-8 bg-surface-2 rounded-full flex items-center justify-center border border-border-subtle">
-						<AlertCircle size={16} class="text-yellow-500" />
-					</div>
-					<div class="flex-1">
-						<p class="text-sm text-text-strong">Summer Night 가사 검토 필요</p>
-						<p class="text-xs text-text-muted">1일 전 • Otte</p>
-					</div>
+			{:else if comments.length > 0}
+				<div class="space-y-4">
+					{#each comments.slice(0, 5) as comment}
+						<div class="flex items-start gap-3">
+							<div class="w-8 h-8 bg-surface-2 rounded-full flex items-center justify-center border border-border-subtle">
+								<MessageSquare size={16} class="text-brand-pink" />
+							</div>
+							<div class="flex-1">
+								<p class="text-sm text-text-strong">{comment.content}</p>
+								<p class="text-xs text-text-muted">
+									{new Date(comment.created_at).toLocaleString('ko-KR', { 
+										year: 'numeric', 
+										month: 'short', 
+										day: 'numeric',
+										hour: '2-digit',
+										minute: '2-digit'
+									})} • {comment.user_name || 'Unknown'}
+								</p>
+							</div>
+						</div>
+					{/each}
 				</div>
-				<div class="flex items-start gap-3">
-					<div class="w-8 h-8 bg-surface-2 rounded-full flex items-center justify-center border border-border-subtle">
-						<CheckCircle size={16} class="text-green-500" />
-					</div>
-					<div class="flex-1">
-						<p class="text-sm text-text-strong">Demo Collection 프로젝트 완료</p>
-						<p class="text-xs text-text-muted">3일 전 • System</p>
-					</div>
-				</div>
-			</div>
+			{:else}
+				<p class="text-text-muted text-center py-8">코멘트가 없습니다.</p>
+			{/if}
 		</div>
 
 		<div class="bg-surface-1 rounded-lg p-6 border border-border-subtle">
