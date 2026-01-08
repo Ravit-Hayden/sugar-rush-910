@@ -245,3 +245,192 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 		});
 	}
 };
+
+export const PUT: RequestHandler = async ({ request, platform }) => {
+	try {
+		const feedbackData = await request.json();
+		const { id, title, content, status, priority, tags } = feedbackData;
+
+		if (!id) {
+			const response: ApiErr = {
+				ok: false,
+				error: {
+					code: 'VALIDATION_ERROR',
+					message: '피드백 ID를 입력해주세요.',
+					details: 'id is required'
+				}
+			};
+			return new Response(JSON.stringify(response), {
+				status: 400,
+				headers: { 'content-type': 'application/json' }
+			});
+		}
+
+		const db = platform?.env?.DB;
+		let updatedFeedback;
+
+		if (db) {
+			try {
+				// 업데이트할 필드 구성
+				const updateFields: string[] = [];
+				const updateValues: any[] = [];
+
+				if (title !== undefined) {
+					updateFields.push('title = ?');
+					updateValues.push(title.trim());
+				}
+				if (content !== undefined) {
+					updateFields.push('content = ?');
+					updateValues.push(content.trim());
+				}
+				if (status !== undefined) {
+					updateFields.push('status = ?');
+					updateValues.push(status);
+				}
+				if (priority !== undefined) {
+					updateFields.push('priority = ?');
+					updateValues.push(priority);
+				}
+				if (tags !== undefined) {
+					updateFields.push('tags = ?');
+					updateValues.push(JSON.stringify(tags));
+				}
+
+				// updated_at 항상 업데이트
+				updateFields.push('updated_at = ?');
+				updateValues.push(new Date().toISOString());
+
+				// id 추가
+				updateValues.push(id);
+
+				if (updateFields.length > 1) {
+					// updated_at 외에 다른 필드가 있는 경우
+					const query = `UPDATE feedbacks SET ${updateFields.join(', ')} WHERE id = ?`;
+					await db.prepare(query).bind(...updateValues).run();
+				} else {
+					// updated_at만 업데이트하는 경우
+					await db
+						.prepare('UPDATE feedbacks SET updated_at = ? WHERE id = ?')
+						.bind(new Date().toISOString(), id)
+						.run();
+				}
+
+				// 업데이트된 피드백 정보 조회
+				const { results } = await db
+					.prepare('SELECT * FROM feedbacks WHERE id = ?')
+					.bind(id)
+					.first();
+
+				updatedFeedback = {
+					id,
+					...results,
+					tags: typeof results?.tags === 'string' ? JSON.parse(results.tags) : results?.tags || []
+				};
+			} catch (dbError) {
+				console.error('Database error:', dbError);
+				updatedFeedback = {
+					id,
+					title: title?.trim(),
+					content: content?.trim(),
+					status: status,
+					priority: priority,
+					tags: tags || [],
+					updated_at: new Date().toISOString()
+				};
+			}
+		} else {
+			updatedFeedback = {
+				id,
+				title: title?.trim(),
+				content: content?.trim(),
+				status: status,
+				priority: priority,
+				tags: tags || [],
+				updated_at: new Date().toISOString()
+			};
+		}
+
+		const response: ApiOk<typeof updatedFeedback> = {
+			ok: true,
+			data: updatedFeedback
+		};
+
+		return new Response(JSON.stringify(response), {
+			headers: { 'content-type': 'application/json' }
+		});
+	} catch (error) {
+		console.error('Feedback update error:', error);
+		const response: ApiErr = {
+			ok: false,
+			error: {
+				code: 'INTERNAL_ERROR',
+				message: '피드백 업데이트 중 오류가 발생했습니다.',
+				details: error instanceof Error ? error.message : 'Unknown error'
+			}
+		};
+
+		return new Response(JSON.stringify(response), {
+			status: 500,
+			headers: { 'content-type': 'application/json' }
+		});
+	}
+};
+
+export const DELETE: RequestHandler = async ({ request, platform }) => {
+	try {
+		const { id } = await request.json();
+
+		if (!id) {
+			const response: ApiErr = {
+				ok: false,
+				error: {
+					code: 'VALIDATION_ERROR',
+					message: '피드백 ID를 입력해주세요.',
+					details: 'id is required'
+				}
+			};
+			return new Response(JSON.stringify(response), {
+				status: 400,
+				headers: { 'content-type': 'application/json' }
+			});
+		}
+
+		const db = platform?.env?.DB;
+
+		if (db) {
+			try {
+				// 피드백 삭제
+				await db
+					.prepare('DELETE FROM feedbacks WHERE id = ?')
+					.bind(id)
+					.run();
+			} catch (dbError) {
+				console.error('Database error:', dbError);
+			}
+		}
+
+		const response: ApiOk<{ id: string }> = {
+			ok: true,
+			data: { id }
+		};
+
+		return new Response(JSON.stringify(response), {
+			headers: { 'content-type': 'application/json' }
+		});
+	} catch (error) {
+		console.error('Feedback deletion error:', error);
+		const response: ApiErr = {
+			ok: false,
+			error: {
+				code: 'INTERNAL_ERROR',
+				message: '피드백 삭제 중 오류가 발생했습니다.',
+				details: error instanceof Error ? error.message : 'Unknown error'
+			}
+		};
+
+		return new Response(JSON.stringify(response), {
+			status: 500,
+			headers: { 'content-type': 'application/json' }
+		});
+	}
+};

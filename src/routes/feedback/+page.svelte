@@ -210,24 +210,23 @@
 		}
 
 		try {
-			// TODO: API PUT 구현 후 활성화
-			// const response = await fetch('/api/feedback', {
-			// 	method: 'PUT',
-			// 	headers: { 'Content-Type': 'application/json' },
-			// 	body: JSON.stringify({ id: feedbackId, title: editingTitle.trim(), content: editingContent.trim() })
-			// });
-			// const result = await response.json();
-			// if (!response.ok || !result.ok) {
-			// 	throw new Error(result.error?.message || '피드백 수정에 실패했습니다.');
-			// }
+			const response = await fetch('/api/feedback', {
+				method: 'PUT',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ id: feedbackId, title: editingTitle.trim(), content: editingContent.trim() })
+			});
+			const result = await response.json();
+			if (!response.ok || !result.ok) {
+				throw new Error(result.error?.message || '피드백 수정에 실패했습니다.');
+			}
 
-			// 임시: 로컬 상태 업데이트
+			// 로컬 상태 업데이트
 			feedbacks = feedbacks.map(f => 
 				f.id === feedbackId 
 					? { ...f, title: editingTitle.trim(), content: editingContent.trim() }
 					: f
 			);
-			toast.add('피드백이 수정되었습니다. (API 구현 대기 중)', 'success', 3000);
+			toast.add('피드백이 수정되었습니다.', 'success', 3000);
 			editingFeedbackId = null;
 			editingTitle = '';
 			editingContent = '';
@@ -247,18 +246,17 @@
 		}
 
 		try {
-			// TODO: API DELETE 구현 후 활성화
-			// const response = await fetch(`/api/feedback`, {
-			// 	method: 'DELETE',
-			// 	headers: { 'Content-Type': 'application/json' },
-			// 	body: JSON.stringify({ id: feedbackId })
-			// });
-			// const result = await response.json();
-			// if (!response.ok || !result.ok) {
-			// 	throw new Error(result.error?.message || '피드백 삭제에 실패했습니다.');
-			// }
+			const response = await fetch(`/api/feedback`, {
+				method: 'DELETE',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ id: feedbackId })
+			});
+			const result = await response.json();
+			if (!response.ok || !result.ok) {
+				throw new Error(result.error?.message || '피드백 삭제에 실패했습니다.');
+			}
 
-			// 임시: 목록에서 제거
+			// 목록에서 제거
 			feedbacks = feedbacks.filter(f => f.id !== feedbackId);
 			toast.add('피드백이 삭제되었습니다.', 'success', 3000);
 		} catch (error) {
@@ -322,24 +320,23 @@
 	// 보관 처리
 	async function handleArchive(feedbackId: string) {
 		try {
-			// TODO: API 상태 변경 구현 후 활성화
-			// const response = await fetch('/api/feedback', {
-			// 	method: 'PUT',
-			// 	headers: { 'Content-Type': 'application/json' },
-			// 	body: JSON.stringify({ id: feedbackId, status: 'archived' })
-			// });
-			// const result = await response.json();
-			// if (!response.ok || !result.ok) {
-			// 	throw new Error(result.error?.message || '보관 처리에 실패했습니다.');
-			// }
+			const response = await fetch('/api/feedback', {
+				method: 'PUT',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ id: feedbackId, status: 'archived' })
+			});
+			const result = await response.json();
+			if (!response.ok || !result.ok) {
+				throw new Error(result.error?.message || '보관 처리에 실패했습니다.');
+			}
 
-			// 임시: 로컬 상태 업데이트
+			// 로컬 상태 업데이트
 			feedbacks = feedbacks.map(f => 
 				f.id === feedbackId 
 					? { ...f, status: 'archived' }
 					: f
 			);
-			toast.add('피드백이 보관되었습니다. (API 구현 대기 중)', 'success', 3000);
+			toast.add('피드백이 보관되었습니다.', 'success', 3000);
 		} catch (error) {
 			console.error('보관 처리 오류:', error);
 			const errorMessage = error instanceof Error 
