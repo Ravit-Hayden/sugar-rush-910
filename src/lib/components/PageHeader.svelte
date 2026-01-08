@@ -22,7 +22,7 @@
 					{#if action.href}
 						<a 
 							href={action.href}
-							class="page-header-action-button inline-flex items-center justify-center gap-2 px-4 py-2 w-full sm:w-auto rounded-lg transition-colors duration-200 font-medium {action.label === '편집' ? 'page-header-edit-button bg-transparent border border-brand-pink text-brand-pink focus:bg-brand-pink focus:border-brand-pink focus:text-white focus-visible:bg-brand-pink focus-visible:border-brand-pink focus-visible:text-white focus:outline-none focus:ring-0' : 'page-header-primary-button bg-brand-pink text-white focus:bg-brand-pink focus:text-white focus-visible:bg-brand-pink focus-visible:text-white focus:outline-none focus:ring-0'}"
+							class="page-header-action-button inline-flex items-center justify-center gap-2 px-4 py-2 w-full sm:w-auto rounded-lg transition-colors duration-200 font-medium {action.label === '편집' ? 'page-header-edit-button bg-transparent border border-brand-pink text-brand-pink focus:bg-brand-pink focus:border-brand-pink focus:text-white focus-visible:bg-brand-pink focus-visible:border-brand-pink focus-visible:text-white focus:outline-none focus:ring-0' : 'page-header-primary-button bg-brand-pink text-[var(--surface-2)] hover:[&>svg]:!text-[var(--surface-2)] focus:bg-brand-pink focus:text-white focus:[&>svg]:!text-white focus-visible:bg-brand-pink focus-visible:text-white focus-visible:[&>svg]:!text-white focus:outline-none focus:ring-0'}"
 						>
 							{#if action.icon}
 								<svelte:component this={action.icon} size={16} />
@@ -32,7 +32,7 @@
 					{:else}
 						<button 
 							onclick={action.onclick}
-							class="page-header-action-button inline-flex items-center justify-center gap-2 px-4 py-2 w-full sm:w-auto rounded-lg transition-colors duration-200 font-medium {action.label === '편집' ? 'page-header-edit-button bg-transparent border border-brand-pink text-brand-pink focus:bg-brand-pink focus:border-brand-pink focus:text-white focus-visible:bg-brand-pink focus-visible:border-brand-pink focus-visible:text-white focus:outline-none focus:ring-0' : 'page-header-primary-button bg-brand-pink text-white focus:bg-brand-pink focus:text-white focus-visible:bg-brand-pink focus-visible:text-white focus:outline-none focus:ring-0'}"
+							class="page-header-action-button inline-flex items-center justify-center gap-2 px-4 py-2 w-full sm:w-auto rounded-lg transition-colors duration-200 font-medium {action.label === '편집' ? 'page-header-edit-button bg-transparent border border-brand-pink text-brand-pink focus:bg-brand-pink focus:border-brand-pink focus:text-white focus-visible:bg-brand-pink focus-visible:border-brand-pink focus-visible:text-white focus:outline-none focus:ring-0' : 'page-header-primary-button bg-brand-pink text-[var(--surface-2)] hover:[&>svg]:!text-[var(--surface-2)] focus:bg-brand-pink focus:text-white focus:[&>svg]:!text-white focus-visible:bg-brand-pink focus-visible:text-white focus-visible:[&>svg]:!text-white focus:outline-none focus:ring-0'}"
 						>
 							{#if action.icon}
 								<svelte:component this={action.icon} size={16} />
