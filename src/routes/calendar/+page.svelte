@@ -54,8 +54,7 @@
 	}
 
 	function handleAddEvent() {
-		// 새 일정 추가 페이지로 이동 (향후 구현)
-		// goto('/calendar/new');
+		goto('/calendar/new');
 	}
 
 	// 더보기 메뉴 토글
