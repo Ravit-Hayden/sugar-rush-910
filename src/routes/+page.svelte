@@ -10,6 +10,7 @@
 	import ActionsCard from '$lib/components/cards/ActionsCard.svelte';
 	import LogsCard from '$lib/components/cards/LogsCard.svelte';
 	import KpiCard from '$lib/components/cards/KpiCard.svelte';
+	import FinancialStatsCard from '$lib/components/cards/FinancialStatsCard.svelte';
 	import SearchResultsMain from '$lib/components/SearchResultsMain.svelte';
 
 	// 검색 상태
@@ -140,6 +141,11 @@
 			</div>
 			<div class="col-span-1">
 				<LogsCard {logs} />
+			</div>
+
+			<!-- 수익/지출 통계 카드 -->
+			<div class="col-span-1 sm:col-span-2 lg:col-span-3">
+				<FinancialStatsCard />
 			</div>
 
 			<!-- KPI (반응형 위치/크기 조절) -->
