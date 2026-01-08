@@ -54,32 +54,54 @@
 		return () => {};
 	});
 
-	let notifications = [
-		{
-			id: '1',
-			title: '새로운 피드백이 도착했습니다',
-			message: 'El님이 새로운 피드백을 남겼습니다.',
-			time: '5분 전',
-			status: 'unread',
-			type: 'feedback'
-		},
-		{
-			id: '2',
-			title: '앨범 발매 일정 알림',
-			message: 'Sugar Rush Vol.1 발매가 3일 남았습니다.',
-			time: '1시간 전',
-			status: 'read',
-			type: 'release'
-		},
-		{
-			id: '3',
-			title: '시스템 업데이트 완료',
-			message: '보안 업데이트가 성공적으로 완료되었습니다.',
-			time: '3시간 전',
-			status: 'read',
-			type: 'system'
+	// 알림 데이터
+	let notifications = $state<any[]>([]);
+	let notificationsLoading = $state(true);
+
+	// 알림 데이터 로드
+	$effect(() => {
+		if (selectedTab === 'notifications') {
+			(async () => {
+				try {
+					notificationsLoading = true;
+					const response = await fetch('/api/notifications?limit=1000');
+					const data = await response.json();
+					if (data.ok) {
+						notifications = (data.data || []).map((notif: any) => ({
+							...notif,
+							time: formatTime(notif.created_at)
+						}));
+					}
+				} catch (error) {
+					console.error('Failed to load notifications:', error);
+				} finally {
+					notificationsLoading = false;
+				}
+			})();
 		}
-	];
+		return () => {};
+	});
+
+	// 알림 읽음 처리
+	async function markAsRead(notificationId: string) {
+		try {
+			const response = await fetch('/api/notifications', {
+				method: 'PUT',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ id: notificationId, status: 'read' })
+			});
+
+			const data = await response.json();
+			if (data.ok) {
+				// 로컬 상태 업데이트
+				notifications = notifications.map(n => 
+					n.id === notificationId ? { ...n, status: 'read' } : n
+				);
+			}
+		} catch (error) {
+			console.error('Failed to mark notification as read:', error);
+		}
+	}
 
 	function getStatusColor(status: string) {
 		switch (status) {
@@ -303,8 +325,13 @@
 			</div>
 		{:else if selectedTab === 'notifications'}
 			<!-- 알림 섹션 -->
-			<div class="space-y-4">
-				{#each notifications as notification (notification.id)}
+			{#if notificationsLoading}
+				<div class="flex items-center justify-center py-12">
+					<p class="text-text-muted">로딩 중...</p>
+				</div>
+			{:else}
+				<div class="space-y-4">
+					{#each notifications as notification (notification.id)}
 					<div class="bg-surface-1 rounded-lg p-4 hover:bg-surface-2 transition-colors duration-200 border border-border-subtle {notification.status === 'unread' ? 'ring-2 ring-brand-pink/20' : ''}">
 						<div class="flex items-start gap-3">
 							<div class="flex-shrink-0">
@@ -329,7 +356,14 @@
 									</div>
 									<div class="flex items-center gap-1">
 										{#if notification.status === 'unread'}
-											<div class="w-2 h-2 bg-brand-pink rounded-full"></div>
+											<button
+												onclick={() => markAsRead(notification.id)}
+												class="p-1 hover:bg-surface-2 rounded transition-colors duration-200"
+												type="button"
+												aria-label="읽음 처리"
+											>
+												<div class="w-2 h-2 bg-brand-pink rounded-full"></div>
+											</button>
 										{/if}
 										<button class="p-1 hover:bg-surface-2 rounded transition-colors duration-200" type="button">
 											<Trash2 size={14} class="text-text-muted" />
@@ -338,12 +372,13 @@
 								</div>
 							</div>
 						</div>
-					</div>
-				{/each}
-			</div>
+						</div>
+					{/each}
+				</div>
+			{/if}
 
 			<!-- 빈 상태 -->
-			{#if notifications.length === 0}
+			{#if !notificationsLoading && notifications.length === 0}
 				<div class="text-center py-12">
 					<Bell size={48} class="text-text-muted mx-auto mb-4" />
 					<h3 class="text-lg font-semibold text-text-strong mb-2">알림이 없습니다</h3>
