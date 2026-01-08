@@ -3,9 +3,11 @@
 	import { Search, Bell, X } from 'lucide-svelte';
 	import ThemeToggle from './ThemeToggle.svelte';
 
-	let sidebarWidth = $state(72); // 기본값: 축소 상태
+	// 사이드바 너비는 클라이언트 사이드에서만 설정 (SSR과 일치시키기 위해)
+	let sidebarWidth = $state(72); // 기본값: 축소 상태 (SSR과 동일)
 	let searchInput: HTMLInputElement;
 	let searchValue = $state('');
+	let isMounted = $state(false); // hydration 완료 여부
 
 	// 메뉴 아이템 정의 (사이드바와 동일)
 	const menuItems = [
@@ -36,12 +38,15 @@
 		return '대시보드';
 	}
 
-	// 사이드바 너비 변경 이벤트 처리
+	// 사이드바 너비 변경 이벤트 처리 (클라이언트 사이드에서만)
 	$effect(() => {
 		if (typeof window === 'undefined') {
 			return () => {}; // SSR 시 빈 cleanup 함수 반환
 		}
 
+		// 클라이언트에서만 초기값 설정 (hydration 후)
+		// SSR과 일치시키기 위해 기본값 72를 유지하고,
+		// 클라이언트에서 이벤트로 업데이트됨
 		const handleSidebarWidthChange = (event: CustomEvent) => {
 			sidebarWidth = event.detail.width;
 		};
@@ -53,6 +58,14 @@
 				window.removeEventListener('sidebar-width-change', handleSidebarWidthChange as EventListener);
 			}
 		};
+	});
+
+	// 클라이언트 사이드 마운트 확인
+	$effect(() => {
+		if (typeof window !== 'undefined') {
+			isMounted = true;
+		}
+		return () => {};
 	});
 
 	// 키보드 단축키: Ctrl+K 또는 Cmd+K로 검색창 포커스
@@ -84,7 +97,7 @@
 	});
 </script>
 
-<header class="h-20 px-6 fixed top-0 left-0 right-0 z-[60] bg-bg transition-all duration-300" style="margin-left: {sidebarWidth}px;">
+<header class="h-20 px-6 fixed top-0 left-0 right-0 z-[60] bg-bg" style="margin-left: {sidebarWidth}px;">
 	<div class="flex h-full items-center justify-between">
 		<!-- 왼쪽 섹션: 페이지 제목 -->
 		<div class="flex items-center gap-4">
@@ -108,7 +121,7 @@
 						bind:value={searchValue}
 						aria-label="검색"
 						aria-describedby="search-description"
-						class="pl-10 {searchValue.trim() ? 'pr-10' : 'pr-4'} py-1.5 w-full bg-surface-1 border border-border-subtle border-[1px] rounded-md text-text-base placeholder-text-muted focus:outline-none focus:ring-0 transition-colors duration-200"
+						class="input-base pl-10 {searchValue.trim() ? 'pr-10' : 'pr-4'} py-1.5 w-full text-base placeholder:text-text-muted focus:outline-none focus:ring-0"
 					/>
 					{#if searchValue.trim()}
 						<button
@@ -117,10 +130,10 @@
 								searchValue = '';
 								searchInput?.focus();
 							}}
-							class="search-clear-button absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 flex items-center justify-center bg-transparent hover:bg-transparent focus:bg-transparent focus-visible:bg-transparent"
+							class="btn-icon absolute inset-y-0 right-2.5 flex items-center pointer-events-auto"
 							aria-label="검색 초기화"
 						>
-							<X size={16} class="lucide-icon" />
+							<X size={16} class="lucide-icon text-text-muted" />
 						</button>
 					{/if}
 					<span id="search-description" class="sr-only">Ctrl+K 또는 Cmd+K를 눌러 검색창에 포커스할 수 있습니다</span>
@@ -129,12 +142,12 @@
 
 			<!-- 알림 버튼 -->
 			<div class="flex items-center flex-shrink-0">
-				<a href="/feedback" class="notification-button relative inline-flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 rounded-md transition-colors focus:outline-none focus:ring-0" aria-label="알림">
+				<a href="/feedback" class="notification-button relative inline-flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 rounded-md focus:outline-none focus:ring-0" aria-label="알림">
 					<Bell 
 						size={14} 
-						class="sm:w-4 sm:h-4 transition-colors lucide-icon {$page.url.pathname.startsWith('/feedback') ? 'text-brand-pink' : 'text-text-base'}" 
+						class="sm:w-4 sm:h-4 lucide-icon {isMounted && $page.url.pathname.startsWith('/feedback') ? 'text-brand-pink' : 'text-text-base'}" 
 					/>
-					{#if !$page.url.pathname.startsWith('/feedback')}
+					{#if isMounted && !$page.url.pathname.startsWith('/feedback')}
 						<span class="notification-dot absolute -top-0.5 -right-0.5 w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full" style="background-color: var(--brand-pink);"></span>
 					{/if}
 				</a>

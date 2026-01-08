@@ -147,6 +147,7 @@
 				previewUrl = album.cover;
 			}
 		}
+		return () => {};
 	});
 
 	// 선택 가능한 장르 목록 (선택된 장르 제외)
@@ -224,6 +225,22 @@
 		}
 	}
 
+	// 이미지 삭제 함수
+	function handleImageRemove(event: MouseEvent) {
+		event.stopPropagation(); // 업로드 영역 클릭 이벤트 방지
+		// 미리보기 URL 해제 (blob URL인 경우만)
+		if (previewUrl && previewUrl.startsWith('blob:')) {
+			URL.revokeObjectURL(previewUrl);
+		}
+		// 상태 초기화
+		imageFile = null;
+		previewUrl = '';
+		// 파일 입력 초기화
+		if (fileInput) {
+			fileInput.value = '';
+		}
+	}
+
 	// 이미지 선택 핸들러
 	function handleImageSelect(event: Event) {
 		const target = event.target as HTMLInputElement;
@@ -234,8 +251,43 @@
 	}
 
 	// 이미지 업로드 영역 클릭 핸들러
-	function handleImageAreaClick() {
+	function handleImageAreaClick(event: MouseEvent) {
+		const uploadZone = event.currentTarget as HTMLElement;
+		// 업로드 영역에 포커스 주기
+		uploadZone.focus();
 		fileInput?.click();
+	}
+
+	// 파일 입력 포커스 해제 핸들러 (다이얼로그 취소 시 포커스 해제)
+	function handleFileInputBlur() {
+		// 파일이 선택되지 않았으면 업로드 영역의 포커스도 해제
+		if (!fileInput?.files || fileInput.files.length === 0) {
+			// 업로드 영역 요소 찾아서 포커스 해제
+			setTimeout(() => {
+				const uploadZone = document.querySelector('.upload-zone[aria-label="앨범 커버 업로드"]') as HTMLElement;
+				if (uploadZone && document.activeElement === uploadZone) {
+					uploadZone.blur();
+				}
+			}, 100);
+		}
+	}
+
+	// 파일 입력 클릭 핸들러 (다이얼로그가 열렸는지 감지)
+	function handleFileInputClick() {
+		// 다이얼로그가 열린 후 닫힐 때를 감지하기 위해 window focus 이벤트 사용
+		const handleWindowFocus = () => {
+			// 파일이 선택되지 않았으면 업로드 영역 포커스 해제
+			setTimeout(() => {
+				if (!fileInput?.files || fileInput.files.length === 0) {
+					const uploadZone = document.querySelector('.upload-zone[aria-label="앨범 커버 업로드"]') as HTMLElement;
+					if (uploadZone && document.activeElement === uploadZone) {
+						uploadZone.blur();
+					}
+				}
+				window.removeEventListener('focus', handleWindowFocus);
+			}, 100);
+		};
+		window.addEventListener('focus', handleWindowFocus);
 	}
 
 	// 드래그 앤 드롭 핸들러
@@ -332,13 +384,13 @@
 				<!-- 좌우 배치 컨테이너 -->
 				<div class="flex flex-col lg:flex-row gap-10">
 					<!-- [좌측] 이미지 업로드 영역 -->
-					<div class="w-full lg:w-80 flex-shrink-0">
+					<div class="group relative w-full lg:w-80 flex-shrink-0">
 						<div
 							onclick={handleImageAreaClick}
 							ondragover={handleDragOver}
 							ondragleave={handleDragLeave}
 							ondrop={handleDrop}
-							class="upload-zone w-full aspect-square bg-surface-1 rounded-xl border-2 cursor-pointer flex items-center justify-center overflow-hidden {isDragging ? 'border-brand-pink bg-surface-2/50' : ''}"
+							class="upload-zone relative w-full aspect-square bg-surface-1 rounded-xl border-2 cursor-pointer flex items-center justify-center overflow-visible {isDragging ? 'border-brand-pink bg-surface-2/50' : ''}"
 							data-dragging={isDragging}
 							role="button"
 							tabindex="0"
@@ -356,17 +408,30 @@
 								class="hidden"
 								bind:this={fileInput}
 								onchange={handleImageSelect}
+								onclick={handleFileInputClick}
+								onblur={handleFileInputBlur}
 							/>
 							{#if previewUrl}
+								<div class="relative w-full h-full overflow-hidden rounded-xl">
 								<img
 									src={previewUrl}
 									alt="앨범 커버 미리보기"
 									class="w-full h-full object-cover rounded-xl"
 								/>
+								</div>
+								<button
+									type="button"
+									onclick={handleImageRemove}
+									class="btn-icon absolute bottom-0 right-0 bg-surface-1 border-t border-l border-border-subtle rounded-tl-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 focus:outline-none focus:opacity-100 flex items-center justify-center"
+									style="transform: translateY(calc(100% + 4px));"
+									aria-label="이미지 삭제"
+								>
+									<X size={18} class="lucide-icon text-text-strong" style="stroke-width: 2.5;" />
+								</button>
 							{:else}
-								<div class="flex flex-col items-center justify-center gap-3 text-text-muted">
+								<div class="flex flex-col items-center justify-center gap-2 text-text-muted">
 									<Image size={48} class="lucide-icon" />
-									<span class="text-sm font-medium">커버 업로드</span>
+									<span class="text-sm font-medium">클릭 또는 드래그하여 업로드</span>
 								</div>
 							{/if}
 						</div>
@@ -425,7 +490,7 @@
 										toggleGenreDropdown();
 									}
 								}}
-								class="w-full min-h-10 px-4 pr-10 py-1.5 bg-surface-2 border border-border-subtle rounded-lg text-text-base transition-colors duration-200 flex flex-wrap gap-2 items-center cursor-pointer hover:border-[var(--hover-cyan)] hover:text-[var(--hover-cyan)] focus-within:border-brand-pink focus-within:text-brand-pink focus-within:outline-none focus-within:ring-0"
+								class="w-full min-h-10 px-4 pr-10 py-0 bg-surface-2 border border-border-subtle rounded-lg text-text-base transition-colors duration-200 flex flex-wrap gap-2 items-center cursor-pointer focus-within:outline-none focus-within:ring-0"
 								role="button"
 								aria-haspopup="listbox"
 								aria-expanded={genreDropdownOpen}
@@ -452,13 +517,13 @@
 									{/each}
 								{/if}
 							</div>
-							<div class="pointer-events-none absolute top-3 right-3 flex items-center">
+							<div class="pointer-events-none absolute top-3 right-2.5 flex items-center">
 								<ChevronDownIcon size={16} class="lucide-icon text-text-muted transition-colors duration-200" />
 							</div>
 							{#if genreDropdownOpen}
-								<ul role="listbox" class="absolute left-0 w-full mt-[6px] bg-surface-1 border rounded-[6px] z-10 border-border-subtle max-h-60 overflow-y-auto">
+								<ul role="listbox" class="absolute left-0 w-full mt-[6px] bg-surface-1 border border-border-subtle rounded-[6px] z-10 max-h-60 custom-list-scrollbar">
 									{#if availableGenres.length === 0}
-										<li class="px-4 py-2 text-sm text-text-muted text-center">모든 장르가 선택되었습니다</li>
+										<li class="px-4 py-2 text-base text-text-muted text-center">모든 장르가 선택되었습니다</li>
 									{:else}
 										{#each availableGenres as genre}
 											<li
@@ -472,7 +537,7 @@
 														addGenre(genre);
 													}
 												}}
-												class="px-4 py-2 text-sm text-text-base bg-transparent transition-colors duration-200 cursor-pointer genre-dropdown-item focus:!bg-brand-pink focus:!text-white focus:outline-none"
+												class="px-4 py-2 text-base text-text-base bg-transparent transition-colors duration-200 cursor-pointer genre-dropdown-item focus:!bg-brand-pink focus:!text-white focus:outline-none"
 											>
 												{genre}
 											</li>
@@ -527,7 +592,7 @@
 													selectStatusOption(option.value);
 												}
 											}}
-											class="px-4 py-2 text-sm text-text-base hover:bg-surface-2 cursor-pointer {formData.status === option.value ? 'bg-brand-pink text-white' : ''}"
+											class="px-4 py-2 text-base text-text-base hover:bg-surface-2 cursor-pointer {formData.status === option.value ? 'bg-brand-pink text-white' : ''}"
 										>
 											{option.label}
 										</li>
@@ -568,7 +633,7 @@
 					</button>
 					<button
 						type="submit"
-						class="px-6 py-2 bg-brand-pink text-white rounded-lg hover:bg-brand-pink/90 focus:bg-brand-pink/90 focus-visible:bg-brand-pink/90 focus:outline-none focus:ring-0 transition-colors duration-200 font-medium"
+						class="px-6 py-2 bg-brand-pink text-white rounded-lg focus:outline-none focus:ring-0 transition-colors duration-200 font-medium"
 					>
 						저장
 					</button>

@@ -107,7 +107,7 @@
 
 	// 컴포넌트 마운트 시 초기화
 	$effect(() => {
-		if (!browser) return;
+		if (!browser) return () => {};
 		
 		// 마운트됨으로 표시
 		mounted = true;

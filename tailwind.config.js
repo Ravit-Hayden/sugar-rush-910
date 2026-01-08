@@ -8,6 +8,7 @@ export default {
         // 브랜드 색상
         'brand-pink': 'var(--brand-pink)',
         'hover-cyan': 'var(--hover-cyan)',
+        'hover-point': 'var(--hover-point)',
         
         // 텍스트 색상
         'text-base': 'var(--text-base)',

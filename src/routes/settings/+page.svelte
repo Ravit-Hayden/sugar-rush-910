@@ -131,6 +131,7 @@
 			}
 			previewUrl = newArtistPhotoUrl;
 		}
+		return () => {};
 	});
 
 	// 새 아티스트 추가
@@ -287,6 +288,7 @@
 		if (activeTab === 'data' && artists.length === 0 && !loading) {
 			loadArtists();
 		}
+		return () => {};
 	});
 
 	const tabs = [
@@ -343,7 +345,7 @@
 									id="username"
 									type="text" 
 									value="Sugar Rush Admin" 
-									class="w-full px-3 py-2 bg-surface-2 border border-border-subtle rounded-md text-text-strong focus:outline-none focus:ring-2 focus:ring-brand-pink focus:border-transparent transition-all duration-200"
+									class="input-base w-full px-3 py-2"
 								/>
 							</div>
 							<div>
@@ -352,7 +354,7 @@
 									id="email"
 									type="email" 
 									value="admin@sugarrush.com" 
-									class="w-full px-3 py-2 bg-surface-2 border border-border-subtle rounded-md text-text-strong focus:outline-none focus:ring-2 focus:ring-brand-pink focus:border-transparent transition-all duration-200"
+									class="input-base w-full px-3 py-2"
 								/>
 							</div>
 							<div>
@@ -628,7 +630,7 @@
 																type="url"
 																bind:value={newArtistPhotoUrl}
 																placeholder="https://example.com/photo.jpg"
-																class="w-full px-3 {newArtistPhotoUrl.trim() ? 'pr-8' : 'pr-3'} py-1.5 text-sm bg-surface-2 border border-border-subtle rounded-md text-text-strong focus:outline-none transition-colors duration-200"
+																class="input-base w-full px-3 {newArtistPhotoUrl.trim() ? 'pr-8' : 'pr-3'} py-1.5 text-sm"
 																onkeydown={(e) => {
 																	if (e.key === 'Escape') resetForm();
 																}}
@@ -682,7 +684,7 @@
 																type="url"
 																bind:value={newArtistWebsite}
 																placeholder="https://example.com"
-																class="w-full px-3 {newArtistWebsite.trim() ? 'pr-8' : 'pr-3'} py-1.5 text-sm bg-surface-2 border border-border-subtle rounded-md text-text-strong focus:outline-none transition-colors duration-200"
+																class="input-base w-full px-3 {newArtistWebsite.trim() ? 'pr-8' : 'pr-3'} py-1.5 text-sm"
 																onkeydown={(e) => {
 																	if (e.key === 'Escape') resetForm();
 																}}
@@ -707,7 +709,7 @@
 																type="email"
 																bind:value={newArtistEmail}
 																placeholder="artist@example.com"
-																class="w-full px-3 {newArtistEmail.trim() ? 'pr-8' : 'pr-3'} py-1.5 text-sm bg-surface-2 border border-border-subtle rounded-md text-text-strong focus:outline-none transition-colors duration-200"
+																class="input-base w-full px-3 {newArtistEmail.trim() ? 'pr-8' : 'pr-3'} py-1.5 text-sm"
 																onkeydown={(e) => {
 																	if (e.key === 'Escape') resetForm();
 																}}
@@ -740,7 +742,7 @@
 																type="url"
 																bind:value={newArtistInstagram}
 																placeholder="https://instagram.com/..."
-																class="w-full px-3 {newArtistInstagram.trim() ? 'pr-8' : 'pr-3'} py-1.5 text-sm bg-surface-2 border border-border-subtle rounded-md text-text-strong focus:outline-none transition-colors duration-200"
+																class="input-base w-full px-3 {newArtistInstagram.trim() ? 'pr-8' : 'pr-3'} py-1.5 text-sm"
 																onkeydown={(e) => {
 																	if (e.key === 'Escape') resetForm();
 																}}
@@ -765,7 +767,7 @@
 																type="url"
 																bind:value={newArtistTwitter}
 																placeholder="https://twitter.com/..."
-																class="w-full px-3 {newArtistTwitter.trim() ? 'pr-8' : 'pr-3'} py-1.5 text-sm bg-surface-2 border border-border-subtle rounded-md text-text-strong focus:outline-none transition-colors duration-200"
+																class="input-base w-full px-3 {newArtistTwitter.trim() ? 'pr-8' : 'pr-3'} py-1.5 text-sm"
 																onkeydown={(e) => {
 																	if (e.key === 'Escape') resetForm();
 																}}
@@ -790,7 +792,7 @@
 																type="url"
 																bind:value={newArtistYoutube}
 																placeholder="https://youtube.com/..."
-																class="w-full px-3 {newArtistYoutube.trim() ? 'pr-8' : 'pr-3'} py-1.5 text-sm bg-surface-2 border border-border-subtle rounded-md text-text-strong focus:outline-none transition-colors duration-200"
+																class="input-base w-full px-3 {newArtistYoutube.trim() ? 'pr-8' : 'pr-3'} py-1.5 text-sm"
 																onkeydown={(e) => {
 																	if (e.key === 'Escape') resetForm();
 																}}
@@ -823,7 +825,7 @@
 																type="text"
 																bind:value={newArtistGenre}
 																placeholder="예: Pop, R&B, Hip-Hop"
-																class="w-full px-3 {newArtistGenre.trim() ? 'pr-8' : 'pr-3'} py-1.5 text-sm bg-surface-2 border border-border-subtle rounded-md text-text-strong focus:outline-none transition-colors duration-200"
+																class="input-base w-full px-3 {newArtistGenre.trim() ? 'pr-8' : 'pr-3'} py-1.5 text-sm"
 																onkeydown={(e) => {
 																	if (e.key === 'Escape') resetForm();
 																}}
@@ -857,7 +859,7 @@
 																type="text"
 																bind:value={newArtistAgency}
 																placeholder="소속사명"
-																class="w-full px-3 {newArtistAgency.trim() ? 'pr-8' : 'pr-3'} py-1.5 text-sm bg-surface-2 border border-border-subtle rounded-md text-text-strong focus:outline-none transition-colors duration-200"
+																class="input-base w-full px-3 {newArtistAgency.trim() ? 'pr-8' : 'pr-3'} py-1.5 text-sm"
 																onkeydown={(e) => {
 																	if (e.key === 'Escape') resetForm();
 																}}
@@ -882,7 +884,7 @@
 																type="text"
 																bind:value={newArtistCountry}
 																placeholder="예: 대한민국, USA"
-																class="w-full px-3 {newArtistCountry.trim() ? 'pr-8' : 'pr-3'} py-1.5 text-sm bg-surface-2 border border-border-subtle rounded-md text-text-strong focus:outline-none transition-colors duration-200"
+																class="input-base w-full px-3 {newArtistCountry.trim() ? 'pr-8' : 'pr-3'} py-1.5 text-sm"
 																onkeydown={(e) => {
 																	if (e.key === 'Escape') resetForm();
 																}}

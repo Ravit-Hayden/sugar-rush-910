@@ -84,11 +84,11 @@
 	<!-- 하단 액션 -->
 	<div class="flex items-center justify-between mt-3">
 		<div class="flex gap-x-2 flex-wrap items-center">
-			<a href="/tasks/new" class="inline-flex items-center pl-1.5 pr-2 py-1 rounded border border-brand-pink text-brand-pink text-xs font-medium hover:bg-brand-pink hover:text-white transition cursor-pointer" aria-label="새 태스크" title="새 태스크">
+			<a href="/tasks/new" class="inline-flex items-center pl-1.5 pr-2 py-1 rounded border border-brand-pink text-brand-pink text-xs font-medium cursor-pointer" aria-label="새 태스크" title="새 태스크">
 				<Plus size={12} class="mr-1" />
 				작업
 			</a>
-			<a href="/mentions" class="inline-flex items-center pl-1.5 pr-2 py-1 rounded border border-brand-pink text-brand-pink text-xs font-medium hover:bg-brand-pink hover:text-white transition cursor-pointer" aria-label="멘션" title="멘션">
+			<a href="/mentions" class="inline-flex items-center pl-1.5 pr-2 py-1 rounded border border-brand-pink text-brand-pink text-xs font-medium cursor-pointer" aria-label="멘션" title="멘션">
 				<MessageCircle size={12} class="mr-1" />
 				멘션
 			</a>

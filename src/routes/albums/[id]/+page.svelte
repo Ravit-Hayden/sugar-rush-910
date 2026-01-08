@@ -297,7 +297,7 @@
 
 	// 외부 클릭 시 더보기 메뉴 닫기
 	$effect(() => {
-		if (!moreMenuOpen) return;
+		if (!moreMenuOpen) return () => {};
 
 		function handleClickOutside(event: MouseEvent) {
 			const target = event.target as HTMLElement;
@@ -318,7 +318,7 @@
 
 	// Escape 키로 메뉴 닫기
 	$effect(() => {
-		if (!moreMenuOpen) return;
+		if (!moreMenuOpen) return () => {};
 
 		function handleEscape(e: KeyboardEvent) {
 			if (e.key === 'Escape') {
@@ -334,7 +334,7 @@
 
 	// 외부 클릭 시 장르 말풍선 닫기
 	$effect(() => {
-		if (!isGenreOpen) return;
+		if (!isGenreOpen) return () => {};
 
 		function handleClickOutside(event: MouseEvent) {
 			const target = event.target as HTMLElement;
@@ -355,7 +355,7 @@
 
 	// Escape 키로 장르 말풍선 닫기
 	$effect(() => {
-		if (!isGenreOpen) return;
+		if (!isGenreOpen) return () => {};
 
 		function handleEscape(e: KeyboardEvent) {
 			if (e.key === 'Escape') {

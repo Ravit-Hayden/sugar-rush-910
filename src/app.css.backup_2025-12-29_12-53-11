@@ -77,8 +77,6 @@
   --bg: #000000;
   --surface-2: #121212;
   --surface-1: #1A1A1A;
-  --calendar-bg: #222222;  /* 캘린더 배경 (다크 모드: surface-1보다 한 톤 밝게) */
-  --calendar-picker-bg: #2A2A2A;  /* 년도/월 선택 드롭다운 배경 (다크 모드: 캘린더보다 한 톤 더 밝게) */
   --border-subtle: #252528;
 }
 
@@ -90,8 +88,6 @@
    --bg: #F7F3E9;
    --surface-2: #F3EBDD;
    --surface-1: #FFF8EF;
-   --calendar-bg: #FFF8EF;      /* 캘린더 배경 (라이트 모드: surface-1과 동일) */
-   --calendar-picker-bg: #FFF8EF;  /* 년도/월 선택 드롭다운 배경 (라이트 모드: 캘린더와 동일) */
    --border-subtle: #B8A896;    /* 더 진하게 (기존 #D9CCBC) */
    --hover-cyan: #8A2BE2;       /* 호환성 유지 (deprecated: --hover-point 사용 권장) */
    --hover-point: #8A2BE2;      /* 호버 포인트 컬러 (라이트 모드: Purple) */
@@ -162,7 +158,7 @@
     /* 커스텀 변수는 표준 CSS로 분리 (에러 방지) */
     border-color: var(--border-subtle);
     background-color: var(--surface-2);
-    color: var(--text-base) !important;
+    color: var(--text-base);
   }
   
   /* [규칙] Hover는 Focus가 없을 때만 적용 */
@@ -175,61 +171,57 @@
   .input-base:focus-within,
   .input-base[aria-expanded="true"] { /* 팝업 열림 상태 포함 */
     border-color: var(--brand-pink) !important;
-    color: var(--text-base) !important; /* 포커스 시에도 텍스트 색상 유지 */
   }
 
   /* 2. 아이콘 버튼 (X버튼, 달력 등) */
   .btn-icon {
-    @apply flex items-center justify-center border-none cursor-pointer;
-    background-color: transparent;
+    @apply flex items-center justify-center bg-transparent border-none cursor-pointer;
     color: var(--text-muted);
   }
   /* Hover: 포커스가 없을 때만 적용 */
   .btn-icon:hover:not(:focus):not(:focus-visible) {
-    background-color: transparent;
-    color: var(--hover-point);
+    color: var(--hover-point) !important;
   }
-  /* Focus: 최우선 (Brand Pink) */
+  /* Focus: 최우선 (Brand Pink) - 포커스 링이 보일 때도 호버 효과 완전 차단 */
   .btn-icon:focus, 
   .btn-icon:focus-visible {
-    background-color: transparent;
-    color: var(--brand-pink);
+    color: var(--brand-pink) !important;
     outline: none;
   }
-  /* Focus + Hover: 포커스 색상 유지 */
+  /* Focus + Hover: 포커스 색상 유지 (호버 효과 완전 무시) */
   .btn-icon:focus:hover,
   .btn-icon:focus-visible:hover {
-    background-color: transparent;
-    color: var(--brand-pink);
+    color: var(--brand-pink) !important;
   }
-  /* 내부 아이콘도 동일한 규칙 적용 */
+  /* 내부 아이콘도 동일한 규칙 적용 (전역 스타일보다 우선) */
   .btn-icon:hover:not(:focus):not(:focus-visible) .lucide-icon {
-    color: var(--hover-point);
+    color: var(--hover-point) !important;
   }
   .btn-icon:focus .lucide-icon,
   .btn-icon:focus-visible .lucide-icon {
-    color: var(--brand-pink);
+    color: var(--brand-pink) !important;
   }
+  /* 포커스 링이 보일 때 호버 효과 완전 차단 */
   .btn-icon:focus:hover .lucide-icon,
   .btn-icon:focus-visible:hover .lucide-icon {
-    color: var(--brand-pink);
+    color: var(--brand-pink) !important;
   }
 
   /* 3. 태그/칩 (장르 선택) */
   .tag-chip {
-    @apply inline-flex items-center pl-0 pr-3 py-1 rounded-full cursor-pointer text-base bg-transparent;
-    border: none;
+    @apply inline-flex items-center px-3 py-1 rounded-full border cursor-pointer text-sm bg-transparent;
+    border-color: var(--border-subtle);
     color: var(--text-base);
   }
-  /* 장르 이름 텍스트는 호버 효과 없음 (삭제 버튼만 효과 적용) */
   .tag-chip:hover:not(.selected) {
-    /* 텍스트 색상 변경 제거 */
+    border-color: var(--hover-point);
+    color: var(--hover-point);
   }
   /* 선택된 태그는 Hover 색상 간섭 없이 무조건 Pink */
   .tag-chip.selected,
   .tag-chip[data-selected="true"] {
     background-color: var(--brand-pink) !important;
-    border: none !important;
+    border-color: var(--brand-pink) !important;
     color: white !important;
   }
 
@@ -254,17 +246,6 @@
     color: var(--hover-point);
     text-decoration: underline;
   }
-  .text-link:focus,
-  .text-link:focus-visible {
-    color: var(--brand-pink);
-    text-decoration: underline;
-    outline: none;
-  }
-  .text-link:focus:hover,
-  .text-link:focus-visible:hover {
-    color: var(--brand-pink);
-    text-decoration: underline;
-  }
 }
 
 /* 미디어 업로드 영역 스타일 */
@@ -274,129 +255,10 @@
   transition: border-color 0.2s, background-color 0.2s;
 }
 
-.upload-zone:hover:not(:focus):not(:focus-visible),
-.upload-zone[data-dragging="true"]:not(:focus):not(:focus-visible) {
+.upload-zone:hover,
+.upload-zone[data-dragging="true"] {
   border-color: var(--hover-point);
   background-color: color-mix(in srgb, var(--hover-point) 5%, transparent);
-}
-
-/* 업로드 영역 호버 시 아이콘 및 텍스트 색상 변경 (세트 개념) */
-.upload-zone:hover:not(:focus):not(:focus-visible) .lucide-icon,
-.upload-zone[data-dragging="true"]:not(:focus):not(:focus-visible) .lucide-icon {
-  color: var(--hover-point) !important;
-}
-
-.upload-zone:hover:not(:focus):not(:focus-visible) span,
-.upload-zone[data-dragging="true"]:not(:focus):not(:focus-visible) span {
-  color: var(--hover-point) !important;
-}
-
-/* 업로드 영역 포커스 효과 */
-.upload-zone:focus,
-.upload-zone:focus-visible {
-  border-color: var(--brand-pink) !important;
-  background-color: color-mix(in srgb, var(--brand-pink) 5%, transparent) !important;
-  outline: none !important;
-  box-shadow: none !important;
-}
-
-/* 업로드 영역 포커스 시 아이콘 및 텍스트 색상 변경 (세트 개념) - 전역 규칙보다 우선 */
-.upload-zone:focus .lucide-icon,
-.upload-zone:focus-visible .lucide-icon,
-.upload-zone:focus-within .lucide-icon,
-.upload-zone:focus svg.lucide-icon,
-.upload-zone:focus-visible svg.lucide-icon,
-.upload-zone:focus-within svg.lucide-icon {
-  color: var(--brand-pink) !important;
-}
-
-.upload-zone:focus span,
-.upload-zone:focus-visible span,
-.upload-zone:focus-within span {
-  color: var(--brand-pink) !important;
-}
-
-.upload-zone:focus:hover,
-.upload-zone:focus-visible:hover {
-  border-color: var(--brand-pink) !important;
-  background-color: color-mix(in srgb, var(--brand-pink) 5%, transparent) !important;
-}
-
-/* 업로드 영역 포커스+호버 시 아이콘 및 텍스트 색상 유지 (세트 개념) - 전역 규칙보다 우선 */
-.upload-zone:focus:hover .lucide-icon,
-.upload-zone:focus-visible:hover .lucide-icon,
-.upload-zone:focus-within:hover .lucide-icon,
-.upload-zone:focus:hover svg.lucide-icon,
-.upload-zone:focus-visible:hover svg.lucide-icon,
-.upload-zone:focus-within:hover svg.lucide-icon {
-  color: var(--brand-pink) !important;
-}
-
-.upload-zone:focus:hover span,
-.upload-zone:focus-visible:hover span,
-.upload-zone:focus-within:hover span {
-  color: var(--brand-pink) !important;
-}
-
-/* 라이트 모드 업로드 영역 호버/포커스 효과 (다크 모드와 동일) */
-[data-theme="light"] .upload-zone:hover:not(:focus):not(:focus-visible),
-[data-theme="light"] .upload-zone[data-dragging="true"]:not(:focus):not(:focus-visible) {
-  border-color: var(--hover-point);
-  background-color: color-mix(in srgb, var(--hover-point) 5%, transparent);
-}
-
-[data-theme="light"] .upload-zone:hover:not(:focus):not(:focus-visible) .lucide-icon,
-[data-theme="light"] .upload-zone[data-dragging="true"]:not(:focus):not(:focus-visible) .lucide-icon {
-  color: var(--hover-point) !important;
-}
-
-[data-theme="light"] .upload-zone:hover:not(:focus):not(:focus-visible) span,
-[data-theme="light"] .upload-zone[data-dragging="true"]:not(:focus):not(:focus-visible) span {
-  color: var(--hover-point) !important;
-}
-
-[data-theme="light"] .upload-zone:focus,
-[data-theme="light"] .upload-zone:focus-visible {
-  border-color: var(--brand-pink) !important;
-  background-color: color-mix(in srgb, var(--brand-pink) 5%, transparent) !important;
-  outline: none !important;
-  box-shadow: none !important;
-}
-
-[data-theme="light"] .upload-zone:focus .lucide-icon,
-[data-theme="light"] .upload-zone:focus-visible .lucide-icon,
-[data-theme="light"] .upload-zone:focus-within .lucide-icon,
-[data-theme="light"] .upload-zone:focus svg.lucide-icon,
-[data-theme="light"] .upload-zone:focus-visible svg.lucide-icon,
-[data-theme="light"] .upload-zone:focus-within svg.lucide-icon {
-  color: var(--brand-pink) !important;
-}
-
-[data-theme="light"] .upload-zone:focus span,
-[data-theme="light"] .upload-zone:focus-visible span,
-[data-theme="light"] .upload-zone:focus-within span {
-  color: var(--brand-pink) !important;
-}
-
-[data-theme="light"] .upload-zone:focus:hover,
-[data-theme="light"] .upload-zone:focus-visible:hover {
-  border-color: var(--brand-pink) !important;
-  background-color: color-mix(in srgb, var(--brand-pink) 5%, transparent) !important;
-}
-
-[data-theme="light"] .upload-zone:focus:hover .lucide-icon,
-[data-theme="light"] .upload-zone:focus-visible:hover .lucide-icon,
-[data-theme="light"] .upload-zone:focus-within:hover .lucide-icon,
-[data-theme="light"] .upload-zone:focus:hover svg.lucide-icon,
-[data-theme="light"] .upload-zone:focus-visible:hover svg.lucide-icon,
-[data-theme="light"] .upload-zone:focus-within:hover svg.lucide-icon {
-  color: var(--brand-pink) !important;
-}
-
-[data-theme="light"] .upload-zone:focus:hover span,
-[data-theme="light"] .upload-zone:focus-visible:hover span,
-[data-theme="light"] .upload-zone:focus-within:hover span {
-  color: var(--brand-pink) !important;
 }
 
 /* 카드 UI 스타일 */
@@ -404,8 +266,7 @@
   /* transition 제거됨 - 즉각적인 반응 */
 }
 
-/* 인터랙티브 카드만 호버 효과 적용 (폼 컨테이너 등 비인터랙티브 카드는 제외) */
-.card-base.card-interactive:hover {
+.card-base:hover {
   border-color: var(--hover-point);
 }
 
@@ -413,41 +274,22 @@
   cursor: pointer;
 }
 
-/* 폼 컨테이너나 내부에 입력 필드가 있는 큰 카드는 호버/포커스 효과 없음 */
-form + *,
-form ~ *,
-.bg-surface-1.rounded-lg.border:has(form),
-.bg-surface-1.rounded-lg.border:has(input),
-.bg-surface-1.rounded-lg.border:has(button[type="submit"]),
-.bg-surface-1.rounded-lg.border:has(button[type="button"]) {
-  /* 호버/포커스 효과 제거 - 내부 요소들이 이미 인터랙티브 */
-}
-
-/* 폼이 직접 포함된 컨테이너는 호버 효과 없음 */
-.bg-surface-1.rounded-lg.border:has(> form):hover,
-.bg-surface-1.rounded-lg.border:has(> form):focus,
-.bg-surface-1.rounded-lg.border:has(> form):focus-visible,
-.bg-surface-1.rounded-lg.border:has(form):hover,
-.bg-surface-1.rounded-lg.border:has(form):focus,
-.bg-surface-1.rounded-lg.border:has(form):focus-visible {
-  border-color: var(--border-subtle) !important;
-  outline: none !important;
-}
-
 
 /* 드래그 가능한 리스트 아이템 스타일 */
 .draggable-item {
   cursor: grab;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .draggable-item:active {
   cursor: grabbing;
   border-color: var(--brand-pink);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 .draggable-item[data-dragging="true"] {
   border-color: var(--brand-pink);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 .draggable-item[data-drop-target="true"] {
@@ -489,25 +331,24 @@ form ~ *,
   display: inline-flex;
   align-items: center;
   padding: 0.25rem 0.75rem;
-  padding-left: 0;
   border-radius: 9999px;
-  border: none;
-  background-color: transparent;
+  border: 1px solid var(--border-subtle);
+  background-color: var(--surface-2);
   color: var(--text-base);
-  font-size: 1rem;
-  transition: background-color 0.2s;
+  font-size: 0.875rem;
+  transition: border-color 0.2s, color 0.2s, background-color 0.2s;
 }
 
-/* 장르 이름 텍스트는 호버 효과 없음 (삭제 버튼만 효과 적용) */
 .tag-chip:hover {
-  /* 텍스트 색상 변경 제거 */
+  border-color: var(--hover-point);
+  color: var(--hover-point);
 }
 
 .tag-chip[data-selected="true"],
 .tag-chip.selected {
   background-color: var(--brand-pink);
   color: white;
-  border: none;
+  border-color: var(--brand-pink);
 }
 
 /* 텍스트 선택 강조 */
@@ -871,33 +712,8 @@ textarea[aria-invalid="true"]:focus {
   background-color: transparent !important;
 }
 
-/* 텍스트 핑크 링크 + 호버 배경 시안 (다크 모드) - 텍스트 색상만 변경 */
-a.text-brand-pink.hover\:bg-hover-cyan:hover:not(:focus):not(:focus-visible),
-a[class*="text-brand-pink"][class*="hover:bg-hover-cyan"]:hover:not(:focus):not(:focus-visible) {
+[data-theme="light"] .hover\:bg-hover-cyan:hover {
   color: var(--hover-point) !important;
-}
-
-/* 텍스트 핑크 링크 + 호버 배경 시안 (라이트 모드) - 텍스트 색상만 변경 */
-[data-theme="light"] a.text-brand-pink.hover\:bg-hover-cyan:hover:not(:focus):not(:focus-visible),
-[data-theme="light"] a[class*="text-brand-pink"][class*="hover:bg-hover-cyan"]:hover:not(:focus):not(:focus-visible) {
-  color: var(--hover-point) !important;
-}
-
-/* 텍스트 핑크 링크 + 호버 배경 시안 - 포커스 (모든 모드) */
-a.text-brand-pink.hover\:bg-hover-cyan:focus,
-a.text-brand-pink.hover\:bg-hover-cyan:focus-visible,
-a[class*="text-brand-pink"][class*="hover:bg-hover-cyan"]:focus,
-a[class*="text-brand-pink"][class*="hover:bg-hover-cyan"]:focus-visible {
-  color: var(--brand-pink) !important;
-  outline: none !important;
-}
-
-/* 텍스트 핑크 링크 + 호버 배경 시안 - 포커스+호버 (모든 모드) */
-a.text-brand-pink.hover\:bg-hover-cyan:focus:hover,
-a.text-brand-pink.hover\:bg-hover-cyan:focus-visible:hover,
-a[class*="text-brand-pink"][class*="hover:bg-hover-cyan"]:focus:hover,
-a[class*="text-brand-pink"][class*="hover:bg-hover-cyan"]:focus-visible:hover {
-  color: var(--brand-pink) !important;
 }
 
 [data-theme="light"] .hover\:text-hover-cyan:hover {
@@ -1026,7 +842,7 @@ a[class*="text-brand-pink"][class*="hover:bg-hover-cyan"]:focus-visible:hover {
 }
 
 /* 라이트 모드에서 일반 버튼 호버 배경 색상 변경 (테마 토글 버튼, 아티스트/앨범 선택 드롭다운 버튼 제외, 포커스가 아닐 때만) */
-[data-theme="light"] button:hover:not([class*="bg-"]):not(.theme-toggle-button):not([data-action="toggle-sidebar"]):not(.btn-icon):not(:focus):not(:focus-visible) {
+[data-theme="light"] button:hover:not([class*="bg-"]):not(.theme-toggle-button):not([data-action="toggle-sidebar"]):not(:focus):not(:focus-visible) {
   background-color: var(--surface-1) !important;
 }
 
@@ -1035,16 +851,6 @@ a[class*="text-brand-pink"][class*="hover:bg-hover-cyan"]:focus-visible:hover {
 [data-theme="light"] .album-select-dropdown button:hover:not(:focus):not(:focus-visible) {
   background-color: transparent !important;
   background: none !important;
-}
-
-/* .btn-icon은 항상 배경색 투명 (라이트 모드 포함) */
-[data-theme="light"] .btn-icon,
-[data-theme="light"] .btn-icon:hover,
-[data-theme="light"] .btn-icon:focus,
-[data-theme="light"] .btn-icon:focus-visible,
-[data-theme="light"] .btn-icon:focus:hover,
-[data-theme="light"] .btn-icon:focus-visible:hover {
-  background-color: transparent;
 }
 
 /* 라이트 모드에서 버튼 내부 아이콘 호버 색상 변경 (trending-up 아이콘 제외, 포커스가 아닐 때만) */
@@ -1683,10 +1489,9 @@ input[type="checkbox"]:checked::after {
    ========================= */
 
 /* 카드 호버 효과 - 메인 영역의 카드/패널에만 적용 (라이트/다크 모드 통합) */
-/* 아티스트 관리 카드, 데이터 관리 카드, 폼 컨테이너, 업로드 영역은 제외 */
-/* 포커스 상태일 때는 호버 효과 없음 */
-main.main-content-area .bg-surface-1:hover:not(.artist-card):not(.data-management-card):not(:has(form)):not(.upload-zone):not(:focus):not(:focus-visible):not(:focus-within),
-main.main-content-area .bg-surface-2:hover:not(.artist-card):not(.data-management-card):not(:has(form)):not(.upload-zone):not(:focus):not(:focus-visible):not(:focus-within) {
+/* 아티스트 관리 카드와 데이터 관리 카드는 제외 */
+main.main-content-area .bg-surface-1:hover:not(.artist-card):not(.data-management-card),
+main.main-content-area .bg-surface-2:hover:not(.artist-card):not(.data-management-card) {
   border-color: var(--hover-point) !important;
   transition: border-color 0.2s ease;
 }
@@ -1700,34 +1505,10 @@ aside.bg-surface-2:hover {
 
 /* 배지 호버 효과 제거 - 배지는 호버 효과 불필요 */
 
-/* 아이콘 호버 효과 (포커스 상태가 아닐 때만) */
-/* 포커스 상태의 요소 내부 아이콘은 호버 효과 없음 */
-.lucide-icon:hover:not(:focus):not(:focus-visible):not(:focus-within) {
+/* 아이콘 호버 효과 (포커스가 아닐 때만) */
+.lucide-icon:hover:not(:focus):not(:focus-visible) {
   color: var(--hover-point) !important;
   transition: color 0.2s ease;
-}
-
-/* 포커스 상태의 요소 내부 아이콘은 호버 효과 무시 (업로드 영역 제외) */
-:focus .lucide-icon:hover,
-:focus-visible .lucide-icon:hover,
-:focus-within .lucide-icon:hover {
-  color: inherit !important;
-}
-
-/* 업로드 영역은 포커스 시 핫핑크 색상 유지 (전역 규칙보다 우선) */
-.upload-zone:focus .lucide-icon,
-.upload-zone:focus-visible .lucide-icon,
-.upload-zone:focus-within .lucide-icon,
-.upload-zone:focus .lucide-icon:hover,
-.upload-zone:focus-visible .lucide-icon:hover,
-.upload-zone:focus-within .lucide-icon:hover,
-.upload-zone:focus svg.lucide-icon,
-.upload-zone:focus-visible svg.lucide-icon,
-.upload-zone:focus-within svg.lucide-icon,
-.upload-zone:focus svg.lucide-icon:hover,
-.upload-zone:focus-visible svg.lucide-icon:hover,
-.upload-zone:focus-within svg.lucide-icon:hover {
-  color: var(--brand-pink) !important;
 }
 
 /* ActionsCard 아이콘 호버 효과 (포커스가 아닐 때만) - PageHeader 버튼 제외 */
@@ -2075,67 +1856,52 @@ input:focus-visible, button:focus-visible {
    DatePicker 포커스/호버 규칙 (아이콘과 라인 세트 적용)
    ============================================================ */
 
-/* DatePicker 인풋 포커스 효과 */
-.datepicker-input:focus,
-.datepicker-input:focus-visible {
+/* DatePicker 호버 효과 (포커스가 아닐 때만) */
+.datepicker-container:hover:not(:focus-within) .datepicker-icon {
+  color: var(--hover-point) !important;
+  transition: color 0.3s ease;
+}
+
+.datepicker-container:hover:not(:focus-within) .datepicker-input {
+  border-color: var(--hover-point) !important;
+  transition: border-color 0.3s ease;
+}
+
+/* DatePicker 포커스 효과 (호버와 무관하게 항상 적용) */
+.datepicker-container:focus-within .datepicker-input {
   border-color: var(--brand-pink) !important;
   transition: border-color 0.3s ease;
-  outline: none;
 }
 
-/* DatePicker 캘린더 아이콘 호버 효과 (포커스가 아닐 때만) */
-.datepicker-input:hover:not(:focus):not(:focus-visible) ~ button span[role="button"] .lucide-icon,
-.datepicker-input:hover:not(:focus):not(:focus-visible) ~ button span[role="button"]:hover .lucide-icon {
-  color: var(--hover-point);
-  transition: color 0.3s ease;
-}
-
-/* DatePicker 인풋 호버 효과 (포커스가 아닐 때만) */
-.datepicker-input:hover:not(:focus):not(:focus-visible) {
-  border-color: var(--hover-point);
-  transition: border-color 0.3s ease;
-}
-
-/* DatePicker 캘린더 아이콘 포커스 효과 */
-button span[role="button"][aria-label="캘린더 열기"]:focus .lucide-icon,
-button span[role="button"][aria-label="캘린더 열기"]:focus-visible .lucide-icon,
-button span[role="button"][aria-label="캘린더 열기"]:focus:hover .lucide-icon,
-button span[role="button"][aria-label="캘린더 열기"]:focus-visible:hover .lucide-icon {
+.datepicker-container:focus-within .datepicker-icon {
   color: var(--brand-pink) !important;
-  transition: color 0.3s ease;
-}
-
-/* DatePicker 캘린더 아이콘 호버 효과 (포커스가 아닐 때만) */
-button span[role="button"][aria-label="캘린더 열기"]:hover:not(:focus):not(:focus-visible) .lucide-icon {
-  color: var(--hover-point);
   transition: color 0.3s ease;
 }
 
 /* 포커스+호버: 포커스가 우선 (호버 효과 완전 무시) */
-.datepicker-input:focus:hover,
-.datepicker-input:focus-visible:hover {
+.datepicker-container:focus-within:hover .datepicker-icon {
+  color: var(--brand-pink) !important;
+}
+
+.datepicker-container:focus-within:hover .datepicker-input {
   border-color: var(--brand-pink) !important;
 }
 
 /* 라이트 모드에서 DatePicker 포커스 효과는 핫핑크 유지 */
-[data-theme="light"] .datepicker-input:focus,
-[data-theme="light"] .datepicker-input:focus-visible {
+[data-theme="light"] .datepicker-container:focus-within .datepicker-input {
   border-color: var(--brand-pink) !important;
 }
 
-[data-theme="light"] .datepicker-input:hover:not(:focus):not(:focus-visible) {
-  border-color: var(--hover-point);
-}
-
-[data-theme="light"] button span[role="button"][aria-label="캘린더 열기"]:focus .lucide-icon,
-[data-theme="light"] button span[role="button"][aria-label="캘린더 열기"]:focus-visible .lucide-icon,
-[data-theme="light"] button span[role="button"][aria-label="캘린더 열기"]:focus:hover .lucide-icon,
-[data-theme="light"] button span[role="button"][aria-label="캘린더 열기"]:focus-visible:hover .lucide-icon {
+[data-theme="light"] .datepicker-container:focus-within .datepicker-icon {
   color: var(--brand-pink) !important;
 }
 
-[data-theme="light"] button span[role="button"][aria-label="캘린더 열기"]:hover:not(:focus):not(:focus-visible) .lucide-icon {
-  color: var(--hover-point);
+[data-theme="light"] .datepicker-container:focus-within:hover .datepicker-icon {
+  color: var(--brand-pink) !important;
+}
+
+[data-theme="light"] .datepicker-container:focus-within:hover .datepicker-input {
+  border-color: var(--brand-pink) !important;
 }
 
 /* 알림 버튼 호버/선택 효과 */
@@ -2278,7 +2044,7 @@ button span[role="button"][aria-label="캘린더 열기"]:hover:not(:focus):not(
 /* 호버 효과 (포커스가 아닐 때만) */
 .action-button:hover:not(:focus):not(:focus-visible) {
   border-color: var(--hover-point) !important;
-  background-color: transparent !important;
+  background-color: var(--surface-3) !important;
   transition: border-color 0.3s ease, background-color 0.3s ease;
 }
 
@@ -2636,7 +2402,7 @@ main.main-content,
   margin: 0 !important; 
   border-radius: 0 !important; 
   padding: 8px 16px; 
-  font-size: 1rem; 
+  font-size: .875rem; 
   line-height: 1.5; 
   color: var(--text-base); 
   transition: background-color .15s, color .15s;
@@ -2649,17 +2415,17 @@ main.main-content,
 
 .filter-dropdown [role="option"][aria-selected="true"] { background-color: var(--brand-pink) !important; color: #fff !important }
 .filter-dropdown [role="option"][aria-selected="true"] .text-search-highlight { color: #fff !important }
-.filter-dropdown [role="option"]:hover:not([aria-selected="true"]):not(:focus-visible):not(:focus) { background-color: var(--hover-point) !important; color: #000000 !important }
+.filter-dropdown [role="option"]:hover:not([aria-selected="true"]):not(:focus-visible):not(:focus) { background-color: var(--hover-point) !important; color: var(--text-on-hover) !important }
 .filter-dropdown [role="option"]:focus:not([aria-selected="true"]),
-.filter-dropdown [role="option"]:focus-visible:not([aria-selected="true"]) { background-color: var(--brand-pink) !important; color: #FFFFFF !important; outline: none }
+.filter-dropdown [role="option"]:focus-visible:not([aria-selected="true"]) { background-color: var(--brand-pink) !important; color: #fff !important; outline: none }
 .filter-dropdown [role="option"]:focus:not([aria-selected="true"]):hover,
-.filter-dropdown [role="option"]:focus-visible:not([aria-selected="true"]):hover { background-color: var(--brand-pink) !important; color: #FFFFFF !important; outline: none }
+.filter-dropdown [role="option"]:focus-visible:not([aria-selected="true"]):hover { background-color: var(--brand-pink) !important; color: #fff !important; outline: none }
 
 [data-theme="light"] .filter-dropdown [role="option"]:hover:not([aria-selected="true"]):not(:focus-visible):not(:focus) { background-color: var(--hover-point) !important; color: var(--text-on-hover) !important }
 [data-theme="light"] .filter-dropdown [role="option"]:focus:not([aria-selected="true"]),
-[data-theme="light"] .filter-dropdown [role="option"]:focus-visible:not([aria-selected="true"]) { background-color: var(--brand-pink) !important; color: #FFFFFF !important; outline: none }
+[data-theme="light"] .filter-dropdown [role="option"]:focus-visible:not([aria-selected="true"]) { background-color: var(--brand-pink) !important; color: #fff !important }
 [data-theme="light"] .filter-dropdown [role="option"]:focus:not([aria-selected="true"]):hover,
-[data-theme="light"] .filter-dropdown [role="option"]:focus-visible:not([aria-selected="true"]):hover { background-color: var(--brand-pink) !important; color: #FFFFFF !important; outline: none }
+[data-theme="light"] .filter-dropdown [role="option"]:focus-visible:not([aria-selected="true"]):hover { background-color: var(--brand-pink) !important; color: #fff !important }
 
 .filter-dropdown *:focus { outline: none !important; box-shadow: none }
 .filter-dropdown *:focus-visible { outline: none !important; box-shadow: none }
@@ -2986,7 +2752,7 @@ main.main-content,
 }
 
 .sort-dropdown [role="option"][aria-selected="true"] { background-color: var(--brand-pink) !important; color: #fff !important }
-.sort-dropdown [role="option"]:hover:not([aria-selected="true"]):not(:focus-visible):not(:focus) { background-color: var(--hover-point) !important; color: #000000 !important }
+.sort-dropdown [role="option"]:hover:not([aria-selected="true"]):not(:focus-visible):not(:focus) { background-color: var(--hover-point) !important; color: var(--text-on-hover) !important }
 .sort-dropdown [role="option"]:focus-visible:not([aria-selected="true"]) { background-color: var(--brand-pink) !important; color: #fff !important; outline: none }
 .sort-dropdown [role="option"]:focus:not([aria-selected="true"]) { background-color: var(--brand-pink) !important; color: #fff !important; outline: none }
 
@@ -3048,6 +2814,7 @@ main.main-content,
   min-width: calc(100% + 2rem);
   width: max-content;
   max-width: calc(100vw - 2rem);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
   left: -1rem;
   right: -1rem;
 }
@@ -3449,111 +3216,6 @@ button.hover\:bg-brand-pink\/90:focus-visible:hover .lucide-icon {
   color: #FFFFFF !important;
 }
 
-/* ============================================================
-   호버색 배경 버튼 (bg-hover-cyan / bg-hover-point)
-   ============================================================ */
-
-/* bg-hover-cyan 버튼 기본 상태 */
-button.bg-hover-cyan,
-button[class*="bg-hover-cyan"],
-button.bg-hover-point {
-  background-color: var(--hover-point) !important;
-  color: #000000 !important;
-}
-
-button.bg-hover-cyan .lucide-icon,
-button[class*="bg-hover-cyan"] .lucide-icon,
-button.bg-hover-point .lucide-icon {
-  color: #000000 !important;
-}
-
-[data-theme="light"] button.bg-hover-cyan,
-[data-theme="light"] button[class*="bg-hover-cyan"],
-[data-theme="light"] button.bg-hover-point {
-  background-color: var(--hover-point) !important;
-  color: var(--text-on-hover) !important;
-}
-
-[data-theme="light"] button.bg-hover-cyan .lucide-icon,
-[data-theme="light"] button[class*="bg-hover-cyan"] .lucide-icon,
-[data-theme="light"] button.bg-hover-point .lucide-icon {
-  color: var(--text-on-hover) !important;
-}
-
-/* bg-hover-cyan 버튼 호버 (포커스 없을 때) */
-button.bg-hover-cyan:hover:not(:focus):not(:focus-visible),
-button[class*="bg-hover-cyan"]:hover:not(:focus):not(:focus-visible),
-button.bg-hover-point:hover:not(:focus):not(:focus-visible) {
-  background-color: var(--hover-point) !important;
-  color: #000000 !important;
-}
-
-button.bg-hover-cyan:hover:not(:focus):not(:focus-visible) .lucide-icon,
-button[class*="bg-hover-cyan"]:hover:not(:focus):not(:focus-visible) .lucide-icon,
-button.bg-hover-point:hover:not(:focus):not(:focus-visible) .lucide-icon {
-  color: #000000 !important;
-}
-
-[data-theme="light"] button.bg-hover-cyan:hover:not(:focus):not(:focus-visible),
-[data-theme="light"] button[class*="bg-hover-cyan"]:hover:not(:focus):not(:focus-visible),
-[data-theme="light"] button.bg-hover-point:hover:not(:focus):not(:focus-visible) {
-  background-color: var(--hover-point) !important;
-  color: var(--text-on-hover) !important;
-}
-
-[data-theme="light"] button.bg-hover-cyan:hover:not(:focus):not(:focus-visible) .lucide-icon,
-[data-theme="light"] button[class*="bg-hover-cyan"]:hover:not(:focus):not(:focus-visible) .lucide-icon,
-[data-theme="light"] button.bg-hover-point:hover:not(:focus):not(:focus-visible) .lucide-icon {
-  color: var(--text-on-hover) !important;
-}
-
-/* bg-hover-cyan 버튼 포커스 (모든 모드) */
-button.bg-hover-cyan:focus,
-button.bg-hover-cyan:focus-visible,
-button[class*="bg-hover-cyan"]:focus,
-button[class*="bg-hover-cyan"]:focus-visible,
-button.bg-hover-point:focus,
-button.bg-hover-point:focus-visible {
-  background-color: var(--brand-pink) !important;
-  color: #FFFFFF !important;
-  outline: none !important;
-}
-
-button.bg-hover-cyan:focus .lucide-icon,
-button.bg-hover-cyan:focus-visible .lucide-icon,
-button[class*="bg-hover-cyan"]:focus .lucide-icon,
-button[class*="bg-hover-cyan"]:focus-visible .lucide-icon,
-button.bg-hover-point:focus .lucide-icon,
-button.bg-hover-point:focus-visible .lucide-icon,
-button[class*="bg-hover-point"]:focus .lucide-icon,
-button[class*="bg-hover-point"]:focus-visible .lucide-icon {
-  color: #FFFFFF !important;
-  stroke: #FFFFFF !important;
-}
-
-/* bg-hover-cyan 버튼 포커스+호버 */
-button.bg-hover-cyan:focus:hover,
-button.bg-hover-cyan:focus-visible:hover,
-button[class*="bg-hover-cyan"]:focus:hover,
-button[class*="bg-hover-cyan"]:focus-visible:hover,
-button.bg-hover-point:focus:hover,
-button.bg-hover-point:focus-visible:hover {
-  background-color: var(--brand-pink) !important;
-  color: #FFFFFF !important;
-}
-
-button.bg-hover-cyan:focus:hover .lucide-icon,
-button.bg-hover-cyan:focus-visible:hover .lucide-icon,
-button[class*="bg-hover-cyan"]:focus:hover .lucide-icon,
-button[class*="bg-hover-cyan"]:focus-visible:hover .lucide-icon,
-button.bg-hover-point:focus:hover .lucide-icon,
-button.bg-hover-point:focus-visible:hover .lucide-icon,
-button[class*="bg-hover-point"]:focus:hover .lucide-icon,
-button[class*="bg-hover-point"]:focus-visible:hover .lucide-icon {
-  color: #FFFFFF !important;
-  stroke: #FFFFFF !important;
-}
-
 /* 캐릭터 카드 호버/포커스 효과 */
 .character-card-container {
   transition: border-color 0.3s ease;
@@ -3580,16 +3242,16 @@ button:hover:not(:focus):not(:focus-visible) .lucide-icon {
   color: var(--hover-point) !important;
   transition: color 0.2s ease;
 }
-/* bg-brand-pink 버튼과 bg-hover-point 버튼은 제외 (아이콘 색상 유지) */
-button:not(.bg-brand-pink):not([class*="bg-brand-pink"]):not(.hover\:bg-brand-pink\/90):not(.bg-hover-point):not([class*="bg-hover-point"]):focus .lucide-icon,
-button:not(.bg-brand-pink):not([class*="bg-brand-pink"]):not(.hover\:bg-brand-pink\/90):not(.bg-hover-point):not([class*="bg-hover-point"]):focus-visible .lucide-icon {
+/* bg-brand-pink 버튼은 제외 (아이콘 색상 유지) */
+button:not(.bg-brand-pink):not([class*="bg-brand-pink"]):not(.hover\:bg-brand-pink\/90):focus .lucide-icon,
+button:not(.bg-brand-pink):not([class*="bg-brand-pink"]):not(.hover\:bg-brand-pink\/90):focus-visible .lucide-icon {
   color: var(--brand-pink) !important;
   transition: color 0.2s ease;
 }
-button:not(.bg-brand-pink):not([class*="bg-brand-pink"]):not(.hover\:bg-brand-pink\/90):not(.bg-hover-point):not([class*="bg-hover-point"]):focus:hover .lucide-icon,
-button:not(.bg-brand-pink):not([class*="bg-brand-pink"]):not(.hover\:bg-brand-pink\/90):not(.bg-hover-point):not([class*="bg-hover-point"]):focus-visible:hover .lucide-icon,
-button:not(.bg-brand-pink):not([class*="bg-brand-pink"]):not(.hover\:bg-brand-pink\/90):not(.bg-hover-point):not([class*="bg-hover-point"]):focus:hover:not(:focus-visible) .lucide-icon,
-button:not(.bg-brand-pink):not([class*="bg-brand-pink"]):not(.hover\:bg-brand-pink\/90):not(.bg-hover-point):not([class*="bg-hover-point"]):focus-visible:hover:not(:focus) .lucide-icon {
+button:not(.bg-brand-pink):not([class*="bg-brand-pink"]):not(.hover\:bg-brand-pink\/90):focus:hover .lucide-icon,
+button:not(.bg-brand-pink):not([class*="bg-brand-pink"]):not(.hover\:bg-brand-pink\/90):focus-visible:hover .lucide-icon,
+button:not(.bg-brand-pink):not([class*="bg-brand-pink"]):not(.hover\:bg-brand-pink\/90):focus:hover:not(:focus-visible) .lucide-icon,
+button:not(.bg-brand-pink):not([class*="bg-brand-pink"]):not(.hover\:bg-brand-pink\/90):focus-visible:hover:not(:focus) .lucide-icon {
   color: var(--brand-pink) !important;
 }
 
@@ -3623,33 +3285,16 @@ input[type="number"].number-input-custom + div button:focus-visible .lucide-icon
   border-color: var(--brand-pink) !important;
 }
 
-/* 상태 드롭다운 버튼 호버 시 보더+아이콘 세트 개념 (포커스 없을 때만) */
-.status-dropdown:hover:not(:focus-within):not([data-open="true"]) button {
-  border-color: var(--hover-point) !important;
-}
-
-.status-dropdown:hover:not(:focus-within):not([data-open="true"]) button svg,
-.status-dropdown:hover:not(:focus-within):not([data-open="true"]) button .lucide-icon,
-.status-dropdown:hover:not(:focus-within):not([data-open="true"]) .lucide-icon {
+.status-dropdown button:hover:not(:focus):not(:focus-visible) svg,
+.status-dropdown button:hover:not(:focus):not(:focus-visible) .lucide-icon {
   color: var(--hover-point) !important;
 }
 
-[data-theme="light"] .status-dropdown:hover:not(:focus-within):not([data-open="true"]) button svg,
-[data-theme="light"] .status-dropdown:hover:not(:focus-within):not([data-open="true"]) button .lucide-icon,
-[data-theme="light"] .status-dropdown:hover:not(:focus-within):not([data-open="true"]) .lucide-icon {
+[data-theme="light"] .status-dropdown button:hover:not(:focus):not(:focus-visible) svg,
+[data-theme="light"] .status-dropdown button:hover:not(:focus):not(:focus-visible) .lucide-icon {
   color: var(--hover-point) !important;
 }
 
-/* 상태 드롭다운 버튼 포커스 시 보더+아이콘 세트 개념 */
-.status-dropdown:focus-within button,
-.status-dropdown button:focus,
-.status-dropdown button:focus-visible {
-  border-color: var(--brand-pink) !important;
-}
-
-.status-dropdown:focus-within button svg,
-.status-dropdown:focus-within button .lucide-icon,
-.status-dropdown:focus-within .lucide-icon,
 .status-dropdown button:focus svg,
 .status-dropdown button:focus .lucide-icon,
 .status-dropdown button:focus-visible svg,
@@ -3657,26 +3302,8 @@ input[type="number"].number-input-custom + div button:focus-visible .lucide-icon
   color: var(--brand-pink) !important;
 }
 
-/* 상태 드롭다운 버튼 포커스+호버 시 보더+아이콘 세트 개념 */
-.status-dropdown:focus-within:hover button,
-.status-dropdown button:focus:hover,
-.status-dropdown button:focus-visible:hover {
-  border-color: var(--brand-pink) !important;
-}
-
-.status-dropdown:focus-within:hover button svg,
-.status-dropdown:focus-within:hover button .lucide-icon,
-.status-dropdown:focus-within:hover .lucide-icon,
-.status-dropdown button:focus:hover svg,
-.status-dropdown button:focus:hover .lucide-icon,
-.status-dropdown button:focus-visible:hover svg,
-.status-dropdown button:focus-visible:hover .lucide-icon {
-  color: var(--brand-pink) !important;
-}
-
 .status-dropdown[data-open="true"] button svg,
-.status-dropdown[data-open="true"] button .lucide-icon,
-.status-dropdown[data-open="true"] .lucide-icon {
+.status-dropdown[data-open="true"] button .lucide-icon {
   color: var(--brand-pink) !important;
 }
 
@@ -3692,7 +3319,7 @@ input[type="number"].number-input-custom + div button:focus-visible .lucide-icon
   box-shadow: none !important;
 }
 
-/* 상태 드롭다운 스크롤바 스타일 - 장르 드롭다운과 동일한 색상 */
+/* 상태 드롭다운 스크롤바 스타일 */
 .status-dropdown ul::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -3703,31 +3330,31 @@ input[type="number"].number-input-custom + div button:focus-visible .lucide-icon
 }
 
 .status-dropdown ul::-webkit-scrollbar-thumb {
-  background-color: color-mix(in srgb, var(--hover-point) 30%, transparent);
+  background: var(--border-subtle);
   border-radius: 3px;
 }
 
 .status-dropdown ul::-webkit-scrollbar-thumb:hover {
-  background-color: var(--hover-point);
+  background: var(--text-muted);
 }
 
 /* Firefox */
 .status-dropdown ul {
   scrollbar-width: thin;
-  scrollbar-color: color-mix(in srgb, var(--hover-point) 30%, transparent) transparent;
+  scrollbar-color: var(--border-subtle) transparent;
 }
 
 /* 라이트 모드 */
 [data-theme="light"] .status-dropdown ul::-webkit-scrollbar-thumb {
-  background-color: color-mix(in srgb, var(--hover-point) 30%, transparent);
+  background: var(--border-subtle);
 }
 
 [data-theme="light"] .status-dropdown ul::-webkit-scrollbar-thumb:hover {
-  background-color: var(--hover-point);
+  background: var(--text-muted);
 }
 
 [data-theme="light"] .status-dropdown ul {
-  scrollbar-color: color-mix(in srgb, var(--hover-point) 30%, transparent) transparent;
+  scrollbar-color: var(--border-subtle) transparent;
 }
 
 /* ============================================================
@@ -3974,7 +3601,6 @@ input[type="number"].number-input-custom + div button:focus-visible .lucide-icon
   border-color: var(--hover-point) !important;
 }
 
-/* 포커스 시 호버 효과 완전 차단 (핫핑크만 표시) */
 .cancel-button:focus,
 .cancel-button:focus-visible {
   background-color: transparent !important;
@@ -3984,7 +3610,6 @@ input[type="number"].number-input-custom + div button:focus-visible .lucide-icon
   box-shadow: none !important;
 }
 
-/* 포커스+호버 시에도 핫핑크 유지 (호버 라인 완전 차단) */
 .cancel-button:focus:hover,
 .cancel-button:focus-visible:hover,
 .cancel-button:focus:focus:hover,
@@ -3996,88 +3621,17 @@ input[type="number"].number-input-custom + div button:focus-visible .lucide-icon
   box-shadow: none !important;
 }
 
-/* 포커스 시 Tailwind border 클래스 오버라이드 */
-.cancel-button:focus.border-border-subtle,
-.cancel-button:focus-visible.border-border-subtle,
-.cancel-button:focus:hover.border-border-subtle,
-.cancel-button:focus-visible:hover.border-border-subtle {
-  border-color: var(--brand-pink) !important;
-}
-
 /* 취소 버튼 내부 아이콘 색상 변경 */
 .cancel-button:hover:not(:focus):not(:focus-visible) svg,
 .cancel-button:hover:not(:focus):not(:focus-visible) .lucide-icon {
   color: var(--hover-point) !important;
 }
 
-/* 장르 드롭다운 아이템 호버/포커스 스타일 */
+/* 장르 드롭다운 아이템 호버 스타일 */
 /* 다크/라이트 모드: 호버 포인트 배경 + 텍스트 색상 */
-.genre-dropdown-item:hover:not(:focus):not(:focus-visible) {
+.genre-dropdown-item:hover {
   background-color: var(--hover-point) !important;
   color: var(--text-on-hover) !important;
-}
-
-/* 장르 드롭다운 아이템 포커스 효과 (필터 드롭다운과 동일) */
-.genre-dropdown-item:focus,
-.genre-dropdown-item:focus-visible {
-  background-color: var(--brand-pink) !important;
-  color: #FFFFFF !important;
-  outline: none !important;
-}
-
-.genre-dropdown-item:focus:hover,
-.genre-dropdown-item:focus-visible:hover {
-  background-color: var(--brand-pink) !important;
-  color: #FFFFFF !important;
-}
-
-/* 장르 드롭다운 컨테이너 스타일 - 세트 개념 (보더 + 아이콘) */
-/* 호버: 포커스 없을 때만 적용 */
-.genre-dropdown:hover:not(:focus-within):not([aria-expanded="true"]) #genres,
-.genre-dropdown:hover:not(:focus-within):not([aria-expanded="true"]) [id="genres"],
-.genre-dropdown:hover:not(:focus-within):not([aria-expanded="true"]) > div:first-child {
-  border-color: var(--hover-point);
-}
-
-.genre-dropdown:hover:not(:focus-within):not([aria-expanded="true"]) > div.pointer-events-none .lucide-icon {
-  color: var(--hover-point);
-}
-
-/* 포커스: 드롭다운이 열려있을 때도 포함 */
-.genre-dropdown:focus-within #genres,
-.genre-dropdown:focus-within [id="genres"],
-.genre-dropdown:focus-within > div:first-child,
-.genre-dropdown[aria-expanded="true"] #genres,
-.genre-dropdown[aria-expanded="true"] [id="genres"],
-.genre-dropdown[aria-expanded="true"] > div:first-child {
-  border-color: var(--brand-pink);
-  color: var(--text-base);
-}
-
-.genre-dropdown:focus-within > div.pointer-events-none .lucide-icon,
-.genre-dropdown[aria-expanded="true"] > div.pointer-events-none .lucide-icon {
-  color: var(--brand-pink);
-}
-
-/* 포커스+호버: 포커스 색상 유지 */
-.genre-dropdown:focus-within:hover #genres,
-.genre-dropdown:focus-within:hover [id="genres"],
-.genre-dropdown:focus-within:hover > div:first-child,
-.genre-dropdown[aria-expanded="true"]:hover #genres,
-.genre-dropdown[aria-expanded="true"]:hover [id="genres"],
-.genre-dropdown[aria-expanded="true"]:hover > div:first-child {
-  border-color: var(--brand-pink);
-  color: var(--text-base);
-}
-
-.genre-dropdown:focus-within:hover > div.pointer-events-none .lucide-icon,
-.genre-dropdown[aria-expanded="true"]:hover > div.pointer-events-none .lucide-icon {
-  color: var(--brand-pink);
-}
-
-/* 장르 태그 칩 텍스트는 호버 효과 없음 (삭제 버튼과 드롭다운 아이콘만 효과 적용) */
-.genre-dropdown:hover:not(:focus-within):not([aria-expanded="true"]) .tag-chip {
-  color: var(--text-base);
 }
 
 .cancel-button:focus svg,
@@ -4191,166 +3745,60 @@ input[type="number"].number-input-custom + div button:focus-visible .lucide-icon
 }
 
 /* ============================================================
-   보더+텍스트 핑크 링크 (border-brand-pink + text-brand-pink)
-   TasksCard 등에서 사용되는 보더만 있는 링크
-   ============================================================ */
-
-/* 기본 상태: border-width 고정으로 레이아웃 shift 방지 */
-a.border-brand-pink.text-brand-pink,
-a[class*="border-brand-pink"][class*="text-brand-pink"] {
-  border-width: 1px !important;
-  box-sizing: border-box !important;
-  /* transition 완전 제거로 움직임 방지 */
-  transition: none !important;
-  transform: none !important;
-  will-change: auto !important;
-  position: relative !important;
-}
-
-/* 보더+텍스트 핑크 링크 - 호버 (포커스 없을 때) */
-a.border-brand-pink.text-brand-pink:hover:not(:focus):not(:focus-visible),
-a[class*="border-brand-pink"][class*="text-brand-pink"]:hover:not(:focus):not(:focus-visible) {
-  background-color: transparent !important;
-  border-color: var(--hover-point) !important;
-  color: var(--hover-point) !important;
-  /* 레이아웃 shift 방지: border-width 고정 */
-  border-width: 1px !important;
-  box-sizing: border-box !important;
-  /* transition 완전 제거로 움직임 방지 */
-  transition: none !important;
-  transform: none !important;
-  will-change: auto !important;
-  position: relative !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-}
-
-a.border-brand-pink.text-brand-pink:hover:not(:focus):not(:focus-visible) svg,
-a.border-brand-pink.text-brand-pink:hover:not(:focus):not(:focus-visible) .lucide-icon,
-a[class*="border-brand-pink"][class*="text-brand-pink"]:hover:not(:focus):not(:focus-visible) svg,
-a[class*="border-brand-pink"][class*="text-brand-pink"]:hover:not(:focus):not(:focus-visible) .lucide-icon {
-  color: var(--hover-point) !important;
-}
-
-/* 보더+텍스트 핑크 링크 - 포커스 (배경색 변경 없음, 보더+텍스트+아이콘만 변경) */
-a.border-brand-pink.text-brand-pink:focus,
-a.border-brand-pink.text-brand-pink:focus-visible,
-a[class*="border-brand-pink"][class*="text-brand-pink"]:focus,
-a[class*="border-brand-pink"][class*="text-brand-pink"]:focus-visible {
-  background-color: transparent !important;
-  border-color: var(--brand-pink) !important;
-  color: var(--brand-pink) !important;
-  outline: none !important;
-  /* 레이아웃 shift 방지: border-width 고정 */
-  border-width: 1px !important;
-  box-sizing: border-box !important;
-  /* transition 완전 제거로 움직임 방지 */
-  transition: none !important;
-  transform: none !important;
-  will-change: auto !important;
-  position: relative !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-}
-
-a.border-brand-pink.text-brand-pink:focus svg,
-a.border-brand-pink.text-brand-pink:focus-visible svg,
-a.border-brand-pink.text-brand-pink:focus .lucide-icon,
-a.border-brand-pink.text-brand-pink:focus-visible .lucide-icon,
-a[class*="border-brand-pink"][class*="text-brand-pink"]:focus svg,
-a[class*="border-brand-pink"][class*="text-brand-pink"]:focus-visible svg,
-a[class*="border-brand-pink"][class*="text-brand-pink"]:focus .lucide-icon,
-a[class*="border-brand-pink"][class*="text-brand-pink"]:focus-visible .lucide-icon {
-  color: var(--brand-pink) !important;
-}
-
-/* 보더+텍스트 핑크 링크 - 포커스+호버 (배경색 변경 없음, 보더+텍스트+아이콘만 변경) */
-a.border-brand-pink.text-brand-pink:focus:hover,
-a.border-brand-pink.text-brand-pink:focus-visible:hover,
-a[class*="border-brand-pink"][class*="text-brand-pink"]:focus:hover,
-a[class*="border-brand-pink"][class*="text-brand-pink"]:focus-visible:hover {
-  background-color: transparent !important;
-  border-color: var(--brand-pink) !important;
-  color: var(--brand-pink) !important;
-  /* transition 완전 제거로 움직임 방지 */
-  transition: none !important;
-  transform: none !important;
-  will-change: auto !important;
-  position: relative !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-}
-
-a.border-brand-pink.text-brand-pink:focus:hover svg,
-a.border-brand-pink.text-brand-pink:focus-visible:hover svg,
-a.border-brand-pink.text-brand-pink:focus:hover .lucide-icon,
-a.border-brand-pink.text-brand-pink:focus-visible:hover .lucide-icon,
-a[class*="border-brand-pink"][class*="text-brand-pink"]:focus:hover svg,
-a[class*="border-brand-pink"][class*="text-brand-pink"]:focus-visible:hover svg,
-a[class*="border-brand-pink"][class*="text-brand-pink"]:focus:hover .lucide-icon,
-a[class*="border-brand-pink"][class*="text-brand-pink"]:focus-visible:hover .lucide-icon {
-  color: var(--brand-pink) !important;
-}
-
-/* ============================================================
    커스텀 스크롤바 강제 적용 (.custom-list-scrollbar)
    ============================================================ */
 /* 1. 커스텀 스크롤바 컨테이너 */
 .custom-list-scrollbar {
-  overflow-y: auto; /* 내용이 넘칠 때만 스크롤바 표시 */
-  scrollbar-width: thin; /* Firefox: thin으로 최소화 (호버 시 두꺼워짐 최소화) */
-  scrollbar-color: color-mix(in srgb, var(--hover-point) 30%, transparent) transparent; /* Firefox (Dark) */
+  overflow-y: scroll !important; /* 항상 스크롤바 영역 확보 */
+  scrollbar-width: thin !important; /* Firefox: thin으로 최소화 (호버 시 두꺼워짐 최소화) */
+  scrollbar-color: color-mix(in srgb, var(--hover-point) 30%, transparent) transparent !important; /* Firefox (Dark) */
+  scrollbar-gutter: stable; /* 스크롤바 공간을 미리 확보하여 레이아웃 시프트 방지 */
 }
 
 /* 2. Webkit 스크롤바 전체 크기 */
 .custom-list-scrollbar::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 8px !important;
+  height: 8px !important;
+  display: block !important;
 }
 
 /* 3. [핵심] 화살표 버튼 공간 완전 제거 */
 .custom-list-scrollbar::-webkit-scrollbar-button {
-  display: none;
-  width: 0;
-  height: 0;
-  background: transparent;
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
 }
 .custom-list-scrollbar::-webkit-scrollbar-corner {
-  display: none;
+  display: none !important;
 }
 
 /* 4. 트랙 (투명) */
 .custom-list-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-  margin: 0;
+  background: transparent !important;
+  margin: 0 !important;
 }
 
 /* 5. 썸 (막대) - 브랜드 포인트 스타일 (Dark Mode) */
 .custom-list-scrollbar::-webkit-scrollbar-thumb {
-  background-color: color-mix(in srgb, var(--hover-point) 30%, transparent);
-  border: 2px solid transparent; /* 여백 효과 */
-  background-clip: padding-box;
-  border-radius: 4px;
+  background-color: color-mix(in srgb, var(--hover-point) 30%, transparent) !important;
+  border: 2px solid transparent !important; /* 여백 효과 */
+  background-clip: padding-box !important;
+  border-radius: 4px !important;
 }
 .custom-list-scrollbar::-webkit-scrollbar-thumb:hover {
-  background-color: var(--hover-point);
+  background-color: var(--hover-point) !important;
 }
 
 /* 6. 라이트 모드 오버라이드 (Light Mode) */
 [data-theme="light"] .custom-list-scrollbar {
-  scrollbar-color: color-mix(in srgb, var(--hover-point) 30%, transparent) transparent; /* Firefox (Light) */
+  scrollbar-color: color-mix(in srgb, var(--hover-point) 30%, transparent) transparent !important; /* Firefox (Light) */
 }
 [data-theme="light"] .custom-list-scrollbar::-webkit-scrollbar-thumb {
-  background-color: color-mix(in srgb, var(--hover-point) 30%, transparent);
+  background-color: color-mix(in srgb, var(--hover-point) 30%, transparent) !important;
 }
 [data-theme="light"] .custom-list-scrollbar::-webkit-scrollbar-thumb:hover {
-  background-color: var(--hover-point);
+  background-color: var(--hover-point) !important;
 }
 
 /* ============================================================
@@ -4640,42 +4088,4 @@ button[type="button"]:focus-visible {
 #artist-agency:focus:hover,
 #artist-country:focus:hover {
   border-color: var(--brand-pink) !important;
-}
-
-/* 트랙 TITLE 버튼 텍스트 호버 효과 (텍스트 위에만) */
-.track-title-button-text:hover {
-  color: var(--hover-point) !important;
-}
-
-/* 선택된 상태일 때는 호버해도 브랜드 핑크 유지 */
-.track-title-button-text.text-brand-pink:hover {
-  color: var(--brand-pink) !important;
-}
-
-/* 캘린더 날짜 호버 효과 (배경색 없이 텍스트 색상만 변경) */
-.calendar-dropdown button[type="button"]:hover:not(.bg-brand-pink):not([class*="bg-brand-pink"]):not(.cursor-default) {
-  color: var(--hover-point) !important;
-}
-
-/* 인라인 색상 클래스가 있어도 호버 효과 적용 */
-.calendar-dropdown button[type="button"][class*="text-"]:hover:not(.bg-brand-pink):not([class*="bg-brand-pink"]):not(.cursor-default) {
-  color: var(--hover-point) !important;
-}
-
-/* 선택된 날짜는 호버 효과 없음 (포커스 우선) */
-.calendar-dropdown button[type="button"].bg-brand-pink:hover {
-  /* 호버 효과 없음 - 포커스 색상 유지 */
-}
-
-/* disabled 상태에서도 호버/포커스 효과 유지 (bg-brand-pink 버튼) */
-button.bg-brand-pink:disabled:hover:not(:focus):not(:focus-visible) {
-  background-color: var(--brand-pink) !important;
-  opacity: 0.7 !important;
-}
-
-button.bg-brand-pink:disabled:focus,
-button.bg-brand-pink:disabled:focus-visible {
-  background-color: var(--brand-pink) !important;
-  opacity: 0.7 !important;
-  outline: none !important;
 }

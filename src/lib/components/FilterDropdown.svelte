@@ -57,7 +57,7 @@
 
 	// 외부 클릭 감지
 	$effect(() => {
-		if (!open || !containerElement) return;
+		if (!open || !containerElement) return () => {};
 		return useClickOutside('.filter-dropdown', () => {
 			onToggle();
 		}, open);
@@ -65,7 +65,7 @@
 
 	// Escape 키 감지
 	$effect(() => {
-		if (!open) return;
+		if (!open) return () => {};
 		return useEscapeKey(() => {
 			onToggle();
 		}, open);

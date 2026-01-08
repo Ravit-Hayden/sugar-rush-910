@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { useClickOutside, useEscapeKey } from '$lib/utils/clickOutside';
-	import { ChevronDown, User, X } from 'lucide-svelte';
+	import { ChevronDown, X } from 'lucide-svelte';
 	import { getArtistNames, getArtistNamesAsync } from '$lib/constants/artists';
 
 	interface Props {
@@ -31,11 +31,13 @@
 		(async () => {
 			artistNames = await getArtistNamesAsync();
 		})();
+		return () => {};
 	});
 
 	// value prop이 변경되면 inputValue도 업데이트
 	$effect(() => {
 		inputValue = value;
+		return () => {};
 	});
 
 	// 입력한 텍스트로 아티스트 목록 필터링
@@ -66,15 +68,11 @@
 	});
 
 	function handleSelect(artistName: string) {
+		// 즉시 드롭다운 닫기 (다른 이벤트 핸들러보다 먼저 실행)
+		dropdownOpen = false;
 		inputValue = artistName;
 		onChange(artistName);
-		dropdownOpen = false;
 		focusedIndex = -1; // 포커스 인덱스 초기화
-		// 포커스 유지 (키보드 네비게이션 개선)
-		if (typeof window !== 'undefined') {
-			const input = document.querySelector('.artist-select-dropdown input') as HTMLInputElement;
-			input?.focus();
-		}
 	}
 
 	function handleInputChange(e: Event) {
@@ -186,11 +184,6 @@
 
 <div bind:this={containerElement} class="relative artist-select-dropdown w-full">
 	<div class="relative">
-		<!-- 아이콘 -->
-		<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
-			<User size={16} class="lucide-icon text-text-muted transition-colors duration-200" />
-		</div>
-		
 		<!-- 입력 필드 -->
 		<input
 			type="text"
@@ -199,7 +192,7 @@
 			onfocus={handleInputFocus}
 			onkeydown={handleInputKeydown}
 			required={required}
-			class="input-base w-full h-10 pl-10 {inputValue.trim() ? 'pr-[4.5rem]' : 'pr-[2.625rem]'} text-base placeholder:text-text-muted"
+			class="input-base w-full h-10 px-4 {inputValue.trim() ? 'pr-[4.5rem]' : 'pr-[2.625rem]'} text-base placeholder:text-text-muted"
 			placeholder={placeholder}
 		/>
 		
@@ -252,10 +245,14 @@
 		<ul 
 			bind:this={listElement}
 			role="listbox" 
-			class="filter-dropdown absolute left-0 w-full mt-[6px] bg-surface-1 border border-border-subtle rounded-[6px] z-[9999] overflow-hidden pt-0"
+			class="filter-dropdown absolute left-0 w-full mt-[6px] bg-surface-1 border border-border-subtle rounded-[6px] z-[9999] max-h-60 custom-list-scrollbar pt-0"
+			onclick={(e) => {
+				// ul 클릭도 내부 클릭으로 처리하여 외부 클릭 감지 방지
+				e.stopPropagation();
+			}}
 		>
 			{#if filteredArtistNames.length === 0}
-				<li class="px-4 py-2 text-sm text-text-muted text-center">
+				<li class="px-4 py-2 text-base text-text-muted text-center">
 					{#if inputValue.trim()}
 						"{inputValue}"와 일치하는 아티스트가 없습니다
 					{:else}
@@ -269,10 +266,15 @@
 						aria-selected={inputValue === artistName}
 						tabindex={focusedIndex === index ? 0 : -1}
 						class={focusedIndex === index ? 'keyboard-focused' : ''}
-						onclick={() => handleSelect(artistName)}
+						onclick={(e) => {
+							e.preventDefault();
+							e.stopPropagation();
+							handleSelect(artistName);
+						}}
 						onkeydown={(e) => {
 							if (e.key === 'Enter' || e.key === ' ') {
 								e.preventDefault();
+								e.stopPropagation();
 								handleSelect(artistName);
 							}
 						}}

@@ -56,6 +56,7 @@
 			formData.release_date_kr = track.release_date_kr || '';
 			formData.release_date_global = track.release_date_global || '';
 		}
+		return () => {};
 	});
 
 	// 선택 가능한 장르 목록 (선택된 장르 제외)
@@ -248,7 +249,7 @@
 										toggleGenreDropdown();
 									}
 								}}
-								class="w-full min-h-10 px-4 pr-10 py-1.5 bg-surface-2 border border-border-subtle rounded-lg text-text-base transition-colors duration-200 flex flex-wrap gap-2 items-center cursor-pointer hover:border-[var(--hover-cyan)] hover:text-[var(--hover-cyan)] focus-within:border-brand-pink focus-within:text-brand-pink focus-within:outline-none focus-within:ring-0"
+								class="w-full min-h-10 px-4 pr-10 py-0 bg-surface-2 border border-border-subtle rounded-lg text-text-base transition-colors duration-200 flex flex-wrap gap-2 items-center cursor-pointer focus-within:outline-none focus-within:ring-0"
 								role="button"
 								aria-haspopup="listbox"
 								aria-expanded={genreDropdownOpen}
@@ -275,11 +276,11 @@
 									{/each}
 								{/if}
 							</div>
-							<div class="pointer-events-none absolute top-3 right-3 flex items-center">
+							<div class="pointer-events-none absolute top-3 right-2.5 flex items-center">
 								<ChevronDown size={16} class="lucide-icon text-text-muted transition-colors duration-200" />
 							</div>
 							{#if genreDropdownOpen}
-								<ul role="listbox" class="absolute left-0 w-full mt-[6px] bg-surface-1 border rounded-[6px] z-10 border-border-subtle max-h-60 overflow-y-auto">
+								<ul role="listbox" class="absolute left-0 w-full mt-[6px] bg-surface-1 border border-border-subtle rounded-[6px] z-10 max-h-60 custom-list-scrollbar">
 									{#if availableGenres.length === 0}
 										<li class="px-4 py-2 text-sm text-text-muted text-center">모든 장르가 선택되었습니다</li>
 									{:else}
@@ -390,7 +391,7 @@
 					</button>
 					<button
 						type="submit"
-						class="px-6 py-2 bg-brand-pink text-white rounded-lg hover:bg-brand-pink/90 focus:bg-brand-pink/90 focus-visible:bg-brand-pink/90 focus:outline-none focus:ring-0 transition-colors duration-200 font-medium"
+						class="px-6 py-2 bg-brand-pink text-white rounded-lg focus:outline-none focus:ring-0 transition-colors duration-200 font-medium"
 					>
 						저장
 					</button>

@@ -51,7 +51,7 @@
 
 	// 외부 클릭 감지
 	$effect(() => {
-		if (!isOpen) return;
+		if (!isOpen) return () => {};
 		return useClickOutside('.more-menu-dropdown', () => {
 			onClose();
 		}, isOpen);

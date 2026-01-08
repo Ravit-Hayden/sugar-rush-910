@@ -102,6 +102,7 @@
 		for (let y = year - 1; y <= year + 1; y++) {
 			loadHolidays(y);
 		}
+		return () => {};
 	});
 
 	// Date를 ISO 문자열로 변환 (YYYY-MM-DD)
@@ -197,6 +198,7 @@
 		if (selectedDate && selectedDate instanceof Date && !isNaN(selectedDate.getTime())) {
 			displayMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
 		}
+		return () => {};
 	});
 </script>
 

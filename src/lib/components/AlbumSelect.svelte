@@ -35,6 +35,7 @@
 	// value prop이 변경되면 inputValue도 업데이트
 	$effect(() => {
 		inputValue = value;
+		return () => {};
 	});
 
 	// 아티스트별 필터링
@@ -280,7 +281,7 @@
 		<ul 
 			bind:this={listElement}
 			role="listbox" 
-			class="filter-dropdown absolute left-0 w-full mt-[6px] bg-surface-1 border border-border-subtle rounded-[6px] z-[9999] overflow-hidden pt-0"
+			class="filter-dropdown absolute left-0 w-full mt-[6px] bg-surface-1 border border-border-subtle rounded-[6px] z-[9999] max-h-60 custom-list-scrollbar pt-0"
 		>
 			{#if filteredAlbums.length === 0}
 				<li class="px-4 py-2 text-sm text-text-muted text-center">

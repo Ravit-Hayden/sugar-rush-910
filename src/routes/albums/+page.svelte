@@ -651,7 +651,7 @@
 
 	// 외부 클릭 시 트랙 목록 닫기
 	$effect(() => {
-		if (selectedAlbumId === null) return;
+		if (selectedAlbumId === null) return () => {};
 
 		function handleClickOutside(event: MouseEvent) {
 			const target = event.target as HTMLElement;
@@ -676,7 +676,7 @@
 
 	// 외부 클릭 시 더보기 메뉴 닫기
 	$effect(() => {
-		if (moreMenuOpenId === null) return;
+		if (moreMenuOpenId === null) return () => {};
 
 		function handleClickOutside(event: MouseEvent) {
 			const target = event.target as HTMLElement;
@@ -701,7 +701,7 @@
 
 	// Escape 키로 더보기 메뉴 닫기
 	$effect(() => {
-		if (moreMenuOpenId === null) return;
+		if (moreMenuOpenId === null) return () => {};
 
 		function handleEscape(e: KeyboardEvent) {
 			if (e.key === 'Escape') {
@@ -717,7 +717,7 @@
 
 	// 외부 클릭 시 정렬 드롭다운 닫기
 	$effect(() => {
-		if (!sortDropdownOpen) return;
+		if (!sortDropdownOpen) return () => {};
 
 		function handleClickOutside(event: MouseEvent) {
 			const target = event.target as HTMLElement;
@@ -741,7 +741,7 @@
 
 	// 외부 클릭 시 필터 드롭다운 닫기
 	$effect(() => {
-		if (!filterDropdownOpen) return;
+		if (!filterDropdownOpen) return () => {};
 
 		function handleClickOutside(event: MouseEvent) {
 			const target = event.target as HTMLElement;
@@ -766,7 +766,7 @@
 	// Escape 키로 드롭다운 닫기
 	$effect(() => {
 		const anyOpen = sortDropdownOpen || filterDropdownOpen;
-		if (!anyOpen) return;
+		if (!anyOpen) return () => {};
 
 		function handleEscape(e: KeyboardEvent) {
 			if (e.key === 'Escape') {
@@ -890,6 +890,7 @@
 	// 필터/검색 변경 시 첫 페이지로 리셋
 	$effect(() => {
 		currentPage = 1;
+		return () => {};
 	});
 
 	function handleCreateAlbum() {
@@ -1067,7 +1068,7 @@
 			
 			<!-- 드롭다운 리스트 -->
 			{#if sortDropdownOpen}
-				<ul role="listbox" class="absolute left-0 w-full mt-[6px] bg-surface-1 border rounded-[6px] z-10 border-border-subtle overflow-hidden shadow-lg">
+				<ul role="listbox" class="absolute left-0 w-full mt-[6px] bg-surface-1 border rounded-[6px] z-10 border-border-subtle overflow-hidden">
 					{#each sortOptions as opt}
 						<li
 							role="option"

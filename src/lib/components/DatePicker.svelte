@@ -18,14 +18,31 @@
   let wrapperElement: HTMLDivElement | undefined;
   let inputValue = $state(''); // 직접 입력값
   let instanceId = $state(Math.random().toString(36).substring(7)); // 고유 인스턴스 ID
+  let yearMonthPickerOpen = $state(false); // 년도/월 선택 드롭다운 열림 상태
 
-  // value prop이 변경되면 inputValue도 업데이트
+  // 요일 이름 반환 함수
+  function getDayName(date: Date): string {
+    const days = ['일', '월', '화', '수', '목', '금', '토'];
+    return days[date.getDay()];
+  }
+
+  // value prop이 변경되면 inputValue도 업데이트 (요일 포함)
   $effect(() => {
     if (value) {
+      const date = new Date(value);
+      if (!isNaN(date.getTime())) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const dayName = getDayName(date);
+        inputValue = `${year}. ${month}. ${day}. ${dayName}`;
+      } else {
       inputValue = value.replace(/-/g, '. ') + '.';
+      }
     } else {
       inputValue = '';
     }
+    return () => {};
   });
 
   // value가 변경되면 viewDate 동기화
@@ -33,11 +50,12 @@
     if (value && !isNaN(new Date(value).getTime())) {
       viewDate = new Date(value);
     }
+    return () => {};
   });
 
   // 다른 DatePicker가 열릴 때 이 인스턴스 닫기
   $effect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined') return () => {};
 
     function handleCloseAll(event: CustomEvent) {
       if (event.detail?.except !== instanceId && isOpen) {
@@ -101,33 +119,33 @@
       return classes + "text-text-muted/30 opacity-40 hover:bg-transparent cursor-default";
     }
 
-    // 2순위: 선택된 날짜 (가장 강한 강조)
+    // 2순위: 선택된 날짜 (가장 강한 강조, 포커스 우선 - 호버 효과 없음)
     if (isSelected) {
-      return classes + "bg-brand-pink text-white font-medium hover:bg-brand-pink/90";
+      return classes + "bg-brand-pink text-white font-medium";
     }
     
     // 3순위: 오늘 날짜 (초록색 텍스트 + 볼드 + 연한 배경)
     if (isToday) {
-      return classes + "text-[#24a86b] dark:text-[#4be39b] font-bold bg-[#24a86b]/10 dark:bg-[#4be39b]/20 hover:bg-[#24a86b]/20";
+      return classes + "text-[#24a86b] dark:text-[#4be39b] font-bold bg-[#24a86b]/10 dark:bg-[#4be39b]/20 hover:text-hover-point";
     }
     
     // 4순위: 공휴일 (일요일 색상과 동일)
     if (isHoliday) {
-      return classes + "text-[#ff4b7d] font-medium hover:bg-surface-2";
+      return classes + "text-[#ff4b7d] font-medium hover:text-hover-point";
     }
     
     // 5순위: 일요일
     if (dayOfWeek === 0) {
-      return classes + "text-[#ff4b7d] hover:bg-surface-2";
+      return classes + "text-[#ff4b7d] hover:text-hover-point";
     }
     
     // 6순위: 토요일
     if (dayOfWeek === 6) {
-      return classes + "text-[#2f64c8] dark:text-[#6fb6ff] hover:bg-surface-2";
+      return classes + "text-[#2f64c8] dark:text-[#6fb6ff] hover:text-hover-point";
     }
     
     // 7순위: 평일
-    return classes + "text-text-base hover:bg-surface-2";
+    return classes + "text-text-base hover:text-hover-point";
   }
 
   function selectDate(date: Date) {
@@ -148,6 +166,33 @@
     viewDate = new Date(viewDate.getFullYear(), viewDate.getMonth() + offset, 1);
   }
 
+  function changeYear(year: number) {
+    viewDate = new Date(year, viewDate.getMonth(), 1);
+    yearMonthPickerOpen = false;
+  }
+
+  function changeYearMonth(month: number) {
+    viewDate = new Date(viewDate.getFullYear(), month, 1);
+    yearMonthPickerOpen = false;
+  }
+
+  function toggleYearMonthPicker() {
+    yearMonthPickerOpen = !yearMonthPickerOpen;
+  }
+
+  // 년도 리스트 생성 (현재 년도 기준 ±10년)
+  const availableYears = $derived.by(() => {
+    const currentYear = new Date().getFullYear();
+    const years: number[] = [];
+    for (let i = currentYear - 10; i <= currentYear + 10; i++) {
+      years.push(i);
+    }
+    return years;
+  });
+
+  // 월 리스트 (1~12월)
+  const availableMonths = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+
   function toggleCalendar() {
     if (!isOpen) {
       // 다른 DatePicker가 열려있으면 모두 닫기
@@ -156,6 +201,11 @@
       }
       if (value) viewDate = new Date(value);
       isOpen = true;
+      // 캘린더가 열릴 때 아이콘에 포커스 주기
+      setTimeout(() => {
+        const iconSpan = wrapperElement?.querySelector('span[role="button"][aria-label="캘린더 열기"]') as HTMLElement;
+        iconSpan?.focus();
+      }, 0);
     } else {
       isOpen = false;
     }
@@ -164,12 +214,29 @@
   function handleClickOutside(event: MouseEvent) {
     if (isOpen && wrapperElement) {
       const target = event.target as Node;
-      // 캘린더 컨테이너 내부 클릭이 아니고, 캘린더 드롭다운 내부도 아닌 경우에만 닫기
+      
+      // 1. wrapperElement 밖 클릭 → 캘린더 전체 닫기
       if (!wrapperElement.contains(target)) {
-        // 캘린더 드롭다운이 열려있고 그 내부를 클릭한 경우는 제외
+        yearMonthPickerOpen = false;
+        isOpen = false;
+        return;
+      }
+      
+      // 2. wrapperElement 안 클릭 처리
         const calendarDropdown = wrapperElement.querySelector('.calendar-dropdown');
-        if (!calendarDropdown || !calendarDropdown.contains(target)) {
-          isOpen = false;
+      const yearMonthPicker = wrapperElement.querySelector('.year-month-picker');
+      
+      // 년도/월 드롭다운이 열려있을 때만 추가 처리
+      if (yearMonthPickerOpen && yearMonthPicker) {
+        // 년도/월 드롭다운 안 클릭 → 아무것도 안 함 (이미 stopPropagation으로 처리됨)
+        if (yearMonthPicker.contains(target)) {
+          return;
+        }
+        
+        // 캘린더 드롭다운 안이지만 년도/월 드롭다운 밖 클릭 → 드롭다운만 닫기
+        if (calendarDropdown && calendarDropdown.contains(target)) {
+          yearMonthPickerOpen = false;
+          return;
         }
       }
     }
@@ -189,9 +256,12 @@
     }
   }
 
-  // 직접 입력 처리: YYYY. MM. DD. 형식을 YYYY-MM-DD로 변환
+  // 직접 입력 처리: YYYY. MM. DD. 형식을 YYYY-MM-DD로 변환 (요일 정보 제거)
   function parseInputDate(input: string): string {
     if (!input || !input.trim()) return '';
+    
+    // 요일 정보 제거: (일), (월), (화), (수), (목), (금), (토) 제거
+    let cleanedInput = input.trim().replace(/\s*\([일월화수목금토]\)\s*$/, '');
     
     // YYYY. MM. DD. 또는 YYYY MM DD 형식 파싱
     const patterns = [
@@ -200,7 +270,7 @@
     ];
     
     for (const pattern of patterns) {
-      const match = input.trim().match(pattern);
+      const match = cleanedInput.match(pattern);
       if (match) {
         const [, year, month, day] = match;
         const yearNum = parseInt(year, 10);
@@ -242,9 +312,18 @@
   }
 
   function handleInputBlur() {
-    // 포커스가 벗어날 때 유효한 날짜로 포맷팅
+    // 포커스가 벗어날 때 유효한 날짜로 포맷팅 (요일 포함)
     if (inputValue.trim() && value) {
+      const date = new Date(value);
+      if (!isNaN(date.getTime())) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const dayName = getDayName(date);
+        inputValue = `${year}. ${month}. ${day}. ${dayName}`;
+      } else {
       inputValue = value.replace(/-/g, '. ') + '.';
+      }
     } else if (!value) {
       inputValue = '';
     }
@@ -253,6 +332,7 @@
   function handleClear() {
     inputValue = '';
     value = '';
+    isOpen = false; // 캘린더도 함께 닫기
     // 입력 필드로 포커스 이동
     if (typeof window !== 'undefined') {
       const input = wrapperElement?.querySelector('.datepicker-input') as HTMLInputElement;
@@ -276,13 +356,10 @@
         if (inputValue && value) {
           viewDate = new Date(value);
         }
-      }}
-    onclick={(e) => {
-      e.stopPropagation();
-      toggleCalendar();
     }}
     onkeydown={handleKeydown}
-    class="input-base w-full h-10 px-4 {inputValue.trim() ? 'pr-[4.5rem]' : 'pr-[2.625rem]'} text-base placeholder:text-text-muted cursor-pointer box-border datepicker-input"
+    class="input-base w-full h-10 px-4 {inputValue.trim() ? 'pr-[4.5rem]' : 'pr-[2.625rem]'} text-base placeholder:text-text-muted cursor-text box-border datepicker-input"
+    aria-expanded={isOpen ? 'true' : 'false'}
     {...Object.fromEntries(Object.entries(restProps).filter(([key]) => key !== 'tabindex' && key !== 'list'))}
     />
     
@@ -310,6 +387,13 @@
     <!-- 캘린더 버튼 -->
     <button 
       type="button" 
+      class="btn-icon absolute inset-y-0 right-2.5 flex items-center pointer-events-none" 
+      aria-label="캘린더 열기"
+      aria-expanded={isOpen}
+      tabindex="-1"
+    >
+      <span 
+        class="flex h-4 w-4 items-center justify-center pointer-events-auto cursor-pointer"
       onclick={(e) => {
         e.stopPropagation();
         toggleCalendar();
@@ -320,23 +404,106 @@
           toggleCalendar();
         }
       }}
-                class="btn-icon absolute inset-y-0 right-2.5 flex items-center pointer-events-auto" 
+        role="button"
+        tabindex="0"
       aria-label="캘린더 열기"
-      aria-expanded={isOpen}
     >
-      <span class="flex h-4 w-4 items-center justify-center">
                   <Calendar size={16} class="lucide-icon text-text-muted" />
       </span>
     </button>
 
   {#if isOpen}
-    <div class="calendar-dropdown absolute bottom-full right-0 mb-2 w-[18rem] bg-surface-1 border border-border-subtle rounded-xl p-4 z-50" transition:fade={{ duration: 100 }} onclick={(e) => e.stopPropagation()}>
-      <div class="flex items-center justify-between mb-4 px-1">
+    <div class="calendar-dropdown absolute bottom-full right-0 mb-2 w-[18rem] border border-border-subtle rounded-xl p-4 z-50" style="background-color: var(--calendar-bg);" transition:fade={{ duration: 100 }} onclick={(e) => {
+      // 년도/월 드롭다운이 열려있을 때, 드롭다운 밖의 캘린더 영역 클릭 시 드롭다운만 닫기
+      if (yearMonthPickerOpen) {
+        const target = e.target as Node;
+        const yearMonthPicker = (e.currentTarget as HTMLElement).querySelector('.year-month-picker');
+        if (yearMonthPicker && !yearMonthPicker.contains(target)) {
+          yearMonthPickerOpen = false;
+        }
+      }
+      e.stopPropagation();
+    }}>
+      <div class="flex items-center justify-between mb-4 px-1 relative">
         <button type="button" onclick={(e) => { e.stopPropagation(); changeMonth(-1); }} class="p-1 hover:bg-surface-2 rounded-md text-text-muted"><ChevronLeft size={16} /></button>
-        <span class="text-sm font-semibold text-text-strong w-28 text-center tabular-nums">
+        <button 
+          type="button" 
+          onclick={(e) => { 
+            e.stopPropagation(); 
+            toggleYearMonthPicker(); 
+          }}
+          onkeydown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              toggleYearMonthPicker();
+            }
+          }}
+          class="text-sm font-semibold text-text-strong w-28 text-center tabular-nums px-2 py-1 rounded-md hover:text-hover-point focus:text-brand-pink focus:outline-none transition-colors duration-200"
+          aria-label="년도와 월 선택"
+          aria-expanded={yearMonthPickerOpen}
+        >
           {viewDate.getFullYear()}년 {viewDate.getMonth() + 1}월
-        </span>
+        </button>
         <button type="button" onclick={(e) => { e.stopPropagation(); changeMonth(1); }} class="p-1 hover:bg-surface-2 rounded-md text-text-muted"><ChevronRight size={16} /></button>
+        
+        <!-- 년도/월 선택 드롭다운 -->
+        {#if yearMonthPickerOpen}
+          <div class="year-month-picker absolute left-1/2 -translate-x-1/2 top-full mt-2 w-48 border border-border-subtle rounded-xl p-3 z-[60]" style="background-color: var(--calendar-picker-bg);" onclick={(e) => e.stopPropagation()}>
+            <div class="grid grid-cols-2 gap-3">
+              <!-- 년도 선택 -->
+              <div>
+                <div class="text-xs font-medium text-text-muted mb-2 px-2">년도</div>
+                <div class="max-h-48 overflow-y-auto custom-list-scrollbar">
+                  {#each availableYears as year}
+                    <button
+                      type="button"
+                      onclick={(e) => {
+                        e.stopPropagation();
+                        changeYear(year);
+                      }}
+                      onkeydown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          changeYear(year);
+                        }
+                      }}
+                      class="w-full px-2 py-1.5 text-sm text-text-base hover:text-hover-point focus:text-brand-pink focus:outline-none rounded-md transition-colors duration-200 text-left {viewDate.getFullYear() === year ? 'text-brand-pink font-semibold' : ''}"
+                      aria-selected={viewDate.getFullYear() === year}
+                    >
+                      {year}
+                    </button>
+                  {/each}
+                </div>
+              </div>
+              
+              <!-- 월 선택 -->
+              <div>
+                <div class="text-xs font-medium text-text-muted mb-2 px-2">월</div>
+                <div class="max-h-48 overflow-y-auto custom-list-scrollbar">
+                  {#each availableMonths as month}
+                    <button
+                      type="button"
+                      onclick={(e) => {
+                        e.stopPropagation();
+                        changeYearMonth(month - 1);
+                      }}
+                      onkeydown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          changeYearMonth(month - 1);
+                        }
+                      }}
+                      class="w-full px-2 py-1.5 text-sm text-text-base hover:text-hover-point focus:text-brand-pink focus:outline-none rounded-md transition-colors duration-200 text-left {(viewDate.getMonth() + 1) === month ? 'text-brand-pink font-semibold' : ''}"
+                      aria-selected={(viewDate.getMonth() + 1) === month}
+                    >
+                      {month}월
+                    </button>
+                  {/each}
+                </div>
+              </div>
+            </div>
+          </div>
+        {/if}
       </div>
       <div class="grid grid-cols-7 mb-2 text-center">
         <span class="text-xs font-medium text-[#ff4b7d]">일</span>

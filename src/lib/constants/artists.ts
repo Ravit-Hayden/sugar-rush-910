@@ -27,6 +27,51 @@ const DEFAULT_ARTISTS: Artist[] = [
 		description: 'Sugar Rush 910 프로젝트의 메인 아티스트'
 	},
 	{
+		id: 'sugar-rush-band',
+		name: 'Sugar Rush Band',
+		description: 'Sugar Rush의 밴드 버전'
+	},
+	{
+		id: 'sugar-rush-collective',
+		name: 'Sugar Rush Collective',
+		description: 'Sugar Rush의 컬렉티브 프로젝트'
+	},
+	{
+		id: 'sugar-rush-duo',
+		name: 'Sugar Rush Duo',
+		description: 'Sugar Rush의 듀오 프로젝트'
+	},
+	{
+		id: 'sugar-rush-ensemble',
+		name: 'Sugar Rush Ensemble',
+		description: 'Sugar Rush의 앙상블 프로젝트'
+	},
+	{
+		id: 'sugar-rush-group',
+		name: 'Sugar Rush Group',
+		description: 'Sugar Rush의 그룹 프로젝트'
+	},
+	{
+		id: 'sugar-rush-project',
+		name: 'Sugar Rush Project',
+		description: 'Sugar Rush의 프로젝트 버전'
+	},
+	{
+		id: 'sugar-rush-studio',
+		name: 'Sugar Rush Studio',
+		description: 'Sugar Rush의 스튜디오 프로젝트'
+	},
+	{
+		id: 'sugar-rush-team',
+		name: 'Sugar Rush Team',
+		description: 'Sugar Rush의 팀 프로젝트'
+	},
+	{
+		id: 'sugar-rush-unit',
+		name: 'Sugar Rush Unit',
+		description: 'Sugar Rush의 유닛 프로젝트'
+	},
+	{
 		id: 'various',
 		name: 'Various',
 		description: '다양한 아티스트'

@@ -537,6 +537,7 @@
 			likesMin,
 			likesMax
 		});
+		return () => {};
 	});
 
 	// 페이지 로드 시 필터 상태 복원

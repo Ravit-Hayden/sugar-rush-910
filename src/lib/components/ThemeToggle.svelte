@@ -12,6 +12,7 @@
 			document.documentElement.setAttribute('data-theme', theme);
 			mounted = true;
 		}
+		return () => {};
 	});
 
 	function toggleTheme() {
