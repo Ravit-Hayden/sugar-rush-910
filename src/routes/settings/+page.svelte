@@ -23,6 +23,14 @@
 		}
 	});
 
+	// 사용자 관리
+	let users = $state<any[]>([]);
+	let usersLoading = $state(false);
+	let showAddUserForm = $state(false);
+	let newUserEmail = $state('');
+	let newUserRole = $state<'owner' | 'editor' | 'viewer'>('viewer');
+	let editingUserId: string | null = $state(null);
+
 	// 아티스트 관리
 	let artists: Artist[] = $state([]);
 	let loading = $state(false);
@@ -283,6 +291,83 @@
 	}
 
 
+	// 사용자 목록 로드
+	async function loadUsers() {
+		usersLoading = true;
+		try {
+			const response = await fetch('/api/users');
+			const result = await response.json();
+			if (result.ok) {
+				users = result.data;
+			}
+		} catch (error) {
+			console.error('Failed to load users:', error);
+		} finally {
+			usersLoading = false;
+		}
+	}
+
+	// 사용자 추가
+	async function addUser() {
+		if (!newUserEmail.trim()) return;
+
+		try {
+			const response = await fetch('/api/users', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					email: newUserEmail.trim(),
+					role: newUserRole
+				})
+			});
+
+			const result = await response.json();
+			if (result.ok) {
+				await loadUsers();
+				newUserEmail = '';
+				newUserRole = 'viewer';
+				showAddUserForm = false;
+			} else {
+				alert(result.error?.message || '사용자 추가에 실패했습니다.');
+			}
+		} catch (error) {
+			console.error('Failed to add user:', error);
+			alert('사용자 추가 중 오류가 발생했습니다.');
+		}
+	}
+
+	// 사용자 권한 수정
+	async function updateUserRole(userId: string, newRole: 'owner' | 'editor' | 'viewer') {
+		try {
+			const response = await fetch('/api/users', {
+				method: 'PUT',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					id: userId,
+					role: newRole
+				})
+			});
+
+			const result = await response.json();
+			if (result.ok) {
+				await loadUsers();
+			} else {
+				alert(result.error?.message || '사용자 권한 수정에 실패했습니다.');
+			}
+		} catch (error) {
+			console.error('Failed to update user role:', error);
+			alert('사용자 권한 수정 중 오류가 발생했습니다.');
+		}
+	}
+
+	// 사용자 탭 활성화 시 사용자 로드
+	$effect(() => {
+		if (activeTab === 'users' && users.length === 0 && !usersLoading) {
+			loadUsers();
+		}
+		return () => {};
+	});
+
 	// 데이터 탭 활성화 시 아티스트 로드
 	$effect(() => {
 		if (activeTab === 'data' && artists.length === 0 && !loading) {
@@ -296,6 +381,7 @@
 		{ id: 'notifications', label: '알림', icon: Bell },
 		{ id: 'privacy', label: '개인정보', icon: Shield },
 		{ id: 'appearance', label: '외관', icon: Palette },
+		{ id: 'users', label: '사용자 관리', icon: User },
 		{ id: 'data', label: '데이터', icon: Database }
 	];
 </script>
