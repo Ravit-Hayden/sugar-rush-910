@@ -8,56 +8,51 @@
 	let selectedFilter = 'all';
 	let selectedTab = 'feedback';
 
-	let feedbacks = [
-		{
-			id: '1',
-			title: '새로운 앨범 컨셉에 대한 피드백',
-			from: 'El',
-			avatar: 'E',
-			time: '1시간 전',
-			status: 'unread',
-			priority: 'high',
-			content: 'Sugar Rush Vol.2의 컨셉에 대해 몇 가지 제안이 있습니다. 현재 방향이 좋지만, 좀 더 실험적인 요소를 추가하면 어떨까요?',
-			rating: 5,
-			tags: ['앨범', '컨셉', '제안']
-		},
-		{
-			id: '2',
-			title: '마케팅 전략 개선 제안',
-			from: 'Otte',
-			avatar: 'O',
-			time: '3시간 전',
-			status: 'read',
-			priority: 'medium',
-			content: '현재 마케팅 전략이 효과적이지만, 소셜 미디어 활용도를 높이면 더 좋을 것 같습니다.',
-			rating: 4,
-			tags: ['마케팅', '소셜미디어']
-		},
-		{
-			id: '3',
-			title: '사용자 인터페이스 개선 요청',
-			from: 'Mixer',
-			avatar: 'M',
-			time: '1일 전',
-			status: 'replied',
-			priority: 'low',
-			content: '업로드 페이지의 사용자 경험을 개선할 수 있는 방법이 있을까요?',
-			rating: 3,
-			tags: ['UI/UX', '업로드']
-		},
-		{
-			id: '4',
-			title: '음질 개선 관련 문의',
-			from: 'Producer',
-			avatar: 'P',
-			time: '2일 전',
-			status: 'archived',
-			priority: 'medium',
-			content: '최근 업로드된 트랙들의 음질이 이전보다 향상된 것 같습니다. 어떤 기술을 사용하셨나요?',
-			rating: 5,
-			tags: ['음질', '기술']
-		}
-	];
+	// 피드백 데이터
+	let feedbacks = $state<any[]>([]);
+	let loading = $state(true);
+
+	// 시간 포맷팅 함수
+	function formatTime(dateString: string): string {
+		const date = new Date(dateString);
+		const now = new Date();
+		const diffMs = now.getTime() - date.getTime();
+		const diffMins = Math.floor(diffMs / 60000);
+		const diffHours = Math.floor(diffMs / 3600000);
+		const diffDays = Math.floor(diffMs / 86400000);
+
+		if (diffMins < 1) return '방금 전';
+		if (diffMins < 60) return `${diffMins}분 전`;
+		if (diffHours < 24) return `${diffHours}시간 전`;
+		if (diffDays < 7) return `${diffDays}일 전`;
+		return date.toLocaleDateString('ko-KR');
+	}
+
+	// 피드백 데이터 로드
+	$effect(() => {
+		(async () => {
+			try {
+				loading = true;
+				const params = new URLSearchParams();
+				if (selectedFilter !== 'all') {
+					params.append('status', selectedFilter);
+				}
+				const response = await fetch(`/api/feedback?${params.toString()}&limit=1000`);
+				const data = await response.json();
+				if (data.ok) {
+					feedbacks = (data.data || []).map((fb: any) => ({
+						...fb,
+						time: formatTime(fb.created_at)
+					}));
+				}
+			} catch (error) {
+				console.error('Failed to load feedbacks:', error);
+			} finally {
+				loading = false;
+			}
+		})();
+		return () => {};
+	});
 
 	let notifications = [
 		{
@@ -142,15 +137,15 @@
 		}
 	}
 
-	const filteredFeedbacks = feedbacks.filter(feedback => {
-		const matchesSearch = feedback.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-							 feedback.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
-							 feedback.from.toLowerCase().includes(searchQuery.toLowerCase());
+	const filteredFeedbacks = $derived(feedbacks.filter(feedback => {
+		const matchesSearch = feedback.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+							 feedback.content?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+							 feedback.from?.toLowerCase().includes(searchQuery.toLowerCase());
 		const matchesFilter = selectedFilter === 'all' || feedback.status === selectedFilter;
 		return matchesSearch && matchesFilter;
-	});
+	}));
 
-	const unreadCount = feedbacks.filter(f => f.status === 'unread').length;
+	const unreadCount = $derived(feedbacks.filter(f => f.status === 'unread').length);
 	const notificationUnreadCount = notifications.filter(n => n.status === 'unread').length;
 </script>
 
@@ -208,8 +203,13 @@
 				/>
 
 				<!-- 피드백 목록 -->
-				<div class="space-y-4">
-					{#each filteredFeedbacks as feedback (feedback.id)}
+				{#if loading}
+					<div class="flex items-center justify-center py-12">
+						<p class="text-text-muted">로딩 중...</p>
+					</div>
+				{:else}
+					<div class="space-y-4">
+						{#each filteredFeedbacks as feedback (feedback.id)}
 						<div class="bg-surface-1 rounded-lg p-6 hover:bg-surface-2 transition-colors duration-200 border border-border-subtle {feedback.status === 'unread' ? 'ring-2 ring-brand-pink/20' : ''}">
 							<div class="flex items-start gap-4">
 								<!-- 아바타 -->
@@ -286,11 +286,12 @@
 								</div>
 							</div>
 						</div>
-					{/each}
-				</div>
+						{/each}
+					</div>
+				{/if}
 
 				<!-- 빈 상태 -->
-				{#if filteredFeedbacks.length === 0}
+				{#if !loading && filteredFeedbacks.length === 0}
 					<div class="text-center py-12">
 						<MessageSquare size={48} class="text-text-muted mx-auto mb-4" />
 						<h3 class="text-lg font-semibold text-text-strong mb-2">피드백을 찾을 수 없습니다</h3>
