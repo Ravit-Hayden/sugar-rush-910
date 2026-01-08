@@ -360,6 +360,36 @@
 		}
 	}
 
+	// 사용자 삭제
+	async function handleDeleteUser(userId: string, userEmail: string) {
+		if (!confirm(`사용자 "${userEmail}"을(를) 삭제하시겠습니까?`)) {
+			return;
+		}
+
+		try {
+			// TODO: API DELETE 구현 후 활성화
+			// const response = await fetch(`/api/users`, {
+			// 	method: 'DELETE',
+			// 	headers: { 'Content-Type': 'application/json' },
+			// 	body: JSON.stringify({ id: userId })
+			// });
+			// const result = await response.json();
+			// if (!response.ok || !result.ok) {
+			// 	throw new Error(result.error?.message || '사용자 삭제에 실패했습니다.');
+			// }
+
+			// 임시: 목록에서 제거
+			users = users.filter(u => u.id !== userId);
+			alert('사용자가 삭제되었습니다. (API 구현 대기 중)');
+		} catch (error) {
+			console.error('사용자 삭제 오류:', error);
+			const errorMessage = error instanceof Error 
+				? error.message 
+				: '사용자 삭제 중 오류가 발생했습니다.';
+			alert(errorMessage);
+		}
+	}
+
 	// 사용자 탭 활성화 시 사용자 로드
 	$effect(() => {
 		if (activeTab === 'users' && users.length === 0 && !usersLoading) {
@@ -539,6 +569,120 @@
 									<option value="en">English</option>
 									<option value="ja">日本語</option>
 								</select>
+							</div>
+						</div>
+					</div>
+				{:else if activeTab === 'users'}
+					<div>
+						<h3 class="text-lg font-semibold text-text-strong mb-6 flex items-center gap-2">
+							<User size={20} class="text-brand-pink" />
+							사용자 관리
+						</h3>
+						<div class="space-y-6">
+							<!-- 사용자 추가 폼 -->
+							<div class="bg-surface-2 rounded-lg p-4 border border-border-subtle">
+								<div class="flex items-center justify-between mb-4">
+									<h4 class="text-sm font-medium text-text-strong">사용자 추가</h4>
+									<button
+										type="button"
+										onclick={() => showAddUserForm = !showAddUserForm}
+										class="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-brand-pink text-white rounded-md hover:bg-brand-pink/90 transition-colors duration-200 font-medium"
+									>
+										<Plus size={14} />
+										{showAddUserForm ? '취소' : '추가'}
+									</button>
+								</div>
+								{#if showAddUserForm}
+									<div class="space-y-3">
+										<div>
+											<label for="new-user-email" class="block text-xs font-medium text-text-strong mb-1.5">이메일</label>
+											<input
+												id="new-user-email"
+												type="email"
+												bind:value={newUserEmail}
+												placeholder="user@example.com"
+												class="input-base w-full px-3 py-1.5 text-sm"
+											/>
+										</div>
+										<div>
+											<label for="new-user-role" class="block text-xs font-medium text-text-strong mb-1.5">역할</label>
+											<select
+												id="new-user-role"
+												bind:value={newUserRole}
+												class="input-base w-full px-3 py-1.5 text-sm"
+											>
+												<option value="viewer">뷰어</option>
+												<option value="editor">편집자</option>
+												<option value="owner">소유자</option>
+											</select>
+										</div>
+										<div class="flex items-center gap-2">
+											<button
+												type="button"
+												onclick={addUser}
+												class="px-3 py-1.5 text-sm bg-brand-pink text-white rounded-md hover:bg-brand-pink/90 transition-colors duration-200 font-medium"
+											>
+												추가
+											</button>
+											<button
+												type="button"
+												onclick={() => {
+													showAddUserForm = false;
+													newUserEmail = '';
+													newUserRole = 'viewer';
+												}}
+												class="px-3 py-1.5 text-sm bg-surface-1 text-text-base rounded-md border border-border-subtle hover:bg-surface-2 transition-colors duration-200 font-medium"
+											>
+												취소
+											</button>
+										</div>
+									</div>
+								{/if}
+							</div>
+
+							<!-- 사용자 목록 -->
+							<div class="bg-surface-2 rounded-lg p-4 border border-border-subtle">
+								<h4 class="text-sm font-medium text-text-strong mb-4">사용자 목록</h4>
+								{#if usersLoading}
+									<div class="text-sm text-text-muted text-center py-4">로딩 중...</div>
+								{:else if users.length === 0}
+									<div class="text-sm text-text-muted text-center py-4">등록된 사용자가 없습니다.</div>
+								{:else}
+									<div class="space-y-3">
+										{#each users as user (user.id)}
+											<div class="p-3 bg-surface-1 rounded-md border border-border-subtle">
+												<div class="flex items-center justify-between gap-3">
+													<div class="flex-1 min-w-0">
+														<div class="text-sm font-medium text-text-strong truncate">{user.email || user.id}</div>
+														<div class="text-xs text-text-muted mt-1">
+															역할: 
+															<select
+																value={user.role}
+																onchange={(e) => {
+																	const target = e.target as HTMLSelectElement;
+																	updateUserRole(user.id, target.value as 'owner' | 'editor' | 'viewer');
+																}}
+																class="ml-1 px-2 py-0.5 text-xs bg-surface-2 border border-border-subtle rounded focus:outline-none focus:ring-1 focus:ring-brand-pink"
+															>
+																<option value="viewer">뷰어</option>
+																<option value="editor">편집자</option>
+																<option value="owner">소유자</option>
+															</select>
+														</div>
+													</div>
+													<button
+														type="button"
+														onclick={() => handleDeleteUser(user.id, user.email || user.id)}
+														class="p-1.5 text-text-muted hover:text-red-500 hover:bg-surface-2 rounded-md transition-colors duration-200 focus:outline-none focus:ring-0 focus:text-red-500"
+														aria-label="사용자 삭제"
+													>
+														<Trash2 size={14} />
+													</button>
+												</div>
+											</div>
+										{/each}
+									</div>
+								{/if}
 							</div>
 						</div>
 					</div>
