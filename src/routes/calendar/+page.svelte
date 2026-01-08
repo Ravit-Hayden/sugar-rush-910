@@ -1,9 +1,12 @@
 <script lang="ts">
-	import { Calendar, Clock, Plus, CheckCircle } from 'lucide-svelte';
+	import { goto } from '$app/navigation';
+	import { Calendar, Clock, Plus, CheckCircle, Edit, Trash2 } from 'lucide-svelte';
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import PageContent from '$lib/components/PageContent.svelte';
 	import SearchFilterBar from '$lib/components/SearchFilterBar.svelte';
 	import EmptyState from '$lib/components/EmptyState.svelte';
+	import MoreMenuDropdown from '$lib/components/MoreMenuDropdown.svelte';
+	import { toast } from '$lib/stores/toast';
 
 	let searchQuery = '';
 	let selectedFilter = 'all';
@@ -11,6 +14,7 @@
 	// 이벤트 데이터
 	let events = $state<any[]>([]);
 	let loading = $state(true);
+	let moreMenuOpenId = $state<string | null>(null);
 
 	// 이벤트 데이터 로드
 	$effect(() => {
@@ -52,6 +56,50 @@
 	function handleAddEvent() {
 		// 새 일정 추가 페이지로 이동 (향후 구현)
 		// goto('/calendar/new');
+	}
+
+	// 더보기 메뉴 토글
+	function handleMoreMenuToggle(id: string) {
+		moreMenuOpenId = moreMenuOpenId === id ? null : id;
+	}
+
+	function handleMoreMenuClose() {
+		moreMenuOpenId = null;
+	}
+
+	// 이벤트 수정
+	function handleEdit(id: string) {
+		goto(`/calendar/${id}/edit`);
+	}
+
+	// 이벤트 삭제 (API는 나중에 구현)
+	async function handleDelete(id: string) {
+		if (!confirm('이 일정을 삭제하시겠습니까?')) {
+			return;
+		}
+
+		try {
+			// TODO: API DELETE 구현 후 활성화
+			// const response = await fetch(`/api/calendar`, {
+			// 	method: 'DELETE',
+			// 	headers: { 'Content-Type': 'application/json' },
+			// 	body: JSON.stringify({ id })
+			// });
+			// const result = await response.json();
+			// if (!response.ok || !result.ok) {
+			// 	throw new Error(result.error?.message || '일정 삭제에 실패했습니다.');
+			// }
+
+			// 임시: 목록에서 제거
+			events = events.filter(e => e.id !== id);
+			toast.add('일정이 삭제되었습니다.', 'success', 3000);
+		} catch (error) {
+			console.error('일정 삭제 오류:', error);
+			const errorMessage = error instanceof Error 
+				? error.message 
+				: '일정 삭제 중 오류가 발생했습니다.';
+			toast.add(errorMessage, 'error', 5000);
+		}
 	}
 
 	const typeOptions = [
@@ -113,19 +161,41 @@
 								<div class="flex items-center gap-4 text-xs text-text-muted">
 									<span class="flex items-center gap-1">
 										<Clock size={12} />
-										{event.date} {event.time}
+										{event.date} {event.time || ''}
 									</span>
 									<span class="badge-base {getTypeColor(event.type)}">
 										{getTypeLabel(event.type)}
 									</span>
 								</div>
 							</div>
-							<div class="flex-shrink-0">
+							<div class="flex items-center gap-2 flex-shrink-0">
 								{#if event.status === 'completed'}
 									<CheckCircle size={16} class="text-green-500" />
 								{:else}
 									<div class="w-3 h-3 bg-brand-pink rounded-full"></div>
 								{/if}
+								<MoreMenuDropdown
+									itemId={event.id}
+									openId={moreMenuOpenId}
+									items={[
+										{
+											label: '수정',
+											icon: Edit,
+											onClick: () => handleEdit(event.id),
+											ariaLabel: '일정 수정'
+										},
+										{
+											label: '삭제',
+											icon: Trash2,
+											onClick: () => handleDelete(event.id),
+											ariaLabel: '일정 삭제',
+											danger: true,
+											separator: true
+										}
+									]}
+									onToggle={handleMoreMenuToggle}
+									onClose={handleMoreMenuClose}
+								/>
 							</div>
 						</div>
 					{/each}
