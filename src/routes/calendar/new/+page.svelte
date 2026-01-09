@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { Asterisk } from 'lucide-svelte';
+	import { Asterisk, X } from 'lucide-svelte';
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import PageContent from '$lib/components/PageContent.svelte';
 	import DatePicker from '$lib/components/DatePicker.svelte';
@@ -25,6 +25,9 @@
 
 	// 검증 상태
 	let validationErrors = $state<Record<string, string>>({});
+
+	// 입력 필드 참조
+	let titleInput: HTMLInputElement;
 
 	// 이벤트 타입 옵션
 	const eventTypes = [
@@ -110,30 +113,34 @@
 				goto('/calendar');
 			}, 1000);
 		} catch (error) {
-			console.error('이벤트 추가 오류:', error);
+			console.error('일정 추가 오류:', error);
 			const errorMessage = error instanceof Error 
 				? error.message 
-				: '이벤트 추가 중 오류가 발생했습니다.';
+				: '일정 추가 중 오류가 발생했습니다.';
 			toast.add(errorMessage, 'error', 5000);
 		} finally {
 			isSubmitting = false;
 		}
 	}
 
-	function handleCancel() {
+	function handleCancel(event: MouseEvent) {
+		const button = event.currentTarget as HTMLButtonElement;
 		if (confirm('작성 중인 내용을 저장하지 않고 나가시겠습니까?')) {
 			goto('/calendar');
+		} else {
+			// confirm에서 취소를 선택한 경우 포커스 해제
+			button.blur();
 		}
 	}
 </script>
 
 <svelte:head>
-	<title>새 일정 추가</title>
+	<title>일정 추가</title>
 </svelte:head>
 
 <PageContent>
 	<PageHeader 
-		title="새 일정 추가"
+		title="일정 추가"
 		description="새로운 일정을 추가합니다"
 	/>
 
@@ -146,20 +153,40 @@
 				
 				<!-- 제목 -->
 				<div class="w-full">
-					<label for="title" class="block text-sm font-medium text-text-strong mb-2">
-						제목 <Asterisk size={12} class="inline text-brand-pink ml-0" />
-					</label>
-					<input
-						type="text"
-						id="title"
-						name="title"
-						bind:value={formData.title}
-						required
-						aria-invalid={validationErrors.title ? 'true' : 'false'}
-						aria-describedby={validationErrors.title ? 'title-error' : undefined}
-						class="input-base w-full h-10 px-4 text-base placeholder:text-text-muted {validationErrors.title ? 'border-danger-fg' : ''}"
-						placeholder="일정 제목을 입력하세요"
-					/>
+					<div class="flex items-center justify-between mb-2">
+						<label for="title" class="block text-sm font-medium text-text-strong">
+							제목 <Asterisk size={12} class="inline text-brand-pink ml-0" />
+						</label>
+					</div>
+					<div class="relative">
+						<input
+							type="text"
+							id="title"
+							name="title"
+							bind:this={titleInput}
+							bind:value={formData.title}
+							required
+							aria-invalid={validationErrors.title ? 'true' : 'false'}
+							aria-describedby={validationErrors.title ? 'title-error' : undefined}
+							class="input-base w-full h-10 px-4 {formData.title.trim() ? 'pr-10' : 'pr-4'} text-base placeholder:text-text-muted {validationErrors.title ? 'border-danger-fg' : ''}"
+							placeholder="일정 제목을 입력하세요"
+						/>
+						{#if formData.title.trim()}
+							<button
+								type="button"
+								onclick={() => {
+									formData.title = '';
+									titleInput?.focus();
+								}}
+								class="btn-icon absolute inset-y-0 right-2.5 flex items-center pointer-events-auto"
+								aria-label="입력 내용 지우기"
+							>
+								<span class="flex h-4 w-4 items-center justify-center">
+									<X size={16} class="lucide-icon text-text-muted" />
+								</span>
+							</button>
+						{/if}
+					</div>
 					{#if validationErrors.title}
 						<p id="title-error" class="mt-1.5 text-sm text-danger-fg" role="alert">
 							{validationErrors.title}
