@@ -43,6 +43,10 @@
 	let editingCommentId = $state<string | null>(null);
 	let editingContent = $state('');
 
+	// 코멘트 작성 상태
+	let newCommentContent = $state('');
+	let isSubmittingComment = $state(false);
+
 	// 코멘트 데이터 로드
 	$effect(() => {
 		(async () => {
@@ -168,6 +172,50 @@
 			toast.add(errorMessage, 'error', 5000);
 		}
 	}
+
+	// 코멘트 추가
+	async function handleAddComment() {
+		if (!newCommentContent.trim()) {
+			toast.add('코멘트 내용을 입력해주세요.', 'error', 3000);
+			return;
+		}
+
+		if (isSubmittingComment) return;
+		isSubmittingComment = true;
+
+		try {
+			const response = await fetch('/api/comments', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					content: newCommentContent.trim(),
+					user_id: 'user_1', // TODO: 실제 사용자 ID로 교체
+					user_name: 'El', // TODO: 실제 사용자 이름으로 교체
+					track_id: null,
+					album_id: null
+				})
+			});
+
+			const result = await response.json();
+
+			if (!response.ok || !result.ok) {
+				throw new Error(result.error?.message || '코멘트 추가에 실패했습니다.');
+			}
+
+			// 목록에 새 코멘트 추가 (맨 앞에)
+			comments = [result.data, ...comments];
+			newCommentContent = '';
+			toast.add('코멘트가 추가되었습니다.', 'success', 3000);
+		} catch (error) {
+			console.error('코멘트 추가 오류:', error);
+			const errorMessage = error instanceof Error 
+				? error.message 
+				: '코멘트 추가 중 오류가 발생했습니다.';
+			toast.add(errorMessage, 'error', 5000);
+		} finally {
+			isSubmittingComment = false;
+		}
+	}
 </script>
 
 <PageContent>
@@ -231,6 +279,33 @@
 				<MessageSquare size={20} class="text-brand-pink" />
 				최근 코멘트
 			</h3>
+
+			<!-- 코멘트 작성 폼 -->
+			<div class="mb-6 pb-6 border-b border-border-subtle">
+				<textarea
+					bind:value={newCommentContent}
+					rows="3"
+					placeholder="새 코멘트를 입력하세요..."
+					class="input-base w-full px-4 py-3 text-sm resize-none mb-3"
+					onkeydown={(e) => {
+						if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+							e.preventDefault();
+							handleAddComment();
+						}
+					}}
+				></textarea>
+				<div class="flex items-center justify-end gap-2">
+					<button
+						type="button"
+						onclick={handleAddComment}
+						disabled={isSubmittingComment || !newCommentContent.trim()}
+						class="px-4 py-2 text-sm bg-brand-pink text-white rounded-lg hover:bg-brand-pink/90 transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+					>
+						{isSubmittingComment ? '추가 중...' : '코멘트 추가'}
+					</button>
+				</div>
+				<p class="text-xs text-text-muted mt-2">Ctrl/Cmd + Enter로 빠르게 추가할 수 있습니다</p>
+			</div>
 			{#if commentsLoading}
 				<div class="flex items-center justify-center py-8">
 					<p class="text-text-muted">로딩 중...</p>
