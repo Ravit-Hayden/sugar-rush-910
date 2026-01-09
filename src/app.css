@@ -936,8 +936,16 @@ a[class*="text-brand-pink"][class*="hover:bg-hover-cyan"]:focus-visible:hover {
 
 [data-theme="light"] .sidebar-menu-item:focus .lucide-icon,
 [data-theme="light"] .sidebar-menu-item:focus-visible .lucide-icon,
+[data-theme="light"] .sidebar-menu-item:focus-within .lucide-icon,
+[data-theme="light"] .sidebar-menu-item:focus .lucide-icon:hover,
+[data-theme="light"] .sidebar-menu-item:focus-visible .lucide-icon:hover,
+[data-theme="light"] .sidebar-menu-item:focus-within .lucide-icon:hover,
 [data-theme="light"] aside nav ul li a.sidebar-menu-item:focus .lucide-icon,
-[data-theme="light"] aside nav ul li a.sidebar-menu-item:focus-visible .lucide-icon {
+[data-theme="light"] aside nav ul li a.sidebar-menu-item:focus-visible .lucide-icon,
+[data-theme="light"] aside nav ul li a.sidebar-menu-item:focus-within .lucide-icon,
+[data-theme="light"] aside nav ul li a.sidebar-menu-item:focus .lucide-icon:hover,
+[data-theme="light"] aside nav ul li a.sidebar-menu-item:focus-visible .lucide-icon:hover,
+[data-theme="light"] aside nav ul li a.sidebar-menu-item:focus-within .lucide-icon:hover {
   color: #FFFFFF !important;
 }
 
@@ -950,12 +958,7 @@ a[class*="text-brand-pink"][class*="hover:bg-hover-cyan"]:focus-visible:hover {
   color: #FFFFFF !important;
 }
 
-[data-theme="light"] .sidebar-menu-item:focus:hover .lucide-icon,
-[data-theme="light"] .sidebar-menu-item:focus-visible:hover .lucide-icon,
-[data-theme="light"] aside nav ul li a.sidebar-menu-item:focus:hover .lucide-icon,
-[data-theme="light"] aside nav ul li a.sidebar-menu-item:focus-visible:hover .lucide-icon {
-  color: #FFFFFF !important;
-}
+/* 이미 위에서 처리됨 */
 
 /* 라이트 모드 - 활성화/포커스 시 아이콘 흰색 강제 (모든 클래스 조합 포함) */
 [data-theme="light"] .sidebar-menu-item.active .lucide-icon,
@@ -1284,7 +1287,11 @@ a[class*="text-brand-pink"][class*="hover:bg-hover-cyan"]:focus-visible:hover {
 }
 
 .sidebar-menu-item:focus .lucide-icon,
-.sidebar-menu-item:focus-visible .lucide-icon {
+.sidebar-menu-item:focus-visible .lucide-icon,
+.sidebar-menu-item:focus-within .lucide-icon,
+.sidebar-menu-item:focus .lucide-icon:hover,
+.sidebar-menu-item:focus-visible .lucide-icon:hover,
+.sidebar-menu-item:focus-within .lucide-icon:hover {
   color: #FFFFFF !important;
 }
 
@@ -1295,10 +1302,7 @@ a[class*="text-brand-pink"][class*="hover:bg-hover-cyan"]:focus-visible:hover {
   color: #FFFFFF !important;
 }
 
-.sidebar-menu-item:focus:hover .lucide-icon,
-.sidebar-menu-item:focus-visible:hover .lucide-icon {
-  color: #FFFFFF !important;
-}
+/* 이미 위에서 처리됨 */
 
 .sidebar-menu-item.active {
   background-color: var(--brand-pink) !important;
@@ -1587,7 +1591,11 @@ aside nav ul li a.sidebar-menu-item:focus-visible {
 }
 
 aside nav ul li a.sidebar-menu-item:focus .lucide-icon,
-aside nav ul li a.sidebar-menu-item:focus-visible .lucide-icon {
+aside nav ul li a.sidebar-menu-item:focus-visible .lucide-icon,
+aside nav ul li a.sidebar-menu-item:focus-within .lucide-icon,
+aside nav ul li a.sidebar-menu-item:focus .lucide-icon:hover,
+aside nav ul li a.sidebar-menu-item:focus-visible .lucide-icon:hover,
+aside nav ul li a.sidebar-menu-item:focus-within .lucide-icon:hover {
   color: #FFFFFF !important;
 }
 
@@ -1598,10 +1606,7 @@ aside nav ul li a.sidebar-menu-item:focus-visible:hover {
   color: #FFFFFF !important;
 }
 
-aside nav ul li a.sidebar-menu-item:focus:hover .lucide-icon,
-aside nav ul li a.sidebar-menu-item:focus-visible:hover .lucide-icon {
-  color: #FFFFFF !important;
-}
+/* 이미 위에서 처리됨 */
 
 aside nav ul li a.sidebar-menu-item.active {
   background-color: var(--brand-pink) !important;
