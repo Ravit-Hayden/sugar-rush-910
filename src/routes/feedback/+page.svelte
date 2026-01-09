@@ -16,6 +16,14 @@
 	let replyingFeedbackId = $state<string | null>(null);
 	let replyContent = $state('');
 
+	// 피드백 작성 상태
+	let showNewFeedbackForm = $state(false);
+	let newFeedbackTitle = $state('');
+	let newFeedbackContent = $state('');
+	let newFeedbackPriority = $state('medium');
+	let newFeedbackRating = $state(5);
+	let isSubmittingFeedback = $state(false);
+
 	// 피드백 데이터
 	let feedbacks = $state<any[]>([]);
 	let loading = $state(true);
@@ -346,6 +354,65 @@
 		}
 	}
 
+	// 피드백 추가
+	async function handleAddFeedback() {
+		if (!newFeedbackTitle.trim() || !newFeedbackContent.trim()) {
+			toast.add('제목과 내용을 모두 입력해주세요.', 'error', 3000);
+			return;
+		}
+
+		if (isSubmittingFeedback) return;
+		isSubmittingFeedback = true;
+
+		try {
+			const response = await fetch('/api/feedback', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					title: newFeedbackTitle.trim(),
+					content: newFeedbackContent.trim(),
+					from: 'El', // TODO: 실제 사용자 이름으로 교체
+					avatar: 'E', // TODO: 실제 사용자 아바타로 교체
+					status: 'unread',
+					priority: newFeedbackPriority,
+					rating: newFeedbackRating,
+					tags: []
+				})
+			});
+
+			const result = await response.json();
+
+			if (!response.ok || !result.ok) {
+				throw new Error(result.error?.message || '피드백 추가에 실패했습니다.');
+			}
+
+			// 목록에 새 피드백 추가 (맨 앞에)
+			feedbacks = [{ ...result.data, time: formatTime(result.data.created_at) }, ...feedbacks];
+			newFeedbackTitle = '';
+			newFeedbackContent = '';
+			newFeedbackPriority = 'medium';
+			newFeedbackRating = 5;
+			showNewFeedbackForm = false;
+			toast.add('피드백이 추가되었습니다.', 'success', 3000);
+		} catch (error) {
+			console.error('피드백 추가 오류:', error);
+			const errorMessage = error instanceof Error 
+				? error.message 
+				: '피드백 추가 중 오류가 발생했습니다.';
+			toast.add(errorMessage, 'error', 5000);
+		} finally {
+			isSubmittingFeedback = false;
+		}
+	}
+
+	function handleCancelNewFeedback() {
+		newFeedbackTitle = '';
+		newFeedbackContent = '';
+		newFeedbackPriority = 'medium';
+		newFeedbackRating = 5;
+		showNewFeedbackForm = false;
+	}
+
 	// 알림 삭제
 	async function handleDeleteNotification(notificationId: string) {
 		if (!confirm('이 알림을 삭제하시겠습니까?')) {
@@ -429,6 +496,106 @@
 						{ value: 'archived', label: '보관됨' }
 					]}
 				/>
+
+				<!-- 피드백 작성 폼 -->
+				<div class="mb-6">
+					{#if !showNewFeedbackForm}
+						<button
+							type="button"
+							onclick={() => showNewFeedbackForm = true}
+							class="w-full px-4 py-3 bg-surface-1 border border-border-subtle rounded-lg hover:bg-surface-2 transition-colors duration-200 flex items-center justify-center gap-2 text-text-base"
+						>
+							<MessageSquare size={16} />
+							<span class="font-medium">새 피드백 작성</span>
+						</button>
+					{:else}
+						<div class="bg-surface-1 rounded-lg border border-border-subtle p-6">
+							<h3 class="text-lg font-semibold text-text-strong mb-4">피드백 작성</h3>
+							<div class="space-y-4">
+								<!-- 제목 -->
+								<div>
+									<label for="new-feedback-title" class="block text-sm font-medium text-text-strong mb-2">
+										제목
+									</label>
+									<input
+										type="text"
+										id="new-feedback-title"
+										bind:value={newFeedbackTitle}
+										placeholder="피드백 제목을 입력하세요"
+										class="input-base w-full h-10 px-4 text-base placeholder:text-text-muted"
+									/>
+								</div>
+
+								<!-- 내용 -->
+								<div>
+									<label for="new-feedback-content" class="block text-sm font-medium text-text-strong mb-2">
+										내용
+									</label>
+									<textarea
+										id="new-feedback-content"
+										bind:value={newFeedbackContent}
+										rows="4"
+										placeholder="피드백 내용을 입력하세요"
+										class="input-base w-full px-4 py-2 text-base placeholder:text-text-muted resize-none"
+									></textarea>
+								</div>
+
+								<!-- 우선순위 -->
+								<div>
+									<label for="new-feedback-priority" class="block text-sm font-medium text-text-strong mb-2">
+										우선순위
+									</label>
+									<select
+										id="new-feedback-priority"
+										bind:value={newFeedbackPriority}
+										class="input-base w-full h-10 px-4 text-base"
+									>
+										<option value="low">낮음</option>
+										<option value="medium">보통</option>
+										<option value="high">높음</option>
+									</select>
+								</div>
+
+								<!-- 평점 -->
+								<div>
+									<label for="new-feedback-rating" class="block text-sm font-medium text-text-strong mb-2">
+										평점
+									</label>
+									<select
+										id="new-feedback-rating"
+										bind:value={newFeedbackRating}
+										class="input-base w-full h-10 px-4 text-base"
+									>
+										<option value={1}>1</option>
+										<option value={2}>2</option>
+										<option value={3}>3</option>
+										<option value={4}>4</option>
+										<option value={5}>5</option>
+									</select>
+								</div>
+
+								<!-- 버튼 -->
+								<div class="flex items-center justify-end gap-3 pt-2">
+									<button
+										type="button"
+										onclick={handleCancelNewFeedback}
+										class="cancel-button px-4 py-2 bg-surface-2 text-text-base rounded-lg border border-border-subtle transition-colors duration-200 font-medium"
+									>
+										취소
+									</button>
+									<button
+										type="button"
+										onclick={handleAddFeedback}
+										disabled={isSubmittingFeedback}
+										class="px-4 py-2 bg-brand-pink text-white rounded-lg hover:bg-brand-pink/90 transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+									>
+										{isSubmittingFeedback ? '추가 중...' : '피드백 추가'}
+									</button>
+								</div>
+							</div>
+						</div>
+					{/if}
+				</div>
 
 				<!-- 피드백 목록 -->
 				{#if loading}
