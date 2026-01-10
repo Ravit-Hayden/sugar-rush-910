@@ -148,54 +148,54 @@
 
 <!-- 사이드바 컨테이너 -->
 <aside 
-	class="top-0 fixed left-0 h-screen bg-surface-2 sidebar-border-right z-50 overflow-hidden"
+	class="top-0 fixed left-0 h-screen bg-surface-2 sidebar-border-right z-40 overflow-hidden"
 	style="width: {sidebarCollapsed ? '72px' : '250px'}; transition: width 200ms ease-in-out, transform 200ms ease-in-out;"
 >
-	<div class="h-full w-full overflow-hidden">
-		<nav class="h-full flex flex-col">
-			<!-- 상단 토글 버튼과 로고 -->
-			<div class="flex items-center h-20 border-b border-border-subtle flex-shrink-0 px-6">
-				<!-- 상태 표시 아이콘 (모바일) / 토글 버튼 (데스크톱) -->
-				<!-- SSR 시에는 항상 데스크톱 버전을 렌더링하고, 마운트 후 조건부 표시 -->
-				<div class="flex-shrink-0 w-6 h-6 inline-flex items-center justify-center pointer-events-none" 
-					 style="color: var(--brand-pink) !important; display: {mounted && isMobile ? 'flex' : 'none'};">
-					<PanelsTopLeft 
-						size={20} 
-						style="color: var(--brand-pink) !important; pointer-events: none;"
-					/>
-				</div>
-				<!-- 토글 버튼 (클릭 가능) - 모바일이 아닐 때 또는 마운트 전에 표시 -->
-				<button
-					onclick={handleSidebarToggle}
-					onmouseenter={() => sidebarToggleHovered = true}
-					onmouseleave={() => sidebarToggleHovered = false}
-					class="flex-shrink-0 w-6 h-6 inline-flex items-center justify-center rounded-md transition-colors duration-200 ease-in-out focus:outline-none focus:ring-0 cursor-pointer"
-					style="display: {mounted && isMobile ? 'none' : 'flex'};"
-					aria-label="사이드바 토글"
-					type="button"
-					data-action="toggle-sidebar"
-				>
-					{#if sidebarCollapsed}
-						<PanelLeftOpen 
-							size={20} 
-							class="transition-colors duration-200 ease-in-out {sidebarToggleClicked ? 'text-brand-pink' : sidebarToggleHovered ? 'text-hover-cyan' : 'text-brand-pink'}" 
-						/>
-					{:else}
-						<PanelLeftClose 
-							size={20} 
-							class="transition-colors duration-200 ease-in-out {sidebarToggleClicked ? 'text-brand-pink' : sidebarToggleHovered ? 'text-hover-cyan' : 'text-brand-pink'}" 
-						/>
-					{/if}
-				</button>
-				
-				<!-- 로고 -->
-				<div class="sidebar-text-animation ml-3 {sidebarCollapsed ? 'collapsed' : 'expanded'}">
-					<img src="/logo.svg" alt="Sugar Rush" class="h-6 w-auto" />
-				</div>
+	<div class="h-full w-full overflow-hidden flex flex-col">
+		<!-- 상단 토글 버튼과 로고 (고정 영역) -->
+		<div class="flex items-center h-20 border-b border-border-subtle flex-shrink-0 px-6">
+			<!-- 상태 표시 아이콘 (모바일) / 토글 버튼 (데스크톱) -->
+			<!-- SSR 시에는 항상 데스크톱 버전을 렌더링하고, 마운트 후 조건부 표시 -->
+			<div class="flex-shrink-0 w-6 h-6 inline-flex items-center justify-center pointer-events-none" 
+				 style="color: var(--brand-pink) !important; display: {mounted && isMobile ? 'flex' : 'none'};">
+				<PanelsTopLeft 
+					size={20} 
+					style="color: var(--brand-pink) !important; pointer-events: none;"
+				/>
 			</div>
+			<!-- 토글 버튼 (클릭 가능) - 모바일이 아닐 때 또는 마운트 전에 표시 -->
+			<button
+				onclick={handleSidebarToggle}
+				onmouseenter={() => sidebarToggleHovered = true}
+				onmouseleave={() => sidebarToggleHovered = false}
+				class="flex-shrink-0 w-6 h-6 inline-flex items-center justify-center rounded-md transition-colors duration-200 ease-in-out focus:outline-none focus:ring-0 cursor-pointer"
+				style="display: {mounted && isMobile ? 'none' : 'flex'};"
+				aria-label="사이드바 토글"
+				type="button"
+				data-action="toggle-sidebar"
+			>
+				{#if sidebarCollapsed}
+					<PanelLeftOpen 
+						size={20} 
+						class="transition-colors duration-200 ease-in-out {sidebarToggleClicked ? 'text-brand-pink' : sidebarToggleHovered ? 'text-hover-cyan' : 'text-brand-pink'}" 
+					/>
+				{:else}
+					<PanelLeftClose 
+						size={20} 
+						class="transition-colors duration-200 ease-in-out {sidebarToggleClicked ? 'text-brand-pink' : sidebarToggleHovered ? 'text-hover-cyan' : 'text-brand-pink'}" 
+					/>
+				{/if}
+			</button>
+			
+			<!-- 로고 -->
+			<div class="sidebar-text-animation ml-3 {sidebarCollapsed ? 'collapsed' : 'expanded'}">
+				<img src="/logo.svg" alt="Sugar Rush" class="h-6 w-auto" />
+			</div>
+		</div>
 
-			<!-- 메뉴 아이템들 -->
-			<ul class="space-y-0 flex-1 overflow-hidden">
+		<!-- 메뉴 아이템들 (스크롤 가능 영역) -->
+		<nav class="flex-1 overflow-hidden">
+			<ul class="space-y-0 h-full overflow-y-auto overflow-x-hidden">
 			{#each menuItems as item (item.label)}
 				{@const IconComponent = item.icon}
 				<li class="overflow-hidden">
