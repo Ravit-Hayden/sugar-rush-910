@@ -78,7 +78,7 @@
 					{@const IconComponent = getStatusIcon(item.value)}
 					<a
 						href="/status/{item.key}"
-						class="flex items-center h-12 px-4 bg-surface-1 rounded hover:bg-surface-2 transition-colors min-w-0"
+						class="flex items-center h-12 px-4 bg-surface-1 rounded hover:bg-surface-2 transition-colors"
 					>
 						<!-- 좌측 아이콘 -->
 						<span class="flex-shrink-0 w-5 h-5 flex items-center justify-center mr-3">

@@ -603,8 +603,8 @@
 						<p class="text-text-muted">로딩 중...</p>
 					</div>
 				{:else}
-					<div class="space-y-4">
-						{#each filteredFeedbacks as feedback (feedback.id)}
+				<div class="space-y-4">
+					{#each filteredFeedbacks as feedback (feedback.id)}
 						<div class="bg-surface-1 rounded-lg p-6 hover:bg-surface-2 transition-colors duration-200 border border-border-subtle {feedback.status === 'unread' ? 'ring-2 ring-brand-pink/20' : ''}">
 							<div class="flex items-start gap-4">
 								<!-- 아바타 -->
@@ -650,27 +650,27 @@
 										</div>
 									{:else}
 										<!-- 보기 모드 -->
-										<div class="flex items-start justify-between mb-2">
-											<div class="flex-1">
-												<h3 class="text-lg font-semibold text-text-strong mb-1">{feedback.title}</h3>
-												<div class="flex items-center gap-2 text-sm text-text-muted mb-2">
-													<span>{feedback.from}</span>
-													<span>•</span>
-													<span class="flex items-center gap-1">
-														<Clock size={12} />
-														{feedback.time}
-													</span>
-												</div>
+									<div class="flex items-start justify-between mb-2">
+										<div class="flex-1">
+											<h3 class="text-lg font-semibold text-text-strong mb-1">{feedback.title}</h3>
+											<div class="flex items-center gap-2 text-sm text-text-muted mb-2">
+												<span>{feedback.from}</span>
+												<span>•</span>
+												<span class="flex items-center gap-1">
+													<Clock size={12} />
+													{feedback.time}
+												</span>
 											</div>
-											<div class="flex items-center gap-2">
-												<!-- 우선순위 -->
-												<span class="badge-base {getPriorityColor(feedback.priority)}">
-													{getPriorityLabel(feedback.priority)}
-												</span>
-												<!-- 상태 -->
-												<span class="badge-base {getStatusColor(feedback.status)}">
-													{getStatusLabel(feedback.status)}
-												</span>
+										</div>
+										<div class="flex items-center gap-2">
+											<!-- 우선순위 -->
+											<span class="badge-base {getPriorityColor(feedback.priority)}">
+												{getPriorityLabel(feedback.priority)}
+											</span>
+											<!-- 상태 -->
+											<span class="badge-base {getStatusColor(feedback.status)}">
+												{getStatusLabel(feedback.status)}
+											</span>
 												<!-- 더보기 메뉴 -->
 												<MoreMenuDropdown
 													itemId={feedback.id}
@@ -694,31 +694,31 @@
 													onToggle={handleMoreMenuToggle}
 													onClose={handleMoreMenuClose}
 												/>
-											</div>
 										</div>
+									</div>
 
-										<!-- 평점 -->
-										<div class="flex items-center gap-1 mb-3">
-											{#each Array(5) as _, i}
-												<Star 
-													size={14} 
-													class="{i < feedback.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'}" 
-												/>
-											{/each}
-											<span class="text-sm text-text-muted ml-2">({feedback.rating}/5)</span>
-										</div>
+									<!-- 평점 -->
+									<div class="flex items-center gap-1 mb-3">
+										{#each Array(5) as _, i}
+											<Star 
+												size={14} 
+												class="{i < feedback.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'}" 
+											/>
+										{/each}
+										<span class="text-sm text-text-muted ml-2">({feedback.rating}/5)</span>
+									</div>
 
-										<!-- 내용 -->
-										<p class="text-text-muted mb-4 line-clamp-2">{feedback.content}</p>
+									<!-- 내용 -->
+									<p class="text-text-muted mb-4 line-clamp-2">{feedback.content}</p>
 
-										<!-- 태그 -->
-										<div class="flex flex-wrap gap-2 mb-4">
-											{#each feedback.tags as tag}
-												<span class="px-2 py-1 bg-surface-1 text-xs text-text-muted rounded">
-													{tag}
-												</span>
-											{/each}
-										</div>
+									<!-- 태그 -->
+									<div class="flex flex-wrap gap-2 mb-4">
+										{#each feedback.tags as tag}
+											<span class="px-2 py-1 bg-surface-1 text-xs text-text-muted rounded">
+												{tag}
+											</span>
+										{/each}
+									</div>
 
 										<!-- 답변 영역 -->
 										{#if replyingFeedbackId === feedback.id}
@@ -748,31 +748,31 @@
 											</div>
 										{/if}
 
-										<!-- 액션 버튼 -->
-										<div class="flex items-center gap-2">
+									<!-- 액션 버튼 -->
+									<div class="flex items-center gap-2">
 											<button 
 												type="button"
 												onclick={() => handleReplyStart(feedback.id)}
 												class="inline-flex items-center gap-1 px-3 py-1.5 text-sm bg-brand-pink text-white rounded-lg hover:bg-brand-pink/90 transition-colors duration-200 font-medium"
 											>
-												<Reply size={14} />
-												답변
-											</button>
+											<Reply size={14} />
+											답변
+										</button>
 											<button 
 												type="button"
 												onclick={() => handleArchive(feedback.id)}
 												class="cancel-button inline-flex items-center gap-1 px-3 py-1.5 text-sm bg-surface-2 text-text-muted rounded-lg border border-border-subtle transition-colors duration-200 font-medium"
 											>
-												<Archive size={14} />
-												보관
-											</button>
-										</div>
+											<Archive size={14} />
+											보관
+										</button>
+									</div>
 									{/if}
 								</div>
 							</div>
 						</div>
-						{/each}
-					</div>
+					{/each}
+				</div>
 				{/if}
 
 				<!-- 빈 상태 -->
@@ -793,8 +793,8 @@
 					<p class="text-text-muted">로딩 중...</p>
 				</div>
 			{:else}
-				<div class="space-y-4">
-					{#each notifications as notification (notification.id)}
+			<div class="space-y-4">
+				{#each notifications as notification (notification.id)}
 					<div class="bg-surface-1 rounded-lg p-4 hover:bg-surface-2 transition-colors duration-200 border border-border-subtle {notification.status === 'unread' ? 'ring-2 ring-brand-pink/20' : ''}">
 						<div class="flex items-start gap-3">
 							<div class="flex-shrink-0">
@@ -825,7 +825,7 @@
 												type="button"
 												aria-label="읽음 처리"
 											>
-												<div class="w-2 h-2 bg-brand-pink rounded-full"></div>
+											<div class="w-2 h-2 bg-brand-pink rounded-full"></div>
 											</button>
 										{/if}
 										<button 
@@ -840,9 +840,9 @@
 								</div>
 							</div>
 						</div>
-						</div>
-					{/each}
-				</div>
+					</div>
+				{/each}
+			</div>
 			{/if}
 
 			<!-- 빈 상태 -->
