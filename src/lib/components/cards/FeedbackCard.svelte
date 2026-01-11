@@ -56,16 +56,23 @@
 				{#each displayFeedback.slice(0, 4) as item (item.id)}
 					<a
 						href="/feedback/{item.id}"
-						class="flex items-center gap-2 p-3 bg-surface-1 rounded hover:bg-surface-2 transition-colors h-full min-w-0"
+						class="flex items-center h-12 px-4 bg-surface-1 rounded hover:bg-surface-2 transition-colors min-w-0"
 					>
-						<MessageSquare size={16} class="text-text-base flex-shrink-0" />
-						<span class="text-sm text-text-base text-center flex-1 truncate min-w-0">{item.text}</span>
-						<span class="text-xs flex-shrink-0 {getAuthorColor(item.from)} whitespace-nowrap">{item.from}</span>
+						<!-- 좌측 아이콘 -->
+						<span class="flex-shrink-0 w-5 h-5 flex items-center justify-center mr-3">
+							<MessageSquare size={16} class="text-text-base flex-shrink-0" />
+						</span>
+						<!-- 중간 텍스트 (좌측정렬) -->
+						<span class="flex-1 text-sm text-text-base truncate text-left min-w-0">{item.text}</span>
+						<!-- 우측 상태/버튼 -->
+						<span class="flex-shrink-0 flex items-center gap-x-2 ml-2">
+							<span class="text-xs {getAuthorColor(item.from)} whitespace-nowrap">{item.from}</span>
+						</span>
 					</a>
 				{/each}
 				{#if displayFeedback.length < 4}
 					{#each Array.from({length: 4 - displayFeedback.length}) as _, i}
-						<div class="p-3 bg-surface-1 rounded h-full opacity-0 pointer-events-none">&nbsp;</div>
+						<div class="h-12 px-4 bg-surface-1 rounded opacity-0 pointer-events-none">&nbsp;</div>
 					{/each}
 				{/if}
 			{/if}

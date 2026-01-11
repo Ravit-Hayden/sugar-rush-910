@@ -20,7 +20,7 @@
 	];
 </script>
 
-<div class="h-[396px] lg:h-[600px] flex flex-col justify-between p-5 rounded-lg bg-surface-2 border border-border-subtle overflow-hidden pt-[24px]">
+<div class="card-base h-[396px] lg:h-[600px] flex flex-col justify-between p-5 rounded-lg bg-surface-2 border border-border-subtle overflow-hidden pt-[24px]">
 	<!-- 상단 타이틀영역 -->
 	<div class="flex items-center justify-between mb-4">
 		<h3 class="text-lg font-bold text-text-strong truncate">KPI 요약 그래프</h3>
