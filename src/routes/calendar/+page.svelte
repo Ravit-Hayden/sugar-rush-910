@@ -149,7 +149,10 @@
 				{:else if filteredEvents.length > 0}
 					<div class="space-y-4">
 						{#each filteredEvents as event (event.id)}
-						<div class="flex items-center gap-4 p-4 bg-surface-2 rounded-lg hover:bg-surface-1 transition-colors duration-200 border border-border-subtle">
+						<a 
+							href="/calendar/{event.id}"
+							class="flex items-center gap-4 p-4 bg-surface-2 rounded-lg hover:bg-surface-1 transition-colors duration-200 border border-border-subtle cursor-pointer"
+						>
 							<div class="flex-shrink-0">
 								<div class="w-12 h-12 bg-surface-1 rounded-lg flex items-center justify-center border border-border-subtle">
 									<Calendar size={20} class="text-brand-pink" />
@@ -167,7 +170,8 @@
 									</span>
 								</div>
 							</div>
-							<div class="flex items-center gap-2 flex-shrink-0">
+						</a>
+							<div class="flex items-center gap-2 flex-shrink-0" onclick={(e) => e.stopPropagation()}>
 								{#if event.status === 'completed'}
 									<CheckCircle size={16} class="text-green-500" />
 								{:else}
@@ -196,7 +200,7 @@
 									onClose={handleMoreMenuClose}
 								/>
 							</div>
-						</div>
+						</a>
 					{/each}
 					</div>
 				{:else}

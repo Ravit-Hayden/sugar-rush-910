@@ -1077,7 +1077,10 @@
 		{#if filteredMusicVideos.length > 0}
 			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 				{#each filteredMusicVideos as video (video.id)}
-					<div class="bg-surface-1 rounded-lg overflow-hidden hover:bg-surface-2 transition-colors duration-200 group border border-border-subtle">
+					<a 
+						href="/music-videos/{video.id}"
+						class="bg-surface-1 rounded-lg overflow-hidden hover:bg-surface-2 transition-colors duration-200 group border border-border-subtle block"
+					>
 						<div class="relative aspect-video bg-surface-2 overflow-hidden rounded-t-lg">
 							<!-- 기본 이미지 (회색 배경 + 회색 로고) -->
 							<div class="absolute inset-0 flex items-center justify-center bg-surface-2 rounded-t-lg">
@@ -1131,9 +1134,22 @@
 									{/each}
 								</div>
 								<div class="flex items-center gap-1">
-									<button class="btn-icon w-8 h-8 inline-flex items-center justify-center rounded-md" title="편집" aria-label="편집">
+									<a 
+										href="/music-videos/{video.id}"
+										class="btn-icon w-8 h-8 inline-flex items-center justify-center rounded-md" 
+										title="상세보기" 
+										aria-label="상세보기"
+									>
+										<Video size={14} class="text-text-muted" />
+									</a>
+									<a 
+										href="/music-videos/{video.id}/edit"
+										class="btn-icon w-8 h-8 inline-flex items-center justify-center rounded-md" 
+										title="편집" 
+										aria-label="편집"
+									>
 										<Edit size={14} class="text-text-muted" />
-									</button>
+									</a>
 									<button class="btn-icon w-8 h-8 inline-flex items-center justify-center rounded-md" title="다운로드" aria-label="다운로드">
 										<Download size={14} class="text-text-muted" />
 									</button>

@@ -180,6 +180,34 @@
     yearMonthPickerOpen = !yearMonthPickerOpen;
   }
 
+  // 년도/월 선택 드롭다운이 열릴 때 현재 년도와 월로 스크롤
+  $effect(() => {
+    if (yearMonthPickerOpen) {
+      // 다음 틱에서 DOM이 렌더링된 후 스크롤
+      setTimeout(() => {
+        const yearContainer = wrapperElement?.querySelector('.year-month-picker .max-h-48:first-of-type') as HTMLElement;
+        const monthContainer = wrapperElement?.querySelector('.year-month-picker .max-h-48:last-of-type') as HTMLElement;
+        
+        // 현재 년도로 스크롤
+        if (yearContainer) {
+          const currentYearButton = yearContainer.querySelector(`button[aria-selected="true"]`) as HTMLElement;
+          if (currentYearButton) {
+            currentYearButton.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }
+        
+        // 현재 월로 스크롤
+        if (monthContainer) {
+          const currentMonthButton = monthContainer.querySelector(`button[aria-selected="true"]`) as HTMLElement;
+          if (currentMonthButton) {
+            currentMonthButton.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }
+      }, 0);
+    }
+    return () => {};
+  });
+
   // 년도 리스트 생성 (현재 년도 기준 ±10년)
   const availableYears = $derived.by(() => {
     const currentYear = new Date().getFullYear();

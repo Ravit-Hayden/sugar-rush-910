@@ -1,0 +1,138 @@
+/* ==========================================================================
+   Sidebar Menu Item Styles (완전 통합 버전 - 적용용)
+   - 모든 상태 조합 완벽 커버
+   - !important 최소화 (CSS 특이성으로 해결)
+   - 하이드레이션 안전 (클라이언트 전용 클래스 없음)
+   
+   적용 방법:
+   1. src/app.css에서 기존 .sidebar-menu-item 관련 스타일 모두 삭제
+   2. 이 코드를 삽입
+   3. 필요 시 aside nav ul li a 선택자 버전도 추가
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. 기본 트랜지션 설정
+   -------------------------------------------------------------------------- */
+.sidebar-menu-item {
+    transition: all 200ms ease-in-out;
+}
+
+.sidebar-menu-item span {
+    transition: opacity 200ms ease-in-out;
+}
+
+/* --------------------------------------------------------------------------
+   2. 호버 상태 (Pure Hover) - 포커스/활성화 제외
+   우선순위: 낮음 (포커스/활성화보다 낮음)
+   -------------------------------------------------------------------------- */
+
+/* 2-1. 다크 모드 호버 */
+.sidebar-menu-item:hover:not(.active):not(:focus):not(:focus-visible) {
+    background-color: var(--hover-point);
+    color: var(--text-on-hover);
+}
+
+.sidebar-menu-item:hover:not(.active):not(:focus):not(:focus-visible) .lucide-icon {
+    color: var(--text-on-hover);
+}
+
+/* 2-2. 라이트 모드 호버 (배경색 포함 - 중요!) */
+[data-theme="light"] .sidebar-menu-item:hover:not(.active):not(:focus):not(:focus-visible) {
+    background-color: var(--hover-point);
+    color: var(--surface-2);
+}
+
+[data-theme="light"] .sidebar-menu-item:hover:not(.active):not(:focus):not(:focus-visible) .lucide-icon {
+    color: var(--surface-2);
+}
+
+/* --------------------------------------------------------------------------
+   3. 포커스 상태 (Focus) - 호버보다 우선순위 높음
+   우선순위: 중간 (활성화보다 낮음, 호버보다 높음)
+   -------------------------------------------------------------------------- */
+
+/* 3-1. 포커스 기본 (다크/라이트 공통) */
+.sidebar-menu-item:focus,
+.sidebar-menu-item:focus-visible {
+    background-color: var(--brand-pink);
+    color: #FFFFFF;
+    outline: none;
+    box-shadow: none;
+}
+
+.sidebar-menu-item:focus .lucide-icon,
+.sidebar-menu-item:focus-visible .lucide-icon {
+    color: #FFFFFF;
+}
+
+/* 3-2. 포커스+호버 (포커스 상태에서 호버해도 포커스 색상 유지) */
+.sidebar-menu-item:focus:hover,
+.sidebar-menu-item:focus-visible:hover {
+    background-color: var(--brand-pink);
+    color: #FFFFFF;
+}
+
+.sidebar-menu-item:focus:hover .lucide-icon,
+.sidebar-menu-item:focus-visible:hover .lucide-icon {
+    color: #FFFFFF;
+}
+
+/* --------------------------------------------------------------------------
+   4. 활성화 상태 (Active) - 최고 우선순위
+   우선순위: 최고 (모든 상태보다 높음)
+   -------------------------------------------------------------------------- */
+
+/* 4-1. 활성화 기본 */
+.sidebar-menu-item.active {
+    background-color: var(--brand-pink);
+    color: #FFFFFF;
+}
+
+.sidebar-menu-item.active .lucide-icon {
+    color: #FFFFFF;
+}
+
+/* 4-2. 활성화+호버 (활성화 상태에서 호버해도 활성화 색상 유지) */
+.sidebar-menu-item.active:hover {
+    background-color: var(--brand-pink);
+    color: #FFFFFF;
+}
+
+.sidebar-menu-item.active:hover .lucide-icon {
+    color: #FFFFFF;
+}
+
+/* 4-3. 활성화+포커스 (명시적 추가 - 중요!) */
+.sidebar-menu-item.active:focus,
+.sidebar-menu-item.active:focus-visible {
+    background-color: var(--brand-pink);
+    color: #FFFFFF;
+}
+
+.sidebar-menu-item.active:focus .lucide-icon,
+.sidebar-menu-item.active:focus-visible .lucide-icon {
+    color: #FFFFFF;
+}
+
+/* 4-4. 활성화+포커스+호버 (명시적 추가 - 중요!) */
+.sidebar-menu-item.active:focus:hover,
+.sidebar-menu-item.active:focus-visible:hover {
+    background-color: var(--brand-pink);
+    color: #FFFFFF;
+}
+
+.sidebar-menu-item.active:focus:hover .lucide-icon,
+.sidebar-menu-item.active:focus-visible:hover .lucide-icon {
+    color: #FFFFFF;
+}
+
+/* 4-5. 활성화 상태의 텍스트 강제 적용 */
+.sidebar-menu-item.active span,
+.sidebar-menu-item.active .sidebar-text-animation span,
+.sidebar-menu-item.active .sidebar-text-animation span.text-sm {
+    color: #FFFFFF;
+}
+
+/* ==========================================================================
+   END: Sidebar Menu Item Styles
+   ========================================================================== */
