@@ -318,6 +318,10 @@ a[href*="/path/"]:focus-visible:hover {
 
 ### 6.3 더보기 버튼
 
+#### 패턴 A: 단독 더보기 버튼 (기본)
+
+대부분의 카드에서 사용하는 표준 패턴입니다.
+
 ```html
 <a 
   href="/path" 
@@ -326,6 +330,27 @@ a[href*="/path/"]:focus-visible:hover {
   더보기
 </a>
 ```
+
+#### 패턴 B: 바로가기 버튼 + 더보기 버튼
+
+TasksCard, CountdownCard, FailuresCard에서 사용하는 패턴입니다.
+
+```html
+<div class="flex items-center justify-between mt-3">
+  <div class="flex items-center gap-2">
+    <!-- 바로가기 버튼들 -->
+    <a href="/path/action" class="inline-flex items-center pl-1.5 pr-2 py-1 rounded border border-brand-pink text-brand-pink text-xs font-medium hover:bg-brand-pink hover:text-white transition cursor-pointer">
+      <IconComponent size={12} class="mr-1" />
+      버튼명
+    </a>
+  </div>
+  <a href="/path" class="text-brand-pink text-sm font-semibold px-2 py-1 rounded hover:bg-hover-cyan transition-colors">더보기</a>
+</div>
+```
+
+**차이점**:
+- 패턴 A: `self-end mt-3` 사용 (단독 배치)
+- 패턴 B: flex 컨테이너로 좌우 배치, `self-end` 없음
 
 ---
 
@@ -775,6 +800,27 @@ html, body {
 
 ---
 
-**마지막 업데이트**: 2026-01-11
+**마지막 업데이트**: 2026-01-12
 
 **작성자**: AI Assistant (based on codebase analysis)
+
+---
+
+## 📝 변경 이력
+
+### 2026-01-12 — 가이드-구현 동기화 완료
+
+| Phase | 작업 내용 | 커밋 |
+|-------|---------|------|
+| **Backup** | 현재 상태 백업 (`backup_guide_sync_2026-01-12/`) | - |
+| **Phase 1** | StatusCard, ActionsCard에 `min-w-0` 추가, FeedbackCard 더보기 버튼 패딩 통일 (`px-4` → `px-2`) | `8dacd3d` |
+| **Phase 2** | FeedbackCard 리스트 항목 레이아웃 수정 (`gap-2 p-3 h-full` → `h-12 px-4`), KpiCard에 `card-base` 클래스 추가 | `b1ebc0d` |
+| **Phase 3** | FinancialStatsCard 리스트 항목 `<div>` → `<a>` 태그 변경 (호버/포커스 효과 적용) | `7513211` |
+
+### 복구 방법
+
+```powershell
+# Phase 1 이전 상태로 복구
+Copy-Item backup_guide_sync_2026-01-12/*.svelte src/lib/components/cards/ -Force
+Copy-Item backup_guide_sync_2026-01-12/app.css src/ -Force
+```
