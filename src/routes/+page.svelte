@@ -142,13 +142,19 @@
 			<div class="col-span-1">
 				<LogsCard {logs} />
 			</div>
-			<div class="col-span-1">
-				<FinancialStatsCard />
-			</div>
 
-			<!-- KPI (반응형 위치/크기 조절) -->
+			<!-- 수익/지출 통계 & KPI (같은 행에 배치) -->
 			<div class="col-span-1 sm:col-span-2 lg:col-span-3">
-				<KpiCard {kpi} />
+				<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+					<!-- 수익/지출 통계 (왼쪽) -->
+					<div class="col-span-1">
+						<FinancialStatsCard />
+					</div>
+					<!-- KPI (오른쪽 2열) -->
+					<div class="col-span-1 lg:col-span-2">
+						<KpiCard {kpi} />
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
