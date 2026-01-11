@@ -51,73 +51,72 @@
 		{:else if stats}
 			<!-- 요약 카드 (3개) -->
 			<div class="grid grid-cols-3 gap-2 mb-3">
-					<!-- 총 수익 -->
-					<div class="bg-surface-1 rounded p-3 min-w-0">
-						<div class="flex items-center gap-1.5 mb-1.5 min-w-0">
-							<TrendingUp size={14} class="text-green-500 flex-shrink-0" />
-							<span class="text-xs font-medium text-text-muted truncate">총 수익</span>
-						</div>
-						<div class="text-base font-bold text-text-strong truncate" data-type="number" title="₩{stats.totalRevenue.toLocaleString()}">
-							{formatNumber(stats.totalRevenue)}
-						</div>
+				<!-- 총 수익 -->
+				<div class="bg-surface-1 rounded p-3 min-w-0">
+					<div class="flex items-center gap-1.5 mb-1.5 min-w-0">
+						<TrendingUp size={14} class="text-green-500 flex-shrink-0" />
+						<span class="text-xs font-medium text-text-muted truncate">총 수익</span>
 					</div>
-
-					<!-- 총 지출 -->
-					<div class="bg-surface-1 rounded p-3 min-w-0">
-						<div class="flex items-center gap-1.5 mb-1.5 min-w-0">
-							<TrendingDown size={14} class="text-red-500 flex-shrink-0" />
-							<span class="text-xs font-medium text-text-muted truncate">총 지출</span>
-						</div>
-						<div class="text-base font-bold text-text-strong truncate" data-type="number" title="₩{stats.totalExpense.toLocaleString()}">
-							{formatNumber(stats.totalExpense)}
-						</div>
-					</div>
-
-					<!-- 순이익 -->
-					<div class="bg-surface-1 rounded p-3 min-w-0">
-						<div class="flex items-center gap-1.5 mb-1.5 min-w-0">
-							<DollarSign size={14} class="{stats.netProfit >= 0 ? 'text-green-500' : 'text-red-500'} flex-shrink-0" />
-							<span class="text-xs font-medium text-text-muted truncate">순이익</span>
-						</div>
-						<div class="text-base font-bold {stats.netProfit >= 0 ? 'text-green-500' : 'text-red-500'} truncate" data-type="number" title="{stats.netProfit >= 0 ? '+' : ''}₩{stats.netProfit.toLocaleString()}">
-							{stats.netProfit >= 0 ? '+' : ''}{formatNumber(Math.abs(stats.netProfit))}
-						</div>
+					<div class="text-base font-bold text-text-strong truncate" data-type="number" title="₩{stats.totalRevenue.toLocaleString()}">
+						{formatNumber(stats.totalRevenue)}
 					</div>
 				</div>
 
-				<!-- 이번 달 요약 -->
-				<div class="mb-3 p-3 bg-surface-1 rounded flex-shrink-0">
-					<h4 class="text-xs font-semibold text-text-strong mb-2">이번 달</h4>
-					<div class="grid grid-cols-3 gap-2 text-center">
-						<div class="min-w-0">
-							<div class="text-xs text-text-muted mb-0.5 truncate">수익</div>
-							<div class="text-xs font-semibold text-text-strong truncate" data-type="number" title="₩{stats.monthlyRevenue.toLocaleString()}">
-								{formatNumber(stats.monthlyRevenue)}
-							</div>
-						</div>
-						<div class="min-w-0">
-							<div class="text-xs text-text-muted mb-0.5 truncate">지출</div>
-							<div class="text-xs font-semibold text-text-strong truncate" data-type="number" title="₩{stats.monthlyExpense.toLocaleString()}">
-								{formatNumber(stats.monthlyExpense)}
-							</div>
-						</div>
-						<div class="min-w-0">
-							<div class="text-xs text-text-muted mb-0.5 truncate">순이익</div>
-							<div class="text-xs font-semibold {stats.monthlyProfit >= 0 ? 'text-green-500' : 'text-red-500'} truncate" data-type="number" title="{stats.monthlyProfit >= 0 ? '+' : ''}₩{stats.monthlyProfit.toLocaleString()}">
-								{stats.monthlyProfit >= 0 ? '+' : ''}{formatNumber(Math.abs(stats.monthlyProfit))}
-							</div>
-						</div>
+				<!-- 총 지출 -->
+				<div class="bg-surface-1 rounded p-3 min-w-0">
+					<div class="flex items-center gap-1.5 mb-1.5 min-w-0">
+						<TrendingDown size={14} class="text-red-500 flex-shrink-0" />
+						<span class="text-xs font-medium text-text-muted truncate">총 지출</span>
+					</div>
+					<div class="text-base font-bold text-text-strong truncate" data-type="number" title="₩{stats.totalExpense.toLocaleString()}">
+						{formatNumber(stats.totalExpense)}
 					</div>
 				</div>
 
-			<!-- 플랫폼별 수익 & 카테고리별 지출 (세로로 배치) -->
-			<div class="grid grid-rows-2 gap-3 min-h-0">
-				<!-- 플랫폼별 수익 (상위 3개) -->
+				<!-- 순이익 -->
+				<div class="bg-surface-1 rounded p-3 min-w-0">
+					<div class="flex items-center gap-1.5 mb-1.5 min-w-0">
+						<DollarSign size={14} class="{stats.netProfit >= 0 ? 'text-green-500' : 'text-red-500'} flex-shrink-0" />
+						<span class="text-xs font-medium text-text-muted truncate">순이익</span>
+					</div>
+					<div class="text-base font-bold {stats.netProfit >= 0 ? 'text-green-500' : 'text-red-500'} truncate" data-type="number" title="{stats.netProfit >= 0 ? '+' : ''}₩{stats.netProfit.toLocaleString()}">
+						{stats.netProfit >= 0 ? '+' : ''}{formatNumber(Math.abs(stats.netProfit))}
+					</div>
+				</div>
+			</div>
+
+			<!-- 이번 달 요약 (간소화) -->
+			<div class="mb-3 p-2.5 bg-surface-1 rounded">
+				<div class="grid grid-cols-3 gap-2 text-center">
+					<div class="min-w-0">
+						<div class="text-xs text-text-muted mb-0.5 truncate">이번 달 수익</div>
+						<div class="text-xs font-semibold text-text-strong truncate" data-type="number" title="₩{stats.monthlyRevenue.toLocaleString()}">
+							{formatNumber(stats.monthlyRevenue)}
+						</div>
+					</div>
+					<div class="min-w-0">
+						<div class="text-xs text-text-muted mb-0.5 truncate">이번 달 지출</div>
+						<div class="text-xs font-semibold text-text-strong truncate" data-type="number" title="₩{stats.monthlyExpense.toLocaleString()}">
+							{formatNumber(stats.monthlyExpense)}
+						</div>
+					</div>
+					<div class="min-w-0">
+						<div class="text-xs text-text-muted mb-0.5 truncate">이번 달 순이익</div>
+						<div class="text-xs font-semibold {stats.monthlyProfit >= 0 ? 'text-green-500' : 'text-red-500'} truncate" data-type="number" title="{stats.monthlyProfit >= 0 ? '+' : ''}₩{stats.monthlyProfit.toLocaleString()}">
+							{stats.monthlyProfit >= 0 ? '+' : ''}{formatNumber(Math.abs(stats.monthlyProfit))}
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- 플랫폼별 수익 & 카테고리별 지출 (한 줄에 나란히) -->
+			<div class="grid grid-cols-2 gap-3">
+				<!-- 플랫폼별 수익 (상위 2개) -->
 				{#if stats.revenueByPlatform && stats.revenueByPlatform.length > 0}
 					<div class="min-h-0 flex flex-col">
 						<h4 class="text-xs font-semibold text-text-strong mb-2 truncate">플랫폼별 수익</h4>
 						<div class="space-y-1.5">
-							{#each stats.revenueByPlatform.slice(0, 3) as platform}
+							{#each stats.revenueByPlatform.slice(0, 2) as platform}
 								<div class="flex items-center justify-between gap-2 min-w-0">
 									<span class="text-xs text-text-base truncate min-w-0">{platform.platform}</span>
 									<span class="text-xs font-medium text-text-strong flex-shrink-0" data-type="number" title="₩{platform.amount.toLocaleString()}">
@@ -129,12 +128,12 @@
 					</div>
 				{/if}
 
-				<!-- 카테고리별 지출 (상위 3개) -->
+				<!-- 카테고리별 지출 (상위 2개) -->
 				{#if stats.expenseByCategory && stats.expenseByCategory.length > 0}
 					<div class="min-h-0 flex flex-col">
 						<h4 class="text-xs font-semibold text-text-strong mb-2 truncate">카테고리별 지출</h4>
 						<div class="space-y-1.5">
-							{#each stats.expenseByCategory.slice(0, 3) as category}
+							{#each stats.expenseByCategory.slice(0, 2) as category}
 								<div class="flex items-center justify-between gap-2 min-w-0">
 									<span class="text-xs text-text-base truncate min-w-0">{category.category}</span>
 									<span class="text-xs font-medium text-text-strong flex-shrink-0" data-type="number" title="₩{category.amount.toLocaleString()}">
