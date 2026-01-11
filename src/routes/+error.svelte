@@ -7,7 +7,7 @@
 
 	let { error, status, message }: { error: any; status: number; message: string } = $props();
 
-	const errorTitle = $derived(() => {
+	const errorTitle = $derived.by(() => {
 		if (status === 404) return '페이지를 찾을 수 없습니다';
 		if (status === 500) return '서버 오류가 발생했습니다';
 		if (status >= 400 && status < 500) return '요청 오류';
@@ -15,7 +15,7 @@
 		return '오류가 발생했습니다';
 	});
 
-	const errorDescription = $derived(() => {
+	const errorDescription = $derived.by(() => {
 		if (status === 404) return '요청하신 페이지가 존재하지 않습니다.';
 		if (status === 500) return '서버에서 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
 		if (status >= 400 && status < 500) return '요청을 처리할 수 없습니다.';
