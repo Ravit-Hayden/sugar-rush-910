@@ -1230,12 +1230,21 @@ a[class*="text-brand-pink"][class*="hover:bg-hover-cyan"]:focus-visible:hover {
     color: #FFFFFF !important;
 }
 
+/* 누르는 중(:active) 상태에서 아이콘 호버 효과 완전 차단 */
+.sidebar-menu-item:active:not(.active):not(:focus):not(:focus-visible) .lucide-icon:hover {
+    color: #FFFFFF !important;
+}
+
 [data-theme="light"] .sidebar-menu-item:active:not(.active):not(:focus):not(:focus-visible) {
     background-color: var(--brand-pink) !important;
     color: #FFFFFF !important;
 }
 
 [data-theme="light"] .sidebar-menu-item:active:not(.active):not(:focus):not(:focus-visible) .lucide-icon {
+    color: #FFFFFF !important;
+}
+
+[data-theme="light"] .sidebar-menu-item:active:not(.active):not(:focus):not(:focus-visible) .lucide-icon:hover {
     color: #FFFFFF !important;
 }
 
@@ -1416,12 +1425,21 @@ aside nav ul li a.sidebar-menu-item:active:not(.active):not(:focus):not(:focus-v
     color: #FFFFFF !important;
 }
 
+/* 누르는 중(:active) 상태에서 아이콘 호버 효과 완전 차단 (확장) */
+aside nav ul li a.sidebar-menu-item:active:not(.active):not(:focus):not(:focus-visible) .lucide-icon:hover {
+    color: #FFFFFF !important;
+}
+
 [data-theme="light"] aside nav ul li a.sidebar-menu-item:active:not(.active):not(:focus):not(:focus-visible) {
     background-color: var(--brand-pink) !important;
     color: #FFFFFF !important;
 }
 
 [data-theme="light"] aside nav ul li a.sidebar-menu-item:active:not(.active):not(:focus):not(:focus-visible) .lucide-icon {
+    color: #FFFFFF !important;
+}
+
+[data-theme="light"] aside nav ul li a.sidebar-menu-item:active:not(.active):not(:focus):not(:focus-visible) .lucide-icon:hover {
     color: #FFFFFF !important;
 }
 
@@ -1866,6 +1884,14 @@ aside.bg-surface-2:hover {
 .sidebar-menu-item.active:hover .lucide-icon:hover,
 aside nav ul li a.sidebar-menu-item.active .lucide-icon:hover,
 aside nav ul li a.sidebar-menu-item.active:hover .lucide-icon:hover {
+  color: #FFFFFF !important;
+}
+
+/* 누르는 중(:active) 상태의 사이드바 메뉴 아이템 아이콘 호버 효과 완전 차단 (전역 규칙보다 높은 특이성) */
+.sidebar-menu-item:active .lucide-icon:hover,
+.sidebar-menu-item:active:hover .lucide-icon:hover,
+aside nav ul li a.sidebar-menu-item:active .lucide-icon:hover,
+aside nav ul li a.sidebar-menu-item:active:hover .lucide-icon:hover {
   color: #FFFFFF !important;
 }
 
