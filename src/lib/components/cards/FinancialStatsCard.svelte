@@ -24,14 +24,15 @@
 	});
 </script>
 
-<div class="card-base bg-surface-1 rounded-lg p-6 border border-border-subtle">
-	<h3 class="text-lg font-semibold text-text-strong mb-6">수익/지출 통계</h3>
+<div class="card-base h-[396px] flex flex-col bg-surface-1 rounded-lg p-6 border border-border-subtle overflow-hidden pt-[24px]">
+	<h3 class="text-lg font-semibold text-text-strong mb-6 flex-shrink-0">수익/지출 통계</h3>
 
 	{#if loading}
-		<div class="flex items-center justify-center py-8">
+		<div class="flex items-center justify-center py-8 flex-1">
 			<p class="text-text-muted">로딩 중...</p>
 		</div>
 	{:else if stats}
+		<div class="flex-1 overflow-y-auto min-h-0">
 		<!-- 요약 카드 -->
 		<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
 			<!-- 총 수익 -->
@@ -126,7 +127,10 @@
 				</div>
 			</div>
 		{/if}
+		</div>
 	{:else}
-		<p class="text-text-muted text-center py-8">통계 데이터가 없습니다.</p>
+		<div class="flex-1 flex items-center justify-center">
+			<p class="text-text-muted text-center py-8">통계 데이터가 없습니다.</p>
+		</div>
 	{/if}
 </div>
