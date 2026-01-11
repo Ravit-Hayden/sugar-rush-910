@@ -35,9 +35,9 @@
 </script>
 
 <div class="card-base h-[396px] flex flex-col justify-between p-5 rounded-lg bg-surface-2 border border-border-subtle overflow-hidden pt-[24px]">
-	<div class="flex-1 min-h-0 flex flex-col">
+	<div>
 		<!-- 상단 타이틀영역 -->
-		<div class="flex items-center justify-between mb-4 flex-shrink-0">
+		<div class="flex items-center justify-between mb-4">
 			<h3 class="text-lg font-bold text-text-strong truncate">수익/지출 통계</h3>
 			<button class="inline-flex items-center justify-center w-5 h-5 rounded-full hover:bg-surface-1 transition-colors ml-2" aria-label="정보" title="수익 및 지출 통계 요약" type="button">
 				<Info size={12} class="text-text-muted" />
@@ -45,13 +45,12 @@
 		</div>
 
 		{#if loading}
-			<div class="flex items-center justify-center py-8 flex-1">
+			<div class="flex items-center justify-center py-8">
 				<p class="text-text-muted">로딩 중...</p>
 			</div>
 		{:else if stats}
-			<div class="flex-1 min-h-0 flex flex-col">
-				<!-- 요약 카드 (3개) -->
-				<div class="grid grid-cols-3 gap-2 mb-3 flex-shrink-0">
+			<!-- 요약 카드 (3개) -->
+			<div class="grid grid-cols-3 gap-2 mb-3">
 					<!-- 총 수익 -->
 					<div class="bg-surface-1 rounded p-3 min-w-0">
 						<div class="flex items-center gap-1.5 mb-1.5 min-w-0">
@@ -111,52 +110,51 @@
 					</div>
 				</div>
 
-				<!-- 플랫폼별 수익 & 카테고리별 지출 (세로로 배치) -->
-				<div class="flex-1 min-h-0 grid grid-rows-2 gap-3">
-					<!-- 플랫폼별 수익 (상위 3개) -->
-					{#if stats.revenueByPlatform && stats.revenueByPlatform.length > 0}
-						<div class="min-h-0 flex flex-col">
-							<h4 class="text-xs font-semibold text-text-strong mb-2 truncate">플랫폼별 수익</h4>
-							<div class="flex-1 space-y-1.5 min-h-0">
-								{#each stats.revenueByPlatform.slice(0, 3) as platform}
-									<div class="flex items-center justify-between gap-2 min-w-0">
-										<span class="text-xs text-text-base truncate min-w-0">{platform.platform}</span>
-										<span class="text-xs font-medium text-text-strong flex-shrink-0" data-type="number" title="₩{platform.amount.toLocaleString()}">
-											{formatNumber(platform.amount)}
-										</span>
-									</div>
-								{/each}
-							</div>
+			<!-- 플랫폼별 수익 & 카테고리별 지출 (세로로 배치) -->
+			<div class="grid grid-rows-2 gap-3 min-h-0">
+				<!-- 플랫폼별 수익 (상위 3개) -->
+				{#if stats.revenueByPlatform && stats.revenueByPlatform.length > 0}
+					<div class="min-h-0 flex flex-col">
+						<h4 class="text-xs font-semibold text-text-strong mb-2 truncate">플랫폼별 수익</h4>
+						<div class="space-y-1.5">
+							{#each stats.revenueByPlatform.slice(0, 3) as platform}
+								<div class="flex items-center justify-between gap-2 min-w-0">
+									<span class="text-xs text-text-base truncate min-w-0">{platform.platform}</span>
+									<span class="text-xs font-medium text-text-strong flex-shrink-0" data-type="number" title="₩{platform.amount.toLocaleString()}">
+										{formatNumber(platform.amount)}
+									</span>
+								</div>
+							{/each}
 						</div>
-					{/if}
+					</div>
+				{/if}
 
-					<!-- 카테고리별 지출 (상위 3개) -->
-					{#if stats.expenseByCategory && stats.expenseByCategory.length > 0}
-						<div class="min-h-0 flex flex-col">
-							<h4 class="text-xs font-semibold text-text-strong mb-2 truncate">카테고리별 지출</h4>
-							<div class="flex-1 space-y-1.5 min-h-0">
-								{#each stats.expenseByCategory.slice(0, 3) as category}
-									<div class="flex items-center justify-between gap-2 min-w-0">
-										<span class="text-xs text-text-base truncate min-w-0">{category.category}</span>
-										<span class="text-xs font-medium text-text-strong flex-shrink-0" data-type="number" title="₩{category.amount.toLocaleString()}">
-											{formatNumber(category.amount)}
-										</span>
-									</div>
-								{/each}
-							</div>
+				<!-- 카테고리별 지출 (상위 3개) -->
+				{#if stats.expenseByCategory && stats.expenseByCategory.length > 0}
+					<div class="min-h-0 flex flex-col">
+						<h4 class="text-xs font-semibold text-text-strong mb-2 truncate">카테고리별 지출</h4>
+						<div class="space-y-1.5">
+							{#each stats.expenseByCategory.slice(0, 3) as category}
+								<div class="flex items-center justify-between gap-2 min-w-0">
+									<span class="text-xs text-text-base truncate min-w-0">{category.category}</span>
+									<span class="text-xs font-medium text-text-strong flex-shrink-0" data-type="number" title="₩{category.amount.toLocaleString()}">
+										{formatNumber(category.amount)}
+									</span>
+								</div>
+							{/each}
 						</div>
-					{/if}
-				</div>
+					</div>
+				{/if}
 			</div>
 		{:else}
-			<div class="flex-1 flex items-center justify-center">
-				<p class="text-text-muted text-center py-8 text-sm">통계 데이터가 없습니다.</p>
+			<div class="flex items-center justify-center py-8">
+				<p class="text-text-muted text-center text-sm">통계 데이터가 없습니다.</p>
 			</div>
 		{/if}
 	</div>
 
 	<!-- 하단 액션 -->
-	<div class="flex items-center justify-end mt-3 flex-shrink-0">
+	<div class="flex items-center justify-end mt-3">
 		<a href="/revenue" class="text-brand-pink font-semibold text-sm px-2 py-1 rounded transition-colors hover:bg-hover-cyan inline-flex items-center gap-1">
 			자세히 보기
 			<ExternalLink size={12} />
