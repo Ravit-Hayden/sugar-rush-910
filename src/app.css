@@ -1220,23 +1220,23 @@ a[class*="text-brand-pink"][class*="hover:bg-hover-cyan"]:focus-visible:hover {
     color: var(--surface-2) !important;
 }
 
-/* 2-3. 누르는 중 (active) - 호버 색상 유지, 색상 변경 없음 */
+/* 2-3. 누르는 중 (active) - 포커스 효과 유지 (마우스 클릭 시에도 포커스 색상) */
 .sidebar-menu-item:active:not(.active):not(:focus):not(:focus-visible) {
-    background-color: var(--hover-point) !important;
-    color: #000000 !important;
+    background-color: var(--brand-pink) !important;
+    color: #FFFFFF !important;
 }
 
 .sidebar-menu-item:active:not(.active):not(:focus):not(:focus-visible) .lucide-icon {
-    color: #000000 !important;
+    color: #FFFFFF !important;
 }
 
 [data-theme="light"] .sidebar-menu-item:active:not(.active):not(:focus):not(:focus-visible) {
-    background-color: var(--hover-point) !important;
-    color: var(--surface-2) !important;
+    background-color: var(--brand-pink) !important;
+    color: #FFFFFF !important;
 }
 
 [data-theme="light"] .sidebar-menu-item:active:not(.active):not(:focus):not(:focus-visible) .lucide-icon {
-    color: var(--surface-2) !important;
+    color: #FFFFFF !important;
 }
 
 /* --------------------------------------------------------------------------
@@ -1406,23 +1406,23 @@ aside nav ul li a.sidebar-menu-item:hover:not(.active):not(:focus):not(:focus-vi
     color: var(--surface-2) !important;
 }
 
-/* 2-3. 누르는 중 (active) - 호버 색상 유지, 색상 변경 없음 (확장) */
+/* 2-3. 누르는 중 (active) - 포커스 효과 유지 (마우스 클릭 시에도 포커스 색상) (확장) */
 aside nav ul li a.sidebar-menu-item:active:not(.active):not(:focus):not(:focus-visible) {
-    background-color: var(--hover-point) !important;
-    color: var(--text-on-hover) !important;
+    background-color: var(--brand-pink) !important;
+    color: #FFFFFF !important;
 }
 
 aside nav ul li a.sidebar-menu-item:active:not(.active):not(:focus):not(:focus-visible) .lucide-icon {
-    color: #000000 !important;
+    color: #FFFFFF !important;
 }
 
 [data-theme="light"] aside nav ul li a.sidebar-menu-item:active:not(.active):not(:focus):not(:focus-visible) {
-    background-color: var(--hover-point) !important;
-    color: var(--surface-2) !important;
+    background-color: var(--brand-pink) !important;
+    color: #FFFFFF !important;
 }
 
 [data-theme="light"] aside nav ul li a.sidebar-menu-item:active:not(.active):not(:focus):not(:focus-visible) .lucide-icon {
-    color: var(--surface-2) !important;
+    color: #FFFFFF !important;
 }
 
 /* --------------------------------------------------------------------------
