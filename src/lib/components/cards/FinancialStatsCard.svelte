@@ -109,8 +109,8 @@
 				</div>
 			</div>
 
-			<!-- 플랫폼별 수익 & 카테고리별 지출 (고정 행 수) -->
-			<div class="grid grid-rows-2 gap-2 min-h-0">
+			<!-- 플랫폼별 수익 & 카테고리별 지출 (가로 배치) -->
+			<div class="grid grid-cols-2 gap-3">
 				<!-- 플랫폼별 수익 (상위 2개) -->
 				{#if stats.revenueByPlatform && stats.revenueByPlatform.length > 0}
 					<div class="min-h-0 flex flex-col">
