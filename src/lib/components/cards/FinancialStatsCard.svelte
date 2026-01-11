@@ -147,12 +147,15 @@
 						<h4 class="text-xs font-semibold text-text-strong mb-3 truncate">플랫폼별 수익</h4>
 						<div class="space-y-3">
 							{#each stats.revenueByPlatform.slice(0, 2) as platform}
-								<div class="flex items-center h-12 px-4 bg-surface-1 rounded hover:bg-surface-2 transition-colors min-w-0">
+								<a
+									href="/revenue"
+									class="flex items-center h-12 px-4 bg-surface-1 rounded hover:bg-surface-2 transition-colors min-w-0"
+								>
 									<span class="flex-1 text-sm text-text-base truncate min-w-0">{platform.platform}</span>
 									<span class="flex-shrink-0 text-sm font-semibold text-green-500 ml-2" data-type="number" title="{platform.amount.toLocaleString()}원">
 										{formatNumber(platform.amount)}
 									</span>
-								</div>
+								</a>
 							{/each}
 						</div>
 					</div>
@@ -164,12 +167,15 @@
 						<h4 class="text-xs font-semibold text-text-strong mb-3 truncate">카테고리별 지출</h4>
 						<div class="space-y-3">
 							{#each stats.expenseByCategory.slice(0, 2) as category}
-								<div class="flex items-center h-12 px-4 bg-surface-1 rounded hover:bg-surface-2 transition-colors min-w-0">
+								<a
+									href="/revenue"
+									class="flex items-center h-12 px-4 bg-surface-1 rounded hover:bg-surface-2 transition-colors min-w-0"
+								>
 									<span class="flex-1 text-sm text-text-base truncate min-w-0">{category.category}</span>
 									<span class="flex-shrink-0 text-sm font-semibold text-red-500 ml-2" data-type="number" title="{category.amount.toLocaleString()}원">
 										{formatNumber(category.amount)}
 									</span>
-								</div>
+								</a>
 							{/each}
 						</div>
 					</div>
