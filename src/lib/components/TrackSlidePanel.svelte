@@ -281,20 +281,16 @@
 
 				<!-- 타이틀 곡 체크박스 -->
 				<div class="flex items-center gap-3">
-					<label class="relative flex items-center cursor-pointer group" for="is-title-track">
+					<label class="relative flex items-center cursor-pointer" for="is-title-track">
 						<input
 							type="checkbox"
 							id="is-title-track"
 							bind:checked={formData.is_title}
-							class="peer sr-only"
+							class="w-4 h-4 rounded appearance-none bg-transparent border border-[color:var(--text-base)] 
+								checked:bg-transparent checked:border-[color:var(--brand-pink)]
+								hover:border-[color:var(--hover-point)] focus:ring-2 focus:ring-[color:var(--brand-pink)]
+								transition-all duration-200 cursor-pointer relative"
 						/>
-						<div class="w-5 h-5 border-2 border-border-subtle rounded bg-transparent peer-checked:border-brand-pink peer-checked:bg-brand-pink group-hover:border-hover-point peer-focus:border-brand-pink transition-colors flex items-center justify-center">
-							{#if formData.is_title}
-								<svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
-								</svg>
-							{/if}
-						</div>
 						<span class="ml-2 text-sm text-text-base">타이틀 곡으로 설정</span>
 					</label>
 				</div>
