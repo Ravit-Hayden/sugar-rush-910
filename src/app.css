@@ -4920,3 +4920,11 @@ button.bg-brand-pink:disabled:focus-visible {
     max-width: 100% !important;
   }
 }
+
+/* 슬라이드 패널 푸터 - 보더 호버 효과 없음 */
+.slide-panel-footer,
+.slide-panel-footer:hover,
+.slide-panel-footer:focus,
+.slide-panel-footer:focus-within {
+  border-color: var(--border-subtle) !important;
+}
