@@ -79,9 +79,12 @@
 	// 선택 가능한 장르 목록
 	const availableGenres = $derived(GENRES.filter(genre => !formData.genres.includes(genre)));
 
-	// 패널 열릴 때 데이터 초기화
+	// 패널 열릴 때 데이터 초기화 및 배경 스크롤 차단
 	$effect(() => {
 		if (isOpen) {
+			// 배경 스크롤 차단
+			document.body.style.overflow = 'hidden';
+			
 			if (mode === 'edit' && trackData) {
 				formData = {
 					title: trackData.title || '',
@@ -107,7 +110,15 @@
 			validationErrors = {};
 			audioFile = null;
 			audioFileUrl = null;
+		} else {
+			// 패널 닫힐 때 배경 스크롤 복원
+			document.body.style.overflow = '';
 		}
+		
+		// cleanup: 컴포넌트 언마운트 시 스크롤 복원
+		return () => {
+			document.body.style.overflow = '';
+		};
 	});
 
 	// ESC 키로 닫기
