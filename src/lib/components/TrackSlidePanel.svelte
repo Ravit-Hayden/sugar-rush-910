@@ -450,6 +450,7 @@
 						<DatePicker
 							value={formData.release_date_kr}
 							onChange={(value: string) => formData.release_date_kr = value}
+							align="left"
 						/>
 					</div>
 					<div>
@@ -457,6 +458,7 @@
 						<DatePicker
 							value={formData.release_date_global}
 							onChange={(value: string) => formData.release_date_global = value}
+							align="right"
 						/>
 					</div>
 				</div>

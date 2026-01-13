@@ -10,6 +10,7 @@
     id = undefined,
     name = undefined,
     class: className = '',
+    align = 'right', // 캘린더 정렬: 'left' | 'right'
     ...restProps
   } = $props();
   
@@ -441,7 +442,7 @@
     </button>
 
   {#if isOpen}
-    <div class="calendar-dropdown absolute bottom-full right-0 mb-2 w-[18rem] border border-border-subtle rounded-xl p-4 z-50" style="background-color: var(--calendar-bg);" transition:fade={{ duration: 100 }} onclick={(e) => {
+    <div class="calendar-dropdown absolute bottom-full {align === 'left' ? 'left-0' : 'right-0'} mb-2 w-[18rem] border border-border-subtle rounded-xl p-4 z-50" style="background-color: var(--calendar-bg);" transition:fade={{ duration: 100 }} onclick={(e) => {
       // 년도/월 드롭다운이 열려있을 때, 드롭다운 밖의 캘린더 영역 클릭 시 드롭다운만 닫기
       if (yearMonthPickerOpen) {
         const target = e.target as Node;
