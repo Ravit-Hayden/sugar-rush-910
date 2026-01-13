@@ -1854,6 +1854,17 @@ input[type="checkbox"]:checked::after {
   line-height: 1;
 }
 
+/* 타이틀 트랙 체크박스 - 호버/포커스 분리 */
+.title-track-checkbox:hover:not(:focus) {
+  border-color: var(--hover-point) !important;
+}
+
+.title-track-checkbox:focus {
+  border-color: var(--brand-pink) !important;
+  outline: none;
+  box-shadow: 0 0 0 2px var(--brand-pink);
+}
+
 /* =========================
    개별 요소 hover 효과
    ========================= */

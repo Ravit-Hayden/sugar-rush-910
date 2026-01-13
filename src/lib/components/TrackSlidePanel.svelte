@@ -286,9 +286,8 @@
 							type="checkbox"
 							id="is-title-track"
 							bind:checked={formData.is_title}
-							class="w-4 h-4 rounded appearance-none bg-transparent border border-[color:var(--text-base)] 
+							class="title-track-checkbox w-4 h-4 rounded appearance-none bg-transparent border border-[color:var(--text-base)] 
 								checked:bg-transparent checked:border-[color:var(--brand-pink)]
-								hover:border-[color:var(--hover-point)] focus:ring-2 focus:ring-[color:var(--brand-pink)]
 								transition-all duration-200 cursor-pointer relative"
 						/>
 						<span class="ml-2 text-sm text-text-base">타이틀 곡으로 설정</span>
