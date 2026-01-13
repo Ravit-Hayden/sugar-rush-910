@@ -4925,6 +4925,19 @@ button.bg-brand-pink:disabled:focus-visible {
 .slide-panel-footer,
 .slide-panel-footer:hover,
 .slide-panel-footer:focus,
-.slide-panel-footer:focus-within {
+.slide-panel-footer:focus-within,
+aside .slide-panel-footer,
+aside .slide-panel-footer:hover,
+aside .slide-panel-footer:focus,
+aside .slide-panel-footer:focus-within,
+.slide-panel-enter .slide-panel-footer,
+.slide-panel-enter .slide-panel-footer:hover {
+  border-color: var(--border-subtle) !important;
+  border-top-color: var(--border-subtle) !important;
+}
+
+/* 슬라이드 패널 앨범 정보 배너 - 보더 호버 효과 없음 */
+aside .bg-surface-2.flex-shrink-0,
+aside .bg-surface-2.flex-shrink-0:hover {
   border-color: var(--border-subtle) !important;
 }
