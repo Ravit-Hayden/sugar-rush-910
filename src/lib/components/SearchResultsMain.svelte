@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Search, Music, Disc3, CheckSquare, ExternalLink, X, Lightbulb } from 'lucide-svelte';
+	import { Search, Music, Disc3, CheckSquare, ExternalLink, X, Lightbulb, Filter } from 'lucide-svelte';
 
 	export let results: { 
 		exact: { id: string; title: string; type: string; href: string }[];
@@ -7,6 +7,29 @@
 	} = { exact: [], similar: [] };
 	export let query = '';
 	export let onClear: () => void;
+
+	// 필터 상태 ('all' = 전체, 또는 특정 타입)
+	let selectedFilter = 'all';
+
+	// 검색 결과에서 사용 가능한 타입 목록 추출
+	$: availableTypes = [...new Set([
+		...results.exact.map(item => item.type),
+		...results.similar.map(item => item.type)
+	])];
+
+	// 필터링된 결과
+	$: filteredExact = selectedFilter === 'all' 
+		? results.exact 
+		: results.exact.filter(item => item.type === selectedFilter);
+	
+	$: filteredSimilar = selectedFilter === 'all'
+		? results.similar
+		: results.similar.filter(item => item.type === selectedFilter);
+
+	// 필터 변경
+	function setFilter(type: string) {
+		selectedFilter = type;
+	}
 
 	// 검색 결과 항목 클릭 시 검색창 닫기
 	function handleResultClick() {
@@ -147,19 +170,42 @@
 				{#if results?.exact?.length > 0}
 					<div class="mt-2">
 						<span class="text-sm text-text-muted">
-							({results.exact.length}개)
+							({filteredExact.length}개{selectedFilter !== 'all' ? ` / 전체 ${results.exact.length}개` : ''})
 						</span>
 					</div>
 				{/if}
 			</div>
 		</div>
+
+		<!-- 필터 버튼 (타입이 2개 이상일 때만 표시) -->
+		{#if availableTypes.length > 1}
+			<div class="flex items-center gap-2 flex-wrap">
+				<Filter size={14} class="text-text-muted" />
+				<button
+					type="button"
+					onclick={() => setFilter('all')}
+					class="px-3 py-1 text-sm rounded-full transition-colors {selectedFilter === 'all' ? 'bg-brand-pink text-white' : 'bg-surface-2 text-text-muted hover:text-hover-point'}"
+				>
+					전체
+				</button>
+				{#each availableTypes as type}
+					<button
+						type="button"
+						onclick={() => setFilter(type)}
+						class="px-3 py-1 text-sm rounded-full transition-colors {selectedFilter === type ? 'bg-brand-pink text-white' : 'bg-surface-2 text-text-muted hover:text-hover-point'}"
+					>
+						{getTypeLabel(type)}
+					</button>
+				{/each}
+			</div>
+		{/if}
 	</div>
 
-	{#if results?.exact?.length > 0}
+	{#if filteredExact.length > 0}
 		<!-- 정확한 검색 결과 -->
 		<div class="mb-8">
 			<div class="grid grid-cols-12 gap-4">
-				{#each results.exact as item (item.id)}
+				{#each filteredExact as item (item.id)}
 					{@const IconComponent = getIcon(item.type)}
 					<div class="col-span-12 md:col-span-6 lg:col-span-4">
 						<a href={item.href} onclick={handleResultClick} class="block h-72 bg-surface-2 rounded-lg p-6 group">
@@ -202,14 +248,14 @@
 		</div>
 
 		<!-- 추천 항목 (정확한 결과가 있을 때) -->
-		{#if results?.similar?.length > 0}
+		{#if filteredSimilar.length > 0}
 			<div class="mb-8">
 				<div class="flex items-center gap-2 mb-4">
 					<Lightbulb size={18} class="text-text-muted flex-shrink-0" />
 					<h2 class="text-base font-semibold text-text-muted">추천 항목</h2>
 				</div>
 				<div class="grid grid-cols-12 gap-4">
-					{#each results.similar as item (item.id)}
+					{#each filteredSimilar as item (item.id)}
 						{@const IconComponent = getIcon(item.type)}
 						<div class="col-span-12 md:col-span-6 lg:col-span-4">
 							<a href={item.href} onclick={handleResultClick} class="block h-72 bg-surface-2 rounded-lg p-6 group">
@@ -273,14 +319,14 @@
 			</div>
 
 			<!-- 추천 항목 (검색 결과 없을 때) -->
-			{#if results?.similar?.length > 0}
+			{#if filteredSimilar.length > 0}
 				<div class="mb-8">
 					<div class="flex items-center gap-2 mb-4">
 						<Lightbulb size={18} class="text-text-muted flex-shrink-0" />
 						<h2 class="text-base font-semibold text-text-muted">이런 항목은 어떠세요?</h2>
 					</div>
 					<div class="grid grid-cols-12 gap-4">
-						{#each results.similar as item (item.id)}
+						{#each filteredSimilar as item (item.id)}
 							{@const IconComponent = getIcon(item.type)}
 							<div class="col-span-12 md:col-span-6 lg:col-span-4">
 								<a href={item.href} onclick={handleResultClick} class="block h-72 bg-surface-2 rounded-lg p-6 group">
