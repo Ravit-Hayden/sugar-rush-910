@@ -4921,23 +4921,29 @@ button.bg-brand-pink:disabled:focus-visible {
   }
 }
 
-/* 슬라이드 패널 푸터 - 보더 호버 효과 없음 */
-.slide-panel-footer,
-.slide-panel-footer:hover,
-.slide-panel-footer:focus,
-.slide-panel-footer:focus-within,
-aside .slide-panel-footer,
-aside .slide-panel-footer:hover,
-aside .slide-panel-footer:focus,
-aside .slide-panel-footer:focus-within,
-.slide-panel-enter .slide-panel-footer,
-.slide-panel-enter .slide-panel-footer:hover {
-  border-color: var(--border-subtle) !important;
+/* 슬라이드 패널 푸터 - 보더 호버 효과 완전 비활성화 */
+footer.slide-panel-footer {
   border-top-color: var(--border-subtle) !important;
 }
-
-/* 슬라이드 패널 앨범 정보 배너 - 보더 호버 효과 없음 */
-aside .bg-surface-2.flex-shrink-0,
-aside .bg-surface-2.flex-shrink-0:hover {
+footer.slide-panel-footer:hover,
+footer.slide-panel-footer:focus,
+footer.slide-panel-footer:focus-within,
+footer.slide-panel-footer:focus-visible,
+aside footer.slide-panel-footer:hover,
+aside footer.slide-panel-footer:focus,
+.slide-panel-enter footer.slide-panel-footer:hover,
+.slide-panel-enter footer.slide-panel-footer:focus {
+  border-top-color: var(--border-subtle) !important;
   border-color: var(--border-subtle) !important;
+}
+
+/* 슬라이드 패널 내부 모든 보더 - 호버 효과 없음 */
+aside[role="dialog"] *:hover,
+aside[role="dialog"] *:focus {
+  border-top-color: inherit;
+}
+aside[role="dialog"] footer:hover,
+aside[role="dialog"] footer:focus,
+aside[role="dialog"] footer:focus-within {
+  border-top-color: var(--border-subtle) !important;
 }

@@ -517,8 +517,8 @@
 			</form>
 		</div>
 
-		<!-- 푸터 버튼 -->
-		<footer class="slide-panel-footer flex items-center justify-end gap-3 px-6 py-4 border-t border-border-subtle bg-surface-1 flex-shrink-0">
+		<!-- 푸터 버튼 (보더 호버 효과 없음) -->
+		<footer class="slide-panel-footer flex items-center justify-end gap-3 px-6 py-4 border-t border-t-[color:var(--border-subtle)] bg-surface-1 flex-shrink-0">
 			<button
 				type="button"
 				onclick={onClose}
