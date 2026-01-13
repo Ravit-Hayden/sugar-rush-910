@@ -5,20 +5,21 @@ export const GET: RequestHandler = async ({ url }) => {
 	const limit = parseInt(url.searchParams.get('limit') || '8');
 
 	// 목 데이터 - 실제 구현에서는 데이터베이스에서 검색
+	// coverImage: 앨범/트랙 커버 이미지 URL (없으면 아이콘 표시)
 	const mockData = {
 		albums: [
-			{ id: '1', title: 'Sugar Rush Vol.1', type: 'album', href: '/albums/1' },
-			{ id: '2', title: 'Summer Night Collection', type: 'album', href: '/albums/2' },
-			{ id: '3', title: 'Winter Dreams', type: 'album', href: '/albums/3' },
-			{ id: '4', title: 'Spring Melody', type: 'album', href: '/albums/4' },
-			{ id: '5', title: 'Autumn Leaves', type: 'album', href: '/albums/5' }
+			{ id: '1', title: 'Sugar Rush Vol.1', type: 'album', href: '/albums/1', coverImage: 'https://picsum.photos/seed/album1/200' },
+			{ id: '2', title: 'Summer Night Collection', type: 'album', href: '/albums/2', coverImage: 'https://picsum.photos/seed/album2/200' },
+			{ id: '3', title: 'Winter Dreams', type: 'album', href: '/albums/3', coverImage: 'https://picsum.photos/seed/album3/200' },
+			{ id: '4', title: 'Spring Melody', type: 'album', href: '/albums/4' }, // 이미지 없음 - 아이콘 표시
+			{ id: '5', title: 'Autumn Leaves', type: 'album', href: '/albums/5', coverImage: 'https://picsum.photos/seed/album5/200' }
 		],
 		tracks: [
-			{ id: '6', title: 'Sweet Dreams', type: 'track', href: '/tracks/6' },
-			{ id: '7', title: 'Midnight Dance', type: 'track', href: '/tracks/7' },
-			{ id: '8', title: 'Morning Light', type: 'track', href: '/tracks/8' },
-			{ id: '9', title: 'Evening Star', type: 'track', href: '/tracks/9' },
-			{ id: '10', title: 'Rainy Day', type: 'track', href: '/tracks/10' }
+			{ id: '6', title: 'Sweet Dreams', type: 'track', href: '/tracks/6', coverImage: 'https://picsum.photos/seed/track6/200' },
+			{ id: '7', title: 'Midnight Dance', type: 'track', href: '/tracks/7', coverImage: 'https://picsum.photos/seed/track7/200' },
+			{ id: '8', title: 'Morning Light', type: 'track', href: '/tracks/8' }, // 이미지 없음
+			{ id: '9', title: 'Evening Star', type: 'track', href: '/tracks/9', coverImage: 'https://picsum.photos/seed/track9/200' },
+			{ id: '10', title: 'Rainy Day', type: 'track', href: '/tracks/10' } // 이미지 없음
 		],
 		tasks: [
 			{ id: '11', title: '앨범 커버 디자인 검토', type: 'task', href: '/tasks/11' },

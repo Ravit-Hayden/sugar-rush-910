@@ -2,8 +2,8 @@
 	import { Search, Music, Disc3, CheckSquare, ExternalLink, X, Lightbulb, Filter } from 'lucide-svelte';
 
 	export let results: { 
-		exact: { id: string; title: string; type: string; href: string }[];
-		similar: { id: string; title: string; type: string; href: string; recommendReason?: string }[];
+		exact: { id: string; title: string; type: string; href: string; coverImage?: string }[];
+		similar: { id: string; title: string; type: string; href: string; coverImage?: string; recommendReason?: string }[];
 	} = { exact: [], similar: [] };
 	export let query = '';
 	export let onClear: () => void;
@@ -217,11 +217,27 @@
 					<div class="col-span-12 md:col-span-6 lg:col-span-4">
 						<a href={item.href} onclick={handleResultClick} class="block h-72 bg-surface-2 rounded-lg p-6 group search-result-card">
 							<div class="flex flex-col h-full">
-								<!-- 아이콘과 타입 -->
+								<!-- 커버 이미지 또는 아이콘 -->
 								<div class="flex items-center gap-3 mb-4">
-									<div class="w-10 h-10 bg-brand-pink/10 rounded-lg flex items-center justify-center group-hover:bg-brand-pink group-focus:bg-brand-pink">
-										<IconComponent size={20} class="text-brand-pink group-hover:text-white group-focus:text-white" />
-									</div>
+									{#if item.coverImage && (item.type === 'album' || item.type === 'track')}
+										<!-- 앨범/트랙 커버 이미지 -->
+										<div class="relative w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
+											<img 
+												src={item.coverImage} 
+												alt="{item.title} 커버"
+												class="w-full h-full object-cover"
+											/>
+											<!-- 타입 뱃지 (앨범/트랙 구분) -->
+											<div class="absolute bottom-0 right-0 w-4 h-4 bg-brand-pink rounded-tl-md flex items-center justify-center">
+												<IconComponent size={10} class="text-white" />
+											</div>
+										</div>
+									{:else}
+										<!-- 기본 아이콘 -->
+										<div class="w-10 h-10 bg-brand-pink/10 rounded-lg flex items-center justify-center group-hover:bg-brand-pink group-focus:bg-brand-pink flex-shrink-0">
+											<IconComponent size={20} class="text-brand-pink group-hover:text-white group-focus:text-white" />
+										</div>
+									{/if}
 									<div class="text-xs {getTypeColor(item.type)} font-medium">
 										{getTypeLabel(item.type)}
 									</div>
@@ -267,11 +283,27 @@
 						<div class="col-span-12 md:col-span-6 lg:col-span-4">
 							<a href={item.href} onclick={handleResultClick} class="block h-72 bg-surface-2 rounded-lg p-6 group search-result-card">
 								<div class="flex flex-col h-full">
-									<!-- 아이콘과 타입 -->
+									<!-- 커버 이미지 또는 아이콘 -->
 									<div class="flex items-center gap-3 mb-4">
-										<div class="w-10 h-10 bg-surface-1 rounded-lg flex items-center justify-center group-hover:bg-hover-point group-focus:bg-brand-pink">
-											<IconComponent size={20} class="text-text-muted group-hover:text-black group-focus:text-white" />
-										</div>
+										{#if item.coverImage && (item.type === 'album' || item.type === 'track')}
+											<!-- 앨범/트랙 커버 이미지 -->
+											<div class="relative w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
+												<img 
+													src={item.coverImage} 
+													alt="{item.title} 커버"
+													class="w-full h-full object-cover"
+												/>
+												<!-- 타입 뱃지 -->
+												<div class="absolute bottom-0 right-0 w-4 h-4 bg-surface-1 rounded-tl-md flex items-center justify-center">
+													<IconComponent size={10} class="text-text-muted" />
+												</div>
+											</div>
+										{:else}
+											<!-- 기본 아이콘 -->
+											<div class="w-10 h-10 bg-surface-1 rounded-lg flex items-center justify-center group-hover:bg-hover-point group-focus:bg-brand-pink flex-shrink-0">
+												<IconComponent size={20} class="text-text-muted group-hover:text-black group-focus:text-white" />
+											</div>
+										{/if}
 										<div class="flex flex-col">
 											<div class="text-xs {getTypeColor(item.type)} font-medium">
 												{getTypeLabel(item.type)}
@@ -338,11 +370,27 @@
 							<div class="col-span-12 md:col-span-6 lg:col-span-4">
 								<a href={item.href} onclick={handleResultClick} class="block h-72 bg-surface-2 rounded-lg p-6 group search-result-card">
 									<div class="flex flex-col h-full">
-										<!-- 아이콘과 타입 -->
+										<!-- 커버 이미지 또는 아이콘 -->
 										<div class="flex items-center gap-3 mb-4">
-											<div class="w-10 h-10 bg-surface-1 rounded-lg flex items-center justify-center group-hover:bg-hover-point group-focus:bg-brand-pink">
-												<IconComponent size={20} class="text-text-muted group-hover:text-black group-focus:text-white" />
-											</div>
+											{#if item.coverImage && (item.type === 'album' || item.type === 'track')}
+												<!-- 앨범/트랙 커버 이미지 -->
+												<div class="relative w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
+													<img 
+														src={item.coverImage} 
+														alt="{item.title} 커버"
+														class="w-full h-full object-cover"
+													/>
+													<!-- 타입 뱃지 -->
+													<div class="absolute bottom-0 right-0 w-4 h-4 bg-surface-1 rounded-tl-md flex items-center justify-center">
+														<IconComponent size={10} class="text-text-muted" />
+													</div>
+												</div>
+											{:else}
+												<!-- 기본 아이콘 -->
+												<div class="w-10 h-10 bg-surface-1 rounded-lg flex items-center justify-center group-hover:bg-hover-point group-focus:bg-brand-pink flex-shrink-0">
+													<IconComponent size={20} class="text-text-muted group-hover:text-black group-focus:text-white" />
+												</div>
+											{/if}
 											<div class="flex flex-col">
 												<div class="text-xs {getTypeColor(item.type)} font-medium">
 													{getTypeLabel(item.type)}

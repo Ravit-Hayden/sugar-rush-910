@@ -126,8 +126,8 @@
 			const data = await response.json() as { 
 				ok: boolean; 
 				data: { 
-					exact: { id: string; title: string; type: string; href: string }[];
-					similar: { id: string; title: string; type: string; href: string }[];
+					exact: { id: string; title: string; type: string; href: string; coverImage?: string }[];
+					similar: { id: string; title: string; type: string; href: string; coverImage?: string; recommendReason?: string }[];
 				} 
 			};
 			
