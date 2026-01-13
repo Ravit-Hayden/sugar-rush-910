@@ -1872,8 +1872,8 @@ input[type="checkbox"]:checked::after {
 /* 아티스트 관리 카드, 데이터 관리 카드, 폼 컨테이너, 업로드 영역, 리스트 아이템 링크는 제외 */
 /* 포커스 상태일 때는 호버 효과 없음 */
 /* 리스트 아이템은 아이콘/텍스트만 호버 효과 적용 (배경/테두리 변경 없음) */
-main.main-content-area .bg-surface-1:hover:not(.artist-card):not(.data-management-card):not(:has(form)):not(.upload-zone):not(:focus):not(:focus-visible):not(:focus-within):not(a[href*="/tasks/"]):not(a[href*="/calendar/"]):not(a[href*="/status/"]):not(a[href*="/failures/"]):not(a[href*="/logs/"]):not(a[href*="/releases/"]):not(a[href*="/changes/"]):not(a[href*="/feedback/"]):not(a[href*="/albums/new"]):not(a[href*="/tracks/new"]):not(a[href*="/files/upload"]):not(a[href*="/revenue"]),
-main.main-content-area .bg-surface-2:hover:not(.artist-card):not(.data-management-card):not(:has(form)):not(.upload-zone):not(:focus):not(:focus-visible):not(:focus-within):not(a[href*="/tasks/"]):not(a[href*="/calendar/"]):not(a[href*="/status/"]):not(a[href*="/failures/"]):not(a[href*="/logs/"]):not(a[href*="/releases/"]):not(a[href*="/changes/"]):not(a[href*="/feedback/"]):not(a[href*="/albums/new"]):not(a[href*="/tracks/new"]):not(a[href*="/files/upload"]):not(a[href*="/revenue"]) {
+main.main-content-area .bg-surface-1:hover:not(.artist-card):not(.data-management-card):not(:has(form)):not(.upload-zone):not(:focus):not(:focus-visible):not(:focus-within):not(a[href*="/tasks/"]):not(a[href*="/calendar/"]):not(a[href*="/status/"]):not(a[href*="/failures/"]):not(a[href*="/logs/"]):not(a[href*="/releases/"]):not(a[href*="/changes/"]):not(a[href*="/feedback/"]):not(a[href*="/albums/new"]):not(a[href*="/tracks/new"]):not(a[href*="/files/upload"]):not(a[href*="/revenue"]):not(.slide-panel-footer),
+main.main-content-area .bg-surface-2:hover:not(.artist-card):not(.data-management-card):not(:has(form)):not(.upload-zone):not(:focus):not(:focus-visible):not(:focus-within):not(a[href*="/tasks/"]):not(a[href*="/calendar/"]):not(a[href*="/status/"]):not(a[href*="/failures/"]):not(a[href*="/logs/"]):not(a[href*="/releases/"]):not(a[href*="/changes/"]):not(a[href*="/feedback/"]):not(a[href*="/albums/new"]):not(a[href*="/tracks/new"]):not(a[href*="/files/upload"]):not(a[href*="/revenue"]):not(.slide-panel-footer) {
   border-color: var(--hover-point) !important;
   transition: border-color 0.2s ease;
 }
@@ -4919,27 +4919,4 @@ button.bg-brand-pink:disabled:focus-visible {
   .slide-panel-enter {
     max-width: 100% !important;
   }
-}
-
-/* 슬라이드 패널 footer - 호버 효과 차단 */
-.slide-panel-enter footer,
-.slide-panel-enter footer.border-t,
-.slide-panel-enter footer.bg-surface-1 {
-  border-color: var(--border-subtle) !important;
-  pointer-events: auto;
-}
-
-.slide-panel-enter footer:hover,
-.slide-panel-enter footer.border-t:hover,
-.slide-panel-enter footer.bg-surface-1:hover {
-  border-color: var(--border-subtle) !important;
-}
-
-/* 슬라이드 패널 앨범 정보 배너 - 호버 효과 차단 */
-.slide-panel-enter .bg-surface-2.pointer-events-none {
-  border-color: var(--border-subtle) !important;
-}
-
-.slide-panel-enter .bg-surface-2.pointer-events-none:hover {
-  border-color: var(--border-subtle) !important;
 }
