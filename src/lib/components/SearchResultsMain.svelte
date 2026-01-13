@@ -215,7 +215,7 @@
 				{#each filteredExact as item (item.id)}
 					{@const IconComponent = getIcon(item.type)}
 					<div class="col-span-12 md:col-span-6 lg:col-span-4">
-						<a href={item.href} onclick={handleResultClick} class="block h-72 bg-surface-2 rounded-lg p-6 group">
+						<a href={item.href} onclick={handleResultClick} class="block h-72 bg-surface-2 rounded-lg p-6 group search-result-card">
 							<div class="flex flex-col h-full">
 								<!-- 아이콘과 타입 -->
 								<div class="flex items-center gap-3 mb-4">
@@ -245,7 +245,7 @@
 
 								<!-- 하단 액션 -->
 								<div class="flex items-center justify-end pt-4">
-									<span class="text-xs text-text-muted group-hover:text-[var(--hover-point)] group-focus-within:text-[var(--brand-pink)] transition-colors">더보기</span>
+									<span class="more-link text-xs text-text-muted transition-colors">더보기</span>
 								</div>
 							</div>
 						</a>
@@ -265,7 +265,7 @@
 					{#each filteredSimilar as item (item.id)}
 						{@const IconComponent = getIcon(item.type)}
 						<div class="col-span-12 md:col-span-6 lg:col-span-4">
-							<a href={item.href} onclick={handleResultClick} class="block h-72 bg-surface-2 rounded-lg p-6 group">
+							<a href={item.href} onclick={handleResultClick} class="block h-72 bg-surface-2 rounded-lg p-6 group search-result-card">
 								<div class="flex flex-col h-full">
 									<!-- 아이콘과 타입 -->
 									<div class="flex items-center gap-3 mb-4">
@@ -297,7 +297,7 @@
 
 									<!-- 하단 액션 -->
 									<div class="flex items-center justify-end pt-4">
-										<span class="text-xs text-text-muted group-hover:text-[var(--hover-point)] group-focus-within:text-[var(--brand-pink)] transition-colors">더보기</span>
+										<span class="more-link text-xs text-text-muted transition-colors">더보기</span>
 									</div>
 								</div>
 							</a>
@@ -336,7 +336,7 @@
 						{#each filteredSimilar as item (item.id)}
 							{@const IconComponent = getIcon(item.type)}
 							<div class="col-span-12 md:col-span-6 lg:col-span-4">
-								<a href={item.href} onclick={handleResultClick} class="block h-72 bg-surface-2 rounded-lg p-6 group">
+								<a href={item.href} onclick={handleResultClick} class="block h-72 bg-surface-2 rounded-lg p-6 group search-result-card">
 									<div class="flex flex-col h-full">
 										<!-- 아이콘과 타입 -->
 										<div class="flex items-center gap-3 mb-4">
@@ -368,7 +368,7 @@
 
 										<!-- 하단 액션 -->
 										<div class="flex items-center justify-end pt-4">
-											<span class="text-xs text-text-muted group-hover:text-[var(--hover-point)] group-focus-within:text-[var(--brand-pink)] transition-colors">더보기</span>
+											<span class="more-link text-xs text-text-muted transition-colors">더보기</span>
 										</div>
 									</div>
 								</a>

@@ -4726,6 +4726,15 @@ button[aria-label="고급 검색"]:focus-visible:hover .lucide-icon {
   color: var(--brand-pink) !important;
 }
 
+/* 검색 결과 카드 '더보기' 호버 효과 */
+.search-result-card:hover .more-link {
+  color: var(--hover-point) !important;
+}
+.search-result-card:focus .more-link,
+.search-result-card:focus-within .more-link {
+  color: var(--brand-pink) !important;
+}
+
 /* 장르 선택 해제 버튼 */
 .genre-clear-button {
   color: var(--brand-pink) !important;
