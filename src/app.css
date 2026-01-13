@@ -4921,29 +4921,19 @@ button.bg-brand-pink:disabled:focus-visible {
   }
 }
 
-/* 슬라이드 패널 푸터 - 보더 호버 효과 완전 비활성화 */
-footer.slide-panel-footer {
-  border-top-color: var(--border-subtle) !important;
-}
-footer.slide-panel-footer:hover,
-footer.slide-panel-footer:focus,
-footer.slide-panel-footer:focus-within,
-footer.slide-panel-footer:focus-visible,
-aside footer.slide-panel-footer:hover,
-aside footer.slide-panel-footer:focus,
-.slide-panel-enter footer.slide-panel-footer:hover,
-.slide-panel-enter footer.slide-panel-footer:focus {
-  border-top-color: var(--border-subtle) !important;
+/* 슬라이드 패널 푸터 - 호버 효과 없음 */
+.slide-panel-footer,
+.slide-panel-footer:hover,
+.slide-panel-footer:focus,
+.slide-panel-footer:focus-within {
   border-color: var(--border-subtle) !important;
+  background-color: var(--surface-1) !important;
+  pointer-events: auto;
 }
 
-/* 슬라이드 패널 내부 모든 보더 - 호버 효과 없음 */
-aside[role="dialog"] *:hover,
-aside[role="dialog"] *:focus {
-  border-top-color: inherit;
-}
-aside[role="dialog"] footer:hover,
-aside[role="dialog"] footer:focus,
-aside[role="dialog"] footer:focus-within {
+/* 슬라이드 패널 푸터 내부 border-t 호버 효과 제거 */
+.slide-panel-footer.border-t:hover,
+.slide-panel-footer.border-t:focus,
+.slide-panel-footer.border-t:focus-within {
   border-top-color: var(--border-subtle) !important;
 }
