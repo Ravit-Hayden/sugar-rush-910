@@ -115,9 +115,9 @@
 		dropdownOpen = false;
 		focusedIndex = -1;
 		skipNextFocus = true; // 다음 focus 이벤트 무시
-		// 입력 필드로 포커스 이동
-		if (typeof window !== 'undefined') {
-			const input = document.querySelector('.artist-select-dropdown input') as HTMLInputElement;
+		// 이 컴포넌트의 입력 필드로 포커스 이동
+		if (containerElement) {
+			const input = containerElement.querySelector('input') as HTMLInputElement;
 			input?.focus();
 		}
 	}
