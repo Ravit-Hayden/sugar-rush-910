@@ -40,20 +40,40 @@ export const GET: RequestHandler = async ({ url }) => {
 	let similar: any[] = [];
 
 	if (query.trim()) {
-		// 정확한 검색
 		const allItems = [...mockData.albums, ...mockData.tracks, ...mockData.tasks, ...mockData.actions];
+		
+		// 정확한 검색 - 검색어가 제목에 포함된 경우
 		exact = allItems.filter(item => 
 			item.title.toLowerCase().includes(query.toLowerCase())
 		).slice(0, limit);
 
-		// 유사한 항목 (정확한 검색 결과와 다른 모든 항목)
-		similar = allItems.filter(item => 
-			!exact.some(exactItem => exactItem.id === item.id)
-		).slice(0, limit);
+		// 추천 항목 - 검색어와 같은 타입의 항목 또는 관련 항목
+		// 추천 이유를 함께 제공
+		const exactIds = new Set(exact.map(item => item.id));
+		
+		if (exact.length > 0) {
+			// 정확한 결과가 있으면 같은 타입의 다른 항목 추천
+			const exactTypes = new Set(exact.map(item => item.type));
+			similar = allItems
+				.filter(item => !exactIds.has(item.id) && exactTypes.has(item.type))
+				.slice(0, 4)
+				.map(item => ({
+					...item,
+					recommendReason: `"${exact[0]?.title || query}"과(와) 같은 ${getTypeLabel(item.type)} 항목`
+				}));
+		} else {
+			// 정확한 결과가 없으면 최근 항목 또는 인기 항목 추천
+			similar = allItems
+				.slice(0, 4)
+				.map(item => ({
+					...item,
+					recommendReason: '자주 조회되는 항목'
+				}));
+		}
 	} else {
-		// 검색어가 없을 때는 추천 항목 표시
-		const allItems = [...mockData.albums, ...mockData.tracks, ...mockData.tasks, ...mockData.actions];
-		similar = allItems.slice(0, limit);
+		// 검색어가 없을 때는 빈 결과
+		exact = [];
+		similar = [];
 	}
 
 	return new Response(JSON.stringify({
@@ -65,3 +85,18 @@ export const GET: RequestHandler = async ({ url }) => {
 		}
 	});
 };
+
+// 타입별 한글 라벨 (추천 이유 생성용)
+function getTypeLabel(type: string): string {
+	switch (type) {
+		case 'album': return '앨범';
+		case 'track': return '트랙';
+		case 'task': return '할 일';
+		case 'action': return '액션';
+		case 'release': return '발매';
+		case 'revenue': return '수익';
+		case 'feedback': return '피드백';
+		case 'settings': return '설정';
+		default: return '기타';
+	}
+}

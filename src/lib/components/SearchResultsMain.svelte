@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { Search, Music, Disc3, CheckSquare, ExternalLink, X } from 'lucide-svelte';
+	import { Search, Music, Disc3, CheckSquare, ExternalLink, X, Lightbulb } from 'lucide-svelte';
 
 	export let results: { 
 		exact: { id: string; title: string; type: string; href: string }[];
-		similar: { id: string; title: string; type: string; href: string }[];
+		similar: { id: string; title: string; type: string; href: string; recommendReason?: string }[];
 	} = { exact: [], similar: [] };
 	export let query = '';
 	export let onClear: () => void;
@@ -56,8 +56,6 @@
 				return '액션';
 			case 'release':
 				return '발매';
-			case 'status':
-				return '상태';
 			case 'revenue':
 				return '수익';
 			case 'feedback':
@@ -68,7 +66,6 @@
 				return '기타';
 		}
 	};
-
 
 	// 타입별 설명
 	const getDescription = (type: string) => {
@@ -95,66 +92,141 @@
 				return '관련 정보를 확인하고 관리하세요.';
 		}
 	};
+
+	// 검색어 하이라이트 함수
+	function highlightSearchTerm(text: string, searchQuery: string): Array<{ text: string; isMatch: boolean }> {
+		if (!searchQuery || searchQuery.trim() === '') {
+			return [{ text, isMatch: false }];
+		}
+		
+		const lowerText = text.toLowerCase();
+		const lowerQuery = searchQuery.toLowerCase();
+		const parts: Array<{ text: string; isMatch: boolean }> = [];
+		let lastIndex = 0;
+		
+		let index = lowerText.indexOf(lowerQuery, lastIndex);
+		while (index !== -1) {
+			if (index > lastIndex) {
+				parts.push({ text: text.substring(lastIndex, index), isMatch: false });
+			}
+			parts.push({ text: text.substring(index, index + searchQuery.length), isMatch: true });
+			lastIndex = index + searchQuery.length;
+			index = lowerText.indexOf(lowerQuery, lastIndex);
+		}
+		
+		if (lastIndex < text.length) {
+			parts.push({ text: text.substring(lastIndex), isMatch: false });
+		}
+		
+		return parts.length > 0 ? parts : [{ text, isMatch: false }];
+	}
 </script>
 
 <div class="py-6 overflow-hidden">
 	<!-- 검색 결과 헤더 -->
 	<div class="mb-6">
-		<!-- 검색어와 개수 -->
 		<div class="flex items-start gap-3 mb-4 max-w-full">
 			<Search size={20} class="text-brand-pink flex-shrink-0 mt-2" />
 			<div class="flex-1 min-w-0 max-w-full">
-				<!-- 검색어 제목 -->
 				<div class="break-words leading-tight" style="word-break: break-word; overflow-wrap: break-word; hyphens: auto;">
-					<h1 class="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-brand-pink mb-1">
-						{query}
+					<h1 class="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mb-1">
+						<span class="text-brand-pink">{query}</span>
 					</h1>
 					<h2 class="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-text-strong">
 						검색 결과
 					</h2>
 				</div>
-				<!-- 개수 표시 -->
 				{#if results?.exact?.length > 0}
 					<div class="mt-2">
 						<span class="text-sm text-text-muted">
-							({(results?.exact?.length || 0)}개)
+							({results.exact.length}개)
 						</span>
 					</div>
 				{/if}
 			</div>
 		</div>
-		
 	</div>
 
 	{#if results?.exact?.length > 0}
 		<!-- 정확한 검색 결과 -->
 		<div class="mb-8">
-			<h2 class="text-lg font-semibold text-text-strong mb-4 flex items-center gap-2">
-				<Search size={18} class="text-brand-pink" />
-				정확한 검색 결과 ({results?.exact?.length || 0}개)
-			</h2>
 			<div class="grid grid-cols-12 gap-4">
-				{#each results?.exact || [] as item (item.id)}
+				{#each results.exact as item (item.id)}
 					{@const IconComponent = getIcon(item.type)}
 					<div class="col-span-12 md:col-span-6 lg:col-span-4">
-						<div class="h-72 bg-surface-2 border border-brand-pink/20 rounded-md p-6 hover:bg-surface-1 transition-colors group">
-							<a href={item.href} class="block h-full">
+						<a href={item.href} class="block h-72 bg-surface-2 rounded-lg p-6 group">
+							<div class="flex flex-col h-full">
+								<!-- 아이콘과 타입 -->
+								<div class="flex items-center gap-3 mb-4">
+									<div class="w-10 h-10 bg-brand-pink/10 rounded-lg flex items-center justify-center group-hover:bg-brand-pink group-focus:bg-brand-pink">
+										<IconComponent size={20} class="text-brand-pink group-hover:text-white group-focus:text-white" />
+									</div>
+									<div class="text-xs {getTypeColor(item.type)} font-medium">
+										{getTypeLabel(item.type)}
+									</div>
+								</div>
+
+								<!-- 제목 (하이라이트 적용) -->
+								<div class="flex-1">
+									<h3 class="text-lg font-semibold text-text-strong group-hover:text-hover-point group-focus:text-brand-pink mb-2 line-clamp-2">
+										{#each highlightSearchTerm(item.title, query) as part}
+											{#if part.isMatch}
+												<span class="text-search-highlight">{part.text}</span>
+											{:else}
+												{part.text}
+											{/if}
+										{/each}
+									</h3>
+									<p class="text-sm text-text-muted line-clamp-3">
+										{getDescription(item.type)}
+									</p>
+								</div>
+
+								<!-- 하단 액션 -->
+								<div class="flex items-center justify-end pt-4">
+									<span class="text-xs text-text-muted group-hover:text-hover-point group-focus:text-brand-pink">더보기</span>
+								</div>
+							</div>
+						</a>
+					</div>
+				{/each}
+			</div>
+		</div>
+
+		<!-- 추천 항목 (정확한 결과가 있을 때) -->
+		{#if results?.similar?.length > 0}
+			<div class="mb-8">
+				<div class="flex items-center gap-2 mb-4">
+					<Lightbulb size={18} class="text-text-muted flex-shrink-0" />
+					<h2 class="text-base font-semibold text-text-muted">추천 항목</h2>
+				</div>
+				<div class="grid grid-cols-12 gap-4">
+					{#each results.similar as item (item.id)}
+						{@const IconComponent = getIcon(item.type)}
+						<div class="col-span-12 md:col-span-6 lg:col-span-4">
+							<a href={item.href} class="block h-72 bg-surface-2 rounded-lg p-6 group">
 								<div class="flex flex-col h-full">
 									<!-- 아이콘과 타입 -->
 									<div class="flex items-center gap-3 mb-4">
-										<div class="w-10 h-10 bg-brand-pink/10 rounded-lg flex items-center justify-center group-hover:bg-brand-pink transition-colors">
-											<IconComponent size={20} class="text-brand-pink group-hover:text-white transition-colors" />
+										<div class="w-10 h-10 bg-surface-1 rounded-lg flex items-center justify-center group-hover:bg-hover-point group-focus:bg-brand-pink">
+											<IconComponent size={20} class="text-text-muted group-hover:text-black group-focus:text-white" />
 										</div>
-										<div>
+										<div class="flex flex-col">
 											<div class="text-xs {getTypeColor(item.type)} font-medium">
 												{getTypeLabel(item.type)}
 											</div>
+											<!-- 추천 이유 표시 -->
+											{#if item.recommendReason}
+												<div class="text-xs text-text-muted mt-0.5">
+													{item.recommendReason}
+												</div>
+											{/if}
 										</div>
 									</div>
 
 									<!-- 제목 -->
 									<div class="flex-1">
-										<h3 class="text-lg font-semibold text-text-strong group-hover:text-white transition-colors mb-2 line-clamp-2">
+										<h3 class="text-lg font-semibold text-text-strong group-hover:text-hover-point group-focus:text-brand-pink mb-2 line-clamp-2">
 											{item.title}
 										</h3>
 										<p class="text-sm text-text-muted line-clamp-3">
@@ -163,47 +235,69 @@
 									</div>
 
 									<!-- 하단 액션 -->
-									<div class="flex items-center justify-between pt-4 border-t border-border-subtle">
-										<span class="text-xs text-text-muted">자세히 보기</span>
-										<ExternalLink size={16} class="text-text-muted group-hover:text-brand-pink transition-colors" />
+									<div class="flex items-center justify-end pt-4">
+										<span class="text-xs text-text-muted group-hover:text-hover-point group-focus:text-brand-pink">더보기</span>
 									</div>
 								</div>
 							</a>
 						</div>
-					</div>
-				{/each}
+					{/each}
+				</div>
 			</div>
-		</div>
+		{/if}
+	{:else}
+		<!-- 검색 결과 없음 -->
+		<div class="pt-0 pb-6">
+			<div class="text-center mb-12">
+				<Search size={48} class="text-text-muted mx-auto mb-4" />
+				<h3 class="text-lg font-semibold text-text-strong mb-2">
+					"<span class="text-search-highlight">{query}</span>"에 대한 검색 결과가 없습니다
+				</h3>
+				<p class="text-sm text-text-muted mb-6">다른 검색어를 시도해 보세요</p>
+				<button
+					type="button"
+					onclick={onClear}
+					class="inline-flex items-center gap-2 px-4 py-2 bg-brand-pink text-white rounded-md hover:bg-hover-point hover:text-black focus:bg-brand-pink focus:text-white"
+				>
+					<X size={16} />
+					검색 초기화
+				</button>
+			</div>
 
-		<!-- 유사한 항목 추천 (정확한 결과가 있을 때) -->
-		{#if results?.similar?.length > 0}
-			<div class="mb-6">
-				<h2 class="text-lg font-semibold text-text-strong mb-4 flex items-center gap-2">
-					<Search size={18} class="text-text-muted" />
-					추천 항목 ({results?.similar?.length || 0}개)
-				</h2>
-				<div class="grid grid-cols-12 gap-4">
-					{#each results?.similar || [] as item (item.id)}
-						{@const IconComponent = getIcon(item.type)}
-						<div class="col-span-12 md:col-span-6 lg:col-span-4">
-							<div class="h-72 bg-surface-2 border border-border-subtle rounded-md p-6 hover:bg-surface-1 transition-colors group">
-								<a href={item.href} class="block h-full">
+			<!-- 추천 항목 (검색 결과 없을 때) -->
+			{#if results?.similar?.length > 0}
+				<div class="mb-8">
+					<div class="flex items-center gap-2 mb-4">
+						<Lightbulb size={18} class="text-text-muted flex-shrink-0" />
+						<h2 class="text-base font-semibold text-text-muted">이런 항목은 어떠세요?</h2>
+					</div>
+					<div class="grid grid-cols-12 gap-4">
+						{#each results.similar as item (item.id)}
+							{@const IconComponent = getIcon(item.type)}
+							<div class="col-span-12 md:col-span-6 lg:col-span-4">
+								<a href={item.href} class="block h-72 bg-surface-2 rounded-lg p-6 group">
 									<div class="flex flex-col h-full">
 										<!-- 아이콘과 타입 -->
 										<div class="flex items-center gap-3 mb-4">
-											<div class="w-10 h-10 bg-surface-1 rounded-lg flex items-center justify-center group-hover:bg-brand-pink transition-colors">
-												<IconComponent size={20} class="text-text-muted group-hover:text-white transition-colors" />
+											<div class="w-10 h-10 bg-surface-1 rounded-lg flex items-center justify-center group-hover:bg-hover-point group-focus:bg-brand-pink">
+												<IconComponent size={20} class="text-text-muted group-hover:text-black group-focus:text-white" />
 											</div>
-											<div>
+											<div class="flex flex-col">
 												<div class="text-xs {getTypeColor(item.type)} font-medium">
 													{getTypeLabel(item.type)}
 												</div>
+												<!-- 추천 이유 표시 -->
+												{#if item.recommendReason}
+													<div class="text-xs text-text-muted mt-0.5">
+														{item.recommendReason}
+													</div>
+												{/if}
 											</div>
 										</div>
 
 										<!-- 제목 -->
 										<div class="flex-1">
-											<h3 class="text-lg font-semibold text-text-strong group-hover:text-white transition-colors mb-2 line-clamp-2">
+											<h3 class="text-lg font-semibold text-text-strong group-hover:text-hover-point group-focus:text-brand-pink mb-2 line-clamp-2">
 												{item.title}
 											</h3>
 											<p class="text-sm text-text-muted line-clamp-3">
@@ -212,86 +306,11 @@
 										</div>
 
 										<!-- 하단 액션 -->
-										<div class="flex items-center justify-between pt-4 border-t border-border-subtle">
-											<span class="text-xs text-text-muted">자세히 보기</span>
-											<ExternalLink size={16} class="text-text-muted group-hover:text-brand-pink transition-colors" />
+										<div class="flex items-center justify-end pt-4">
+											<span class="text-xs text-text-muted group-hover:text-hover-point group-focus:text-brand-pink">더보기</span>
 										</div>
 									</div>
 								</a>
-							</div>
-						</div>
-					{/each}
-				</div>
-			</div>
-		{/if}
-	{:else}
-		<!-- 검색 결과 없음 - 유사항목 추천 -->
-		<div class="pt-0 pb-6">
-			<div class="text-center mb-12">
-				<Search size={48} class="text-text-muted mx-auto mb-4" />
-				<h3 class="text-lg font-semibold text-text-strong mb-6">검색 결과가 없습니다</h3>
-				<button
-					onclick={onClear}
-					class="inline-flex items-center gap-2 px-4 py-2 bg-brand-pink text-white rounded-md transition-colors"
-					style="background-color: var(--brand-pink); color: white;"
-					onmouseenter={(e) => {
-						e.target.style.backgroundColor = 'var(--hover-cyan)';
-						e.target.style.color = 'black';
-					}}
-					onmouseleave={(e) => {
-						e.target.style.backgroundColor = 'var(--brand-pink)';
-						e.target.style.color = 'white';
-					}}
-				>
-					<X size={16} />
-					검색 초기화
-				</button>
-			</div>
-			
-			<!-- 유사한 항목 추천 -->
-			{#if results?.similar?.length > 0}
-				<div class="mb-6">
-					<h2 class="text-lg font-semibold text-text-strong mb-4 flex items-center gap-2">
-						<Search size={18} class="text-text-muted" />
-						유사한 항목 추천 ({results?.similar?.length || 0}개)
-					</h2>
-					<div class="grid grid-cols-12 gap-4">
-						{#each results?.similar || [] as item (item.id)}
-							{@const IconComponent = getIcon(item.type)}
-							<div class="col-span-12 md:col-span-6 lg:col-span-4">
-								<div class="h-72 bg-surface-2 border border-border-subtle rounded-md p-6 hover:bg-surface-1 transition-colors group">
-									<a href={item.href} class="block h-full">
-										<div class="flex flex-col h-full">
-											<!-- 아이콘과 타입 -->
-											<div class="flex items-center gap-3 mb-4">
-												<div class="w-10 h-10 bg-surface-1 rounded-lg flex items-center justify-center group-hover:bg-brand-pink transition-colors">
-													<IconComponent size={20} class="text-text-muted group-hover:text-white transition-colors" />
-												</div>
-												<div>
-													<div class="text-xs {getTypeColor(item.type)} font-medium">
-														{getTypeLabel(item.type)}
-													</div>
-												</div>
-											</div>
-
-											<!-- 제목 -->
-											<div class="flex-1">
-												<h3 class="text-lg font-semibold text-text-strong group-hover:text-white transition-colors mb-2 line-clamp-2">
-													{item.title}
-												</h3>
-												<p class="text-sm text-text-muted line-clamp-3">
-													{getDescription(item.type)}
-												</p>
-											</div>
-
-											<!-- 하단 액션 -->
-											<div class="flex items-center justify-between pt-4 border-t border-border-subtle">
-												<span class="text-xs text-text-muted">자세히 보기</span>
-												<ExternalLink size={16} class="text-text-muted group-hover:text-brand-pink transition-colors" />
-											</div>
-										</div>
-									</a>
-								</div>
 							</div>
 						{/each}
 					</div>

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import TasksCard from '$lib/components/cards/TasksCard.svelte';
 	import CountdownCard from '$lib/components/cards/CountdownCard.svelte';
 	import FailuresCard from '$lib/components/cards/FailuresCard.svelte';
@@ -11,37 +10,6 @@
 	import LogsCard from '$lib/components/cards/LogsCard.svelte';
 	import KpiCard from '$lib/components/cards/KpiCard.svelte';
 	import FinancialStatsCard from '$lib/components/cards/FinancialStatsCard.svelte';
-	import SearchResultsMain from '$lib/components/SearchResultsMain.svelte';
-
-	// 검색 상태
-	let searchQuery = '';
-	let searchResults: { 
-		exact: { id: string; title: string; type: string; href: string }[];
-		similar: { id: string; title: string; type: string; href: string }[];
-	} = { exact: [], similar: [] };
-	let showSearchResults = false;
-
-	// 검색 상태 변경 이벤트 리스너
-	onMount(() => {
-		const handleSearchChange = (event: CustomEvent) => {
-			searchQuery = event.detail.query;
-			searchResults = event.detail.results;
-			showSearchResults = event.detail.show;
-		};
-
-		window.addEventListener('search-change', handleSearchChange as EventListener);
-		return () => {
-			window.removeEventListener('search-change', handleSearchChange as EventListener);
-		};
-	});
-
-	// 검색 초기화 및 이전 페이지로 이동
-	function clearSearch() {
-		// Header 컴포넌트에 검색 초기화 알림
-		window.dispatchEvent(new CustomEvent('search-clear'));
-		// 이전 페이지로 이동
-		window.history.back();
-	}
 
 	// 목 데이터
 	const tasks = [
@@ -97,16 +65,8 @@
 	];
 </script>
 
-{#if showSearchResults}
-	<!-- 검색 결과 표시 -->
-	<SearchResultsMain 
-		results={searchResults} 
-		query={searchQuery} 
-		onClear={clearSearch} 
-	/>
-{:else}
-	<!-- 기본 대시보드 -->
-	<div class="pt-0 pb-6 bg-bg text-text-base">
+<!-- 대시보드 -->
+<div class="pt-0 pb-6 bg-bg text-text-base">
 		<!-- 헤더 -->
 		<div class="mb-8 mt-1.5">
 			<h1 class="text-3xl font-bold text-text-strong mb-2">대시보드</h1>
@@ -153,5 +113,4 @@
 				<KpiCard {kpi} />
 			</div>
 		</div>
-	</div>
-{/if}
+</div>

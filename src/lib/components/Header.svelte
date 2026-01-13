@@ -1,15 +1,35 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { Search, Bell, X } from 'lucide-svelte';
+	import { goto } from '$app/navigation';
+	import { Search, Bell, X, Loader2 } from 'lucide-svelte';
 	import ThemeToggle from './ThemeToggle.svelte';
 
-	// 사이드바 너비는 클라이언트 사이드에서만 설정 (SSR과 일치시키기 위해)
-	let sidebarWidth = $state(72); // 기본값: 축소 상태 (SSR과 동일)
-	let searchInput: HTMLInputElement;
+	// 검색 관련 상태
 	let searchValue = $state('');
-	let isMounted = $state(false); // hydration 완료 여부
+	let searchIconHovered = $state(false);
+	let searchFocused = $state(false);
+	let searchResults = $state<{ 
+		exact: { id: string; title: string; type: string; href: string }[];
+		similar: { id: string; title: string; type: string; href: string }[];
+	}>({ exact: [], similar: [] });
+	let searchLoading = $state(false);
 
-	// 메뉴 아이템 정의 (사이드바와 동일)
+	// 이전 페이지 경로 저장
+	let previousPath = $state('');
+
+	// 알림 관련 상태
+	let notificationHovered = $state(false);
+	let notificationClicked = $state(false);
+
+	// 사이드바 너비 연동
+	let sidebarWidth = $state(72);
+	let isMounted = $state(false);
+
+	// 검색 디바운스 타이머
+	let searchTimeout: ReturnType<typeof setTimeout>;
+	let searchInput: HTMLInputElement;
+
+	// 메뉴 아이템 정의
 	const menuItems = [
 		{ href: '/', label: '대시보드' },
 		{ href: '/albums', label: '앨범 관리' },
@@ -25,7 +45,7 @@
 		{ href: '/settings', label: '설정' }
 	];
 
-	// 현재 페이지 제목 가져오기 (함수로 변경)
+	// 현재 페이지 제목 가져오기
 	function getPageTitle(pathname: string): string {
 		const exactMatch = menuItems.find(item => item.href === pathname);
 		if (exactMatch) return exactMatch.label;
@@ -38,46 +58,151 @@
 		return '대시보드';
 	}
 
-	// 사이드바 너비 변경 이벤트 처리 (클라이언트 사이드에서만)
+	// 검색 실행
+	async function performSearch(query: string) {
+		searchLoading = true;
+
+		try {
+			const response = await fetch(`/api/search?q=${encodeURIComponent(query)}&limit=8`);
+			const data = await response.json() as { 
+				ok: boolean; 
+				data: { 
+					exact: { id: string; title: string; type: string; href: string }[];
+					similar: { id: string; title: string; type: string; href: string }[];
+				} 
+			};
+			
+			if (data.ok) {
+				// 정확한 검색 결과와 추천 항목 모두 전달
+				searchResults = data.data;
+			} else {
+				searchResults = { exact: [], similar: [] };
+			}
+		} catch (error) {
+			console.error('Search error:', error);
+			searchResults = { exact: [], similar: [] };
+		} finally {
+			searchLoading = false;
+			notifySearchChange();
+		}
+	}
+
+	// 검색어 변경 시 디바운스 처리
+	function handleSearchInput() {
+		clearTimeout(searchTimeout);
+		
+		// 검색 시작 시 현재 경로 저장 (아직 저장 안 된 경우만)
+		if (!previousPath && typeof window !== 'undefined') {
+			previousPath = window.location.pathname;
+		}
+		
+		searchTimeout = setTimeout(() => {
+			if (searchValue.trim()) {
+				performSearch(searchValue);
+			} else {
+				searchResults = { exact: [], similar: [] };
+				notifySearchChange();
+			}
+		}, 300);
+	}
+
+	// 검색 초기화 (이전 페이지로 돌아가기 옵션)
+	function clearSearch(goBack: boolean = true) {
+		const hadSearch = searchValue.trim().length > 0;
+		const savedPreviousPath = previousPath;
+		
+		// 상태 초기화
+		searchValue = '';
+		searchResults = { exact: [], similar: [] };
+		previousPath = '';
+		
+		if (typeof window !== 'undefined') {
+			// 메인 페이지에 검색 종료 알림
+			window.dispatchEvent(new CustomEvent('search-change', {
+				detail: { query: '', results: { exact: [], similar: [] }, show: false }
+			}));
+			
+			// 검색이 활성화되어 있었고, 이전 경로가 있으면 돌아가기
+			if (goBack && hadSearch && savedPreviousPath && savedPreviousPath !== window.location.pathname) {
+				goto(savedPreviousPath);
+			}
+		}
+	}
+
+	// 검색 결과를 메인 페이지로 전달
+	function notifySearchChange() {
+		if (typeof window !== 'undefined') {
+			const shouldShow = searchValue.trim().length > 0;
+			window.dispatchEvent(new CustomEvent('search-change', {
+				detail: { query: searchValue, results: searchResults, show: shouldShow }
+			}));
+		}
+	}
+
+	// 키보드 이벤트 처리
+	function handleKeyDown(e: KeyboardEvent) {
+		if (e.key === 'Escape') {
+			e.preventDefault();
+			clearSearch(true);
+			searchInput?.blur();
+		}
+	}
+
+	// 포커스 시 현재 경로 저장
+	function handleFocus() {
+		searchFocused = true;
+		// 검색어가 없고 이전 경로가 저장 안 된 경우에만 저장
+		if (!searchValue.trim() && !previousPath && typeof window !== 'undefined') {
+			previousPath = window.location.pathname;
+		}
+	}
+
+	// 알림 버튼 클릭 처리
+	function handleNotificationClick() {
+		notificationClicked = true;
+		setTimeout(() => {
+			notificationClicked = false;
+		}, 150);
+		
+		clearSearch(false);
+		if (typeof window !== 'undefined') {
+			goto('/feedback');
+		}
+	}
+
+	// 이벤트 리스너 등록
 	$effect(() => {
 		if (typeof window === 'undefined') {
-			return () => {}; // SSR 시 빈 cleanup 함수 반환
+			return () => {};
 		}
 
-		// 클라이언트에서만 초기값 설정 (hydration 후)
-		// SSR과 일치시키기 위해 기본값 72를 유지하고,
-		// 클라이언트에서 이벤트로 업데이트됨
+		isMounted = true;
+
+		const handleSearchClear = () => {
+			clearSearch(false);
+		};
+
 		const handleSidebarWidthChange = (event: CustomEvent) => {
 			sidebarWidth = event.detail.width;
 		};
 
+		window.addEventListener('search-clear', handleSearchClear);
 		window.addEventListener('sidebar-width-change', handleSidebarWidthChange as EventListener);
 
 		return () => {
-			if (typeof window !== 'undefined') {
-				window.removeEventListener('sidebar-width-change', handleSidebarWidthChange as EventListener);
-			}
+			window.removeEventListener('search-clear', handleSearchClear);
+			window.removeEventListener('sidebar-width-change', handleSidebarWidthChange as EventListener);
 		};
-	});
-
-	// 클라이언트 사이드 마운트 확인
-	$effect(() => {
-		if (typeof window !== 'undefined') {
-			isMounted = true;
-		}
-		return () => {};
 	});
 
 	// 키보드 단축키: Ctrl+K 또는 Cmd+K로 검색창 포커스
 	$effect(() => {
 		if (typeof window === 'undefined') {
-			return () => {}; // SSR 시 빈 cleanup 함수 반환
+			return () => {};
 		}
 
-		function handleKeyDown(e: KeyboardEvent) {
-			// Ctrl+K (Windows/Linux) 또는 Cmd+K (Mac)
+		function handleGlobalKeyDown(e: KeyboardEvent) {
 			if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-				// input 필드에 포커스가 있으면 기본 동작 허용
 				if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
 					return;
 				}
@@ -89,11 +214,23 @@
 			}
 		}
 
-		document.addEventListener('keydown', handleKeyDown);
-
+		document.addEventListener('keydown', handleGlobalKeyDown);
 		return () => {
-			document.removeEventListener('keydown', handleKeyDown);
+			document.removeEventListener('keydown', handleGlobalKeyDown);
 		};
+	});
+
+	// 페이지 경로 변경 감지 - 다른 메뉴 이동 시 검색 초기화
+	let lastPathname = $state('');
+	$effect(() => {
+		const currentPath = $page.url.pathname;
+		
+		// 첫 로드가 아니고, 경로가 변경되었고, 검색어가 있으면 초기화
+		if (lastPathname && lastPathname !== currentPath && searchValue.trim()) {
+			clearSearch(false);
+		}
+		
+		lastPathname = currentPath;
 	});
 </script>
 
@@ -102,55 +239,95 @@
 		<!-- 왼쪽 섹션: 페이지 제목 -->
 		<div class="flex items-center gap-4">
 			<div class="hidden md:flex items-center flex-shrink-0">
-				<h2 class="text-sm sm:text-base font-semibold truncate" style="color: var(--brand-pink);">
-					{getPageTitle($page.url.pathname)}
-				</h2>
+				{#if searchValue.trim()}
+					<div class="flex items-center gap-2">
+						<h2 class="text-sm sm:text-base font-semibold truncate" style="color: var(--brand-pink);">
+							검색 결과
+						</h2>
+						{#if searchResults?.exact?.length > 0}
+							<span class="text-xs text-text-muted flex-shrink-0">
+								({searchResults.exact.length}개)
+							</span>
+						{/if}
+					</div>
+				{:else}
+					<h2 class="text-sm sm:text-base font-semibold truncate" style="color: var(--brand-pink);">
+						{getPageTitle($page.url.pathname)}
+					</h2>
+				{/if}
 			</div>
 		</div>
 
-		<!-- 오른쪽 섹션: 검색창, 알림, 테마 토글 -->
+		<!-- 오른쪽 섹션: 검색창, 알림 버튼, 테마 토글 -->
 		<div class="flex items-center gap-2 sm:gap-4 flex-1 justify-end">
-			<!-- 검색창 -->
-			<div class="flex items-center search-container group">
-				<div class="relative w-full min-w-[120px] sm:min-w-[160px] md:min-w-[200px] lg:min-w-[240px] xl:min-w-[280px] max-w-[320px]">
-					<Search size={16} class="absolute left-3 top-1/2 transform -translate-y-1/2 lucide-icon lucide-search" aria-hidden="true" />
-					<input
-						type="text"
-						placeholder="검색..."
-						bind:this={searchInput}
-						bind:value={searchValue}
-						aria-label="검색"
-						aria-describedby="search-description"
-						class="input-base pl-10 {searchValue.trim() ? 'pr-10' : 'pr-4'} py-1.5 w-full text-base placeholder:text-text-muted focus:outline-none focus:ring-0"
+			<!-- 검색창 (반응형 크기, 입력 시 크기 변화 없음) -->
+			<div class="search-container relative w-full min-w-[120px] sm:min-w-[160px] md:min-w-[200px] lg:min-w-[240px] xl:min-w-[280px] max-w-[320px]">
+				<!-- 검색 아이콘 또는 로딩 스피너 -->
+				{#if searchLoading}
+					<Loader2 
+						size={16} 
+						class="absolute left-3 top-1/2 transform -translate-y-1/2 text-brand-pink animate-spin"
+						aria-hidden="true"
 					/>
-					{#if searchValue.trim()}
-						<button
-							type="button"
-							onclick={() => {
-								searchValue = '';
-								searchInput?.focus();
-							}}
-							class="btn-icon absolute inset-y-0 right-2.5 flex items-center pointer-events-auto"
-							aria-label="검색 초기화"
-						>
-							<X size={16} class="lucide-icon text-text-muted" />
-						</button>
-					{/if}
-					<span id="search-description" class="sr-only">Ctrl+K 또는 Cmd+K를 눌러 검색창에 포커스할 수 있습니다</span>
-				</div>
+				{:else}
+					<Search 
+						size={16} 
+						class="absolute left-3 top-1/2 transform -translate-y-1/2 lucide-icon lucide-search {searchValue || searchFocused ? 'text-brand-pink' : searchIconHovered ? 'text-hover-cyan' : 'text-text-base'}"
+						aria-hidden="true"
+					/>
+				{/if}
+				
+				<input
+					bind:this={searchInput}
+					bind:value={searchValue}
+					type="text"
+					placeholder="검색..."
+					aria-label="검색"
+					aria-describedby="search-description"
+					class="pl-10 pr-10 py-1.5 w-full bg-surface-1 border border-border-subtle rounded-md text-text-base placeholder-text-muted focus:outline-none focus:ring-0"
+					onmouseenter={() => searchIconHovered = true}
+					onmouseleave={() => searchIconHovered = false}
+					onfocus={handleFocus}
+					onblur={() => { searchFocused = false; }}
+					oninput={handleSearchInput}
+					onkeydown={handleKeyDown}
+				/>
+				
+				<!-- X 버튼 (검색어가 있을 때만 표시) -->
+				{#if searchValue.trim()}
+					<button
+						type="button"
+						onclick={() => clearSearch(true)}
+						class="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 flex items-center justify-center bg-transparent text-text-muted hover:text-hover-point hover:bg-transparent focus:text-brand-pink focus:bg-transparent transition-colors"
+						aria-label="검색 초기화"
+					>
+						<X size={16} />
+					</button>
+				{/if}
+				<span id="search-description" class="sr-only">Ctrl+K로 포커스, ESC로 닫기</span>
 			</div>
 
 			<!-- 알림 버튼 -->
 			<div class="flex items-center flex-shrink-0">
-				<a href="/feedback" class="notification-button relative inline-flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 rounded-md focus:outline-none focus:ring-0" aria-label="알림">
+				<button
+					type="button"
+					class="notification-button relative inline-flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 rounded-md focus:outline-none focus:ring-0"
+					onclick={handleNotificationClick}
+					onmouseenter={() => notificationHovered = true}
+					onmouseleave={() => notificationHovered = false}
+					aria-label="알림"
+				>
 					<Bell 
 						size={14} 
-						class="sm:w-4 sm:h-4 lucide-icon {isMounted && $page.url.pathname.startsWith('/feedback') ? 'text-brand-pink' : 'text-text-base'}" 
+						class="sm:w-4 sm:h-4 lucide-icon {notificationClicked ? 'text-brand-pink' : isMounted && $page.url.pathname.startsWith('/feedback') ? 'text-brand-pink' : notificationHovered ? 'text-hover-cyan' : 'text-text-base'}" 
 					/>
 					{#if isMounted && !$page.url.pathname.startsWith('/feedback')}
-						<span class="notification-dot absolute -top-0.5 -right-0.5 w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full" style="background-color: var(--brand-pink);"></span>
+						<span 
+							class="notification-dot absolute -top-0.5 -right-0.5 w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full"
+							style="background-color: {notificationClicked ? 'var(--brand-pink)' : notificationHovered ? 'var(--hover-cyan)' : 'var(--brand-pink)'};"
+						></span>
 					{/if}
-				</a>
+				</button>
 			</div>
 
 			<!-- 테마 토글 -->

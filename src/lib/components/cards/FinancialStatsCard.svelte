@@ -149,7 +149,7 @@
 							{#each stats.revenueByPlatform.slice(0, 2) as platform}
 								<a
 									href="/revenue"
-									class="flex items-center h-12 px-4 bg-surface-1 rounded hover:bg-surface-2 transition-colors min-w-0"
+									class="flex items-center h-12 px-4 bg-surface-1 rounded min-w-0"
 								>
 									<span class="flex-1 text-sm text-text-base truncate min-w-0">{platform.platform}</span>
 									<span class="flex-shrink-0 text-sm font-semibold text-green-500 ml-2" data-type="number" title="{platform.amount.toLocaleString()}원">
@@ -169,7 +169,7 @@
 							{#each stats.expenseByCategory.slice(0, 2) as category}
 								<a
 									href="/revenue"
-									class="flex items-center h-12 px-4 bg-surface-1 rounded hover:bg-surface-2 transition-colors min-w-0"
+									class="flex items-center h-12 px-4 bg-surface-1 rounded min-w-0"
 								>
 									<span class="flex-1 text-sm text-text-base truncate min-w-0">{category.category}</span>
 									<span class="flex-shrink-0 text-sm font-semibold text-red-500 ml-2" data-type="number" title="{category.amount.toLocaleString()}원">
