@@ -258,7 +258,7 @@
 		</div>
 
 		<!-- 폼 본문 (스크롤 가능, 캘린더 팝업을 위해 overflow-x는 visible) -->
-		<div class="flex-1 overflow-y-auto overflow-x-visible custom-list-scrollbar">
+		<div class="flex-1 overflow-y-auto overflow-x-visible custom-list-scrollbar" style="scrollbar-gutter: stable;">
 			<form onsubmit={(e) => { e.preventDefault(); handleSave(); }} class="p-6 space-y-5">
 				
 				<!-- 트랙 제목 -->
