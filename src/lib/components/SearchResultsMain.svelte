@@ -245,7 +245,7 @@
 
 								<!-- 하단 액션 -->
 								<div class="flex items-center justify-end pt-4">
-									<span class="text-xs text-text-muted group-hover:text-hover-point group-focus:text-brand-pink">더보기</span>
+									<span class="text-xs text-text-muted group-hover:text-hover-point group-focus-within:text-brand-pink transition-colors">더보기</span>
 								</div>
 							</div>
 						</a>
@@ -297,7 +297,7 @@
 
 									<!-- 하단 액션 -->
 									<div class="flex items-center justify-end pt-4">
-										<span class="text-xs text-text-muted group-hover:text-hover-point group-focus:text-brand-pink">더보기</span>
+										<span class="text-xs text-text-muted group-hover:text-hover-point group-focus-within:text-brand-pink transition-colors">더보기</span>
 									</div>
 								</div>
 							</a>
@@ -368,7 +368,7 @@
 
 										<!-- 하단 액션 -->
 										<div class="flex items-center justify-end pt-4">
-											<span class="text-xs text-text-muted group-hover:text-hover-point group-focus:text-brand-pink">더보기</span>
+											<span class="text-xs text-text-muted group-hover:text-hover-point group-focus-within:text-brand-pink transition-colors">더보기</span>
 										</div>
 									</div>
 								</a>
