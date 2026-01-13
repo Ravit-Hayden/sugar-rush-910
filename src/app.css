@@ -1862,7 +1862,6 @@ input[type="checkbox"]:checked::after {
 .title-track-checkbox:focus {
   border-color: var(--brand-pink) !important;
   outline: none;
-  box-shadow: 0 0 0 2px var(--brand-pink);
 }
 
 /* =========================
