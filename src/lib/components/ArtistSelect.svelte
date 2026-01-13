@@ -83,15 +83,22 @@
 	}
 
 	function handleInputFocus() {
+		if (skipNextFocus) {
+			skipNextFocus = false;
+			return;
+		}
 		dropdownOpen = true;
 		focusedIndex = -1; // 포커스 인덱스 초기화
 	}
+
+	let skipNextFocus = $state(false);
 
 	function handleClear() {
 		inputValue = '';
 		onChange('');
 		dropdownOpen = false;
 		focusedIndex = -1;
+		skipNextFocus = true; // 다음 focus 이벤트 무시
 		// 입력 필드로 포커스 이동
 		if (typeof window !== 'undefined') {
 			const input = document.querySelector('.artist-select-dropdown input') as HTMLInputElement;
