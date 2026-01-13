@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { useClickOutside, useEscapeKey } from '$lib/utils/clickOutside';
+	import { useEscapeKey } from '$lib/utils/clickOutside';
 	import { ChevronDown, X } from 'lucide-svelte';
 	import { getArtistNames, getArtistNamesAsync } from '$lib/constants/artists';
 
@@ -51,12 +51,28 @@
 	
 	const showCustomInput = $derived(allowCustom && !filteredArtistNames.includes(inputValue) && inputValue.trim() !== '');
 
-	// 외부 클릭 감지
+	// 외부 클릭 감지 - containerElement를 직접 사용
 	$effect(() => {
-		return useClickOutside('.artist-select-dropdown', () => {
-			dropdownOpen = false;
-			focusedIndex = -1; // 외부 클릭 시 포커스 인덱스 초기화
-		}, dropdownOpen);
+		if (!dropdownOpen || !containerElement) return () => {};
+
+		function handleClickOutside(event: MouseEvent) {
+			const target = event.target as HTMLElement;
+			// 이 컴포넌트의 containerElement 내부가 아니면 닫기
+			if (containerElement && !containerElement.contains(target)) {
+				dropdownOpen = false;
+				focusedIndex = -1;
+			}
+		}
+
+		// 다음 틱에 이벤트 리스너 등록
+		const timeoutId = setTimeout(() => {
+			document.addEventListener('click', handleClickOutside, true);
+		}, 0);
+
+		return () => {
+			clearTimeout(timeoutId);
+			document.removeEventListener('click', handleClickOutside, true);
+		};
 	});
 
 	// Escape 키 감지
