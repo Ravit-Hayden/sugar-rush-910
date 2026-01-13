@@ -221,16 +221,12 @@
 								<div class="flex items-center gap-3 mb-4">
 									{#if item.coverImage && (item.type === 'album' || item.type === 'track')}
 										<!-- 앨범/트랙 커버 이미지 -->
-										<div class="relative w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
+										<div class="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
 											<img 
 												src={item.coverImage} 
 												alt="{item.title} 커버"
 												class="w-full h-full object-cover"
 											/>
-											<!-- 타입 뱃지 (앨범/트랙 구분) -->
-											<div class="absolute bottom-0 right-0 w-4 h-4 bg-brand-pink rounded-tl-md flex items-center justify-center">
-												<IconComponent size={10} class="text-white" />
-											</div>
 										</div>
 									{:else}
 										<!-- 기본 아이콘 -->
@@ -287,16 +283,12 @@
 									<div class="flex items-center gap-3 mb-4">
 										{#if item.coverImage && (item.type === 'album' || item.type === 'track')}
 											<!-- 앨범/트랙 커버 이미지 -->
-											<div class="relative w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
+											<div class="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
 												<img 
 													src={item.coverImage} 
 													alt="{item.title} 커버"
 													class="w-full h-full object-cover"
 												/>
-												<!-- 타입 뱃지 -->
-												<div class="absolute bottom-0 right-0 w-4 h-4 bg-surface-1 rounded-tl-md flex items-center justify-center">
-													<IconComponent size={10} class="text-text-muted" />
-												</div>
 											</div>
 										{:else}
 											<!-- 기본 아이콘 -->
