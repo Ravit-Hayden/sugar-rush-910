@@ -8,6 +8,14 @@
 	export let query = '';
 	export let onClear: () => void;
 
+	// 검색 결과 항목 클릭 시 검색창 닫기
+	function handleResultClick() {
+		// 약간의 딜레이 후 검색 초기화 (페이지 이동이 먼저 처리되도록)
+		setTimeout(() => {
+			onClear();
+		}, 100);
+	}
+
 	// 타입별 아이콘 매핑
 	const getIcon = (type: string) => {
 		switch (type) {
@@ -154,7 +162,7 @@
 				{#each results.exact as item (item.id)}
 					{@const IconComponent = getIcon(item.type)}
 					<div class="col-span-12 md:col-span-6 lg:col-span-4">
-						<a href={item.href} class="block h-72 bg-surface-2 rounded-lg p-6 group">
+						<a href={item.href} onclick={handleResultClick} class="block h-72 bg-surface-2 rounded-lg p-6 group">
 							<div class="flex flex-col h-full">
 								<!-- 아이콘과 타입 -->
 								<div class="flex items-center gap-3 mb-4">
@@ -204,7 +212,7 @@
 					{#each results.similar as item (item.id)}
 						{@const IconComponent = getIcon(item.type)}
 						<div class="col-span-12 md:col-span-6 lg:col-span-4">
-							<a href={item.href} class="block h-72 bg-surface-2 rounded-lg p-6 group">
+							<a href={item.href} onclick={handleResultClick} class="block h-72 bg-surface-2 rounded-lg p-6 group">
 								<div class="flex flex-col h-full">
 									<!-- 아이콘과 타입 -->
 									<div class="flex items-center gap-3 mb-4">
@@ -275,7 +283,7 @@
 						{#each results.similar as item (item.id)}
 							{@const IconComponent = getIcon(item.type)}
 							<div class="col-span-12 md:col-span-6 lg:col-span-4">
-								<a href={item.href} class="block h-72 bg-surface-2 rounded-lg p-6 group">
+								<a href={item.href} onclick={handleResultClick} class="block h-72 bg-surface-2 rounded-lg p-6 group">
 									<div class="flex flex-col h-full">
 										<!-- 아이콘과 타입 -->
 										<div class="flex items-center gap-3 mb-4">
