@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { Asterisk, ChevronUp, ChevronDown, ChevronDown as ChevronDownIcon, X, Image, Upload, Plus, GripVertical, Minus } from 'lucide-svelte';
+	import { Asterisk, ChevronUp, ChevronDown, ChevronDown as ChevronDownIcon, X, Image, Upload, Plus, GripVertical, Minus, Pencil } from 'lucide-svelte';
 	import { useClickOutside, useEscapeKey } from '$lib/utils/clickOutside';
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import PageContent from '$lib/components/PageContent.svelte';
@@ -8,6 +8,7 @@
 	import { GENRES } from '$lib/constants/genres';
 	import ArtistSelect from '$lib/components/ArtistSelect.svelte';
 	import { toast } from '$lib/stores/toast';
+	import TrackSlidePanel from '$lib/components/TrackSlidePanel.svelte';
 
 	// 현재 날짜 정보
 	const currentDate = new Date();
@@ -96,6 +97,64 @@
 	let trackFocusedIndex = $state<Record<string, number>>({});
 	let trackNames = $state<string[]>([]);
 	let trackListElements = $state<Record<string, HTMLUListElement>>({});
+
+	// 트랙 슬라이드 패널 상태
+	let trackPanelOpen = $state(false);
+	let trackPanelMode = $state<'create' | 'edit'>('create');
+	let selectedTrackForEdit = $state<{
+		id: string;
+		title: string;
+		artist?: string;
+		genres?: string[];
+		status?: string;
+		release_date_kr?: string;
+		release_date_global?: string;
+		duration?: string;
+		is_title?: boolean;
+	} | null>(null);
+
+	// 새 트랙 생성 패널 열기
+	function openCreateTrackPanel() {
+		trackPanelMode = 'create';
+		selectedTrackForEdit = null;
+		trackPanelOpen = true;
+	}
+
+	// 트랙 수정 패널 열기
+	function openEditTrackPanel(track: typeof formData.tracks[0]) {
+		trackPanelMode = 'edit';
+		selectedTrackForEdit = {
+			id: track.id,
+			title: track.title,
+			is_title: track.is_title,
+			duration: track.duration
+		};
+		trackPanelOpen = true;
+	}
+
+	// 패널에서 트랙 저장
+	function handleTrackPanelSave(data: { id: string; title: string; is_title: boolean; artist?: string; genres?: string[]; status?: string; release_date_kr?: string; release_date_global?: string }) {
+		if (trackPanelMode === 'create') {
+			// 새 트랙 추가
+			formData.tracks = [...formData.tracks, {
+				id: data.id,
+				title: data.title,
+				is_title: data.is_title
+			}];
+			trackInputValues[data.id] = data.title;
+			trackDropdownOpen[data.id] = false;
+			trackFocusedIndex[data.id] = -1;
+		} else {
+			// 기존 트랙 수정
+			formData.tracks = formData.tracks.map(t => 
+				t.id === data.id 
+					? { ...t, title: data.title, is_title: data.is_title }
+					: t
+			);
+			trackInputValues[data.id] = data.title;
+		}
+		trackPanelOpen = false;
+	}
 
 	// 트랙 목록 로드
 	$effect(() => {
@@ -1029,8 +1088,23 @@
 									<div class="absolute left-[5.125rem] top-1/2 -translate-y-1/2 flex items-center pointer-events-none z-10">
 										<span class="text-sm font-medium ml-2 mr-2 text-brand-pink">{index + 1}</span>
 									</div>
-									<!-- 트랙 재생 시간 (X 버튼 왼쪽, 같은 갭) - 등록된 트랙 선택 시에만 표시 -->
+									<!-- 트랙 수정 버튼 + 재생 시간 (트랙이 선택된 경우에만 표시) -->
 									{#if (trackInputValues[track.id] || track.title).trim()}
+										<!-- 수정 버튼 -->
+										<button
+											type="button"
+											onclick={(e) => {
+												e.stopPropagation();
+												openEditTrackPanel(track);
+											}}
+											class="btn-icon absolute right-[7.875rem] top-1/2 -translate-y-1/2 flex items-center pointer-events-auto z-10"
+											aria-label="트랙 수정"
+										>
+											<span class="flex h-4 w-4 items-center justify-center">
+												<Pencil size={14} class="lucide-icon text-text-muted" />
+											</span>
+										</button>
+										<!-- 재생 시간 -->
 										<div class="absolute right-[5.25rem] top-1/2 -translate-y-1/2 flex items-center pointer-events-none z-10">
 											<span class="text-xs text-text-muted tabular-nums">
 												{(() => {
@@ -1141,17 +1215,31 @@
 								</div>
 							</div>
 						{/each}
-						<button
-							type="button"
-							onclick={(e) => {
-								addTrack();
-								(e.currentTarget as HTMLButtonElement).blur();
-							}}
-							class="w-full h-10 px-4 bg-hover-point rounded-lg focus:outline-none focus:ring-0 transition-colors duration-200 flex items-center justify-center gap-2"
-						>
-							<Plus size={16} class="lucide-icon" />
-							<span class="text-sm font-medium">트랙 추가</span>
-						</button>
+						<!-- 트랙 추가 버튼들 -->
+						<div class="flex gap-2">
+							<button
+								type="button"
+								onclick={(e) => {
+									addTrack();
+									(e.currentTarget as HTMLButtonElement).blur();
+								}}
+								class="flex-1 h-10 px-4 bg-surface-2 border border-border-subtle rounded-lg hover:border-hover-point focus:outline-none focus:border-brand-pink transition-colors duration-200 flex items-center justify-center gap-2"
+							>
+								<Plus size={16} class="lucide-icon text-text-muted" />
+								<span class="text-sm font-medium text-text-base">기존 트랙 추가</span>
+							</button>
+							<button
+								type="button"
+								onclick={(e) => {
+									openCreateTrackPanel();
+									(e.currentTarget as HTMLButtonElement).blur();
+								}}
+								class="flex-1 h-10 px-4 bg-hover-point rounded-lg focus:outline-none focus:ring-0 transition-colors duration-200 flex items-center justify-center gap-2"
+							>
+								<Plus size={16} class="lucide-icon" />
+								<span class="text-sm font-medium">새 트랙 생성</span>
+							</button>
+						</div>
 					</div>
 				</div>
 
@@ -1284,3 +1372,14 @@
 		</form>
 	</div>
 </PageContent>
+
+<!-- 트랙 생성/수정 슬라이드 패널 -->
+<TrackSlidePanel
+	isOpen={trackPanelOpen}
+	mode={trackPanelMode}
+	trackData={selectedTrackForEdit}
+	albumTitle={formData.title}
+	albumArtist={formData.artist}
+	onSave={handleTrackPanelSave}
+	onClose={() => trackPanelOpen = false}
+/>
