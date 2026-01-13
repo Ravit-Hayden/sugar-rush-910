@@ -4203,6 +4203,28 @@ input[type="number"].number-input-custom + div button:focus-visible .lucide-icon
   color: var(--hover-point) !important;
 }
 
+/* 기존 트랙 추가 버튼 - 아이콘과 텍스트 세트 호버/포커스 효과 */
+.existing-track-button:hover:not(:focus):not(:focus-visible) .lucide-icon,
+.existing-track-button:hover:not(:focus):not(:focus-visible) span {
+  color: var(--hover-point) !important;
+  transition: color 0.2s ease;
+}
+
+.existing-track-button:focus .lucide-icon,
+.existing-track-button:focus-visible .lucide-icon,
+.existing-track-button:focus span,
+.existing-track-button:focus-visible span {
+  color: var(--brand-pink) !important;
+  transition: color 0.2s ease;
+}
+
+.existing-track-button:focus:hover .lucide-icon,
+.existing-track-button:focus-visible:hover .lucide-icon,
+.existing-track-button:focus:hover span,
+.existing-track-button:focus-visible:hover span {
+  color: var(--brand-pink) !important;
+}
+
 /* 장르 드롭다운 아이템 호버/포커스 스타일 */
 /* 다크/라이트 모드: 호버 포인트 배경 + 텍스트 색상 */
 .genre-dropdown-item:hover:not(:focus):not(:focus-visible) {

@@ -1223,7 +1223,7 @@
 									addTrack();
 									(e.currentTarget as HTMLButtonElement).blur();
 								}}
-								class="flex-1 h-10 px-4 bg-surface-2 border border-border-subtle rounded-lg hover:border-hover-point focus:outline-none focus:border-brand-pink transition-colors duration-200 flex items-center justify-center gap-2"
+								class="existing-track-button flex-1 h-10 px-4 bg-surface-2 border border-border-subtle rounded-lg hover:border-hover-point focus:outline-none focus:border-brand-pink transition-colors duration-200 flex items-center justify-center gap-2"
 							>
 								<Plus size={16} class="lucide-icon text-text-muted" />
 								<span class="text-sm font-medium text-text-base">기존 트랙 추가</span>
