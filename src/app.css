@@ -4921,19 +4921,25 @@ button.bg-brand-pink:disabled:focus-visible {
   }
 }
 
-/* 슬라이드 패널 푸터 - 호버 효과 없음 */
-.slide-panel-footer,
-.slide-panel-footer:hover,
-.slide-panel-footer:focus,
-.slide-panel-footer:focus-within {
+/* 슬라이드 패널 footer - 호버 효과 차단 */
+.slide-panel-enter footer,
+.slide-panel-enter footer.border-t,
+.slide-panel-enter footer.bg-surface-1 {
   border-color: var(--border-subtle) !important;
-  background-color: var(--surface-1) !important;
   pointer-events: auto;
 }
 
-/* 슬라이드 패널 푸터 내부 border-t 호버 효과 제거 */
-.slide-panel-footer.border-t:hover,
-.slide-panel-footer.border-t:focus,
-.slide-panel-footer.border-t:focus-within {
-  border-top-color: var(--border-subtle) !important;
+.slide-panel-enter footer:hover,
+.slide-panel-enter footer.border-t:hover,
+.slide-panel-enter footer.bg-surface-1:hover {
+  border-color: var(--border-subtle) !important;
+}
+
+/* 슬라이드 패널 앨범 정보 배너 - 호버 효과 차단 */
+.slide-panel-enter .bg-surface-2.pointer-events-none {
+  border-color: var(--border-subtle) !important;
+}
+
+.slide-panel-enter .bg-surface-2.pointer-events-none:hover {
+  border-color: var(--border-subtle) !important;
 }
