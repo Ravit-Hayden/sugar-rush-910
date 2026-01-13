@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
-	import { Search, Bell, X, Loader2 } from 'lucide-svelte';
+	import { Search, Bell, X, Loader2, Clock, Trash2 } from 'lucide-svelte';
 	import ThemeToggle from './ThemeToggle.svelte';
 
 	// 검색 관련 상태
@@ -14,8 +14,67 @@
 	}>({ exact: [], similar: [] });
 	let searchLoading = $state(false);
 
+	// 검색 히스토리 상태
+	let searchHistory = $state<string[]>([]);
+	let showHistory = $state(false);
+	const HISTORY_KEY = 'sugar-rush-search-history';
+	const MAX_HISTORY = 10;
+
 	// 이전 페이지 경로 저장
 	let previousPath = $state('');
+
+	// 검색 히스토리 로드
+	function loadHistory(): string[] {
+		if (typeof window === 'undefined') return [];
+		try {
+			const saved = localStorage.getItem(HISTORY_KEY);
+			return saved ? JSON.parse(saved) : [];
+		} catch {
+			return [];
+		}
+	}
+
+	// 검색 히스토리 저장
+	function saveHistory(history: string[]) {
+		if (typeof window === 'undefined') return;
+		try {
+			localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+		} catch {
+			// localStorage 오류 무시
+		}
+	}
+
+	// 검색어를 히스토리에 추가
+	function addToHistory(query: string) {
+		if (!query.trim()) return;
+		// 중복 제거 후 맨 앞에 추가
+		const filtered = searchHistory.filter(h => h !== query);
+		searchHistory = [query, ...filtered].slice(0, MAX_HISTORY);
+		saveHistory(searchHistory);
+	}
+
+	// 히스토리 항목 삭제
+	function removeFromHistory(query: string, e: Event) {
+		e.stopPropagation();
+		e.preventDefault();
+		searchHistory = searchHistory.filter(h => h !== query);
+		saveHistory(searchHistory);
+	}
+
+	// 히스토리 전체 삭제
+	function clearHistory(e: Event) {
+		e.stopPropagation();
+		e.preventDefault();
+		searchHistory = [];
+		saveHistory([]);
+	}
+
+	// 히스토리 항목 클릭 시 검색 실행
+	function searchFromHistory(query: string) {
+		searchValue = query;
+		showHistory = false;
+		performSearch(query);
+	}
 
 	// 알림 관련 상태
 	let notificationHovered = $state(false);
@@ -75,6 +134,10 @@
 			if (data.ok) {
 				// 정확한 검색 결과와 추천 항목 모두 전달
 				searchResults = data.data;
+				// 검색어를 히스토리에 추가
+				addToHistory(query);
+				// 히스토리 드롭다운 숨기기
+				showHistory = false;
 			} else {
 				searchResults = { exact: [], similar: [] };
 			}
@@ -148,12 +211,16 @@
 		}
 	}
 
-	// 포커스 시 현재 경로 저장
+	// 포커스 시 현재 경로 저장 및 히스토리 표시
 	function handleFocus() {
 		searchFocused = true;
 		// 검색어가 없고 이전 경로가 저장 안 된 경우에만 저장
 		if (!searchValue.trim() && !previousPath && typeof window !== 'undefined') {
 			previousPath = window.location.pathname;
+		}
+		// 검색어가 없고 히스토리가 있으면 히스토리 드롭다운 표시
+		if (!searchValue.trim() && searchHistory.length > 0) {
+			showHistory = true;
 		}
 	}
 
@@ -177,6 +244,8 @@
 		}
 
 		isMounted = true;
+		// 검색 히스토리 로드
+		searchHistory = loadHistory();
 
 		const handleSearchClear = () => {
 			clearSearch(false);
@@ -288,7 +357,7 @@
 					onmouseenter={() => searchIconHovered = true}
 					onmouseleave={() => searchIconHovered = false}
 					onfocus={handleFocus}
-					onblur={() => { searchFocused = false; }}
+					onblur={() => { searchFocused = false; setTimeout(() => { showHistory = false; }, 200); }}
 					oninput={handleSearchInput}
 					onkeydown={handleKeyDown}
 				/>
@@ -305,6 +374,47 @@
 					</button>
 				{/if}
 				<span id="search-description" class="sr-only">Ctrl+K로 포커스, ESC로 닫기</span>
+
+				<!-- 검색 히스토리 드롭다운 -->
+				{#if showHistory && searchHistory.length > 0 && !searchValue.trim()}
+					<div class="absolute top-full left-0 right-0 mt-1 bg-surface-1 border border-border-subtle rounded-md shadow-lg z-50 overflow-hidden">
+						<div class="flex items-center justify-between px-3 py-2 border-b border-border-subtle">
+							<span class="text-xs text-text-muted">최근 검색어</span>
+							<button
+								type="button"
+								onclick={clearHistory}
+								class="text-xs text-text-muted hover:text-hover-point transition-colors"
+							>
+								전체 삭제
+							</button>
+						</div>
+						<div class="max-h-48 overflow-y-auto">
+							{#each searchHistory as historyItem}
+								<div 
+									class="flex items-center justify-between px-3 py-2 hover:bg-surface-2 transition-colors group cursor-pointer"
+									onclick={() => searchFromHistory(historyItem)}
+									onkeydown={(e) => e.key === 'Enter' && searchFromHistory(historyItem)}
+									role="option"
+									aria-selected="false"
+									tabindex="0"
+								>
+									<span class="flex items-center gap-2 text-sm text-text-base group-hover:text-hover-point">
+										<Clock size={14} class="text-text-muted" />
+										{historyItem}
+									</span>
+									<button
+										type="button"
+										onclick={(e) => removeFromHistory(historyItem, e)}
+										class="opacity-0 group-hover:opacity-100 text-text-muted hover:text-brand-pink transition-all"
+										aria-label="삭제"
+									>
+										<X size={14} />
+									</button>
+								</div>
+							{/each}
+						</div>
+					</div>
+				{/if}
 			</div>
 
 			<!-- 알림 버튼 -->
