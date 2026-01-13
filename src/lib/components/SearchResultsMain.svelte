@@ -153,11 +153,16 @@
 	}
 </script>
 
-<div class="py-6 overflow-hidden">
+<div class="py-6 overflow-hidden" role="region" aria-label="검색 결과">
+	<!-- 스크린 리더용 결과 개수 알림 -->
+	<div class="sr-only" aria-live="polite" aria-atomic="true">
+		{query} 검색 결과 {filteredExact.length}개{filteredSimilar.length > 0 ? `, 추천 ${filteredSimilar.length}개` : ''}
+	</div>
+
 	<!-- 검색 결과 헤더 -->
 	<div class="mb-6">
 		<div class="flex items-start gap-3 mb-4 max-w-full">
-			<Search size={20} class="text-brand-pink flex-shrink-0 mt-2" />
+			<Search size={20} class="text-brand-pink flex-shrink-0 mt-2" aria-hidden="true" />
 			<div class="flex-1 min-w-0 max-w-full">
 				<div class="break-words leading-tight" style="word-break: break-word; overflow-wrap: break-word; hyphens: auto;">
 					<h1 class="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mb-1">
@@ -169,7 +174,7 @@
 				</div>
 				{#if results?.exact?.length > 0}
 					<div class="mt-2">
-						<span class="text-sm text-text-muted">
+						<span class="text-sm text-text-muted" aria-live="polite">
 							({filteredExact.length}개{selectedFilter !== 'all' ? ` / 전체 ${results.exact.length}개` : ''})
 						</span>
 					</div>
@@ -179,11 +184,12 @@
 
 		<!-- 필터 버튼 (타입이 2개 이상일 때만 표시) -->
 		{#if availableTypes.length > 1}
-			<div class="flex items-center gap-2 flex-wrap">
-				<Filter size={14} class="text-text-muted" />
+			<div class="flex items-center gap-2 flex-wrap" role="group" aria-label="검색 결과 필터">
+				<Filter size={14} class="text-text-muted" aria-hidden="true" />
 				<button
 					type="button"
 					onclick={() => setFilter('all')}
+					aria-pressed={selectedFilter === 'all'}
 					class="px-3 py-1 text-sm rounded-full transition-colors {selectedFilter === 'all' ? 'bg-brand-pink text-white' : 'bg-surface-2 text-text-muted hover:text-hover-point'}"
 				>
 					전체
@@ -192,6 +198,7 @@
 					<button
 						type="button"
 						onclick={() => setFilter(type)}
+						aria-pressed={selectedFilter === type}
 						class="px-3 py-1 text-sm rounded-full transition-colors {selectedFilter === type ? 'bg-brand-pink text-white' : 'bg-surface-2 text-text-muted hover:text-hover-point'}"
 					>
 						{getTypeLabel(type)}
