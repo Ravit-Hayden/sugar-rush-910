@@ -239,15 +239,15 @@
 			</button>
 		</header>
 
-		<!-- 앨범 정보 배너 -->
-		<div class="px-6 py-3 bg-surface-2 border-b border-border-subtle flex-shrink-0">
+		<!-- 앨범 정보 배너 (호버 효과 없음) -->
+		<div class="px-6 py-3 bg-surface-2 flex-shrink-0 pointer-events-none select-none">
 			<p class="text-sm text-text-muted">
 				앨범: <span class="text-text-base font-medium">{albumTitle || '(미지정)'}</span>
 			</p>
 		</div>
 
-		<!-- 폼 본문 (스크롤 가능) -->
-		<div class="flex-1 overflow-y-auto custom-list-scrollbar">
+		<!-- 폼 본문 (스크롤 가능, 캘린더 팝업을 위해 overflow-x는 visible) -->
+		<div class="flex-1 overflow-y-auto overflow-x-visible custom-list-scrollbar">
 			<form onsubmit={(e) => { e.preventDefault(); handleSave(); }} class="p-6 space-y-5">
 				
 				<!-- 트랙 제목 -->
@@ -280,15 +280,22 @@
 				</div>
 
 				<!-- 타이틀 곡 체크박스 -->
-				<div class="flex items-center gap-2">
-					<input
-						type="checkbox"
-						id="is-title-track"
-						bind:checked={formData.is_title}
-						class="w-4 h-4 rounded border-border-subtle text-brand-pink focus:ring-brand-pink"
-					/>
-					<label for="is-title-track" class="text-sm text-text-base">
-						타이틀 곡으로 설정
+				<div class="flex items-center gap-3">
+					<label class="relative flex items-center cursor-pointer group" for="is-title-track">
+						<input
+							type="checkbox"
+							id="is-title-track"
+							bind:checked={formData.is_title}
+							class="peer sr-only"
+						/>
+						<div class="w-5 h-5 border-2 border-border-subtle rounded bg-transparent peer-checked:border-brand-pink peer-checked:bg-brand-pink group-hover:border-hover-point peer-focus:border-brand-pink transition-colors flex items-center justify-center">
+							{#if formData.is_title}
+								<svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+								</svg>
+							{/if}
+						</div>
+						<span class="ml-2 text-sm text-text-base">타이틀 곡으로 설정</span>
 					</label>
 				</div>
 
@@ -338,27 +345,37 @@
 					{/if}
 
 					<!-- 장르 드롭다운 -->
-					<div class="relative">
+					<div class="relative genre-filter-dropdown">
 						<button
 							type="button"
 							onclick={() => genreDropdownOpen = !genreDropdownOpen}
-							class="input-base w-full h-10 px-4 flex items-center justify-between"
+							class="w-full h-10 px-4 pr-10 bg-surface-2 border border-border-subtle rounded-lg text-base text-text-muted text-left focus:outline-none focus:border-brand-pink transition-colors"
+							aria-haspopup="listbox"
+							aria-expanded={genreDropdownOpen}
 						>
-							<span class="text-text-muted">장르 추가...</span>
-							<ChevronDown size={16} class="text-text-muted" />
+							<span class="block truncate">장르 추가...</span>
 						</button>
+						<div class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center">
+							<ChevronDown size={16} class="text-text-muted transition-transform {genreDropdownOpen ? 'rotate-180' : ''}" />
+						</div>
 						
 						{#if genreDropdownOpen}
-							<ul class="absolute left-0 w-full mt-1 bg-surface-1 border border-border-subtle rounded-md z-10 max-h-48 overflow-y-auto custom-list-scrollbar">
+							<ul role="listbox" class="absolute left-0 w-full mt-[6px] bg-surface-1 border border-border-subtle rounded-[6px] z-10 max-h-48 overflow-y-auto custom-list-scrollbar">
 								{#each availableGenres as genre}
-									<li>
-										<button
-											type="button"
-											onclick={() => addGenre(genre)}
-											class="w-full px-4 py-2 text-left text-sm text-text-base hover:bg-surface-2"
-										>
-											{genre}
-										</button>
+									<li
+										role="option"
+										aria-selected="false"
+										tabindex="0"
+										onclick={() => addGenre(genre)}
+										onkeydown={(e) => {
+											if (e.key === 'Enter' || e.key === ' ') {
+												e.preventDefault();
+												addGenre(genre);
+											}
+										}}
+										class="px-4 py-2 text-base text-text-base hover:bg-surface-2 cursor-pointer"
+									>
+										{genre}
 									</li>
 								{/each}
 							</ul>
@@ -367,29 +384,40 @@
 				</div>
 
 				<!-- 상태 -->
-				<div>
+				<div class="status-dropdown" data-open={statusDropdownOpen}>
 					<label class="block text-sm font-medium text-text-strong mb-2">상태</label>
 					<div class="relative">
 						<button
 							type="button"
 							onclick={() => statusDropdownOpen = !statusDropdownOpen}
-							class="input-base w-full h-10 px-4 flex items-center justify-between"
+							class="w-full h-10 px-4 pr-10 bg-surface-2 border border-border-subtle rounded-lg text-base text-text-base text-left focus:outline-none focus:border-brand-pink transition-colors"
+							aria-haspopup="listbox"
+							aria-expanded={statusDropdownOpen}
 						>
-							<span class="text-text-base">{getStatusLabel(formData.status)}</span>
-							<ChevronDown size={16} class="text-text-muted" />
+							<span class="block truncate">{getStatusLabel(formData.status)}</span>
 						</button>
+						<div class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center">
+							<ChevronDown size={16} class="text-text-muted transition-transform {statusDropdownOpen ? 'rotate-180' : ''}" />
+						</div>
 						
 						{#if statusDropdownOpen}
-							<ul class="absolute left-0 w-full mt-1 bg-surface-1 border border-border-subtle rounded-md z-10">
+							<ul role="listbox" class="absolute left-0 w-full mt-[6px] bg-surface-1 border border-border-subtle rounded-[6px] z-10 max-h-60 overflow-y-auto custom-list-scrollbar">
 								{#each statusOptions as option}
-									<li>
-										<button
-											type="button"
-											onclick={() => { formData.status = option.value; statusDropdownOpen = false; }}
-											class="w-full px-4 py-2 text-left text-sm text-text-base hover:bg-surface-2 {formData.status === option.value ? 'bg-surface-2' : ''}"
-										>
-											{option.label}
-										</button>
+									<li
+										role="option"
+										aria-selected={formData.status === option.value}
+										tabindex="0"
+										onclick={() => { formData.status = option.value; statusDropdownOpen = false; }}
+										onkeydown={(e) => {
+											if (e.key === 'Enter' || e.key === ' ') {
+												e.preventDefault();
+												formData.status = option.value;
+												statusDropdownOpen = false;
+											}
+										}}
+										class="px-4 py-2 text-base text-text-base hover:bg-surface-2 cursor-pointer {formData.status === option.value ? 'bg-brand-pink text-white' : ''}"
+									>
+										{option.label}
 									</li>
 								{/each}
 							</ul>
@@ -474,7 +502,7 @@
 			<button
 				type="button"
 				onclick={onClose}
-				class="btn-secondary px-4 py-2"
+				class="cancel-button px-6 py-2 bg-surface-2 text-text-base rounded-lg border border-border-subtle transition-colors duration-200 font-medium"
 			>
 				취소
 			</button>
@@ -482,7 +510,7 @@
 				type="button"
 				onclick={handleSave}
 				disabled={isSubmitting}
-				class="btn-primary px-4 py-2"
+				class="px-6 py-2 bg-brand-pink text-white rounded-lg focus:outline-none focus:ring-0 transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
 			>
 				{isSubmitting ? '저장 중...' : (mode === 'create' ? '트랙 추가' : '저장')}
 			</button>
