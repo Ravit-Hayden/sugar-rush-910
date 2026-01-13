@@ -3290,15 +3290,21 @@ main.main-content,
 	box-shadow: none !important;
 }
 
-/* 입력 필드 포커스 시 아이콘 색상 변경 */
+/* 입력 필드 포커스 시 아이콘 색상 변경 (버튼 호버 시 제외) */
 .artist-select-dropdown:focus-within .lucide-icon,
 .album-select-dropdown:focus-within .lucide-icon {
 	color: var(--brand-pink) !important;
 }
 
-.artist-select-dropdown:focus-within button .lucide-icon,
-.album-select-dropdown:focus-within button .lucide-icon {
+.artist-select-dropdown:focus-within button:not(:hover) .lucide-icon,
+.album-select-dropdown:focus-within button:not(:hover) .lucide-icon {
 	color: var(--brand-pink) !important;
+}
+
+/* 포커스 상태에서 버튼 호버 시 호버 색상 적용 */
+.artist-select-dropdown:focus-within button:hover .lucide-icon,
+.album-select-dropdown:focus-within button:hover .lucide-icon {
+	color: var(--hover-point) !important;
 }
 
 /* 아티스트/앨범 입력 필드 포커스 시 텍스트 색상 */
