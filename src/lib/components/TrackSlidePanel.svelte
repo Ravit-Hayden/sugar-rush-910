@@ -295,7 +295,7 @@
 				</div>
 
 				<!-- 아티스트 -->
-				<div>
+				<div class="w-full">
 					<label for="track-artist" class="block text-sm font-medium text-text-strong mb-2">
 						아티스트 <Asterisk size={12} class="inline text-brand-pink ml-0" />
 					</label>
@@ -308,6 +308,7 @@
 								validationErrors = { ...validationErrors };
 							}
 						}}
+						required
 						placeholder="아티스트를 선택하거나 입력하세요"
 						allowCustom={true}
 					/>
@@ -317,86 +318,108 @@
 				</div>
 
 				<!-- 장르 -->
-				<div>
-					<label class="block text-sm font-medium text-text-strong mb-2">장르</label>
-					
-					<!-- 선택된 장르 태그 -->
-					{#if formData.genres.length > 0}
-						<div class="flex flex-wrap gap-2 mb-2">
-							{#each formData.genres as genre}
-								<span class="inline-flex items-center gap-1 px-2 py-1 bg-surface-2 text-text-base text-sm rounded-md">
-									{genre}
-									<button
-										type="button"
-										onclick={() => removeGenre(genre)}
-										class="text-text-muted hover:text-hover-point"
-										aria-label="{genre} 제거"
-									>
-										<X size={14} />
-									</button>
-								</span>
-							{/each}
-						</div>
-					{/if}
-
-					<!-- 장르 드롭다운 -->
-					<div class="relative genre-filter-dropdown">
-						<button
-							type="button"
+				<div class="w-full">
+					<label for="track-genres" class="block text-sm font-medium text-text-strong mb-2">장르</label>
+					<div class="relative w-full genre-dropdown">
+						<div
+							id="track-genres"
 							onclick={() => genreDropdownOpen = !genreDropdownOpen}
-							class="w-full h-10 px-4 pr-10 bg-surface-2 border border-border-subtle rounded-lg text-base text-text-muted text-left focus:outline-none focus:border-brand-pink transition-colors"
+							onkeydown={(e) => {
+								if (e.key === 'Enter' || e.key === ' ') {
+									e.preventDefault();
+									genreDropdownOpen = !genreDropdownOpen;
+								}
+							}}
+							class="w-full min-h-10 px-4 pr-[2.625rem] py-0 bg-surface-2 border border-border-subtle rounded-lg text-base text-text-base transition-colors duration-200 flex flex-wrap gap-2 items-center cursor-pointer focus-within:outline-none focus-within:ring-0"
+							role="button"
 							aria-haspopup="listbox"
 							aria-expanded={genreDropdownOpen}
+							tabindex="0"
 						>
-							<span class="block truncate">장르 추가...</span>
-						</button>
-						<div class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center">
-							<ChevronDown size={16} class="text-text-muted transition-transform {genreDropdownOpen ? 'rotate-180' : ''}" />
-						</div>
-						
-						{#if genreDropdownOpen}
-							<ul role="listbox" class="absolute left-0 w-full mt-[6px] bg-surface-1 border border-border-subtle rounded-[6px] z-10 max-h-48 overflow-y-auto custom-list-scrollbar">
-								{#each availableGenres as genre}
-									<li
-										role="option"
-										aria-selected="false"
-										tabindex="0"
-										onclick={() => addGenre(genre)}
-										onkeydown={(e) => {
-											if (e.key === 'Enter' || e.key === ' ') {
-												e.preventDefault();
-												addGenre(genre);
-											}
-										}}
-										class="px-4 py-2 text-base text-text-base hover:bg-surface-2 cursor-pointer"
-									>
+							{#if formData.genres.length === 0}
+								<span class="text-text-muted">장르를 선택하세요</span>
+							{:else}
+								{#each formData.genres as genre}
+									<span class="tag-chip">
 										{genre}
-									</li>
+										<button
+											type="button"
+											onclick={(e) => {
+												e.stopPropagation();
+												removeGenre(genre);
+											}}
+											class="btn-icon ml-1 focus:outline-none"
+											aria-label="{genre} 제거"
+										>
+											<X size={12} />
+										</button>
+									</span>
 								{/each}
+							{/if}
+						</div>
+						<div class="pointer-events-none absolute top-3 right-2.5 flex items-center">
+							<span class="flex h-4 w-4 items-center justify-center">
+								<ChevronDown size={16} class="lucide-icon text-text-muted transition-colors duration-200" />
+							</span>
+						</div>
+						{#if genreDropdownOpen}
+							<ul role="listbox" class="absolute left-0 w-full mt-[6px] bg-surface-1 border border-border-subtle rounded-[6px] z-10 max-h-60 custom-list-scrollbar">
+								{#if availableGenres.length === 0}
+									<li class="px-4 py-2 text-base text-text-muted text-center">모든 장르가 선택되었습니다</li>
+								{:else}
+									{#each availableGenres as genre}
+										<li
+											role="option"
+											aria-selected="false"
+											tabindex="0"
+											onclick={() => addGenre(genre)}
+											onkeydown={(e) => {
+												if (e.key === 'Enter' || e.key === ' ') {
+													e.preventDefault();
+													addGenre(genre);
+												}
+											}}
+											class="px-4 py-2 text-base text-text-base bg-transparent transition-colors duration-200 cursor-pointer genre-dropdown-item focus:!bg-brand-pink focus:!text-white focus:outline-none"
+										>
+											{genre}
+										</li>
+									{/each}
+								{/if}
 							</ul>
 						{/if}
 					</div>
 				</div>
 
 				<!-- 상태 -->
-				<div class="status-dropdown" data-open={statusDropdownOpen}>
-					<label class="block text-sm font-medium text-text-strong mb-2">상태</label>
-					<div class="relative">
+				<div class="w-full">
+					<label for="track-status" class="block text-sm font-medium text-text-strong mb-2">상태</label>
+					<div class="relative w-full status-dropdown" data-open={statusDropdownOpen}>
+						<input type="hidden" name="status" value={formData.status} />
 						<button
 							type="button"
+							id="track-status"
+							class="w-full h-10 px-4 pr-[2.625rem] bg-surface-2 border border-border-subtle rounded-lg text-base text-text-base text-left focus:outline-none focus:border-brand-pink focus:ring-0 transition-colors duration-200"
 							onclick={() => statusDropdownOpen = !statusDropdownOpen}
-							class="w-full h-10 px-4 pr-10 bg-surface-2 border border-border-subtle rounded-lg text-base text-text-base text-left focus:outline-none focus:border-brand-pink transition-colors"
+							onkeydown={(e) => {
+								if (e.key === 'Enter' || e.key === ' ') {
+									e.preventDefault();
+									statusDropdownOpen = !statusDropdownOpen;
+								}
+							}}
 							aria-haspopup="listbox"
 							aria-expanded={statusDropdownOpen}
+							tabindex="0"
 						>
 							<span class="block truncate">{getStatusLabel(formData.status)}</span>
 						</button>
+						<!-- 오른쪽 아이콘 래퍼: 통일된 패턴 -->
 						<div class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center">
-							<ChevronDown size={16} class="text-text-muted transition-transform {statusDropdownOpen ? 'rotate-180' : ''}" />
+							<span class="flex h-4 w-4 items-center justify-center">
+								<ChevronDown size={16} class="lucide-icon text-text-muted transition-colors duration-200" />
+							</span>
 						</div>
-						
 						{#if statusDropdownOpen}
-							<ul role="listbox" class="absolute left-0 w-full mt-[6px] bg-surface-1 border border-border-subtle rounded-[6px] z-10 max-h-60 overflow-y-auto custom-list-scrollbar">
+							<ul role="listbox" class="absolute left-0 w-full mt-[6px] bg-surface-1 border rounded-[6px] z-10 border-border-subtle max-h-60 overflow-y-auto custom-list-scrollbar">
 								{#each statusOptions as option}
 									<li
 										role="option"
