@@ -654,7 +654,7 @@
 						{#if genreDropdownOpen}
 							<ul role="listbox" class="absolute left-0 w-full mt-[6px] bg-surface-1 border border-border-subtle rounded-[6px] z-10 max-h-60 custom-list-scrollbar">
 								{#if availableGenres.length === 0}
-									<li class="px-4 py-2 text-sm text-text-muted text-center">모든 장르가 선택되었습니다</li>
+									<li class="px-4 py-2 text-base text-text-muted text-center">모든 장르가 선택되었습니다</li>
 								{:else}
 									{#each availableGenres as genre}
 										<li
@@ -668,7 +668,7 @@
 													addGenre(genre);
 												}
 											}}
-											class="px-4 py-2 text-sm text-text-base bg-transparent transition-colors duration-200 cursor-pointer genre-dropdown-item focus:!bg-brand-pink focus:!text-white focus:outline-none"
+											class="px-4 py-2 text-base text-text-base bg-transparent transition-colors duration-200 cursor-pointer genre-dropdown-item focus:!bg-brand-pink focus:!text-white focus:outline-none"
 										>
 											{genre}
 										</li>
@@ -711,7 +711,7 @@
 							</span>
 						</div>
 						{#if statusDropdownOpen}
-							<ul role="listbox" class="absolute left-0 w-full mt-[6px] bg-surface-1 border rounded-[6px] z-10 border-border-subtle max-h-60 overflow-y-auto">
+							<ul role="listbox" class="absolute left-0 w-full mt-[6px] bg-surface-1 border rounded-[6px] z-10 border-border-subtle max-h-60 overflow-y-auto custom-list-scrollbar">
 								{#each statusOptions as option}
 									<li
 										role="option"
@@ -724,7 +724,7 @@
 												selectStatusOption(option.value);
 											}
 										}}
-										class="px-4 py-2 text-sm text-text-base hover:bg-surface-2 cursor-pointer {formData.status === option.value ? 'bg-brand-pink text-white' : ''}"
+										class="px-4 py-2 text-base text-text-base hover:bg-surface-2 cursor-pointer {formData.status === option.value ? 'bg-brand-pink text-white' : ''}"
 									>
 										{option.label}
 									</li>
