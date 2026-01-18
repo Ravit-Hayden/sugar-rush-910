@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Video, Plus, Play, Edit, Download, Share, Image, Users, Palette, Settings } from 'lucide-svelte';
+	import { Film, Plus, Play, Edit, Download, Share, Image, SquareUserRound, Palette, Settings } from 'lucide-svelte';
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import PageContent from '$lib/components/PageContent.svelte';
 	import SearchFilterBar from '$lib/components/SearchFilterBar.svelte';
@@ -995,9 +995,9 @@
 </script>
 
 <PageContent>
-	<PageHeader 
-		title="뮤직비디오" 
-		description="AI로 뮤직비디오를 생성하고 캐릭터, 에셋을 관리하세요."
+<PageHeader 
+	title="뮤직비디오 센터" 
+	description="AI로 뮤직비디오를 생성하고 캐릭터, 에셋을 관리하세요."
 		actions={[
 			{
 				icon: Plus,
@@ -1016,20 +1016,20 @@
 					class="py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200 {selectedTab === 'videos' ? 'border-brand-pink text-brand-pink' : 'border-transparent text-text-muted hover:text-text-strong hover:border-border-subtle'}"
 					type="button"
 				>
-					<div class="flex items-center gap-2">
-						<Video size={16} />
-						뮤직비디오 ({musicVideos.length})
-					</div>
+<div class="flex items-center gap-2">
+	<Film size={16} />
+	뮤직비디오 ({musicVideos.length})
+</div>
 				</button>
 				<button
 					onclick={() => selectedTab = 'characters'}
 					class="py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200 {selectedTab === 'characters' ? 'border-brand-pink text-brand-pink' : 'border-transparent text-text-muted hover:text-text-strong hover:border-border-subtle'}"
 					type="button"
 				>
-					<div class="flex items-center gap-2">
-						<Users size={16} />
-						캐릭터 ({characters.length})
-					</div>
+<div class="flex items-center gap-2">
+	<SquareUserRound size={16} />
+	캐릭터 ({characters.length})
+</div>
 				</button>
 				<button
 					onclick={() => selectedTab = 'assets'}
@@ -1079,10 +1079,10 @@
 				{#each filteredMusicVideos as video (video.id)}
 					<div class="bg-surface-1 rounded-lg overflow-hidden hover:bg-surface-2 transition-colors duration-200 group border border-border-subtle">
 						<div class="relative aspect-video bg-surface-2 overflow-hidden rounded-t-lg">
-							<!-- 기본 이미지 (회색 배경 + 회색 로고) -->
-							<div class="absolute inset-0 flex items-center justify-center bg-surface-2 rounded-t-lg">
-								<Video size={48} class="text-text-muted opacity-30" />
-							</div>
+<!-- 기본 이미지 (회색 배경 + 회색 로고) -->
+<div class="absolute inset-0 flex items-center justify-center bg-surface-2 rounded-t-lg">
+	<Film size={48} class="text-text-muted opacity-30" />
+</div>
 							<!-- 실제 이미지 (있을 경우) -->
 							{#if video.thumbnail && video.thumbnail !== '/api/placeholder/300/200'}
 								<img
@@ -1183,10 +1183,10 @@
 								}}
 								disabled={!character.image || character.image === '/api/placeholder/200/200'}
 							>
-								<!-- 기본 이미지 (회색 배경 + 회색 로고) -->
-								<div class="absolute inset-0 flex items-center justify-center">
-									<Users size={24} class="text-text-muted opacity-30" />
-							</div>
+<!-- 기본 이미지 (회색 배경 + 회색 로고) -->
+<div class="absolute inset-0 flex items-center justify-center">
+	<SquareUserRound size={24} class="text-text-muted opacity-30" />
+</div>
 								<!-- 실제 이미지 (있을 경우) -->
 								{#if character.image && character.image !== '/api/placeholder/200/200'}
 									<img

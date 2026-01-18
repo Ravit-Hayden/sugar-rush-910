@@ -91,15 +91,16 @@
 	// 메뉴 아이템 정의
 	const menuItems = [
 		{ href: '/', label: '대시보드' },
-		{ href: '/albums', label: '앨범 관리' },
-		{ href: '/tracks', label: '트랙 관리' },
-		{ href: '/music-videos', label: '뮤직비디오 센터' },
-		{ href: '/upload', label: '업로드·검증 센터' },
+		{ href: '/feedback', label: '피드백·알림 센터' },
 		{ href: '/collaboration', label: '제작·협업 보드' },
+		{ href: '/calendar', label: '일정·캘린더' },
+		{ href: '/suno', label: 'SUNO 제작' },
+		{ href: '/upload', label: '음원 관리' },
+		{ href: '/tracks', label: '트랙 관리' },
+		{ href: '/albums', label: '앨범 관리' },
+		{ href: '/music-videos', label: '뮤직비디오 센터' },
 		{ href: '/releases', label: '발매 관리' },
 		{ href: '/revenue', label: '수익 관리' },
-		{ href: '/calendar', label: '일정·캘린더' },
-		{ href: '/feedback', label: '피드백·알림 센터' },
 		{ href: '/security', label: '보안·운영 관리' },
 		{ href: '/settings', label: '설정' }
 	];

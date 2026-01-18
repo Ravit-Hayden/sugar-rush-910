@@ -605,7 +605,7 @@
 				{:else}
 				<div class="space-y-4">
 					{#each filteredFeedbacks as feedback (feedback.id)}
-						<div class="bg-surface-1 rounded-lg p-6 hover:bg-surface-2 transition-colors duration-200 border border-border-subtle {feedback.status === 'unread' ? 'ring-2 ring-brand-pink/20' : ''}">
+						<div class="bg-surface-1 rounded-lg p-6 hover:bg-surface-2 transition-colors duration-200 border border-border-subtle">
 							<div class="flex items-start gap-4">
 								<!-- 아바타 -->
 								<div class="flex-shrink-0">
@@ -795,7 +795,7 @@
 			{:else}
 			<div class="space-y-4">
 				{#each notifications as notification (notification.id)}
-					<div class="bg-surface-1 rounded-lg p-4 hover:bg-surface-2 transition-colors duration-200 border border-border-subtle {notification.status === 'unread' ? 'ring-2 ring-brand-pink/20' : ''}">
+					<div class="bg-surface-1 rounded-lg p-4 hover:bg-surface-2 transition-colors duration-200 border border-border-subtle">
 						<div class="flex items-start gap-3">
 							<div class="flex-shrink-0">
 								<div class="w-8 h-8 bg-surface-2 rounded-full flex items-center justify-center border border-border-subtle">

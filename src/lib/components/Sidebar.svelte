@@ -2,18 +2,18 @@
 	import { page } from '$app/stores';
 	import { browser } from '$app/environment';
 	import {
-		LayoutGrid, Disc3, Music, FolderOpen, Heart, Rocket,
-		DollarSign, Calendar, MessageSquare, Shield, Settings,
-		PanelLeftOpen, PanelLeftClose, PanelsTopLeft, Video
+		LayoutGrid, Disc, Music, Folder, Handshake, Globe,
+		Database, Calendar, MessageSquareDot, ShieldHalf, SlidersHorizontal,
+		PanelLeftOpen, PanelLeftClose, PanelsTopLeft, Film, Headphones
 	} from 'lucide-svelte';
 
 	let sidebarOpen = $state(false);
-	let sidebarCollapsed = $state(true); // 기본값: 축소 상태
+	let sidebarCollapsed = $state(true);
 	let isSearching = $state(false);
 	let sidebarToggleHovered = $state(false);
 	let sidebarToggleClicked = $state(false);
-	let isMobile = $state(false); // 모바일 화면 크기 추적
-	let mounted = $state(false); // 마운트 상태 추적
+	let isMobile = $state(false);
+	let mounted = $state(false);
 
 	// 화면 크기 감지 함수
 	function checkScreenSize() {
@@ -21,29 +21,15 @@
 			const wasMobile = isMobile;
 			isMobile = window.innerWidth < 768;
 			
-			// 화면 크기가 변경될 때 사이드바 상태 조정
 			if (wasMobile !== isMobile) {
-				if (isMobile) {
-					// 모바일로 전환될 때: 사이드바를 축소 상태로 강제 설정
-					sidebarCollapsed = true;
-					sidebarOpen = false;
-					window.dispatchEvent(new CustomEvent('sidebar-collapse-change', { 
-						detail: { collapsed: true } 
-					}));
-					window.dispatchEvent(new CustomEvent('sidebar-width-change', {
-						detail: { width: 72 }
-					}));
-				} else {
-					// 데스크톱으로 전환될 때: 기본 축소 상태 유지
-					sidebarCollapsed = true;
-					sidebarOpen = false;
-					window.dispatchEvent(new CustomEvent('sidebar-collapse-change', { 
-						detail: { collapsed: true } 
-					}));
-					window.dispatchEvent(new CustomEvent('sidebar-width-change', {
-						detail: { width: 72 }
-					}));
-				}
+				sidebarCollapsed = true;
+				sidebarOpen = false;
+				window.dispatchEvent(new CustomEvent('sidebar-collapse-change', { 
+					detail: { collapsed: true } 
+				}));
+				window.dispatchEvent(new CustomEvent('sidebar-width-change', {
+					detail: { width: 72 }
+				}));
 			}
 		}
 	}
@@ -56,7 +42,6 @@
 		}, 150);
 		
 		if (typeof window !== 'undefined') {
-			// 데스크톱: 축소/확장 토글
 			if (window.innerWidth >= 768) {
 				sidebarCollapsed = !sidebarCollapsed;
 				window.dispatchEvent(new CustomEvent('sidebar-collapse-change', { 
@@ -66,7 +51,6 @@
 					detail: { width: sidebarCollapsed ? 72 : 250 }
 				}));
 			} else {
-				// 모바일: 열기/닫기 토글
 				sidebarOpen = !sidebarOpen;
 				window.dispatchEvent(new CustomEvent('sidebar-toggle', { 
 					detail: { open: sidebarOpen } 
@@ -75,20 +59,21 @@
 		}
 	}
 
-	// 메뉴 아이템 정의
+	// 메뉴 아이템 정의 (논리적 작업 흐름 순서)
 	const menuItems = [
 		{ icon: LayoutGrid, label: '대시보드', href: '/' },
-		{ icon: Disc3, label: '앨범 관리', href: '/albums' },
-		{ icon: Music, label: '트랙 관리', href: '/tracks' },
-		{ icon: Video, label: '뮤직비디오 센터', href: '/music-videos' },
-		{ icon: FolderOpen, label: '업로드·검증 센터', href: '/upload' },
-		{ icon: Heart, label: '제작·협업 보드', href: '/collaboration' },
-		{ icon: Rocket, label: '발매 관리', href: '/releases' },
-		{ icon: DollarSign, label: '수익 관리', href: '/revenue' },
+		{ icon: MessageSquareDot, label: '피드백·알림 센터', href: '/feedback' },
+		{ icon: Handshake, label: '제작·협업 보드', href: '/collaboration' },
 		{ icon: Calendar, label: '일정·캘린더', href: '/calendar' },
-		{ icon: MessageSquare, label: '피드백·알림 센터', href: '/feedback' },
-		{ icon: Shield, label: '보안·운영 관리', href: '/security' },
-		{ icon: Settings, label: '설정', href: '/settings' }
+		{ icon: Headphones, label: 'SUNO 제작', href: '/suno' },
+		{ icon: Folder, label: '음원 관리', href: '/upload' },
+		{ icon: Music, label: '트랙 관리', href: '/tracks' },
+		{ icon: Disc, label: '앨범 관리', href: '/albums' },
+		{ icon: Film, label: '뮤직비디오 센터', href: '/music-videos' },
+		{ icon: Globe, label: '발매 관리', href: '/releases' },
+		{ icon: Database, label: '수익 관리', href: '/revenue' },
+		{ icon: ShieldHalf, label: '보안·운영 관리', href: '/security' },
+		{ icon: SlidersHorizontal, label: '설정', href: '/settings' }
 	];
 
 	// 현재 페이지 활성화 확인
@@ -109,28 +94,21 @@
 	$effect(() => {
 		if (!browser) return () => {};
 		
-		// 마운트됨으로 표시
 		mounted = true;
-		
-		// 초기 화면 크기 확인
 		checkScreenSize();
 		
-		// 초기 사이드바 상태를 헤더에 알림
 		window.dispatchEvent(new CustomEvent('sidebar-width-change', {
 			detail: { width: sidebarCollapsed ? 72 : 250 }
 		}));
 		
-		// 리사이즈 이벤트 리스너
 		const handleResize = () => {
 			checkScreenSize();
 		};
 		
-		// ui.js에서 발생하는 사이드바 토글 이벤트 수신
 		const handleSidebarToggleEvent = (event: CustomEvent) => {
 			const newState = event.detail.state;
 			sidebarCollapsed = newState === 'collapsed';
 			
-			// 헤더에 상태 변경 알림
 			window.dispatchEvent(new CustomEvent('sidebar-width-change', {
 				detail: { width: sidebarCollapsed ? 72 : 250 }
 			}));
@@ -152,10 +130,8 @@
 	style="width: {sidebarCollapsed ? '72px' : '250px'}; transition: width 200ms ease-in-out, transform 200ms ease-in-out;"
 >
 	<div class="h-full w-full overflow-hidden flex flex-col">
-		<!-- 상단 토글 버튼과 로고 (고정 영역) -->
+		<!-- 상단 토글 버튼과 로고 -->
 		<div class="flex items-center h-20 border-b border-border-subtle flex-shrink-0 px-6">
-			<!-- 상태 표시 아이콘 (모바일) / 토글 버튼 (데스크톱) -->
-			<!-- SSR 시에는 항상 데스크톱 버전을 렌더링하고, 마운트 후 조건부 표시 -->
 			<div class="flex-shrink-0 w-6 h-6 inline-flex items-center justify-center pointer-events-none" 
 				 style="color: var(--brand-pink) !important; display: {mounted && isMobile ? 'flex' : 'none'};">
 				<PanelsTopLeft 
@@ -163,7 +139,6 @@
 					style="color: var(--brand-pink) !important; pointer-events: none;"
 				/>
 			</div>
-			<!-- 토글 버튼 (클릭 가능) - 모바일이 아닐 때 또는 마운트 전에 표시 -->
 			<button
 				onclick={handleSidebarToggle}
 				onmouseenter={() => sidebarToggleHovered = true}
@@ -187,38 +162,35 @@
 				{/if}
 			</button>
 			
-			<!-- 로고 -->
 			<div class="sidebar-text-animation ml-3 {sidebarCollapsed ? 'collapsed' : 'expanded'}">
 				<img src="/logo.svg" alt="Sugar Rush" class="h-6 w-auto" />
 			</div>
 		</div>
 
-		<!-- 메뉴 아이템들 (스크롤 가능 영역) -->
+		<!-- 메뉴 아이템들 -->
 		<nav class="flex-1 overflow-hidden">
-			<ul class="space-y-0 h-full overflow-y-auto overflow-x-hidden">
-			{#each menuItems as item (item.label)}
-				{@const IconComponent = item.icon}
-				<li class="overflow-hidden">
-					<a
-						href={item.href}
-						onclick={(e) => handleMenuClick(e, item.href)}
-						class="sidebar-menu-item flex items-center h-12 w-full text-text-base transition-colors duration-200 ease-in-out px-6 {isActive(item.href) ? 'active' : ''}"
-						style="outline: none;"
-						title={sidebarCollapsed ? item.label : ''}
-						aria-current={isActive(item.href) ? 'page' : undefined}
-					>
-						<!-- 아이콘 -->
-						<div class="flex-shrink-0 w-5 h-5 flex items-center justify-center">
-							<IconComponent size={20} class="lucide-icon transition-colors duration-200 ease-in-out" />
-						</div>
-						
-						<!-- 텍스트 -->
-						<div class="sidebar-text-animation ml-3 {sidebarCollapsed ? 'collapsed' : 'expanded'}">
-							<span class="text-sm whitespace-nowrap hidden md:inline">{item.label}</span>
-						</div>
-					</a>
-				</li>
-			{/each}
+			<ul class="space-y-0 h-full overflow-y-auto overflow-x-hidden custom-list-scrollbar">
+				{#each menuItems as item (item.label)}
+					{@const IconComponent = item.icon}
+					<li class="overflow-hidden">
+						<a
+							href={item.href}
+							onclick={(e) => handleMenuClick(e, item.href)}
+							class="sidebar-menu-item flex items-center h-12 w-full text-text-base transition-colors duration-200 ease-in-out px-6 {isActive(item.href) ? 'active' : ''}"
+							style="outline: none;"
+							title={sidebarCollapsed ? item.label : ''}
+							aria-current={isActive(item.href) ? 'page' : undefined}
+						>
+<div class="flex-shrink-0 w-5 h-5 flex items-center justify-center">
+	<IconComponent size={20} class="lucide-icon transition-colors duration-200 ease-in-out" />
+</div>
+							
+							<div class="sidebar-text-animation ml-3 {sidebarCollapsed ? 'collapsed' : 'expanded'}">
+								<span class="text-sm whitespace-nowrap hidden md:inline">{item.label}</span>
+							</div>
+						</a>
+					</li>
+				{/each}
 			</ul>
 		</nav>
 	</div>

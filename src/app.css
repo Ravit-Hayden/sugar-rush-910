@@ -80,6 +80,9 @@
   --calendar-bg: #222222;  /* 캘린더 배경 (다크 모드: surface-1보다 한 톤 밝게) */
   --calendar-picker-bg: #2A2A2A;  /* 년도/월 선택 드롭다운 배경 (다크 모드: 캘린더보다 한 톤 더 밝게) */
   --border-subtle: #252528;
+  --toggle-bg: #333333;  /* 토글 배경색 (다크 모드: 진한 회색) */
+  --toggle-knob-on: #00FF2E;  /* 토글 활성화 동그라미 (녹색) */
+  --toggle-knob-off: #6F6F6F;  /* 토글 비활성화 동그라미 (muted 색상) */
 }
 
 /* 라이트 모드 색상 변수 */
@@ -137,6 +140,9 @@
   
   --elotte-green: #76a7a9;        /* El 전용 색상 (다크/라이트 동일) */
   --ok-fg: #FF3DAE;               /* 라이트 모드에서 KPI 색상 변경 (핫핑크) */
+  --toggle-bg: #C9B8A5;  /* 토글 배경색 (라이트 모드: 베이지~갈색 사이) */
+  --toggle-knob-on: #228B22;  /* 토글 활성화 동그라미 (진한 녹색) */
+  --toggle-knob-off: #5C4F3F;  /* 토글 비활성화 동그라미 (muted 색상) */
 }
 
 /* 멤버 컬러 토큰 */
@@ -693,6 +699,7 @@ div[class*="panel"] {
 .text-text-muted { color: var(--text-muted); }
 .text-white { color: #FFFFFF; }
 .border-border-subtle { border-color: var(--border-subtle); }
+.divide-border-subtle > :not([hidden]) ~ :not([hidden]) { border-color: var(--border-subtle); }
 .text-brand-pink { color: var(--brand-pink); }
 .text-hover-cyan { color: var(--hover-point); }
 .text-danger-fg { color: var(--danger-fg); }
@@ -1872,8 +1879,8 @@ input[type="checkbox"]:checked::after {
 /* 아티스트 관리 카드, 데이터 관리 카드, 폼 컨테이너, 업로드 영역, 리스트 아이템 링크는 제외 */
 /* 포커스 상태일 때는 호버 효과 없음 */
 /* 리스트 아이템은 아이콘/텍스트만 호버 효과 적용 (배경/테두리 변경 없음) */
-main.main-content-area .bg-surface-1:hover:not(.artist-card):not(.data-management-card):not(:has(form)):not(.upload-zone):not(:focus):not(:focus-visible):not(:focus-within):not(a[href*="/tasks/"]):not(a[href*="/calendar/"]):not(a[href*="/status/"]):not(a[href*="/failures/"]):not(a[href*="/logs/"]):not(a[href*="/releases/"]):not(a[href*="/changes/"]):not(a[href*="/feedback/"]):not(a[href*="/albums/new"]):not(a[href*="/tracks/new"]):not(a[href*="/files/upload"]):not(a[href*="/revenue"]):not(.slide-panel-footer),
-main.main-content-area .bg-surface-2:hover:not(.artist-card):not(.data-management-card):not(:has(form)):not(.upload-zone):not(:focus):not(:focus-visible):not(:focus-within):not(a[href*="/tasks/"]):not(a[href*="/calendar/"]):not(a[href*="/status/"]):not(a[href*="/failures/"]):not(a[href*="/logs/"]):not(a[href*="/releases/"]):not(a[href*="/changes/"]):not(a[href*="/feedback/"]):not(a[href*="/albums/new"]):not(a[href*="/tracks/new"]):not(a[href*="/files/upload"]):not(a[href*="/revenue"]):not(.slide-panel-footer) {
+main.main-content-area .bg-surface-1:hover:not(.artist-card):not(.data-management-card):not(:has(form)):not(.upload-zone):not(:focus):not(:focus-visible):not(:focus-within):not(a[href*="/tasks/"]):not(a[href*="/calendar/"]):not(a[href*="/status/"]):not(a[href*="/failures/"]):not(a[href*="/logs/"]):not(a[href*="/releases/"]):not(a[href*="/changes/"]):not(a[href*="/feedback/"]):not(a[href*="/albums/new"]):not(a[href*="/tracks/new"]):not(a[href*="/files/upload"]):not(a[href*="/revenue"]):not(.slide-panel-footer):not(.suno-tab-content):not(.suno-tab),
+main.main-content-area .bg-surface-2:hover:not(.artist-card):not(.data-management-card):not(:has(form)):not(.upload-zone):not(:focus):not(:focus-visible):not(:focus-within):not(a[href*="/tasks/"]):not(a[href*="/calendar/"]):not(a[href*="/status/"]):not(a[href*="/failures/"]):not(a[href*="/logs/"]):not(a[href*="/releases/"]):not(a[href*="/changes/"]):not(a[href*="/feedback/"]):not(a[href*="/albums/new"]):not(a[href*="/tracks/new"]):not(a[href*="/files/upload"]):not(a[href*="/revenue"]):not(.slide-panel-footer):not(.suno-tab-content):not(.suno-tab) {
   border-color: var(--hover-point) !important;
   transition: border-color 0.2s ease;
 }
@@ -1883,15 +1890,75 @@ aside.bg-surface-2:hover {
   border-color: var(--border-subtle) !important;
 }
 
+/* SUNO 탭 스타일 */
+.suno-tab-active,
+.suno-tab-active svg,
+.suno-tab-active span {
+  color: var(--brand-pink) !important;
+}
+
+.suno-tab-inactive svg,
+.suno-tab-inactive span {
+  color: var(--text-muted);
+  transition: color 0.2s ease;
+}
+
+.suno-tab-inactive:hover svg,
+.suno-tab-inactive:hover span {
+  color: var(--hover-point) !important;
+}
+
+.suno-tab-inactive:focus-visible svg,
+.suno-tab-inactive:focus-visible span {
+  color: var(--brand-pink) !important;
+}
+
 /* 전역 링크/버튼 스타일 제거됨 - .text-link, .btn-ghost, .btn-icon 클래스 사용 */
 
 /* 배지 호버 효과 제거 - 배지는 호버 효과 불필요 */
 
 /* 아이콘 호버 효과 (포커스 상태가 아닐 때만) */
 /* 포커스 상태의 요소 내부 아이콘은 호버 효과 없음 */
+/* SUNO 탭 아이콘은 제외 (부모 요소에서 관리) */
 .lucide-icon:hover:not(:focus):not(:focus-visible):not(:focus-within) {
   color: var(--hover-point) !important;
   transition: color 0.2s ease;
+}
+
+/* SUNO 탭 내 아이콘은 전역 호버 효과 무시 - 최우선 */
+.suno-tab .lucide-icon:hover,
+.suno-tab-active .lucide-icon:hover,
+.suno-tab-inactive .lucide-icon:hover {
+  color: inherit !important;
+}
+
+/* SUNO 탭 아이콘은 부모 요소에서 호버 효과 관리 - 개별 호버 효과 완전 차단 */
+a.suno-tab .lucide-icon,
+a.suno-tab .lucide-icon:hover,
+a.suno-tab-active .lucide-icon,
+a.suno-tab-active .lucide-icon:hover,
+a.suno-tab-inactive .lucide-icon,
+a.suno-tab-inactive .lucide-icon:hover,
+nav a.suno-tab .lucide-icon:hover,
+nav a.suno-tab-active .lucide-icon:hover,
+nav a.suno-tab-inactive .lucide-icon:hover {
+  color: inherit !important;
+}
+
+/* 비활성 SUNO 탭 호버 시 아이콘+텍스트 색상 강제 적용 */
+a.suno-tab-inactive:hover .lucide-icon,
+a.suno-tab-inactive:hover span,
+nav a.suno-tab-inactive:hover .lucide-icon,
+nav a.suno-tab-inactive:hover span {
+  color: var(--hover-point) !important;
+}
+
+/* 활성 SUNO 탭은 항상 핫핑크 유지 */
+a.suno-tab-active .lucide-icon,
+a.suno-tab-active span,
+a.suno-tab-active:hover .lucide-icon,
+a.suno-tab-active:hover span {
+  color: var(--brand-pink) !important;
 }
 
 /* 활성화 상태의 사이드바 메뉴 아이템 아이콘 호버 효과 완전 차단 (최우선 - 전역 규칙보다 높은 특이성) */

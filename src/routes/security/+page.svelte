@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Shield, Lock, Eye, AlertTriangle, CheckCircle, Key, Clock, User, Settings, Bell, Activity, FileText, Users } from 'lucide-svelte';
+	import { Shield, Lock, Eye, AlertTriangle, CheckCircle, Key, Clock, User, Settings, Bell, Activity, FileText, Users, ShieldAlert, ShieldCheck, ShieldEllipsis, ShieldQuestionMark, ShieldPlus, ShieldUser, ShieldX, ShieldHalf, XCircle, Info } from 'lucide-svelte';
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import PageContent from '$lib/components/PageContent.svelte';
 	import { toast } from '$lib/stores/toast';
@@ -127,7 +127,7 @@
 	function getStatusColor(status: string) {
 		switch (status) {
 			case 'enabled': return 'badge-low-green';
-			case 'disabled': return 'badge-high-urgent';
+			case 'disabled': return 'text-text-muted';
 			case 'warning': return 'badge-medium-yellow';
 			default: return 'text-text-muted';
 		}
@@ -157,8 +157,8 @@
 		switch (type) {
 			case 'success': return CheckCircle;
 			case 'warning': return AlertTriangle;
-			case 'error': return AlertTriangle;
-			case 'info': return Eye;
+			case 'error': return XCircle;
+			case 'info': return Info;
 			default: return CheckCircle;
 		}
 	}
@@ -217,27 +217,30 @@
 	<!-- 탭 네비게이션 -->
 	<div class="mb-6 border-b border-border-subtle">
 		<div class="flex gap-4">
-			<button
-				onclick={() => selectedTab = 'overview'}
-				class="px-4 py-2 text-sm font-medium border-b-2 transition-colors {selectedTab === 'overview' ? 'border-brand-pink text-brand-pink' : 'border-transparent text-text-muted hover:text-text-strong'}"
-				type="button"
-			>
-				개요
-			</button>
-			<button
-				onclick={() => selectedTab = 'settings'}
-				class="px-4 py-2 text-sm font-medium border-b-2 transition-colors {selectedTab === 'settings' ? 'border-brand-pink text-brand-pink' : 'border-transparent text-text-muted hover:text-text-strong'}"
-				type="button"
-			>
-				보안 설정
-			</button>
-			<button
-				onclick={() => selectedTab = 'logs'}
-				class="px-4 py-2 text-sm font-medium border-b-2 transition-colors {selectedTab === 'logs' ? 'border-brand-pink text-brand-pink' : 'border-transparent text-text-muted hover:text-text-strong'}"
-				type="button"
-			>
-				활동 로그
-			</button>
+<button
+	onclick={() => selectedTab = 'overview'}
+	class="px-4 py-2 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 {selectedTab === 'overview' ? 'border-brand-pink text-brand-pink' : 'border-transparent text-text-muted hover:text-text-strong'}"
+	type="button"
+>
+	<ShieldHalf size={16} />
+	개요
+</button>
+<button
+	onclick={() => selectedTab = 'settings'}
+	class="px-4 py-2 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 {selectedTab === 'settings' ? 'border-brand-pink text-brand-pink' : 'border-transparent text-text-muted hover:text-text-strong'}"
+	type="button"
+>
+	<ShieldCheck size={16} />
+	보안 설정
+</button>
+<button
+	onclick={() => selectedTab = 'logs'}
+	class="px-4 py-2 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 {selectedTab === 'logs' ? 'border-brand-pink text-brand-pink' : 'border-transparent text-text-muted hover:text-text-strong'}"
+	type="button"
+>
+	<ShieldEllipsis size={16} />
+	활동 로그
+</button>
 		</div>
 	</div>
 
@@ -256,7 +259,7 @@
 
 			<div class="bg-surface-1 rounded-lg p-6 border border-border-subtle">
 				<div class="flex items-center gap-3 mb-2">
-					<Eye size={20} class="text-brand-pink" />
+					<ShieldQuestionMark size={20} class="text-brand-pink" />
 					<span class="text-sm font-medium text-text-muted">마지막 스캔</span>
 				</div>
 				<div class="text-sm text-text-strong">{formatTime(securityStatus.lastScan)}</div>
@@ -264,7 +267,7 @@
 
 			<div class="bg-surface-1 rounded-lg p-6 border border-border-subtle">
 				<div class="flex items-center gap-3 mb-2">
-					<AlertTriangle size={20} class="text-red-500" />
+					<ShieldAlert size={20} class="text-red-500" />
 					<span class="text-sm font-medium text-text-muted">위협</span>
 				</div>
 				<div class="text-2xl font-bold text-red-500">{securityStatus.threats}</div>
@@ -273,7 +276,7 @@
 
 			<div class="bg-surface-1 rounded-lg p-6 border border-border-subtle">
 				<div class="flex items-center gap-3 mb-2">
-					<Key size={20} class="text-yellow-500" />
+					<ShieldPlus size={20} class="text-yellow-500" />
 					<span class="text-sm font-medium text-text-muted">업데이트</span>
 				</div>
 				<div class="text-2xl font-bold text-yellow-500">{securityStatus.updates}</div>
@@ -285,7 +288,7 @@
 		<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
 			<div class="bg-surface-1 rounded-lg p-6 border border-border-subtle">
 				<div class="flex items-center gap-3 mb-4">
-					<Users size={20} class="text-brand-pink" />
+					<ShieldUser size={20} class="text-brand-pink" />
 					<h3 class="text-lg font-semibold text-text-strong">활성 사용자</h3>
 				</div>
 				<div class="text-3xl font-bold text-text-strong">{securityStatus.activeUsers}</div>
@@ -294,7 +297,7 @@
 
 			<div class="bg-surface-1 rounded-lg p-6 border border-border-subtle">
 				<div class="flex items-center gap-3 mb-4">
-					<Lock size={20} class="text-red-500" />
+					<ShieldX size={20} class="text-red-500" />
 					<h3 class="text-lg font-semibold text-text-strong">실패한 로그인</h3>
 				</div>
 				<div class="text-3xl font-bold text-red-500">{securityStatus.failedLogins}</div>
@@ -305,7 +308,7 @@
 		<!-- 최근 활동 -->
 		<div class="bg-surface-1 rounded-lg p-6 border border-border-subtle">
 			<h3 class="text-lg font-semibold text-text-strong mb-6 flex items-center gap-2">
-				<Activity size={20} class="text-brand-pink" />
+				<ShieldEllipsis size={20} class="text-brand-pink" />
 				최근 활동
 			</h3>
 			<div class="space-y-3">
@@ -337,7 +340,7 @@
 	{#if selectedTab === 'settings'}
 		<div class="bg-surface-1 rounded-lg p-6 border border-border-subtle">
 			<h3 class="text-lg font-semibold text-text-strong mb-6 flex items-center gap-2">
-				<Settings size={20} class="text-brand-pink" />
+				<ShieldCheck size={20} class="text-brand-pink" />
 				보안 설정
 			</h3>
 			<div class="space-y-4">
@@ -351,17 +354,18 @@
 							<span class="badge-base {getStatusColor(item.status)}">
 								{getStatusLabel(item.status)}
 							</span>
-							{#if item.canToggle}
-								<label class="relative inline-flex items-center cursor-pointer">
-									<input
-										type="checkbox"
-										checked={item.status === 'enabled'}
-										onchange={() => toggleSecurityItem(item)}
-										class="sr-only peer"
-									/>
-									<div class="w-11 h-6 bg-surface-1 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-brand-pink rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-pink"></div>
-								</label>
-							{/if}
+							<label class="relative inline-flex items-center {item.canToggle ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'}">
+								<input
+									type="checkbox"
+									checked={item.status === 'enabled'}
+									onchange={() => toggleSecurityItem(item)}
+									disabled={!item.canToggle}
+									class="sr-only peer"
+								/>
+								<div class="w-11 h-6 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:border after:rounded-full after:h-5 after:w-5 after:transition-all" style="background-color: var(--toggle-bg); --tw-border-opacity: 0;" class:peer-checked={item.status === 'enabled'}>
+									<span class="absolute top-[2px] left-[2px] w-5 h-5 rounded-full transition-all" style="background-color: {item.status === 'enabled' ? 'var(--toggle-knob-on)' : 'var(--toggle-knob-off)'}; transform: {item.status === 'enabled' ? 'translateX(100%)' : 'translateX(0)'}"></span>
+								</div>
+							</label>
 						</div>
 					</div>
 				{/each}
@@ -413,7 +417,7 @@
 
 		<div class="bg-surface-1 rounded-lg p-6 border border-border-subtle">
 			<h3 class="text-lg font-semibold text-text-strong mb-6 flex items-center gap-2">
-				<FileText size={20} class="text-brand-pink" />
+				<ShieldEllipsis size={20} class="text-brand-pink" />
 				활동 로그
 			</h3>
 			<div class="space-y-3">
