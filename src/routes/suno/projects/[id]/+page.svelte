@@ -6,7 +6,7 @@
 	import { SUNO_VERSIONS, VOCAL_GENDERS, GENERATION_TYPES, DEFAULT_SLIDER_VALUES } from '$lib/constants/suno/prompts';
 	import type { SUNOProject, ProductionStageStatus, LyricsVersion, SUNOPromptConfig, AudioVersion, LyricsVersionType } from '$lib/types/suno';
 
-	const projectId = $page.params.id;
+	const projectId = $page.params.id ?? '';
 
 	// 탭 상태
 	let activeTab = $state<'lyrics' | 'prompt' | 'audio' | 'progress' | 'history'>('lyrics');
@@ -308,9 +308,10 @@
 						<div class="p-6 space-y-4">
 							<!-- 스타일 -->
 							<div>
-								<label class="block text-sm font-medium text-text-strong mb-2">Styles</label>
+								<label for="styles-{config.id}" class="block text-sm font-medium text-text-strong mb-2">Styles</label>
 								<div class="relative">
 									<textarea
+										id="styles-{config.id}"
 										readonly
 										value={config.styles}
 										class="input-base w-full h-24 px-4 py-3 resize-none"
@@ -328,9 +329,10 @@
 
 							<!-- 제외 스타일 -->
 							<div>
-								<label class="block text-sm font-medium text-text-strong mb-2">Exclude Styles</label>
+								<label for="exclude-styles-{config.id}" class="block text-sm font-medium text-text-strong mb-2">Exclude Styles</label>
 								<div class="relative">
 									<textarea
+										id="exclude-styles-{config.id}"
 										readonly
 										value={config.excludeStyles}
 										class="input-base w-full h-20 px-4 py-3 resize-none"
@@ -348,9 +350,10 @@
 							<!-- 슬라이더들 -->
 							<div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
 								<div>
-									<label class="block text-sm font-medium text-text-strong mb-2">Weirdness</label>
+									<label for="weirdness-{config.id}" class="block text-sm font-medium text-text-strong mb-2">Weirdness</label>
 									<div class="flex items-center gap-3">
 										<input 
+											id="weirdness-{config.id}"
 											type="range" 
 											min="0" 
 											max="100" 
@@ -362,9 +365,10 @@
 									</div>
 								</div>
 								<div>
-									<label class="block text-sm font-medium text-text-strong mb-2">Style Influence</label>
+									<label for="style-influence-{config.id}" class="block text-sm font-medium text-text-strong mb-2">Style Influence</label>
 									<div class="flex items-center gap-3">
 										<input 
+											id="style-influence-{config.id}"
 											type="range" 
 											min="0" 
 											max="100" 
@@ -376,9 +380,10 @@
 									</div>
 								</div>
 								<div>
-									<label class="block text-sm font-medium text-text-strong mb-2">Audio Influence</label>
+									<label for="audio-influence-{config.id}" class="block text-sm font-medium text-text-strong mb-2">Audio Influence</label>
 									<div class="flex items-center gap-3">
 										<input 
+											id="audio-influence-{config.id}"
 											type="range" 
 											min="0" 
 											max="100" 
@@ -459,7 +464,7 @@
 							<div class="px-4 py-3 border-t border-border-subtle bg-surface-2/50">
 								{#each audio.comments as comment}
 									<div class="flex items-start gap-2 text-sm">
-										<span class="font-medium {comment.author === 'El' ? 'text-blue-400' : 'text-purple-400'}">{comment.author}:</span>
+										<span class="font-medium {comment.author === 'El' ? 'text-elotte-green' : 'text-elotte-orange'}">{comment.author}:</span>
 										<span class="text-text-base">{comment.content}</span>
 									</div>
 								{/each}

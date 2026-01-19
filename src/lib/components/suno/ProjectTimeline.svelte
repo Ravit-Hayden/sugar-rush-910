@@ -143,7 +143,7 @@
 									<div class="flex items-center gap-2">
 										<span class="text-sm font-medium text-text-base">{event.title}</span>
 										<span class="text-xs text-text-muted">·</span>
-										<span class="text-xs {event.author === 'El' ? 'text-blue-400' : 'text-purple-400'}">
+										<span class="text-xs {event.author === 'El' ? 'text-elotte-green' : 'text-elotte-orange'}">
 											{event.author}
 										</span>
 									</div>

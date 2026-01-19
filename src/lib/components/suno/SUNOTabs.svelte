@@ -68,7 +68,7 @@
 	</nav>
 
 	<!-- 콘텐츠 영역 (호버/포커스 효과 없음) -->
-	<div class="suno-tab-content bg-surface-1 border border-border-subtle {contentRoundedClass} p-5 sm:p-6 -mt-px">
+	<div class="suno-tab-content bg-surface-1 border border-border-subtle {contentRoundedClass} p-4 -mt-px">
 		{#if children}
 			{@render children()}
 		{/if}

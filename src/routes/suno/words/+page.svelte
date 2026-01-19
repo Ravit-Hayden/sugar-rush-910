@@ -195,6 +195,7 @@
 							aria-selected={selectedCategory === 'all'}
 							tabindex="0"
 							onclick={() => { selectedCategory = 'all'; categoryDropdownOpen = false; }}
+							onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { selectedCategory = 'all'; categoryDropdownOpen = false; } }}
 							class="px-4 py-2 text-base text-text-base hover:bg-surface-1 cursor-pointer {selectedCategory === 'all' ? 'bg-brand-pink text-white' : ''}"
 						>
 							전체 ({categoryStats['all']})
@@ -205,6 +206,7 @@
 								aria-selected={selectedCategory === cat.id}
 								tabindex="0"
 								onclick={() => { selectedCategory = cat.id; categoryDropdownOpen = false; }}
+								onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { selectedCategory = cat.id; categoryDropdownOpen = false; } }}
 								class="px-4 py-2 text-base text-text-base hover:bg-surface-1 cursor-pointer {selectedCategory === cat.id ? 'bg-brand-pink text-white' : ''}"
 							>
 								{cat.name} ({categoryStats[cat.id] || 0})
@@ -283,7 +285,7 @@
 									{/if}
 								</td>
 								<td class="px-3 py-3 text-center">
-									<span class="text-sm font-medium {word.createdBy === 'El' ? 'text-blue-400' : 'text-purple-400'}">
+									<span class="text-sm font-medium {word.createdBy === 'El' ? 'text-elotte-green' : 'text-elotte-orange'}">
 										{word.createdBy}
 									</span>
 								</td>
@@ -332,7 +334,7 @@
 									<span class="px-2 py-0.5 rounded text-xs bg-bg text-text-muted">
 										{getCategoryName(word.category)}
 									</span>
-									<span class="text-xs font-medium {word.createdBy === 'El' ? 'text-blue-400' : 'text-purple-400'}">
+									<span class="text-xs font-medium {word.createdBy === 'El' ? 'text-elotte-green' : 'text-elotte-orange'}">
 										{word.createdBy}
 									</span>
 								</div>
@@ -386,12 +388,16 @@
 	<div
 		class="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4"
 		onclick={() => showAddModal = false}
+		onkeydown={(e) => { if (e.key === 'Escape') showAddModal = false; }}
 		role="dialog"
 		aria-modal="true"
+		tabindex="-1"
 	>
+		<!-- svelte-ignore a11y_no_static_element_interactions -->
 		<div
 			class="bg-surface-1 rounded-lg border border-border-subtle w-full max-w-md"
 			onclick={(e) => e.stopPropagation()}
+			onkeydown={(e) => e.stopPropagation()}
 		>
 			<div class="flex items-center justify-between px-6 py-4 border-b border-border-subtle">
 				<h2 class="text-lg font-semibold text-text-strong">새 워드 추가</h2>
@@ -453,8 +459,8 @@
 
 				<!-- 제작자 -->
 				<div>
-					<label class="block text-sm font-medium text-text-strong mb-2">제작자</label>
-					<div class="flex gap-2">
+					<span id="creator-label" class="block text-sm font-medium text-text-strong mb-2">제작자</span>
+					<div class="flex gap-2" role="group" aria-labelledby="creator-label">
 						<button
 							type="button"
 							onclick={() => newWord.createdBy = 'El'}

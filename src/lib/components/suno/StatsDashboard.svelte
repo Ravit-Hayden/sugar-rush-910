@@ -176,7 +176,7 @@
 							<span class="text-text-base">{label}</span>
 							<span class="text-text-muted">{count}개 ({Math.round(percent)}%)</span>
 						</div>
-						<div class="h-2 bg-surface-2 rounded-full overflow-hidden">
+						<div class="h-2 bg-bg rounded-full overflow-hidden">
 							<div 
 								class="h-full rounded-full transition-all duration-300
 									{key === 'idea' ? 'bg-yellow-500' : ''}
@@ -197,8 +197,8 @@
 			<div class="flex items-center gap-8">
 				{#each Object.entries(authorStats) as [author, count]}
 					<div class="flex-1 text-center">
-						<div class="w-16 h-16 mx-auto rounded-full {author === 'El' ? 'bg-blue-500/20' : 'bg-purple-500/20'} flex items-center justify-center mb-2">
-							<span class="text-2xl font-bold {author === 'El' ? 'text-blue-400' : 'text-purple-400'}">{count}</span>
+						<div class="w-16 h-16 mx-auto rounded-full {author === 'El' ? 'bg-[var(--elotte-green)]/20' : 'bg-[var(--elotte-orange)]/20'} flex items-center justify-center mb-2">
+							<span class="text-2xl font-bold {author === 'El' ? 'text-elotte-green' : 'text-elotte-orange'}">{count}</span>
 						</div>
 						<span class="text-sm font-medium text-text-base">{author}</span>
 					</div>

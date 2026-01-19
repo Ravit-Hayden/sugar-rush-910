@@ -47,28 +47,25 @@
 
 	// 담당자 색상
 	function getAssigneeColor(assignedTo: string): string {
-		if (assignedTo === 'El') return 'text-blue-400';
-		if (assignedTo === 'Otte') return 'text-purple-400';
+		if (assignedTo === 'El') return 'text-elotte-green';
+		if (assignedTo === 'Otte') return 'text-elotte-orange';
 		return 'text-text-muted';
 	}
 </script>
 
 {#if compact}
 	<!-- 컴팩트 뷰 (대시보드용) -->
-	<div class="flex items-center gap-2">
-		<div class="flex-1 h-2 bg-surface-2 rounded-full overflow-hidden">
+	<div>
+		<div class="flex items-center justify-between text-xs mb-1.5">
+			<span class="text-text-muted">현재: {PRODUCTION_STAGES[currentIndex]?.name ?? '시작 전'}</span>
+			<span class="text-text-base font-medium">{progressPercent}%</span>
+		</div>
+		<div class="h-2 bg-bg rounded-full overflow-hidden">
 			<div 
 				class="h-full bg-brand-pink transition-all duration-300"
 				style="width: {progressPercent}%"
 			></div>
 		</div>
-		<span class="text-sm font-medium text-text-base">{progressPercent}%</span>
-	</div>
-	<div class="mt-2 flex items-center gap-1 text-xs text-text-muted">
-		<span>현재: </span>
-		<span class="text-text-base font-medium">
-			{PRODUCTION_STAGES[currentIndex]?.name ?? '시작 전'}
-		</span>
 	</div>
 {:else}
 	<!-- 전체 뷰 -->
@@ -77,7 +74,7 @@
 		<div class="flex items-center justify-between mb-6">
 			<h3 class="text-lg font-semibold text-text-strong">제작 진행률</h3>
 			<div class="flex items-center gap-3">
-				<div class="flex-1 w-32 h-2 bg-surface-2 rounded-full overflow-hidden">
+				<div class="flex-1 w-32 h-2 bg-bg rounded-full overflow-hidden">
 					<div 
 						class="h-full bg-brand-pink transition-all duration-300"
 						style="width: {progressPercent}%"

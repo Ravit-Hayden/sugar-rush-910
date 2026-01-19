@@ -182,8 +182,8 @@
 			<div class="space-y-3">
 				<!-- 버전 유형 -->
 				<div>
-					<label class="block text-sm font-medium text-text-strong mb-2">버전 유형</label>
-					<select bind:value={versionType} class="input-base w-full h-10 px-4">
+					<label for="version-type" class="block text-sm font-medium text-text-strong mb-2">버전 유형</label>
+					<select id="version-type" bind:value={versionType} class="input-base w-full h-10 px-4">
 						{#each versionTypes as type}
 							<option value={type.value}>{type.label}</option>
 						{/each}
@@ -192,8 +192,9 @@
 
 				<!-- SUNO URL -->
 				<div>
-					<label class="block text-sm font-medium text-text-strong mb-2">SUNO Workspace URL (선택)</label>
+					<label for="suno-url" class="block text-sm font-medium text-text-strong mb-2">SUNO Workspace URL (선택)</label>
 					<input
+						id="suno-url"
 						type="url"
 						bind:value={sunoUrl}
 						placeholder="https://suno.com/workspace/..."
@@ -209,7 +210,7 @@
 						<span class="text-text-muted">업로드 중...</span>
 						<span class="text-brand-pink">{uploadProgress}%</span>
 					</div>
-					<div class="h-2 bg-surface-2 rounded-full overflow-hidden">
+					<div class="h-2 bg-bg rounded-full overflow-hidden">
 						<div 
 							class="h-full bg-brand-pink transition-all duration-200"
 							style="width: {uploadProgress}%"

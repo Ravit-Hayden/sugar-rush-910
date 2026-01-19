@@ -245,6 +245,7 @@
 								aria-selected={statusFilter === value}
 								tabindex="0"
 								onclick={() => { statusFilter = value as ProjectStatus | 'all'; statusDropdownOpen = false; }}
+								onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { statusFilter = value as ProjectStatus | 'all'; statusDropdownOpen = false; } }}
 								class="px-4 py-2 text-base text-text-base hover:bg-surface-1 cursor-pointer {statusFilter === value ? 'bg-brand-pink text-white' : ''}"
 							>
 								{label} ({statusCounts[value] || 0})
@@ -283,7 +284,7 @@
 					<!-- 푸터 -->
 					<div class="flex items-center justify-between text-xs text-text-muted">
 						<div class="flex items-center gap-2">
-							<span class="font-medium {project.createdBy === 'El' ? 'text-blue-400' : 'text-purple-400'}">
+							<span class="font-medium {project.createdBy === 'El' ? 'text-elotte-green' : 'text-elotte-orange'}">
 								{project.createdBy}
 							</span>
 							<span>·</span>

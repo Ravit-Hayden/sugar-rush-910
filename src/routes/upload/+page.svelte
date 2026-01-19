@@ -353,7 +353,7 @@
 	function selectAll() {
 		if (selectedIds.size === filteredFiles.length) {
 			selectedIds = new Set();
-		} else {
+				} else {
 			selectedIds = new Set(filteredFiles.map(f => f.id));
 		}
 	}
@@ -1005,7 +1005,7 @@
 				<button type="button" onclick={() => { uploadItems = []; showUploadProgress = false; }} class="text-text-muted hover:text-text-base">
 					<X size={16} />
 				</button>
-			</div>
+	</div>
 			<div class="space-y-2 max-h-32 overflow-y-auto custom-list-scrollbar">
 				{#each uploadItems.slice(-5) as item}
 					<div class="flex items-center gap-3">
@@ -1107,8 +1107,8 @@
 								</td>
 							{/if}
 							<td class="px-4 py-3">
-								<button
-									type="button"
+					<button
+						type="button"
 									onclick={(e) => togglePlay(file, e)}
 									class="w-9 h-9 rounded-full bg-surface-2 flex items-center justify-center hover:bg-brand-pink hover:text-white transition-colors"
 								>
@@ -1117,7 +1117,7 @@
 									{:else}
 										<Play size={14} class="ml-0.5" />
 									{/if}
-								</button>
+					</button>
 							</td>
 							<td class="px-4 py-3">
 								<div class="flex items-center gap-2">
@@ -1127,8 +1127,8 @@
 									{/if}
 									{#if file.linkedTrackId}
 										<Link size={12} class="text-brand-pink flex-shrink-0" />
-									{/if}
-								</div>
+				{/if}
+			</div>
 								{#if file.tags.length > 0}
 									<div class="flex gap-1 mt-1">
 										{#each file.tags.slice(0, 2) as tag}
@@ -1201,14 +1201,14 @@
 									<Play size={16} class="ml-0.5" />
 								{/if}
 							</button>
-						{/if}
-						<div class="flex-1 min-w-0">
+								{/if}
+								<div class="flex-1 min-w-0">
 							<div class="flex items-center gap-2 mb-1">
 								<span class="font-medium text-text-strong truncate">{file.fileName}</span>
 								{#if file.isStarred}
 									<Star size={12} class="text-yellow-500 fill-current flex-shrink-0" />
 								{/if}
-							</div>
+								</div>
 							<div class="flex items-center gap-3 text-xs text-text-muted">
 								<span class="uppercase font-medium {getFormatColor(file.format)}">{file.format}</span>
 								<span>{formatDuration(file.duration)}</span>
@@ -1246,15 +1246,15 @@
 						아직 파일이 없습니다
 					{/if}
 				</p>
-				<button
-					type="button"
+							<button
+								type="button"
 					onclick={() => document.getElementById('main-upload')?.click()}
 					class="mt-4 px-5 py-2.5 bg-brand-pink text-white text-sm font-medium rounded-lg hover:bg-brand-pink/90 transition-colors inline-flex items-center gap-2"
-				>
+							>
 					<Upload size={16} /> 파일 업로드
-				</button>
+							</button>
 			{/if}
-		</div>
+						</div>
 	{/if}
 </PageContent>
 
@@ -1279,7 +1279,7 @@
 				<div>
 					<h2 class="text-base font-semibold text-text-strong">폴더 이동</h2>
 					<p class="text-xs text-text-muted mt-0.5 truncate max-w-[280px]">{moveTargetFile.fileName}</p>
-				</div>
+							</div>
 				<button type="button" onclick={() => { showMoveModal = false; moveTargetFile = null; }} class="text-text-muted hover:text-text-base">
 					<X size={18} />
 				</button>
@@ -1296,9 +1296,9 @@
 					<span class="text-xs text-text-muted">{getFileCount(null)}</span>
 					{#if moveTargetFile.folderId === null}
 						<Check size={16} />
-					{/if}
+						{/if}
 				</button>
-			</div>
+					</div>
 			<!-- 스크롤 가능한 폴더 목록 -->
 			<div class="p-2 max-h-60 overflow-y-auto custom-list-scrollbar">
 				{#each sortedFolders as folder}
@@ -1316,9 +1316,9 @@
 					</button>
 				{/each}
 			</div>
+			</div>
 		</div>
-	</div>
-{/if}
+	{/if}
 
 <!-- 폴더 이동 모달 (일괄) -->
 {#if showBulkMoveModal}
@@ -1341,7 +1341,7 @@
 				<div>
 					<h2 class="text-base font-semibold text-text-strong">폴더 이동</h2>
 					<p class="text-xs text-text-muted mt-0.5">{selectedIds.size}개 파일 선택됨</p>
-				</div>
+			</div>
 				<button type="button" onclick={() => showBulkMoveModal = false} class="text-text-muted hover:text-text-base">
 					<X size={18} />
 				</button>
@@ -1374,7 +1374,7 @@
 			</div>
 		</div>
 	</div>
-{/if}
+							{/if}
 
 <!-- 폴더 생성/편집 모달 -->
 {#if showFolderModal}
@@ -1394,7 +1394,7 @@
 				<button type="button" onclick={() => showFolderModal = false} class="text-text-muted hover:text-text-base">
 					<X size={18} />
 				</button>
-			</div>
+						</div>
 			
 			<div class="px-5 py-4">
 				<label for="folder-name" class="block text-sm font-medium text-text-base mb-2">폴더 이름</label>
@@ -1419,20 +1419,20 @@
 								title={c.name}
 								aria-label={c.name}
 							></button>
-						{/each}
+					{/each}
 						{#if availableColors.length === 0}
 							<p class="col-span-8 text-xs text-text-muted py-2">모든 기본 색상이 사용 중입니다.</p>
-						{/if}
+				{/if}
 					</div>
-				</div>
 			</div>
+		</div>
 
 			<div class="border-t border-border-subtle">
 				<div class="px-5 py-4 flex items-center gap-3">
 					<input type="color" bind:value={customColor} oninput={() => folderColor = 'custom'} class="w-9 h-9 rounded cursor-pointer border-0" aria-label="커스텀 색상" />
 					<input type="text" bind:value={customColor} oninput={() => folderColor = 'custom'} placeholder="#ffffff" class="flex-1 h-9 px-3 bg-surface-2 border border-border-subtle rounded text-sm font-mono focus:outline-none focus:border-brand-pink" />
-				</div>
 			</div>
+				</div>
 
 			<div class="border-t border-border-subtle">
 				<div 
@@ -1453,7 +1453,7 @@
 						{#if extractingColors}
 							<Loader2 size={16} class="animate-spin text-text-muted" />
 						{/if}
-					</div>
+				</div>
 
 					{#if extractedColors.length > 0}
 						<div class="mt-4">
@@ -1469,18 +1469,18 @@
 										title={c}
 									></button>
 								{/each}
-							</div>
+				</div>
 						</div>
 					{/if}
-				</div>
 			</div>
+		</div>
 
 			<div class="flex justify-end gap-3 px-5 py-4 border-t border-border-subtle">
 				<button type="button" onclick={() => showFolderModal = false} class="px-4 py-2 text-sm text-text-muted hover:text-text-base transition-colors">취소</button>
 				<button type="button" onclick={saveFolder} class="px-4 py-2 bg-brand-pink text-white text-sm font-medium rounded-lg hover:bg-brand-pink/90 transition-colors">저장</button>
 			</div>
-		</div>
-	</div>
+				</div>
+				</div>
 {/if}
 
 <!-- 파일 상세 모달 -->
@@ -1501,22 +1501,22 @@
 				<button type="button" onclick={() => showFileModal = false} class="text-text-muted hover:text-text-base">
 					<X size={18} />
 				</button>
-			</div>
+				</div>
 			<div class="p-5 space-y-5">
 				<div>
 					<label for="file-name" class="block text-sm font-medium text-text-base mb-2">파일명</label>
 					<input id="file-name" type="text" bind:value={editName} class="w-full h-10 px-4 bg-surface-2 border border-border-subtle rounded-lg focus:outline-none focus:border-brand-pink" />
-				</div>
+			</div>
 
 				<div class="grid grid-cols-3 gap-3 text-center">
 					<div class="p-3 bg-bg rounded-lg">
 						<p class="text-lg font-bold {getFormatColor(selectedFile.format)} uppercase">{selectedFile.format}</p>
 						<p class="text-xs text-text-muted">포맷</p>
-					</div>
+		</div>
 					<div class="p-3 bg-bg rounded-lg">
 						<p class="text-lg font-bold text-text-strong">{formatDuration(selectedFile.duration)}</p>
 						<p class="text-xs text-text-muted">길이</p>
-					</div>
+	</div>
 					<div class="p-3 bg-bg rounded-lg">
 						<p class="text-lg font-bold text-text-strong">{formatFileSize(selectedFile.fileSize)}</p>
 						<p class="text-xs text-text-muted">크기</p>

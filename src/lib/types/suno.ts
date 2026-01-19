@@ -311,3 +311,17 @@ export interface RandomCombinationResult {
 	combinedText: string;
 	generatedAt: string;
 }
+
+// ============================================
+// 최근 활동
+// ============================================
+
+/** 최근 활동 */
+export interface RecentActivity {
+	id: string;
+	projectId: string;
+	projectTitle: string;
+	action: string;
+	author: Producer;
+	timestamp: string;
+}

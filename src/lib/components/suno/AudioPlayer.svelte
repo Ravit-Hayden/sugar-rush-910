@@ -158,7 +158,7 @@
 
 			<!-- 진행 바 -->
 			<div class="flex-1">
-				<div class="relative h-2 bg-surface-2 rounded-full overflow-hidden">
+				<div class="relative h-2 bg-bg rounded-full overflow-hidden">
 					<div 
 						class="absolute h-full bg-brand-pink transition-all duration-100"
 						style="width: {progressPercent}%"
@@ -253,7 +253,7 @@
 			<div class="space-y-2">
 				{#each audio.comments as comment}
 					<div class="flex items-start gap-2 text-sm">
-						<span class="font-medium {comment.author === 'El' ? 'text-blue-400' : 'text-purple-400'}">{comment.author}:</span>
+						<span class="font-medium {comment.author === 'El' ? 'text-elotte-green' : 'text-elotte-orange'}">{comment.author}:</span>
 						<span class="text-text-base">{comment.content}</span>
 					</div>
 				{/each}

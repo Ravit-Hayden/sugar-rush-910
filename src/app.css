@@ -227,10 +227,7 @@
     border: none;
     color: var(--text-base);
   }
-  /* 장르 이름 텍스트는 호버 효과 없음 (삭제 버튼만 효과 적용) */
-  .tag-chip:hover:not(.selected) {
-    /* 텍스트 색상 변경 제거 */
-  }
+  /* 장르 이름 텍스트는 호버 효과 없음 (삭제 버튼만 효과 적용) - .tag-chip:hover:not(.selected) 제거됨 */
   /* 선택된 태그는 Hover 색상 간섭 없이 무조건 Pink */
   .tag-chip.selected,
   .tag-chip[data-selected="true"] {
@@ -408,6 +405,7 @@
 /* 카드 UI 스타일 */
 .card-base {
   /* transition 제거됨 - 즉각적인 반응 */
+  display: block;
 }
 
 /* 인터랙티브 카드만 호버 효과 적용 (폼 컨테이너 등 비인터랙티브 카드는 제외) */
@@ -420,14 +418,7 @@
 }
 
 /* 폼 컨테이너나 내부에 입력 필드가 있는 큰 카드는 호버/포커스 효과 없음 */
-form + *,
-form ~ *,
-.bg-surface-1.rounded-lg.border:has(form),
-.bg-surface-1.rounded-lg.border:has(input),
-.bg-surface-1.rounded-lg.border:has(button[type="submit"]),
-.bg-surface-1.rounded-lg.border:has(button[type="button"]) {
-  /* 호버/포커스 효과 제거 - 내부 요소들이 이미 인터랙티브 */
-}
+/* 폼 컨테이너나 내부에 입력 필드가 있는 큰 카드는 호버/포커스 효과 없음 - 주석 처리됨 */
 
 /* 폼이 직접 포함된 컨테이너는 호버 효과 없음 */
 .bg-surface-1.rounded-lg.border:has(> form):hover,
@@ -505,9 +496,7 @@ form ~ *,
 }
 
 /* 장르 이름 텍스트는 호버 효과 없음 (삭제 버튼만 효과 적용) */
-.tag-chip:hover {
-  /* 텍스트 색상 변경 제거 */
-}
+/* .tag-chip:hover - 텍스트 색상 변경 제거됨 */
 
 .tag-chip[data-selected="true"],
 .tag-chip.selected {
@@ -954,7 +943,7 @@ a[class*="text-brand-pink"][class*="hover:bg-hover-cyan"]:focus-visible:hover {
 }
 
 /* 라이트 모드에서 일반 버튼 호버 배경 색상 변경 (테마 토글 버튼, 아티스트/앨범 선택 드롭다운 버튼 제외, 포커스가 아닐 때만) */
-[data-theme="light"] button:hover:not([class*="bg-"]):not(.theme-toggle-button):not([data-action="toggle-sidebar"]):not(.btn-icon):not(:focus):not(:focus-visible) {
+[data-theme="light"] button:hover:not([class*="bg-"]):not(.theme-toggle-button):not([data-action="toggle-sidebar"]):not(.btn-icon):not(.notification-button):not(:focus):not(:focus-visible) {
   background-color: var(--surface-1) !important;
 }
 
@@ -2392,7 +2381,14 @@ button span[role="button"][aria-label="캘린더 열기"]:hover:not(:focus):not(
   color: var(--hover-point);
 }
 
-/* 알림 버튼 호버/선택 효과 */
+/* 알림 버튼 호버/선택 효과 - 배경색 없음 */
+.notification-button,
+.notification-button:hover,
+.notification-button:focus,
+.notification-button:focus-visible {
+  background-color: transparent !important;
+}
+
 .notification-button:hover .lucide-icon {
   color: var(--hover-point) !important;
   transition: color 0.3s ease;
@@ -3856,6 +3852,7 @@ button:not(.bg-brand-pink):not([class*="bg-brand-pink"]):not(.hover\:bg-brand-pi
 /* Number input 기본 스피너 숨기기 */
 input[type="number"].number-input-custom {
   -moz-appearance: textfield;
+  appearance: textfield;
 }
 
 input[type="number"].number-input-custom::-webkit-outer-spin-button,
@@ -4954,9 +4951,7 @@ button[type="button"]:focus-visible {
 }
 
 /* 선택된 날짜는 호버 효과 없음 (포커스 우선) */
-.calendar-dropdown button[type="button"].bg-brand-pink:hover {
-  /* 호버 효과 없음 - 포커스 색상 유지 */
-}
+/* .calendar-dropdown button.bg-brand-pink:hover - 호버 효과 없음, 포커스 색상 유지 */
 
 /* disabled 상태에서도 호버/포커스 효과 유지 (bg-brand-pink 버튼) */
 button.bg-brand-pink:disabled:hover:not(:focus):not(:focus-visible) {
