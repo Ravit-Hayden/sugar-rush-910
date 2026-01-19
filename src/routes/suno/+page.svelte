@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { Music, Wallet, TrendingUp, Clock, CheckCircle2, Plus } from 'lucide-svelte';
 	import ProductionProgress from '$lib/components/suno/ProductionProgress.svelte';
 	import StatsDashboard from '$lib/components/suno/StatsDashboard.svelte';
@@ -99,8 +100,17 @@
 	>
 		<!-- svelte-ignore a11y_no_static_element_interactions -->
 		<div class="max-w-3xl w-full" onclick={(e) => e.stopPropagation()} onkeydown={(e) => e.stopPropagation()}>
-			<ProjectTemplates 
-				onSelect={(template) => { showTemplates = false; }}
+<ProjectTemplates
+				onSelect={(template) => { 
+					showTemplates = false;
+					// 프로젝트 생성 페이지로 이동 (템플릿 정보 전달)
+					const params = new URLSearchParams();
+					if (template.name && template.id !== 'blank') params.set('template', template.name);
+					if (template.defaultStyles) params.set('styles', template.defaultStyles);
+					if (template.defaultExclude) params.set('exclude', template.defaultExclude);
+					if (template.defaultVocalGender) params.set('vocal', template.defaultVocalGender);
+					goto(`/suno/projects/new${params.toString() ? '?' + params.toString() : ''}`);
+				}}
 				onClose={() => showTemplates = false}
 			/>
 		</div>

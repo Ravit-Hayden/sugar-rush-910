@@ -1,14 +1,60 @@
 <script lang="ts">
-	import { Plus, Search, ArrowRight, ChevronDown } from 'lucide-svelte';
+	import { goto } from '$app/navigation';
+	import { Plus, Search, ChevronDown, X } from 'lucide-svelte';
 	import ProductionProgress from '$lib/components/suno/ProductionProgress.svelte';
 	import SUNOTabs from '$lib/components/suno/SUNOTabs.svelte';
+	import ProjectTemplates from '$lib/components/suno/ProjectTemplates.svelte';
 	import { PRODUCTION_STAGES } from '$lib/constants/suno/stages';
-	import type { SUNOProject, ProductionStageStatus, ProjectStatus } from '$lib/types/suno';
+	import type { SUNOProject, ProductionStageStatus, ProjectStatus, ProductionStageId } from '$lib/types/suno';
+
+	// 템플릿 모달 상태
+	let showTemplates = $state(false);
 
 	// 필터 상태
 	let searchQuery = $state('');
-	let statusFilter = $state<ProjectStatus | 'all'>('all');
-	let statusDropdownOpen = $state(false);
+	let stageFilter = $state<ProductionStageId | 'all'>('all');
+	let stageDropdownOpen = $state(false);
+
+	// 프로젝트의 현재 단계 가져오기 (첫 번째 미완료 단계)
+	function getCurrentStage(project: SUNOProject): ProductionStageId | null {
+		// 모든 단계가 완료되었으면 released
+		const allCompleted = PRODUCTION_STAGES.every(stage => 
+			project.stages.find(s => s.stageId === stage.id)?.isCompleted
+		);
+		if (allCompleted) return 'released';
+		
+		// 첫 번째 미완료 단계 찾기
+		for (const stage of PRODUCTION_STAGES) {
+			const projectStage = project.stages.find(s => s.stageId === stage.id);
+			if (!projectStage || !projectStage.isCompleted) {
+				return stage.id;
+			}
+		}
+		return 'idea';
+	}
+
+	// 단계 라벨 매핑
+	const stageLabels: Record<ProductionStageId | 'all', string> = {
+		all: '전체',
+		idea: '아이디어 기획',
+		lyrics_draft: '가사 초안',
+		lyrics_structure: '곡구조 버전',
+		lyrics_suno: '수노발음 버전',
+		prompt_writing: '프롬프트 작성',
+		suno_generation: 'SUNO 생성',
+		suno_comparison: '버전 비교',
+		suno_selection: '곡 선정',
+		mixing: '믹싱',
+		audio_editing: '음원 수정',
+		mastering: '마스터링',
+		lyrics_final: '앨범등록 가사',
+		artwork: '아트워크 제작',
+		track_info: '곡 정보 입력',
+		album_ready: '앨범 등록 준비',
+		distribution: '배포처 업로드',
+		promotion: '홍보/마케팅',
+		released: '발매 완료'
+	};
 
 	// 목업 데이터
 	let projects = $state<SUNOProject[]>([
@@ -115,27 +161,379 @@
 			usedWordIds: [],
 			createdAt: '2026-01-13',
 			updatedAt: '2026-01-13'
+		},
+		{
+			id: 'proj6',
+			title: '네온 드라이브',
+			description: '시티팝 레트로 바이브',
+			status: 'in_progress',
+			stages: [
+				{ stageId: 'idea', isCompleted: true, completedAt: '2026-01-08', completedBy: 'El' },
+				{ stageId: 'lyrics_draft', isCompleted: true, completedAt: '2026-01-09', completedBy: 'Otte' },
+				{ stageId: 'lyrics_structure', isCompleted: true, completedAt: '2026-01-10', completedBy: 'Otte' },
+				{ stageId: 'lyrics_suno', isCompleted: true, completedAt: '2026-01-11', completedBy: 'Otte' },
+				{ stageId: 'prompt_writing', isCompleted: false }
+			] as ProductionStageStatus[],
+			progressPercent: 22,
+			createdBy: 'El',
+			lyricsVersions: [],
+			promptConfigs: [],
+			audioVersions: [],
+			usedWordIds: [],
+			createdAt: '2026-01-08',
+			updatedAt: '2026-01-11'
+		},
+		{
+			id: 'proj7',
+			title: '허니 트랩',
+			description: '중독성 있는 댄스팝',
+			status: 'in_progress',
+			stages: [
+				{ stageId: 'idea', isCompleted: true, completedAt: '2026-01-02', completedBy: 'El' },
+				{ stageId: 'lyrics_draft', isCompleted: true, completedAt: '2026-01-03', completedBy: 'Otte' },
+				{ stageId: 'lyrics_structure', isCompleted: true, completedAt: '2026-01-04', completedBy: 'Otte' },
+				{ stageId: 'lyrics_suno', isCompleted: true, completedAt: '2026-01-05', completedBy: 'Otte' },
+				{ stageId: 'prompt_writing', isCompleted: true, completedAt: '2026-01-06', completedBy: 'El' },
+				{ stageId: 'suno_generation', isCompleted: true, completedAt: '2026-01-07', completedBy: 'El' },
+				{ stageId: 'suno_comparison', isCompleted: false }
+			] as ProductionStageStatus[],
+			progressPercent: 33,
+			createdBy: 'El',
+			lyricsVersions: [],
+			promptConfigs: [],
+			audioVersions: [],
+			usedWordIds: [],
+			createdAt: '2026-01-02',
+			updatedAt: '2026-01-07'
+		},
+		{
+			id: 'proj8',
+			title: '문라이트 소나타',
+			description: '피아노 중심 발라드',
+			status: 'in_progress',
+			stages: [
+				{ stageId: 'idea', isCompleted: true, completedAt: '2025-12-20', completedBy: 'Otte' },
+				{ stageId: 'lyrics_draft', isCompleted: true, completedAt: '2025-12-22', completedBy: 'Otte' },
+				{ stageId: 'lyrics_structure', isCompleted: true, completedAt: '2025-12-24', completedBy: 'Otte' },
+				{ stageId: 'lyrics_suno', isCompleted: true, completedAt: '2025-12-26', completedBy: 'Otte' },
+				{ stageId: 'prompt_writing', isCompleted: true, completedAt: '2025-12-28', completedBy: 'El' },
+				{ stageId: 'suno_generation', isCompleted: true, completedAt: '2025-12-30', completedBy: 'El' },
+				{ stageId: 'suno_comparison', isCompleted: true, completedAt: '2026-01-01', completedBy: 'Both' },
+				{ stageId: 'suno_selection', isCompleted: true, completedAt: '2026-01-02', completedBy: 'Both' },
+				{ stageId: 'mixing', isCompleted: false }
+			] as ProductionStageStatus[],
+			progressPercent: 44,
+			createdBy: 'Otte',
+			lyricsVersions: [],
+			promptConfigs: [],
+			audioVersions: [],
+			usedWordIds: [],
+			createdAt: '2025-12-20',
+			updatedAt: '2026-01-02'
+		},
+		{
+			id: 'proj9',
+			title: '캔디 크러쉬',
+			description: '통통 튀는 틴팝',
+			status: 'in_progress',
+			stages: [
+				{ stageId: 'idea', isCompleted: true, completedAt: '2025-12-15', completedBy: 'El' },
+				{ stageId: 'lyrics_draft', isCompleted: true, completedAt: '2025-12-16', completedBy: 'Otte' },
+				{ stageId: 'lyrics_structure', isCompleted: true, completedAt: '2025-12-17', completedBy: 'Otte' },
+				{ stageId: 'lyrics_suno', isCompleted: true, completedAt: '2025-12-18', completedBy: 'Otte' },
+				{ stageId: 'prompt_writing', isCompleted: true, completedAt: '2025-12-19', completedBy: 'El' },
+				{ stageId: 'suno_generation', isCompleted: true, completedAt: '2025-12-20', completedBy: 'El' },
+				{ stageId: 'suno_comparison', isCompleted: true, completedAt: '2025-12-21', completedBy: 'Both' },
+				{ stageId: 'suno_selection', isCompleted: true, completedAt: '2025-12-22', completedBy: 'Both' },
+				{ stageId: 'mixing', isCompleted: true, completedAt: '2025-12-24', completedBy: 'El' },
+				{ stageId: 'audio_editing', isCompleted: true, completedAt: '2025-12-26', completedBy: 'El' },
+				{ stageId: 'mastering', isCompleted: true, completedAt: '2025-12-28', completedBy: 'El' },
+				{ stageId: 'lyrics_final', isCompleted: false }
+			] as ProductionStageStatus[],
+			progressPercent: 61,
+			createdBy: 'El',
+			lyricsVersions: [],
+			promptConfigs: [],
+			audioVersions: [],
+			usedWordIds: [],
+			createdAt: '2025-12-15',
+			updatedAt: '2025-12-28'
+		},
+		{
+			id: 'proj10',
+			title: '미드나잇 블루',
+			description: '재즈 힙합 퓨전',
+			status: 'in_progress',
+			stages: [
+				{ stageId: 'idea', isCompleted: true, completedAt: '2025-12-01', completedBy: 'Otte' },
+				{ stageId: 'lyrics_draft', isCompleted: true, completedAt: '2025-12-03', completedBy: 'Otte' },
+				{ stageId: 'lyrics_structure', isCompleted: true, completedAt: '2025-12-05', completedBy: 'Otte' },
+				{ stageId: 'lyrics_suno', isCompleted: true, completedAt: '2025-12-07', completedBy: 'Otte' },
+				{ stageId: 'prompt_writing', isCompleted: true, completedAt: '2025-12-08', completedBy: 'El' },
+				{ stageId: 'suno_generation', isCompleted: true, completedAt: '2025-12-10', completedBy: 'El' },
+				{ stageId: 'suno_comparison', isCompleted: true, completedAt: '2025-12-11', completedBy: 'Both' },
+				{ stageId: 'suno_selection', isCompleted: true, completedAt: '2025-12-12', completedBy: 'Both' },
+				{ stageId: 'mixing', isCompleted: true, completedAt: '2025-12-14', completedBy: 'El' },
+				{ stageId: 'audio_editing', isCompleted: true, completedAt: '2025-12-16', completedBy: 'El' },
+				{ stageId: 'mastering', isCompleted: true, completedAt: '2025-12-18', completedBy: 'El' },
+				{ stageId: 'lyrics_final', isCompleted: true, completedAt: '2025-12-19', completedBy: 'Otte' },
+				{ stageId: 'artwork', isCompleted: false }
+			] as ProductionStageStatus[],
+			progressPercent: 67,
+			createdBy: 'Otte',
+			lyricsVersions: [],
+			promptConfigs: [],
+			audioVersions: [],
+			usedWordIds: [],
+			createdAt: '2025-12-01',
+			updatedAt: '2025-12-19'
+		},
+		{
+			id: 'proj11',
+			title: '체리 블로썸',
+			description: '봄날 감성 팝',
+			status: 'in_progress',
+			stages: [
+				{ stageId: 'idea', isCompleted: true, completedAt: '2025-11-20', completedBy: 'El' },
+				{ stageId: 'lyrics_draft', isCompleted: true, completedAt: '2025-11-22', completedBy: 'Otte' },
+				{ stageId: 'lyrics_structure', isCompleted: true, completedAt: '2025-11-24', completedBy: 'Otte' },
+				{ stageId: 'lyrics_suno', isCompleted: true, completedAt: '2025-11-26', completedBy: 'Otte' },
+				{ stageId: 'prompt_writing', isCompleted: true, completedAt: '2025-11-27', completedBy: 'El' },
+				{ stageId: 'suno_generation', isCompleted: true, completedAt: '2025-11-29', completedBy: 'El' },
+				{ stageId: 'suno_comparison', isCompleted: true, completedAt: '2025-11-30', completedBy: 'Both' },
+				{ stageId: 'suno_selection', isCompleted: true, completedAt: '2025-12-01', completedBy: 'Both' },
+				{ stageId: 'mixing', isCompleted: true, completedAt: '2025-12-03', completedBy: 'El' },
+				{ stageId: 'audio_editing', isCompleted: true, completedAt: '2025-12-05', completedBy: 'El' },
+				{ stageId: 'mastering', isCompleted: true, completedAt: '2025-12-07', completedBy: 'El' },
+				{ stageId: 'lyrics_final', isCompleted: true, completedAt: '2025-12-08', completedBy: 'Otte' },
+				{ stageId: 'artwork', isCompleted: true, completedAt: '2025-12-10', completedBy: 'El' },
+				{ stageId: 'track_info', isCompleted: false }
+			] as ProductionStageStatus[],
+			progressPercent: 72,
+			createdBy: 'El',
+			lyricsVersions: [],
+			promptConfigs: [],
+			audioVersions: [],
+			usedWordIds: [],
+			createdAt: '2025-11-20',
+			updatedAt: '2025-12-10'
+		},
+		{
+			id: 'proj12',
+			title: '스타더스트',
+			description: '우주 컨셉 일렉트로닉',
+			status: 'in_progress',
+			stages: [
+				{ stageId: 'idea', isCompleted: true, completedAt: '2025-11-01', completedBy: 'Otte' },
+				{ stageId: 'lyrics_draft', isCompleted: true, completedAt: '2025-11-03', completedBy: 'Otte' },
+				{ stageId: 'lyrics_structure', isCompleted: true, completedAt: '2025-11-05', completedBy: 'Otte' },
+				{ stageId: 'lyrics_suno', isCompleted: true, completedAt: '2025-11-07', completedBy: 'Otte' },
+				{ stageId: 'prompt_writing', isCompleted: true, completedAt: '2025-11-08', completedBy: 'El' },
+				{ stageId: 'suno_generation', isCompleted: true, completedAt: '2025-11-10', completedBy: 'El' },
+				{ stageId: 'suno_comparison', isCompleted: true, completedAt: '2025-11-11', completedBy: 'Both' },
+				{ stageId: 'suno_selection', isCompleted: true, completedAt: '2025-11-12', completedBy: 'Both' },
+				{ stageId: 'mixing', isCompleted: true, completedAt: '2025-11-14', completedBy: 'El' },
+				{ stageId: 'audio_editing', isCompleted: true, completedAt: '2025-11-16', completedBy: 'El' },
+				{ stageId: 'mastering', isCompleted: true, completedAt: '2025-11-18', completedBy: 'El' },
+				{ stageId: 'lyrics_final', isCompleted: true, completedAt: '2025-11-19', completedBy: 'Otte' },
+				{ stageId: 'artwork', isCompleted: true, completedAt: '2025-11-21', completedBy: 'El' },
+				{ stageId: 'track_info', isCompleted: true, completedAt: '2025-11-22', completedBy: 'Both' },
+				{ stageId: 'album_ready', isCompleted: false }
+			] as ProductionStageStatus[],
+			progressPercent: 78,
+			createdBy: 'Otte',
+			lyricsVersions: [],
+			promptConfigs: [],
+			audioVersions: [],
+			usedWordIds: [],
+			createdAt: '2025-11-01',
+			updatedAt: '2025-11-22'
+		},
+		{
+			id: 'proj13',
+			title: '레몬 드롭',
+			description: '상큼한 여름 팝',
+			status: 'in_progress',
+			stages: [
+				{ stageId: 'idea', isCompleted: true, completedAt: '2025-10-15', completedBy: 'El' },
+				{ stageId: 'lyrics_draft', isCompleted: true, completedAt: '2025-10-17', completedBy: 'Otte' },
+				{ stageId: 'lyrics_structure', isCompleted: true, completedAt: '2025-10-19', completedBy: 'Otte' },
+				{ stageId: 'lyrics_suno', isCompleted: true, completedAt: '2025-10-21', completedBy: 'Otte' },
+				{ stageId: 'prompt_writing', isCompleted: true, completedAt: '2025-10-22', completedBy: 'El' },
+				{ stageId: 'suno_generation', isCompleted: true, completedAt: '2025-10-24', completedBy: 'El' },
+				{ stageId: 'suno_comparison', isCompleted: true, completedAt: '2025-10-25', completedBy: 'Both' },
+				{ stageId: 'suno_selection', isCompleted: true, completedAt: '2025-10-26', completedBy: 'Both' },
+				{ stageId: 'mixing', isCompleted: true, completedAt: '2025-10-28', completedBy: 'El' },
+				{ stageId: 'audio_editing', isCompleted: true, completedAt: '2025-10-30', completedBy: 'El' },
+				{ stageId: 'mastering', isCompleted: true, completedAt: '2025-11-01', completedBy: 'El' },
+				{ stageId: 'lyrics_final', isCompleted: true, completedAt: '2025-11-02', completedBy: 'Otte' },
+				{ stageId: 'artwork', isCompleted: true, completedAt: '2025-11-04', completedBy: 'El' },
+				{ stageId: 'track_info', isCompleted: true, completedAt: '2025-11-05', completedBy: 'Both' },
+				{ stageId: 'album_ready', isCompleted: true, completedAt: '2025-11-06', completedBy: 'Both' },
+				{ stageId: 'distribution', isCompleted: false }
+			] as ProductionStageStatus[],
+			progressPercent: 83,
+			createdBy: 'El',
+			lyricsVersions: [],
+			promptConfigs: [],
+			audioVersions: [],
+			usedWordIds: [],
+			createdAt: '2025-10-15',
+			updatedAt: '2025-11-06'
+		},
+		{
+			id: 'proj14',
+			title: '버블 파티',
+			description: '파티 EDM',
+			status: 'in_progress',
+			stages: [
+				{ stageId: 'idea', isCompleted: true, completedAt: '2025-10-01', completedBy: 'Otte' },
+				{ stageId: 'lyrics_draft', isCompleted: true, completedAt: '2025-10-03', completedBy: 'Otte' },
+				{ stageId: 'lyrics_structure', isCompleted: true, completedAt: '2025-10-05', completedBy: 'Otte' },
+				{ stageId: 'lyrics_suno', isCompleted: true, completedAt: '2025-10-07', completedBy: 'Otte' },
+				{ stageId: 'prompt_writing', isCompleted: true, completedAt: '2025-10-08', completedBy: 'El' },
+				{ stageId: 'suno_generation', isCompleted: true, completedAt: '2025-10-10', completedBy: 'El' },
+				{ stageId: 'suno_comparison', isCompleted: true, completedAt: '2025-10-11', completedBy: 'Both' },
+				{ stageId: 'suno_selection', isCompleted: true, completedAt: '2025-10-12', completedBy: 'Both' },
+				{ stageId: 'mixing', isCompleted: true, completedAt: '2025-10-14', completedBy: 'El' },
+				{ stageId: 'audio_editing', isCompleted: true, completedAt: '2025-10-16', completedBy: 'El' },
+				{ stageId: 'mastering', isCompleted: true, completedAt: '2025-10-18', completedBy: 'El' },
+				{ stageId: 'lyrics_final', isCompleted: true, completedAt: '2025-10-19', completedBy: 'Otte' },
+				{ stageId: 'artwork', isCompleted: true, completedAt: '2025-10-21', completedBy: 'El' },
+				{ stageId: 'track_info', isCompleted: true, completedAt: '2025-10-22', completedBy: 'Both' },
+				{ stageId: 'album_ready', isCompleted: true, completedAt: '2025-10-23', completedBy: 'Both' },
+				{ stageId: 'distribution', isCompleted: true, completedAt: '2025-10-25', completedBy: 'Both' },
+				{ stageId: 'promotion', isCompleted: false }
+			] as ProductionStageStatus[],
+			progressPercent: 89,
+			createdBy: 'Otte',
+			lyricsVersions: [],
+			promptConfigs: [],
+			audioVersions: [],
+			usedWordIds: [],
+			createdAt: '2025-10-01',
+			updatedAt: '2025-10-25'
+		},
+		{
+			id: 'proj15',
+			title: '드림 캐처',
+			description: '몽환적 신스팝',
+			status: 'completed',
+			stages: PRODUCTION_STAGES.map(stage => ({
+				stageId: stage.id,
+				isCompleted: true,
+				completedAt: '2025-09-30',
+				completedBy: stage.assignedTo === 'El' ? 'El' : 'Otte'
+			})) as ProductionStageStatus[],
+			progressPercent: 100,
+			createdBy: 'El',
+			lyricsVersions: [],
+			promptConfigs: [],
+			audioVersions: [],
+			usedWordIds: [],
+			linkedTrackId: 'track2',
+			createdAt: '2025-09-01',
+			updatedAt: '2025-09-30'
+		},
+		{
+			id: 'proj16',
+			title: '오렌지 선셋',
+			description: '노을빛 어쿠스틱',
+			status: 'in_progress',
+			stages: [
+				{ stageId: 'idea', isCompleted: true, completedAt: '2026-01-14', completedBy: 'Otte' },
+				{ stageId: 'lyrics_draft', isCompleted: false }
+			] as ProductionStageStatus[],
+			progressPercent: 6,
+			createdBy: 'Otte',
+			lyricsVersions: [],
+			promptConfigs: [],
+			audioVersions: [],
+			usedWordIds: [],
+			createdAt: '2026-01-14',
+			updatedAt: '2026-01-14'
+		},
+		{
+			id: 'proj17',
+			title: '바닐라 스카이',
+			description: '부드러운 R&B 발라드',
+			status: 'in_progress',
+			stages: [
+				{ stageId: 'idea', isCompleted: true, completedAt: '2026-01-12', completedBy: 'El' },
+				{ stageId: 'lyrics_draft', isCompleted: true, completedAt: '2026-01-13', completedBy: 'Otte' },
+				{ stageId: 'lyrics_structure', isCompleted: true, completedAt: '2026-01-14', completedBy: 'Otte' },
+				{ stageId: 'lyrics_suno', isCompleted: false }
+			] as ProductionStageStatus[],
+			progressPercent: 17,
+			createdBy: 'El',
+			lyricsVersions: [],
+			promptConfigs: [],
+			audioVersions: [],
+			usedWordIds: [],
+			createdAt: '2026-01-12',
+			updatedAt: '2026-01-14'
+		},
+		{
+			id: 'proj18',
+			title: '핑크 다이아몬드',
+			description: '화려한 댄스팝',
+			status: 'in_progress',
+			stages: [
+				{ stageId: 'idea', isCompleted: true, completedAt: '2026-01-08', completedBy: 'Otte' },
+				{ stageId: 'lyrics_draft', isCompleted: true, completedAt: '2026-01-09', completedBy: 'Otte' },
+				{ stageId: 'lyrics_structure', isCompleted: true, completedAt: '2026-01-10', completedBy: 'Otte' },
+				{ stageId: 'lyrics_suno', isCompleted: true, completedAt: '2026-01-11', completedBy: 'Otte' },
+				{ stageId: 'prompt_writing', isCompleted: true, completedAt: '2026-01-12', completedBy: 'El' },
+				{ stageId: 'suno_generation', isCompleted: false }
+			] as ProductionStageStatus[],
+			progressPercent: 28,
+			createdBy: 'Otte',
+			lyricsVersions: [],
+			promptConfigs: [],
+			audioVersions: [],
+			usedWordIds: [],
+			createdAt: '2026-01-08',
+			updatedAt: '2026-01-12'
+		},
+		{
+			id: 'proj19',
+			title: '골든 아워',
+			description: '황금빛 팝 록',
+			status: 'in_progress',
+			stages: [
+				{ stageId: 'idea', isCompleted: true, completedAt: '2025-12-25', completedBy: 'El' },
+				{ stageId: 'lyrics_draft', isCompleted: true, completedAt: '2025-12-26', completedBy: 'Otte' },
+				{ stageId: 'lyrics_structure', isCompleted: true, completedAt: '2025-12-27', completedBy: 'Otte' },
+				{ stageId: 'lyrics_suno', isCompleted: true, completedAt: '2025-12-28', completedBy: 'Otte' },
+				{ stageId: 'prompt_writing', isCompleted: true, completedAt: '2025-12-29', completedBy: 'El' },
+				{ stageId: 'suno_generation', isCompleted: true, completedAt: '2025-12-30', completedBy: 'El' },
+				{ stageId: 'suno_comparison', isCompleted: true, completedAt: '2025-12-31', completedBy: 'Both' },
+				{ stageId: 'suno_selection', isCompleted: true, completedAt: '2026-01-01', completedBy: 'Both' },
+				{ stageId: 'mixing', isCompleted: true, completedAt: '2026-01-03', completedBy: 'El' },
+				{ stageId: 'audio_editing', isCompleted: false }
+			] as ProductionStageStatus[],
+			progressPercent: 50,
+			createdBy: 'El',
+			lyricsVersions: [],
+			promptConfigs: [],
+			audioVersions: [],
+			usedWordIds: [],
+			createdAt: '2025-12-25',
+			updatedAt: '2026-01-03'
 		}
 	]);
 
-	// 상태별 라벨
-	const statusLabels: Record<ProjectStatus | 'all', string> = {
-		all: '전체',
-		idea: '아이디어',
-		in_progress: '제작 중',
-		completed: '완료',
-		archived: '보관'
-	};
-
-	// 상태별 색상
-	function getStatusColor(status: ProjectStatus): string {
-		switch (status) {
-			case 'idea': return 'bg-yellow-500/20 text-yellow-400';
-			case 'in_progress': return 'bg-brand-pink/20 text-brand-pink';
-			case 'completed': return 'bg-green-500/20 text-green-400';
-			case 'archived': return 'bg-gray-500/20 text-gray-400';
-			default: return 'bg-surface-2 text-text-muted';
-		}
+	// 현재 단계 색상 (텍스트만, 다크/라이트 모드 대응)
+	function getStageColor(stageId: ProductionStageId): string {
+		const stageIndex = PRODUCTION_STAGES.findIndex(s => s.id === stageId);
+		// 초반 단계 (1-6): 노란색
+		if (stageIndex < 6) return 'text-yellow-500 dark:text-yellow-400';
+		// 중반 단계 (7-12): 핑크
+		if (stageIndex < 12) return 'text-brand-pink';
+		// 후반 단계 (13-17): 파란색
+		if (stageIndex < 17) return 'text-blue-500 dark:text-blue-400';
+		// 완료 (18): 녹색
+		return 'text-green-600 dark:text-green-400';
 	}
 
 	// 필터링
@@ -149,19 +547,25 @@
 					return false;
 				}
 			}
-			// 상태 필터
-			if (statusFilter !== 'all' && project.status !== statusFilter) {
-				return false;
+			// 단계 필터
+			if (stageFilter !== 'all') {
+				const currentStage = getCurrentStage(project);
+				if (currentStage !== stageFilter) {
+					return false;
+				}
 			}
 			return true;
 		});
 	});
 
-	// 상태별 카운트
-	const statusCounts = $derived.by(() => {
+	// 단계별 카운트
+	const stageCounts = $derived.by(() => {
 		const counts: Record<string, number> = { all: projects.length };
 		projects.forEach(p => {
-			counts[p.status] = (counts[p.status] || 0) + 1;
+			const currentStage = getCurrentStage(p);
+			if (currentStage) {
+				counts[currentStage] = (counts[currentStage] || 0) + 1;
+			}
 		});
 		return counts;
 	});
@@ -169,13 +573,13 @@
 	// 외부 클릭 처리
 	function handleClickOutside(e: MouseEvent) {
 		const target = e.target as HTMLElement;
-		if (!target.closest('.status-dropdown')) {
-			statusDropdownOpen = false;
+		if (!target.closest('.stage-dropdown')) {
+			stageDropdownOpen = false;
 		}
 	}
 
 	$effect(() => {
-		if (statusDropdownOpen) {
+		if (stageDropdownOpen) {
 			document.addEventListener('click', handleClickOutside);
 		}
 		return () => {
@@ -188,6 +592,34 @@
 	<title>진행 중인 곡 | SUNO 제작</title>
 </svelte:head>
 
+<!-- 템플릿 모달 -->
+{#if showTemplates}
+	<div
+		class="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4"
+		onclick={() => showTemplates = false}
+		onkeydown={(e) => { if (e.key === 'Escape') showTemplates = false; }}
+		role="dialog"
+		aria-modal="true"
+		tabindex="-1"
+	>
+		<!-- svelte-ignore a11y_no_static_element_interactions -->
+		<div class="max-w-3xl w-full" onclick={(e) => e.stopPropagation()} onkeydown={(e) => e.stopPropagation()}>
+			<ProjectTemplates
+				onSelect={(template) => { 
+					showTemplates = false;
+					const params = new URLSearchParams();
+					if (template.name && template.id !== 'blank') params.set('template', template.name);
+					if (template.defaultStyles) params.set('styles', template.defaultStyles);
+					if (template.defaultExclude) params.set('exclude', template.defaultExclude);
+					if (template.defaultVocalGender) params.set('vocal', template.defaultVocalGender);
+					goto(`/suno/projects/new${params.toString() ? '?' + params.toString() : ''}`);
+				}}
+				onClose={() => showTemplates = false}
+			/>
+		</div>
+	</div>
+{/if}
+
 <div class="pt-0 pb-6 sm:pb-6 pb-20 bg-bg text-text-base">
 	<!-- 헤더 -->
 	<div class="mb-8 mt-1.5">
@@ -198,6 +630,7 @@
 			</div>
 			<button
 				type="button"
+				onclick={() => showTemplates = true}
 				class="flex items-center gap-2 px-4 py-2 bg-brand-pink text-white rounded-lg font-medium hover:bg-brand-pink/90 transition-colors flex-shrink-0"
 			>
 				<Plus size={16} />
@@ -211,44 +644,71 @@
 		<!-- 필터 영역 -->
 		<div class="mb-6 flex flex-col sm:flex-row gap-4">
 			<!-- 검색 -->
-			<div class="relative flex-1">
+			<div class="relative flex-1 group">
 				<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-					<Search size={16} class="text-text-muted" />
+					<Search size={16} class="lucide-icon lucide-search" />
 				</div>
 				<input
 					type="text"
 					bind:value={searchQuery}
 					placeholder="곡 제목 또는 설명 검색..."
-					class="w-full h-10 pl-10 pr-4 bg-surface-2 border border-border-subtle rounded-lg text-text-base focus:outline-none focus:border-brand-pink"
+					class="w-full pl-10 {searchQuery.trim() ? 'pr-10' : 'pr-4'} py-1.5 bg-surface-1 border border-border-subtle border-[1px] rounded-md text-text-base placeholder-text-muted focus:outline-none focus:border-brand-pink focus:ring-0 transition-colors duration-200"
+					aria-label="곡 제목 또는 설명 검색"
+					id="suno-project-search"
+					autocomplete="off"
 				/>
+				{#if searchQuery.trim()}
+					<button
+						type="button"
+						onclick={() => {
+							searchQuery = '';
+							const input = document.getElementById('suno-project-search') as HTMLInputElement;
+							input?.focus();
+						}}
+						class="search-clear-button absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 flex items-center justify-center bg-transparent hover:bg-transparent focus:bg-transparent focus-visible:bg-transparent"
+						aria-label="검색 초기화"
+					>
+						<X size={16} class="lucide-icon" />
+					</button>
+				{/if}
 			</div>
 
-			<!-- 상태 필터 -->
-			<div class="relative status-dropdown">
+			<!-- 단계 필터 -->
+			<div class="relative stage-dropdown">
 				<button
 					type="button"
-					onclick={() => statusDropdownOpen = !statusDropdownOpen}
-					class="w-full sm:w-40 h-10 px-4 pr-10 bg-surface-2 border border-border-subtle rounded-lg text-base text-text-base text-left focus:outline-none focus:border-brand-pink transition-colors"
+					onclick={() => stageDropdownOpen = !stageDropdownOpen}
+					class="status-filter-btn w-full sm:w-48 h-10 px-4 pr-10 bg-surface-2 border border-border-subtle rounded-lg text-sm text-text-base text-left transition-colors"
 				>
 					<span class="block truncate">
-						{statusLabels[statusFilter]} ({statusCounts[statusFilter] || 0})
+						{stageLabels[stageFilter]} ({stageCounts[stageFilter] || 0})
 					</span>
 				</button>
 				<div class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center">
 					<ChevronDown size={16} class="text-text-muted" />
 				</div>
-				{#if statusDropdownOpen}
-					<ul class="absolute left-0 w-full mt-[6px] bg-surface-2 border border-border-subtle rounded-[6px] z-10 max-h-60 overflow-y-auto custom-list-scrollbar">
-						{#each Object.entries(statusLabels) as [value, label]}
+				{#if stageDropdownOpen}
+					<ul class="absolute left-0 w-full mt-[6px] bg-surface-2 border border-border-subtle rounded-[6px] z-10 max-h-80 overflow-y-auto custom-list-scrollbar">
+						<li
+							role="option"
+							aria-selected={stageFilter === 'all'}
+							tabindex="0"
+							onclick={() => { stageFilter = 'all'; stageDropdownOpen = false; }}
+							onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { stageFilter = 'all'; stageDropdownOpen = false; } }}
+							class="dropdown-item px-4 py-2 text-sm cursor-pointer transition-colors {stageFilter === 'all' ? 'bg-brand-pink text-white' : 'text-text-base'}"
+						>
+							전체 ({stageCounts['all'] || 0})
+						</li>
+						{#each PRODUCTION_STAGES as stage}
 							<li
 								role="option"
-								aria-selected={statusFilter === value}
+								aria-selected={stageFilter === stage.id}
 								tabindex="0"
-								onclick={() => { statusFilter = value as ProjectStatus | 'all'; statusDropdownOpen = false; }}
-								onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { statusFilter = value as ProjectStatus | 'all'; statusDropdownOpen = false; } }}
-								class="px-4 py-2 text-base text-text-base hover:bg-surface-1 cursor-pointer {statusFilter === value ? 'bg-brand-pink text-white' : ''}"
+								onclick={() => { stageFilter = stage.id; stageDropdownOpen = false; }}
+								onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { stageFilter = stage.id; stageDropdownOpen = false; } }}
+								class="dropdown-item px-4 py-2 text-sm cursor-pointer transition-colors {stageFilter === stage.id ? 'bg-brand-pink text-white' : 'text-text-base'}"
 							>
-								{label} ({statusCounts[value] || 0})
+								{stage.name} ({stageCounts[stage.id] || 0})
 							</li>
 						{/each}
 					</ul>
@@ -259,9 +719,10 @@
 		<!-- 프로젝트 그리드 -->
 		<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
 			{#each filteredProjects as project}
+				{@const currentStage = getCurrentStage(project)}
 				<a 
 					href="/suno/projects/{project.id}"
-					class="block bg-surface-2 rounded-lg border border-border-subtle p-5 hover:border-hover-point transition-colors group"
+					class="project-card block bg-surface-2 rounded-lg border border-border-subtle p-5 transition-colors group"
 				>
 					<!-- 헤더 -->
 					<div class="flex items-start justify-between gap-3 mb-3">
@@ -271,8 +732,8 @@
 							</h3>
 							<p class="text-sm text-text-muted mt-0.5 truncate">{project.description}</p>
 						</div>
-						<span class="flex-shrink-0 px-2 py-1 rounded-md text-xs font-medium {getStatusColor(project.status)}">
-							{statusLabels[project.status]}
+						<span class="flex-shrink-0 px-2 py-1 rounded-md text-xs font-medium {currentStage ? getStageColor(currentStage) : 'text-text-muted'}">
+							{currentStage ? stageLabels[currentStage] : '미정'}
 						</span>
 					</div>
 
@@ -290,16 +751,28 @@
 							<span>·</span>
 							<span>{project.updatedAt}</span>
 						</div>
-						<ArrowRight size={14} class="text-text-muted group-hover:text-brand-pink transition-colors" />
+						<span class="more-link text-brand-pink text-xs font-semibold px-2 py-1 rounded transition-colors">더보기</span>
 					</div>
 				</a>
 			{/each}
 
 			{#if filteredProjects.length === 0}
-				<div class="col-span-full py-12 text-center text-text-muted">
-					{searchQuery || statusFilter !== 'all' 
-						? '검색 결과가 없습니다.' 
-						: '진행 중인 프로젝트가 없습니다.'}
+				<div class="col-span-full py-12 text-center">
+					<p class="text-text-muted mb-4">
+						{searchQuery || stageFilter !== 'all' 
+							? '검색 결과가 없습니다.' 
+							: '진행 중인 프로젝트가 없습니다.'}
+					</p>
+					{#if !searchQuery && stageFilter === 'all'}
+						<button
+							type="button"
+							onclick={() => showTemplates = true}
+							class="inline-flex items-center gap-2 px-4 py-2 bg-brand-pink text-white text-sm font-medium rounded-lg hover:bg-brand-pink/90 transition-colors"
+						>
+							<Plus size={16} />
+							새 프로젝트 만들기
+						</button>
+					{/if}
 				</div>
 			{/if}
 		</div>

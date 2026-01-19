@@ -5004,3 +5004,209 @@ button.bg-brand-pink:disabled:focus-visible {
     max-width: 100% !important;
   }
 }
+
+/* ============================================================
+   템플릿 카드 스타일
+   ============================================================ */
+/* 템플릿 카드 호버 효과 - 보더만 변경 (호버 포인트 색상) */
+.template-card:hover:not(:focus):not(:focus-visible) {
+  border-color: var(--hover-point) !important;
+}
+
+/* 템플릿 카드 포커스 효과 - 보더만 변경 (핫핑크) */
+.template-card:focus,
+.template-card:focus-visible {
+  border-color: var(--brand-pink) !important;
+  outline: none !important;
+}
+
+/* 템플릿 카드 포커스+호버 - 포커스 우선 (핫핑크 유지) */
+.template-card:focus:hover,
+.template-card:focus-visible:hover {
+  border-color: var(--brand-pink) !important;
+}
+
+/* 템플릿 카드 호버 시 제목 색상 변경 (호버 포인트 색상) */
+.template-card:hover:not(:focus):not(:focus-visible) .template-card-title {
+  color: var(--hover-point) !important;
+}
+
+/* 템플릿 카드 포커스 시 제목 색상 변경 (핫핑크) */
+.template-card:focus .template-card-title,
+.template-card:focus-visible .template-card-title {
+  color: var(--brand-pink) !important;
+}
+
+/* 템플릿 카드 포커스+호버 시 제목 색상 - 포커스 우선 (핫핑크 유지) */
+.template-card:focus:hover .template-card-title,
+.template-card:focus-visible:hover .template-card-title {
+  color: var(--brand-pink) !important;
+}
+
+/* 템플릿 카드 내부 아이콘 - 호버/포커스 효과 없음 */
+.template-card .lucide-icon,
+.template-card:hover .lucide-icon,
+.template-card:focus .lucide-icon,
+.template-card:focus-visible .lucide-icon {
+  color: inherit !important;
+}
+
+/* 라이트 모드 - 템플릿 카드 배경색 변경 방지 */
+[data-theme="light"] .template-card:hover,
+[data-theme="light"] .template-card:focus,
+[data-theme="light"] .template-card:focus-visible {
+  background-color: transparent !important;
+}
+
+/* 빈 프로젝트 버튼 호버 효과 (호버 포인트 색상) */
+.empty-project-button:hover:not(:focus):not(:focus-visible) {
+  border-color: var(--hover-point) !important;
+  color: var(--hover-point) !important;
+}
+
+/* 빈 프로젝트 버튼 포커스 효과 (핫핑크) */
+.empty-project-button:focus,
+.empty-project-button:focus-visible {
+  border-color: var(--brand-pink) !important;
+  color: var(--brand-pink) !important;
+  outline: none !important;
+}
+
+/* 빈 프로젝트 버튼 포커스+호버 - 포커스 우선 */
+.empty-project-button:focus:hover,
+.empty-project-button:focus-visible:hover {
+  border-color: var(--brand-pink) !important;
+  color: var(--brand-pink) !important;
+}
+
+/* 카테고리 탭 호버 효과 (비활성 탭만) - 사이드바와 동일 */
+.category-tab:not(.bg-brand-pink):hover:not(:focus):not(:focus-visible) {
+  background-color: var(--hover-point) !important;
+  color: var(--text-on-hover) !important;
+}
+
+/* 카테고리 탭 포커스 효과 (비활성 탭만) - 사이드바와 동일 */
+.category-tab:not(.bg-brand-pink):focus,
+.category-tab:not(.bg-brand-pink):focus-visible {
+  background-color: var(--brand-pink) !important;
+  color: #FFFFFF !important;
+  outline: none !important;
+}
+
+/* 카테고리 탭 포커스+호버 - 포커스 우선 */
+.category-tab:not(.bg-brand-pink):focus:hover,
+.category-tab:not(.bg-brand-pink):focus-visible:hover {
+  background-color: var(--brand-pink) !important;
+  color: #FFFFFF !important;
+}
+
+/* 템플릿 닫기 버튼 호버 효과 (호버 포인트 색상) */
+.template-close-btn:hover:not(:focus):not(:focus-visible) {
+  color: var(--hover-point) !important;
+}
+
+/* 템플릿 닫기 버튼 포커스 효과 (핫핑크) */
+.template-close-btn:focus,
+.template-close-btn:focus-visible {
+  color: var(--brand-pink) !important;
+  outline: none !important;
+}
+
+/* 템플릿 닫기 버튼 포커스+호버 - 포커스 우선 */
+.template-close-btn:focus:hover,
+.template-close-btn:focus-visible:hover {
+  color: var(--brand-pink) !important;
+}
+
+/* ============================================================
+   프로젝트 카드 스타일
+   ============================================================ */
+/* 프로젝트 카드 호버 효과 (호버 포인트 색상) */
+.project-card:hover:not(:focus):not(:focus-visible) {
+  border-color: var(--hover-point) !important;
+}
+
+/* 프로젝트 카드 포커스 효과 (핫핑크) */
+.project-card:focus,
+.project-card:focus-visible {
+  border-color: var(--brand-pink) !important;
+  outline: none !important;
+}
+
+/* 프로젝트 카드 포커스+호버 - 포커스 우선 */
+.project-card:focus:hover,
+.project-card:focus-visible:hover {
+  border-color: var(--brand-pink) !important;
+}
+
+/* 프로젝트 카드 포커스 시 제목 색상 */
+.project-card:focus h3,
+.project-card:focus-visible h3 {
+  color: var(--brand-pink) !important;
+}
+
+/* 프로젝트 카드 포커스 시 화살표 색상 */
+.project-card:focus .lucide-arrow-right,
+.project-card:focus-visible .lucide-arrow-right {
+  color: var(--brand-pink) !important;
+}
+
+/* ============================================================
+   상태 필터 버튼 스타일
+   ============================================================ */
+/* 상태 필터 버튼 호버 효과 */
+.status-filter-btn:hover:not(:focus):not(:focus-visible) {
+  border-color: var(--hover-point) !important;
+}
+
+/* 상태 필터 버튼 포커스 효과 */
+.status-filter-btn:focus,
+.status-filter-btn:focus-visible {
+  border-color: var(--brand-pink) !important;
+  outline: none !important;
+}
+
+/* ============================================================
+   드롭다운 항목 스타일
+   ============================================================ */
+/* 드롭다운 항목 호버 효과 (비선택 상태만) - 사이드바와 동일 */
+.dropdown-item:not(.bg-brand-pink):hover:not(:focus):not(:focus-visible) {
+  background-color: var(--hover-point) !important;
+  color: var(--text-on-hover) !important;
+}
+
+/* 드롭다운 항목 포커스 효과 (비선택 상태만) - 사이드바와 동일 */
+.dropdown-item:not(.bg-brand-pink):focus,
+.dropdown-item:not(.bg-brand-pink):focus-visible {
+  background-color: var(--brand-pink) !important;
+  color: #FFFFFF !important;
+  outline: none !important;
+}
+
+/* 드롭다운 항목 포커스+호버 - 포커스 우선 */
+.dropdown-item:not(.bg-brand-pink):focus:hover,
+.dropdown-item:not(.bg-brand-pink):focus-visible:hover {
+  background-color: var(--brand-pink) !important;
+  color: #FFFFFF !important;
+}
+
+/* ============================================================
+   더보기 링크 스타일 (프로젝트 카드 내)
+   ============================================================ */
+/* 더보기 링크 호버 효과 - 글자색만 변경 */
+.more-link:hover:not(:focus):not(:focus-visible) {
+  color: var(--hover-point) !important;
+}
+
+/* 더보기 링크 포커스 효과 - 글자색만 변경 */
+.more-link:focus,
+.more-link:focus-visible {
+  color: var(--brand-pink) !important;
+  outline: none !important;
+}
+
+/* 더보기 링크 포커스+호버 - 포커스 우선 */
+.more-link:focus:hover,
+.more-link:focus-visible:hover {
+  color: var(--brand-pink) !important;
+}

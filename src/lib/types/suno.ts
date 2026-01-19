@@ -45,12 +45,19 @@ export type ProductionStageId =
 	| 'lyrics_draft'      // 가사 초안
 	| 'lyrics_structure'  // 곡구조 버전
 	| 'lyrics_suno'       // 수노발음 버전
+	| 'prompt_writing'    // 프롬프트 작성
 	| 'suno_generation'   // SUNO 생성
+	| 'suno_comparison'   // 버전 비교
 	| 'suno_selection'    // 곡 선정
-	| 'audio_editing'     // 음원 수정 (El)
-	| 'lyrics_final'      // 앨범등록 가사
+	| 'mixing'            // 믹싱
+	| 'audio_editing'     // 음원 수정
 	| 'mastering'         // 마스터링
+	| 'lyrics_final'      // 앨범등록 가사
+	| 'artwork'           // 아트워크 제작
+	| 'track_info'        // 곡 정보 입력
 	| 'album_ready'       // 앨범 등록 준비
+	| 'distribution'      // 배포처 업로드
+	| 'promotion'         // 홍보/마케팅
 	| 'released';         // 발매 완료
 
 /** 제작 단계 정의 */
