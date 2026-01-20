@@ -61,6 +61,28 @@
 		return 'idea';
 	}
 
+	// 상대 시간 표시 함수
+	function getRelativeTime(dateString: string): string {
+		const date = new Date(dateString);
+		const now = new Date();
+		const diffMs = now.getTime() - date.getTime();
+		const diffSec = Math.floor(diffMs / 1000);
+		const diffMin = Math.floor(diffSec / 60);
+		const diffHour = Math.floor(diffMin / 60);
+		const diffDay = Math.floor(diffHour / 24);
+		const diffWeek = Math.floor(diffDay / 7);
+		const diffMonth = Math.floor(diffDay / 30);
+
+		if (diffSec < 60) return '방금 전';
+		if (diffMin < 60) return `${diffMin}분 전`;
+		if (diffHour < 24) return `${diffHour}시간 전`;
+		if (diffDay === 1) return '어제';
+		if (diffDay < 7) return `${diffDay}일 전`;
+		if (diffWeek < 4) return `${diffWeek}주 전`;
+		if (diffMonth < 12) return `${diffMonth}개월 전`;
+		return dateString;
+	}
+
 	// 단계 라벨 매핑
 	const stageLabels: Record<ProductionStageId | 'all', string> = {
 		all: '전체',
@@ -904,7 +926,7 @@
 								{project.createdBy}
 							</span>
 							<span>·</span>
-							<span>{project.updatedAt}</span>
+							<span>{getRelativeTime(project.updatedAt)}</span>
 						</div>
 						<span class="more-link text-brand-pink text-xs font-semibold px-2 py-1 rounded transition-colors">더보기</span>
 					</div>
