@@ -15,16 +15,15 @@
 	let stageFilter = $state<ProductionStageId | 'all'>('all');
 	let stageDropdownOpen = $state(false);
 	
-	// 담당자 필터
-	type AssigneeFilter = 'all' | 'El' | 'Otte' | 'Both';
+	// 담당자 필터 (프로젝트 생성자 기준)
+	type AssigneeFilter = 'all' | 'El' | 'Otte';
 	let assigneeFilter = $state<AssigneeFilter>('all');
 	let assigneeDropdownOpen = $state(false);
 	
 	const assigneeLabels: Record<AssigneeFilter, string> = {
-		all: '전체 담당자',
+		all: '전체',
 		El: 'El',
-		Otte: 'Otte',
-		Both: '공동'
+		Otte: 'Otte'
 	};
 
 	// 정렬 상태
@@ -604,14 +603,10 @@
 					return false;
 				}
 			}
-			// 담당자 필터
+			// 담당자 필터 (프로젝트 생성자 기준)
 			if (assigneeFilter !== 'all') {
-				const currentStage = getCurrentStage(project);
-				if (currentStage) {
-					const stageDef = PRODUCTION_STAGES.find(s => s.id === currentStage);
-					if (stageDef && stageDef.assignedTo !== assigneeFilter) {
-						return false;
-					}
+				if (project.createdBy !== assigneeFilter) {
+					return false;
 				}
 			}
 			return true;
