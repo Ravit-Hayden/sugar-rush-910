@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { Plus, Search, ChevronDown, X, Filter, ArrowUpDown } from 'lucide-svelte';
+	import { Plus, Search, ChevronDown, X, Filter, ArrowUpDown, User, Music, SearchX } from 'lucide-svelte';
 	import ProductionProgress from '$lib/components/suno/ProductionProgress.svelte';
 	import SUNOTabs from '$lib/components/suno/SUNOTabs.svelte';
 	import ProjectTemplates from '$lib/components/suno/ProjectTemplates.svelte';
@@ -14,6 +14,18 @@
 	let searchQuery = $state('');
 	let stageFilter = $state<ProductionStageId | 'all'>('all');
 	let stageDropdownOpen = $state(false);
+	
+	// 담당자 필터
+	type AssigneeFilter = 'all' | 'El' | 'Otte' | 'Both';
+	let assigneeFilter = $state<AssigneeFilter>('all');
+	let assigneeDropdownOpen = $state(false);
+	
+	const assigneeLabels: Record<AssigneeFilter, string> = {
+		all: '전체 담당자',
+		El: 'El',
+		Otte: 'Otte',
+		Both: '공동'
+	};
 
 	// 정렬 상태
 	type SortOption = 'updated_desc' | 'updated_asc' | 'created_desc' | 'created_asc' | 'title_asc' | 'title_desc' | 'progress_desc' | 'progress_asc';
@@ -570,6 +582,16 @@
 					return false;
 				}
 			}
+			// 담당자 필터
+			if (assigneeFilter !== 'all') {
+				const currentStage = getCurrentStage(project);
+				if (currentStage) {
+					const stageDef = PRODUCTION_STAGES.find(s => s.id === currentStage);
+					if (stageDef && stageDef.assignedTo !== assigneeFilter) {
+						return false;
+					}
+				}
+			}
 			return true;
 		});
 
@@ -618,13 +640,16 @@
 		if (!target.closest('.stage-dropdown')) {
 			stageDropdownOpen = false;
 		}
+		if (!target.closest('.assignee-dropdown')) {
+			assigneeDropdownOpen = false;
+		}
 		if (!target.closest('.sort-dropdown')) {
 			sortDropdownOpen = false;
 		}
 	}
 
 	$effect(() => {
-		if (stageDropdownOpen || sortDropdownOpen) {
+		if (stageDropdownOpen || assigneeDropdownOpen || sortDropdownOpen) {
 			document.addEventListener('click', handleClickOutside);
 		}
 		return () => {
@@ -765,6 +790,46 @@
 				{/if}
 			</div>
 
+			<!-- 담당자 필터 -->
+			<div class="relative assignee-dropdown">
+				<button
+					type="button"
+					onclick={() => assigneeDropdownOpen = !assigneeDropdownOpen}
+					aria-haspopup="listbox"
+					aria-expanded={assigneeDropdownOpen}
+					class="status-filter-btn flex items-center pl-10 pr-8 py-1.5 w-full sm:w-auto sm:min-w-[130px] bg-surface-2 rounded-[6px] text-text-base transition-all duration-200 cursor-pointer border border-border-subtle focus:outline-none focus:border-brand-pink"
+				>
+					<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+						<User size={16} class="lucide-icon text-text-muted transition-colors duration-200" />
+					</div>
+					<span class="flex-1 text-left truncate">
+						{assigneeLabels[assigneeFilter]}
+					</span>
+					<div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+						<ChevronDown size={12} class="text-text-base transition-colors duration-200" />
+					</div>
+				</button>
+				{#if assigneeDropdownOpen}
+					<ul
+						role="listbox"
+						class="absolute z-10 mt-1 w-full bg-surface-2 border border-border-subtle rounded-md shadow-lg max-h-60 overflow-auto"
+					>
+						{#each Object.entries(assigneeLabels) as [value, label]}
+							<li
+								role="option"
+								aria-selected={assigneeFilter === value}
+								tabindex="0"
+								onclick={() => { assigneeFilter = value as AssigneeFilter; assigneeDropdownOpen = false; }}
+								onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { assigneeFilter = value as AssigneeFilter; assigneeDropdownOpen = false; } }}
+								class="dropdown-item px-4 py-2 cursor-pointer transition-colors {assigneeFilter === value ? 'bg-brand-pink text-white' : 'text-text-base hover:bg-hover-point hover:text-text-on-hover'}"
+							>
+								{label}
+							</li>
+						{/each}
+					</ul>
+				{/if}
+			</div>
+
 			<!-- 정렬 -->
 			<div class="relative sort-dropdown">
 				<button
@@ -844,13 +909,29 @@
 			{/each}
 
 			{#if filteredProjects.length === 0}
-				<div class="col-span-full py-12 text-center">
-					<p class="text-text-muted mb-4">
-						{searchQuery || stageFilter !== 'all' 
-							? '검색 결과가 없습니다.' 
-							: '진행 중인 프로젝트가 없습니다.'}
-					</p>
-					{#if !searchQuery && stageFilter === 'all'}
+				<div class="col-span-full py-16 text-center">
+					{#if searchQuery || stageFilter !== 'all' || assigneeFilter !== 'all'}
+						<!-- 필터/검색 결과 없음 -->
+						<div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-surface-2 mb-4">
+							<SearchX size={28} class="text-text-muted" />
+						</div>
+						<p class="text-text-base font-medium mb-2">검색 결과가 없습니다</p>
+						<p class="text-text-muted text-sm mb-4">다른 검색어나 필터를 시도해보세요</p>
+						<button
+							type="button"
+							onclick={() => { searchQuery = ''; stageFilter = 'all'; assigneeFilter = 'all'; }}
+							class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-brand-pink border border-brand-pink rounded-lg hover:bg-brand-pink hover:text-white transition-colors"
+						>
+							<X size={14} />
+							필터 초기화
+						</button>
+					{:else}
+						<!-- 프로젝트 없음 -->
+						<div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-surface-2 mb-4">
+							<Music size={28} class="text-text-muted" />
+						</div>
+						<p class="text-text-base font-medium mb-2">아직 프로젝트가 없습니다</p>
+						<p class="text-text-muted text-sm mb-4">새 프로젝트를 시작해서 음악을 만들어보세요</p>
 						<button
 							type="button"
 							onclick={() => showTemplates = true}
