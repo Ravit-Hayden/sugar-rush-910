@@ -865,8 +865,24 @@
 		</div>
 
 		<!-- 통계 -->
-		<div class="mt-6 text-sm text-text-muted">
-			총 {projects.length}개 프로젝트 | 표시 중 {filteredProjects.length}개
+		<div class="mt-6">
+			<div class="flex flex-wrap items-center gap-4 text-sm">
+				<span class="text-text-muted">
+					총 <span class="font-medium text-text-base">{projects.length}</span>개 프로젝트
+				</span>
+				<span class="text-border-subtle">|</span>
+				<span class="text-text-muted">
+					표시 중 <span class="font-medium text-text-base">{filteredProjects.length}</span>개
+				</span>
+				<span class="text-border-subtle">|</span>
+				<span class="text-text-muted">
+					진행 중 <span class="font-medium text-brand-pink">{projects.filter(p => p.status === 'in_progress').length}</span>개
+				</span>
+				<span class="text-border-subtle">|</span>
+				<span class="text-text-muted">
+					완료 <span class="font-medium text-green-500 dark:text-green-400">{projects.filter(p => p.status === 'completed').length}</span>개
+				</span>
+			</div>
 		</div>
 	</SUNOTabs>
 </div>
