@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { Plus, Search, ChevronDown, X, Filter, ArrowUpDown, User, Music, SearchX } from 'lucide-svelte';
+	import { Plus, Search, ChevronDown, X, Filter, ArrowUpDown, UserRound, Music, SearchX } from 'lucide-svelte';
 	import ProductionProgress from '$lib/components/suno/ProductionProgress.svelte';
 	import SUNOTabs from '$lib/components/suno/SUNOTabs.svelte';
 	import ProjectTemplates from '$lib/components/suno/ProjectTemplates.svelte';
@@ -712,9 +712,9 @@
 	<!-- 탭 + 콘텐츠 -->
 	<SUNOTabs>
 		<!-- 필터 영역 -->
-		<div class="mb-6 flex flex-col sm:flex-row gap-4">
-			<!-- 검색 -->
-			<div class="relative flex-1 group">
+		<div class="mb-6 space-y-3">
+			<!-- 검색 (윗줄) -->
+			<div class="relative group">
 				<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
 					<Search size={16} class="lucide-icon lucide-search" />
 				</div>
@@ -743,14 +743,16 @@
 				{/if}
 			</div>
 
-			<!-- 단계 필터 -->
-			<div class="relative stage-dropdown">
+			<!-- 필터/정렬 (아랫줄) -->
+			<div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+				<!-- 단계 필터 -->
+				<div class="relative stage-dropdown">
 				<button
 					type="button"
 					onclick={() => stageDropdownOpen = !stageDropdownOpen}
 					aria-haspopup="listbox"
 					aria-expanded={stageDropdownOpen}
-					class="status-filter-btn flex items-center pl-10 pr-8 py-1.5 w-full sm:w-auto sm:min-w-[200px] bg-surface-2 rounded-[6px] text-text-base transition-all duration-200 cursor-pointer border border-border-subtle focus:outline-none focus:border-brand-pink"
+					class="status-filter-btn flex items-center pl-10 pr-8 py-1.5 w-full bg-surface-2 rounded-[6px] text-text-base transition-all duration-200 cursor-pointer border border-border-subtle focus:outline-none focus:border-brand-pink"
 				>
 					<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
 						<Filter size={16} class="lucide-icon text-text-muted transition-colors duration-200" />
@@ -791,16 +793,16 @@
 			</div>
 
 			<!-- 담당자 필터 -->
-			<div class="relative assignee-dropdown">
+				<div class="relative assignee-dropdown">
 				<button
 					type="button"
 					onclick={() => assigneeDropdownOpen = !assigneeDropdownOpen}
 					aria-haspopup="listbox"
 					aria-expanded={assigneeDropdownOpen}
-					class="status-filter-btn flex items-center pl-10 pr-8 py-1.5 w-full sm:w-auto sm:min-w-[130px] bg-surface-2 rounded-[6px] text-text-base transition-all duration-200 cursor-pointer border border-border-subtle focus:outline-none focus:border-brand-pink"
+					class="status-filter-btn flex items-center pl-10 pr-8 py-1.5 w-full bg-surface-2 rounded-[6px] text-text-base transition-all duration-200 cursor-pointer border border-border-subtle focus:outline-none focus:border-brand-pink"
 				>
 					<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-						<User size={16} class="lucide-icon text-text-muted transition-colors duration-200" />
+						<UserRound size={16} class="lucide-icon text-text-muted transition-colors duration-200" />
 					</div>
 					<span class="flex-1 text-left truncate">
 						{assigneeLabels[assigneeFilter]}
@@ -831,13 +833,13 @@
 			</div>
 
 			<!-- 정렬 -->
-			<div class="relative sort-dropdown">
+				<div class="relative sort-dropdown">
 				<button
 					type="button"
 					onclick={() => sortDropdownOpen = !sortDropdownOpen}
 					aria-haspopup="listbox"
 					aria-expanded={sortDropdownOpen}
-					class="status-filter-btn flex items-center pl-10 pr-8 py-1.5 w-full sm:w-auto sm:min-w-[170px] bg-surface-2 rounded-[6px] text-text-base transition-all duration-200 cursor-pointer border border-border-subtle focus:outline-none focus:border-brand-pink"
+					class="status-filter-btn flex items-center pl-10 pr-8 py-1.5 w-full bg-surface-2 rounded-[6px] text-text-base transition-all duration-200 cursor-pointer border border-border-subtle focus:outline-none focus:border-brand-pink"
 				>
 					<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
 						<ArrowUpDown size={16} class="lucide-icon text-text-muted transition-colors duration-200" />
@@ -865,6 +867,7 @@
 						{/each}
 					</ul>
 				{/if}
+				</div>
 			</div>
 		</div>
 
