@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { Plus, Search, ChevronDown, X } from 'lucide-svelte';
+	import { Plus, Search, ChevronDown, X, Filter, ArrowUpDown } from 'lucide-svelte';
 	import ProductionProgress from '$lib/components/suno/ProductionProgress.svelte';
 	import SUNOTabs from '$lib/components/suno/SUNOTabs.svelte';
 	import ProjectTemplates from '$lib/components/suno/ProjectTemplates.svelte';
@@ -14,6 +14,22 @@
 	let searchQuery = $state('');
 	let stageFilter = $state<ProductionStageId | 'all'>('all');
 	let stageDropdownOpen = $state(false);
+
+	// 정렬 상태
+	type SortOption = 'updated_desc' | 'updated_asc' | 'created_desc' | 'created_asc' | 'title_asc' | 'title_desc' | 'progress_desc' | 'progress_asc';
+	let sortBy = $state<SortOption>('updated_desc');
+	let sortDropdownOpen = $state(false);
+
+	const sortLabels: Record<SortOption, string> = {
+		updated_desc: '최근 수정순',
+		updated_asc: '오래된 수정순',
+		created_desc: '최근 생성순',
+		created_asc: '오래된 생성순',
+		title_asc: '이름순 (ㄱ-ㅎ)',
+		title_desc: '이름순 (ㅎ-ㄱ)',
+		progress_desc: '진행률 높은순',
+		progress_asc: '진행률 낮은순'
+	};
 
 	// 프로젝트의 현재 단계 가져오기 (첫 번째 미완료 단계)
 	function getCurrentStage(project: SUNOProject): ProductionStageId | null {
@@ -536,9 +552,9 @@
 		return 'text-green-600 dark:text-green-400';
 	}
 
-	// 필터링
+	// 필터링 및 정렬
 	const filteredProjects = $derived.by(() => {
-		return projects.filter(project => {
+		let result = projects.filter(project => {
 			// 검색어 필터
 			if (searchQuery) {
 				const query = searchQuery.toLowerCase();
@@ -556,6 +572,32 @@
 			}
 			return true;
 		});
+
+		// 정렬
+		result.sort((a, b) => {
+			switch (sortBy) {
+				case 'updated_desc':
+					return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+				case 'updated_asc':
+					return new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime();
+				case 'created_desc':
+					return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+				case 'created_asc':
+					return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+				case 'title_asc':
+					return a.title.localeCompare(b.title);
+				case 'title_desc':
+					return b.title.localeCompare(a.title);
+				case 'progress_desc':
+					return b.progressPercent - a.progressPercent;
+				case 'progress_asc':
+					return a.progressPercent - b.progressPercent;
+				default:
+					return 0;
+			}
+		});
+
+		return result;
 	});
 
 	// 단계별 카운트
@@ -576,10 +618,13 @@
 		if (!target.closest('.stage-dropdown')) {
 			stageDropdownOpen = false;
 		}
+		if (!target.closest('.sort-dropdown')) {
+			sortDropdownOpen = false;
+		}
 	}
 
 	$effect(() => {
-		if (stageDropdownOpen) {
+		if (stageDropdownOpen || sortDropdownOpen) {
 			document.addEventListener('click', handleClickOutside);
 		}
 		return () => {
@@ -652,7 +697,7 @@
 					type="text"
 					bind:value={searchQuery}
 					placeholder="곡 제목 또는 설명 검색..."
-					class="w-full pl-10 {searchQuery.trim() ? 'pr-10' : 'pr-4'} py-1.5 bg-surface-1 border border-border-subtle border-[1px] rounded-md text-text-base placeholder-text-muted focus:outline-none focus:border-brand-pink focus:ring-0 transition-colors duration-200"
+					class="w-full pl-10 {searchQuery.trim() ? 'pr-10' : 'pr-4'} py-1.5 bg-surface-2 border border-border-subtle border-[1px] rounded-md text-text-base placeholder-text-muted focus:outline-none focus:border-brand-pink focus:ring-0 transition-colors duration-200"
 					aria-label="곡 제목 또는 설명 검색"
 					id="suno-project-search"
 					autocomplete="off"
@@ -678,15 +723,20 @@
 				<button
 					type="button"
 					onclick={() => stageDropdownOpen = !stageDropdownOpen}
-					class="status-filter-btn w-full sm:w-48 h-10 px-4 pr-10 bg-surface-2 border border-border-subtle rounded-lg text-sm text-text-base text-left transition-colors"
+					aria-haspopup="listbox"
+					aria-expanded={stageDropdownOpen}
+					class="status-filter-btn flex items-center pl-10 pr-8 py-1.5 w-full sm:w-auto sm:min-w-[200px] bg-surface-2 rounded-[6px] text-text-base transition-all duration-200 cursor-pointer border border-border-subtle focus:outline-none focus:border-brand-pink"
 				>
-					<span class="block truncate">
+					<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+						<Filter size={16} class="lucide-icon text-text-muted transition-colors duration-200" />
+					</div>
+					<span class="flex-1 text-left truncate">
 						{stageLabels[stageFilter]} ({stageCounts[stageFilter] || 0})
 					</span>
+					<div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+						<ChevronDown size={12} class="text-text-base transition-colors duration-200" />
+					</div>
 				</button>
-				<div class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center">
-					<ChevronDown size={16} class="text-text-muted" />
-				</div>
 				{#if stageDropdownOpen}
 					<ul class="absolute left-0 w-full mt-[6px] bg-surface-2 border border-border-subtle rounded-[6px] z-10 max-h-80 overflow-y-auto custom-list-scrollbar">
 						<li
@@ -709,6 +759,43 @@
 								class="dropdown-item px-4 py-2 text-sm cursor-pointer transition-colors {stageFilter === stage.id ? 'bg-brand-pink text-white' : 'text-text-base'}"
 							>
 								{stage.name} ({stageCounts[stage.id] || 0})
+							</li>
+						{/each}
+					</ul>
+				{/if}
+			</div>
+
+			<!-- 정렬 -->
+			<div class="relative sort-dropdown">
+				<button
+					type="button"
+					onclick={() => sortDropdownOpen = !sortDropdownOpen}
+					aria-haspopup="listbox"
+					aria-expanded={sortDropdownOpen}
+					class="status-filter-btn flex items-center pl-10 pr-8 py-1.5 w-full sm:w-auto sm:min-w-[170px] bg-surface-2 rounded-[6px] text-text-base transition-all duration-200 cursor-pointer border border-border-subtle focus:outline-none focus:border-brand-pink"
+				>
+					<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+						<ArrowUpDown size={16} class="lucide-icon text-text-muted transition-colors duration-200" />
+					</div>
+					<span class="flex-1 text-left truncate">
+						{sortLabels[sortBy]}
+					</span>
+					<div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+						<ChevronDown size={12} class="text-text-base transition-colors duration-200" />
+					</div>
+				</button>
+				{#if sortDropdownOpen}
+					<ul class="absolute left-0 w-full mt-[6px] bg-surface-2 border border-border-subtle rounded-[6px] z-10 overflow-hidden">
+						{#each Object.entries(sortLabels) as [value, label]}
+							<li
+								role="option"
+								aria-selected={sortBy === value}
+								tabindex="0"
+								onclick={() => { sortBy = value as SortOption; sortDropdownOpen = false; }}
+								onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { sortBy = value as SortOption; sortDropdownOpen = false; } }}
+								class="dropdown-item px-4 py-2 text-sm cursor-pointer transition-colors {sortBy === value ? 'bg-brand-pink text-white' : 'text-text-base'}"
+							>
+								{label}
 							</li>
 						{/each}
 					</ul>
