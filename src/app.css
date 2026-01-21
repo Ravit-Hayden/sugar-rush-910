@@ -550,6 +550,7 @@
   color: var(--text-on-hover);
 }
 
+
 /* 기본 스타일 */
 body {
   background-color: var(--bg);
@@ -687,8 +688,8 @@ div[class*="panel"] {
 .text-text-strong { color: var(--text-strong); }
 .text-text-muted { color: var(--text-muted); }
 .text-white { color: #FFFFFF; }
-.border-border-subtle { border-color: var(--border-subtle); }
-.divide-border-subtle > :not([hidden]) ~ :not([hidden]) { border-color: var(--border-subtle); }
+.border-border-subtle { border-color: var(--border-subtle) !important; }
+.divide-border-subtle > :not([hidden]) ~ :not([hidden]) { border-color: var(--border-subtle) !important; }
 .text-brand-pink { color: var(--brand-pink); }
 .text-hover-cyan { color: var(--hover-point); }
 .text-danger-fg { color: var(--danger-fg); }
@@ -942,8 +943,8 @@ a[class*="text-brand-pink"][class*="hover:bg-hover-cyan"]:focus-visible:hover {
   color: var(--hover-point) !important;
 }
 
-/* 라이트 모드에서 일반 버튼 호버 배경 색상 변경 (테마 토글 버튼, 아티스트/앨범 선택 드롭다운 버튼 제외, 포커스가 아닐 때만) */
-[data-theme="light"] button:hover:not([class*="bg-"]):not(.theme-toggle-button):not([data-action="toggle-sidebar"]):not(.btn-icon):not(.notification-button):not(:focus):not(:focus-visible) {
+/* 라이트 모드에서 일반 버튼 호버 배경 색상 변경 (테마 토글 버튼, 아티스트/앨범 선택 드롭다운 버튼, btn-outline-hover 제외, 포커스가 아닐 때만) */
+[data-theme="light"] button:hover:not([class*="bg-"]):not(.theme-toggle-button):not([data-action="toggle-sidebar"]):not(.btn-icon):not(.notification-button):not(.btn-outline-hover):not(.linked-tracks-btn):not(:focus):not(:focus-visible) {
   background-color: var(--surface-1) !important;
 }
 
@@ -954,12 +955,19 @@ a[class*="text-brand-pink"][class*="hover:bg-hover-cyan"]:focus-visible:hover {
   background: none !important;
 }
 
-/* .btn-icon은 항상 배경색 투명 (라이트 모드 포함) */
+/* .btn-icon, .linked-tracks-btn은 항상 배경색 투명 (라이트 모드 포함) */
 [data-theme="light"] .btn-icon,
 [data-theme="light"] .btn-icon:hover,
 [data-theme="light"] .btn-icon:focus,
 [data-theme="light"] .btn-icon:focus-visible,
 [data-theme="light"] .btn-icon:focus:hover,
+[data-theme="light"] .linked-tracks-btn,
+[data-theme="light"] .linked-tracks-btn:hover,
+[data-theme="light"] .linked-tracks-btn:focus,
+[data-theme="light"] .linked-tracks-btn:focus-visible {
+  background-color: transparent !important;
+  background: transparent !important;
+}
 [data-theme="light"] .btn-icon:focus-visible:hover {
   background-color: transparent;
 }
@@ -967,6 +975,10 @@ a[class*="text-brand-pink"][class*="hover:bg-hover-cyan"]:focus-visible:hover {
 /* 라이트 모드에서 버튼 내부 아이콘 호버 색상 변경 (trending-up 아이콘 제외, 포커스가 아닐 때만) */
 [data-theme="light"] button:hover:not(:focus):not(:focus-visible) .lucide-icon:not(.lucide-trending-up) {
   color: var(--hover-point) !important;
+}
+/* 라이트 모드: 활성 상태 버튼(bg-brand-pink/10) 내부 아이콘 hover 효과 제거 - 최우선 */
+[data-theme="light"] button.border-brand-pink.text-brand-pink[class*="bg-brand-pink"]:hover:not(:focus):not(:focus-visible) .lucide-icon {
+  color: var(--brand-pink) !important;
 }
 
 /* 아티스트/앨범 선택 드롭다운 버튼 아이콘은 별도 규칙 적용 */
@@ -1909,7 +1921,7 @@ aside.bg-surface-2:hover {
 /* 아이콘 호버 효과 (포커스 상태가 아닐 때만) */
 /* 포커스 상태의 요소 내부 아이콘은 호버 효과 없음 */
 /* SUNO 탭 아이콘은 제외 (부모 요소에서 관리) */
-.lucide-icon:hover:not(:focus):not(:focus-visible):not(:focus-within) {
+.lucide-icon:hover:not(:focus):not(:focus-visible):not(:focus-within):not(.combinator-header-icon) {
   color: var(--hover-point) !important;
   transition: color 0.2s ease;
 }
@@ -3832,9 +3844,13 @@ button[class*="bg-hover-point"]:focus-visible:hover .lucide-icon {
 }
 
 /* 버튼 내부 아이콘 호버/포커스 효과 (버튼이 포커스/호버될 때) */
-button:hover:not(:focus):not(:focus-visible) .lucide-icon {
+button:hover:not(:focus):not(:focus-visible) .lucide-icon:not(.combinator-header-icon) {
   color: var(--hover-point) !important;
   transition: color 0.2s ease;
+}
+/* 활성 상태 버튼(bg-brand-pink/10) 내부 아이콘 hover 효과 제거 - 최우선 */
+button.border-brand-pink.text-brand-pink[class*="bg-brand-pink"]:hover:not(:focus):not(:focus-visible) .lucide-icon {
+  color: var(--brand-pink) !important;
 }
 /* bg-brand-pink 버튼과 bg-hover-point 버튼은 제외 (아이콘 색상 유지) */
 button:not(.bg-brand-pink):not([class*="bg-brand-pink"]):not(.hover\:bg-brand-pink\/90):not(.bg-hover-point):not([class*="bg-hover-point"]):focus .lucide-icon,
@@ -5208,5 +5224,495 @@ button.bg-brand-pink:disabled:focus-visible {
 /* 더보기 링크 포커스+호버 - 포커스 우선 */
 .more-link:focus:hover,
 .more-link:focus-visible:hover {
+  color: var(--brand-pink) !important;
+}
+
+/* ============================================================
+   선택 모드 관련 스타일
+   ============================================================ */
+/* 전체 선택 버튼 호버 */
+.select-all-btn:hover:not(:focus):not(:focus-visible) {
+  color: var(--hover-point) !important;
+}
+
+/* 전체 선택 버튼 포커스 */
+.select-all-btn:focus,
+.select-all-btn:focus-visible {
+  color: var(--brand-pink) !important;
+  outline: none !important;
+}
+
+/* 선택 토글 버튼 호버 */
+.selection-toggle-btn:hover:not(:focus):not(:focus-visible) {
+  color: var(--hover-point) !important;
+}
+
+/* 선택 토글 버튼 포커스 */
+.selection-toggle-btn:focus,
+.selection-toggle-btn:focus-visible {
+  color: var(--brand-pink) !important;
+  outline: none !important;
+}
+
+/* 액션 바 버튼 호버 - 보더, 아이콘, 텍스트 세트 */
+.action-bar-btn:hover:not(:focus):not(:focus-visible):not(:disabled) {
+  border-color: var(--hover-point) !important;
+  color: var(--hover-point) !important;
+}
+
+/* 액션 바 버튼 포커스 - 보더, 아이콘, 텍스트 세트 */
+.action-bar-btn:focus:not(:disabled),
+.action-bar-btn:focus-visible:not(:disabled) {
+  border-color: var(--brand-pink) !important;
+  color: var(--brand-pink) !important;
+  outline: none !important;
+}
+
+/* ============================================================
+   휴지통 관련 스타일
+   ============================================================ */
+/* 휴지통 비우기 버튼 호버 */
+.trash-empty-btn:hover:not(:focus):not(:focus-visible) {
+  border-color: var(--hover-point) !important;
+  color: var(--hover-point) !important;
+}
+
+/* 휴지통 비우기 버튼 포커스 */
+.trash-empty-btn:focus,
+.trash-empty-btn:focus-visible {
+  border-color: var(--brand-pink) !important;
+  color: var(--brand-pink) !important;
+  outline: none !important;
+}
+
+/* 휴지통 아이템 버튼 호버 */
+.trash-item-btn:hover:not(:focus):not(:focus-visible) {
+  color: var(--hover-point) !important;
+}
+
+/* 휴지통 아이템 버튼 포커스 */
+.trash-item-btn:focus,
+.trash-item-btn:focus-visible {
+  color: var(--brand-pink) !important;
+  outline: none !important;
+}
+
+/* ============================================================
+   Outline 버튼 hover/focus 스타일 (최우선)
+   - 보더/텍스트/아이콘 세트로 변경
+   - 배경색은 항상 투명 유지 (hover/focus 시에도)
+   ============================================================ */
+button.btn-outline-hover {
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+/* 배경색 항상 투명 유지 (모든 상태, bg-brand-pink/10 클래스 포함) */
+button.btn-outline-hover,
+button.btn-outline-hover:hover,
+button.btn-outline-hover:focus,
+button.btn-outline-hover:focus-visible,
+button.btn-outline-hover:focus:hover,
+button.btn-outline-hover:focus-visible:hover,
+/* bg-brand-pink/10 클래스가 있어도 hover/focus 시 배경 투명 */
+button.btn-outline-hover[class*="bg-brand-pink"]:hover:not(:focus):not(:focus-visible),
+button.btn-outline-hover[class*="bg-brand-pink"]:focus,
+button.btn-outline-hover[class*="bg-brand-pink"]:focus-visible,
+button.btn-outline-hover[class*="bg-brand-pink"]:focus:hover,
+button.btn-outline-hover[class*="bg-brand-pink"]:focus-visible:hover {
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
+/* 호버: 보더/텍스트/아이콘 → hover-point */
+button.btn-outline-hover:hover:not(:focus):not(:focus-visible) {
+  border-color: var(--hover-point) !important;
+  color: var(--hover-point) !important;
+}
+button.btn-outline-hover:hover:not(:focus):not(:focus-visible) svg,
+button.btn-outline-hover:hover:not(:focus):not(:focus-visible) .lucide-icon {
+  color: var(--hover-point) !important;
+}
+
+/* 포커스: 보더/텍스트/아이콘 → brand-pink */
+button.btn-outline-hover:focus,
+button.btn-outline-hover:focus-visible {
+  border-color: var(--brand-pink) !important;
+  color: var(--brand-pink) !important;
+  outline: none !important;
+}
+button.btn-outline-hover:focus svg,
+button.btn-outline-hover:focus-visible svg,
+button.btn-outline-hover:focus .lucide-icon,
+button.btn-outline-hover:focus-visible .lucide-icon {
+  color: var(--brand-pink) !important;
+}
+
+/* 포커스+호버: 포커스 우선 (brand-pink) */
+button.btn-outline-hover:focus:hover,
+button.btn-outline-hover:focus-visible:hover {
+  border-color: var(--brand-pink) !important;
+  color: var(--brand-pink) !important;
+}
+button.btn-outline-hover:focus:hover svg,
+button.btn-outline-hover:focus-visible:hover svg,
+button.btn-outline-hover:focus:hover .lucide-icon,
+button.btn-outline-hover:focus-visible:hover .lucide-icon {
+  color: var(--brand-pink) !important;
+}
+
+/* 라이트 모드: btn-outline-hover 배경 투명 유지 */
+[data-theme="light"] button.btn-outline-hover,
+[data-theme="light"] button.btn-outline-hover:hover,
+[data-theme="light"] button.btn-outline-hover:focus,
+[data-theme="light"] button.btn-outline-hover:focus-visible,
+[data-theme="light"] button.btn-outline-hover:focus:hover,
+[data-theme="light"] button.btn-outline-hover:focus-visible:hover {
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
+/* ============================================================
+   활성 상태 버튼 (border-brand-pink + text-brand-pink) hover/focus 스타일
+   - hover/focus 시에도 배경 투명 유지
+   - 보더/텍스트/아이콘만 변경
+   ============================================================ */
+button.border-brand-pink.text-brand-pink {
+  transition: border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease;
+}
+
+/* hover 시: 보더/텍스트/아이콘 → hover-point, 배경 투명 (bg-brand-pink/10이 없을 때만) */
+button.border-brand-pink.text-brand-pink:not([class*="bg-brand-pink"]):hover:not(:focus):not(:focus-visible) {
+  background-color: transparent !important;
+  background: transparent !important;
+  border-color: var(--hover-point) !important;
+  color: var(--hover-point) !important;
+}
+button.border-brand-pink.text-brand-pink:not([class*="bg-brand-pink"]):hover:not(:focus):not(:focus-visible) svg,
+button.border-brand-pink.text-brand-pink:not([class*="bg-brand-pink"]):hover:not(:focus):not(:focus-visible) .lucide-icon {
+  color: var(--hover-point) !important;
+}
+
+/* 활성 상태(bg-brand-pink/10)일 때는 hover 효과 없음 - 배경 투명, 색상 유지 */
+button.border-brand-pink.text-brand-pink[class*="bg-brand-pink"],
+button.border-brand-pink.text-brand-pink[class*="bg-brand-pink"]:hover:not(:focus):not(:focus-visible) {
+  background-color: transparent !important;
+  background: transparent !important;
+  border-color: var(--brand-pink) !important;
+  color: var(--brand-pink) !important;
+}
+button.border-brand-pink.text-brand-pink[class*="bg-brand-pink"] svg,
+button.border-brand-pink.text-brand-pink[class*="bg-brand-pink"] .lucide-icon,
+button.border-brand-pink.text-brand-pink[class*="bg-brand-pink"]:hover:not(:focus):not(:focus-visible) svg,
+button.border-brand-pink.text-brand-pink[class*="bg-brand-pink"]:hover:not(:focus):not(:focus-visible) .lucide-icon {
+  color: var(--brand-pink) !important;
+}
+
+/* focus 시: 보더/텍스트/아이콘 → brand-pink, 배경 투명 (활성 상태 포함) */
+button.border-brand-pink.text-brand-pink:focus,
+button.border-brand-pink.text-brand-pink:focus-visible,
+button.border-brand-pink.text-brand-pink[class*="bg-brand-pink"]:focus,
+button.border-brand-pink.text-brand-pink[class*="bg-brand-pink"]:focus-visible {
+  background-color: transparent !important;
+  background: transparent !important;
+  border-color: var(--brand-pink) !important;
+  color: var(--brand-pink) !important;
+  outline: none !important;
+}
+button.border-brand-pink.text-brand-pink:focus svg,
+button.border-brand-pink.text-brand-pink:focus-visible svg,
+button.border-brand-pink.text-brand-pink:focus .lucide-icon,
+button.border-brand-pink.text-brand-pink:focus-visible .lucide-icon,
+button.border-brand-pink.text-brand-pink[class*="bg-brand-pink"]:focus svg,
+button.border-brand-pink.text-brand-pink[class*="bg-brand-pink"]:focus-visible svg,
+button.border-brand-pink.text-brand-pink[class*="bg-brand-pink"]:focus .lucide-icon,
+button.border-brand-pink.text-brand-pink[class*="bg-brand-pink"]:focus-visible .lucide-icon {
+  color: var(--brand-pink) !important;
+}
+
+/* focus+hover: 포커스 우선 (brand-pink, 활성 상태 포함) */
+button.border-brand-pink.text-brand-pink:focus:hover,
+button.border-brand-pink.text-brand-pink:focus-visible:hover,
+button.border-brand-pink.text-brand-pink[class*="bg-brand-pink"]:focus:hover,
+button.border-brand-pink.text-brand-pink[class*="bg-brand-pink"]:focus-visible:hover {
+  background-color: transparent !important;
+  background: transparent !important;
+  border-color: var(--brand-pink) !important;
+  color: var(--brand-pink) !important;
+}
+button.border-brand-pink.text-brand-pink:focus:hover svg,
+button.border-brand-pink.text-brand-pink:focus-visible:hover svg,
+button.border-brand-pink.text-brand-pink:focus:hover .lucide-icon,
+button.border-brand-pink.text-brand-pink:focus-visible:hover .lucide-icon,
+button.border-brand-pink.text-brand-pink[class*="bg-brand-pink"]:focus:hover svg,
+button.border-brand-pink.text-brand-pink[class*="bg-brand-pink"]:focus-visible:hover svg,
+button.border-brand-pink.text-brand-pink[class*="bg-brand-pink"]:focus:hover .lucide-icon,
+button.border-brand-pink.text-brand-pink[class*="bg-brand-pink"]:focus-visible:hover .lucide-icon {
+  color: var(--brand-pink) !important;
+}
+
+/* 라이트 모드: border-brand-pink.text-brand-pink 배경 투명 유지 (활성 상태 포함) */
+[data-theme="light"] button.border-brand-pink.text-brand-pink,
+[data-theme="light"] button.border-brand-pink.text-brand-pink:hover,
+[data-theme="light"] button.border-brand-pink.text-brand-pink:focus,
+[data-theme="light"] button.border-brand-pink.text-brand-pink:focus-visible,
+[data-theme="light"] button.border-brand-pink.text-brand-pink:focus:hover,
+[data-theme="light"] button.border-brand-pink.text-brand-pink:focus-visible:hover,
+[data-theme="light"] button.border-brand-pink.text-brand-pink[class*="bg-brand-pink"],
+[data-theme="light"] button.border-brand-pink.text-brand-pink[class*="bg-brand-pink"]:hover,
+[data-theme="light"] button.border-brand-pink.text-brand-pink[class*="bg-brand-pink"]:focus,
+[data-theme="light"] button.border-brand-pink.text-brand-pink[class*="bg-brand-pink"]:focus-visible,
+[data-theme="light"] button.border-brand-pink.text-brand-pink[class*="bg-brand-pink"]:focus:hover,
+[data-theme="light"] button.border-brand-pink.text-brand-pink[class*="bg-brand-pink"]:focus-visible:hover {
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
+/* ============================================================
+   RandomCombinator 버튼 hover/focus 효과
+   - 초기화 버튼, +/- 버튼: 텍스트/아이콘 세트로 변경
+   ============================================================ */
+/* 초기화 버튼 hover/focus */
+.combinator-reset-btn:hover:not(:focus):not(:focus-visible) {
+  color: var(--hover-point) !important;
+}
+.combinator-reset-btn:focus,
+.combinator-reset-btn:focus-visible {
+  color: var(--brand-pink) !important;
+  outline: none !important;
+}
+.combinator-reset-btn:focus:hover,
+.combinator-reset-btn:focus-visible:hover {
+  color: var(--brand-pink) !important;
+}
+
+/* +/- 버튼 hover/focus - 아이콘도 함께 변경 */
+.combinator-counter-btn:hover:not(:focus):not(:focus-visible):not(:disabled) {
+  color: var(--hover-point) !important;
+}
+.combinator-counter-btn:hover:not(:focus):not(:focus-visible):not(:disabled) svg,
+.combinator-counter-btn:hover:not(:focus):not(:focus-visible):not(:disabled) .lucide-icon {
+  color: var(--hover-point) !important;
+}
+.combinator-counter-btn:focus:not(:disabled),
+.combinator-counter-btn:focus-visible:not(:disabled) {
+  color: var(--brand-pink) !important;
+  outline: none !important;
+}
+.combinator-counter-btn:focus:not(:disabled) svg,
+.combinator-counter-btn:focus-visible:not(:disabled) svg,
+.combinator-counter-btn:focus:not(:disabled) .lucide-icon,
+.combinator-counter-btn:focus-visible:not(:disabled) .lucide-icon {
+  color: var(--brand-pink) !important;
+}
+.combinator-counter-btn:focus:hover:not(:disabled),
+.combinator-counter-btn:focus-visible:hover:not(:disabled) {
+  color: var(--brand-pink) !important;
+}
+.combinator-counter-btn:focus:hover:not(:disabled) svg,
+.combinator-counter-btn:focus-visible:hover:not(:disabled) svg,
+.combinator-counter-btn:focus:hover:not(:disabled) .lucide-icon,
+.combinator-counter-btn:focus-visible:hover:not(:disabled) .lucide-icon {
+  color: var(--brand-pink) !important;
+}
+
+/* 프리셋 버튼 (기본/풀 조합/스타일) hover/focus - 보더/텍스트 세트로 변경 */
+.combinator-preset-btn {
+  transition: border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease;
+}
+.combinator-preset-btn:hover:not(:focus):not(:focus-visible) {
+  border-color: var(--hover-point) !important;
+  color: var(--hover-point) !important;
+  background-color: var(--surface-2) !important;
+}
+.combinator-preset-btn:focus,
+.combinator-preset-btn:focus-visible {
+  border-color: var(--brand-pink) !important;
+  color: var(--brand-pink) !important;
+  background-color: var(--surface-2) !important;
+  outline: none !important;
+}
+.combinator-preset-btn:focus:hover,
+.combinator-preset-btn:focus-visible:hover {
+  border-color: var(--brand-pink) !important;
+  color: var(--brand-pink) !important;
+  background-color: var(--surface-2) !important;
+}
+
+/* Sparkles 아이콘 hover 효과 제거 (일반 아이콘) - 최우선 */
+.combinator-header-icon,
+.combinator-header-icon:hover,
+.combinator-header-icon.lucide-icon,
+.combinator-header-icon.lucide-icon:hover,
+svg.combinator-header-icon,
+svg.combinator-header-icon:hover,
+.lucide-icon.combinator-header-icon,
+.lucide-icon.combinator-header-icon:hover,
+div:hover .combinator-header-icon,
+div:hover .combinator-header-icon.lucide-icon {
+  color: var(--brand-pink) !important;
+  transition: none !important;
+}
+
+/* ============================================================
+   프리셋 그룹 버튼 (기본, 장르별, 분위기, 제작용)
+   보더 + 아이콘 + 텍스트가 세트로 변경, 배경은 투명 유지
+   ============================================================ */
+
+/* 기본 스타일 */
+button.preset-group-btn {
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+/* 비활성 상태 - 호버: 보더/텍스트/아이콘 → hover-point */
+button.preset-group-btn:not(.active):hover {
+  border-color: var(--hover-point) !important;
+  color: var(--hover-point) !important;
+}
+button.preset-group-btn:not(.active):hover svg,
+button.preset-group-btn:not(.active):hover .lucide-icon {
+  color: var(--hover-point) !important;
+}
+
+/* 비활성 상태 - 포커스: 보더/텍스트/아이콘 → brand-pink */
+button.preset-group-btn:not(.active):focus,
+button.preset-group-btn:not(.active):focus-visible {
+  border-color: var(--brand-pink) !important;
+  color: var(--brand-pink) !important;
+  outline: none !important;
+}
+button.preset-group-btn:not(.active):focus svg,
+button.preset-group-btn:not(.active):focus-visible svg,
+button.preset-group-btn:not(.active):focus .lucide-icon,
+button.preset-group-btn:not(.active):focus-visible .lucide-icon {
+  color: var(--brand-pink) !important;
+}
+
+/* 활성 상태 - 항상 brand-pink 유지 */
+button.preset-group-btn.active {
+  border-color: var(--brand-pink) !important;
+  color: var(--brand-pink) !important;
+}
+button.preset-group-btn.active svg,
+button.preset-group-btn.active .lucide-icon {
+  color: var(--brand-pink) !important;
+}
+
+/* 활성 상태 - 호버/포커스 시에도 brand-pink 유지 */
+button.preset-group-btn.active:hover,
+button.preset-group-btn.active:focus,
+button.preset-group-btn.active:focus-visible {
+  border-color: var(--brand-pink) !important;
+  color: var(--brand-pink) !important;
+  outline: none !important;
+}
+button.preset-group-btn.active:hover svg,
+button.preset-group-btn.active:focus svg,
+button.preset-group-btn.active:focus-visible svg,
+button.preset-group-btn.active:hover .lucide-icon,
+button.preset-group-btn.active:focus .lucide-icon,
+button.preset-group-btn.active:focus-visible .lucide-icon {
+  color: var(--brand-pink) !important;
+}
+
+/* 분위기 탭의 Sparkles 아이콘 - 호버 시에도 부모 따라감 */
+button.preset-group-btn .preset-group-icon,
+button.preset-group-btn:hover .preset-group-icon {
+  color: inherit !important;
+}
+
+/* ============================================================
+   연결된 트랙 팝업 - 트랙 아이템 호버/포커스 효과
+   ============================================================ */
+.linked-track-item {
+  background-color: transparent;
+  border: none !important;
+}
+
+/* 호버: 배경색 + 글자색 변경 */
+.linked-track-item:hover:not(:focus):not(:focus-visible) {
+  background-color: var(--hover-point) !important;
+}
+
+.linked-track-item:hover:not(:focus):not(:focus-visible) span {
+  color: var(--text-on-hover) !important;
+  background-color: transparent !important;
+}
+
+/* 포커스: 핫핑크 배경 + 흰 글자 */
+.linked-track-item:focus,
+.linked-track-item:focus-visible {
+  background-color: var(--brand-pink) !important;
+  outline: none;
+}
+
+.linked-track-item:focus span,
+.linked-track-item:focus-visible span {
+  color: #FFFFFF !important;
+  background-color: transparent !important;
+}
+
+.linked-track-item:focus:hover,
+.linked-track-item:focus-visible:hover {
+  background-color: var(--brand-pink) !important;
+}
+
+.linked-track-item:focus:hover span,
+.linked-track-item:focus-visible:hover span {
+  color: #FFFFFF !important;
+  background-color: transparent !important;
+}
+
+/* ============================================================
+   제외 스타일 복사 버튼 - 호버/포커스 효과
+   ============================================================ */
+.exclude-copy-btn {
+  background-color: transparent !important;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+/* 기본 상태에서 호버 (복사됨 상태가 아닐 때만) */
+.exclude-copy-btn:not(.text-brand-pink):hover:not(:focus):not(:focus-visible) {
+  border-color: var(--hover-point) !important;
+  color: var(--hover-point) !important;
+}
+
+.exclude-copy-btn:not(.text-brand-pink):hover:not(:focus):not(:focus-visible) svg {
+  color: var(--hover-point) !important;
+}
+
+/* 포커스 */
+.exclude-copy-btn:focus,
+.exclude-copy-btn:focus-visible {
+  border-color: var(--brand-pink) !important;
+  color: var(--brand-pink) !important;
+  outline: none !important;
+}
+
+.exclude-copy-btn:focus svg,
+.exclude-copy-btn:focus-visible svg {
+  color: var(--brand-pink) !important;
+}
+
+/* 포커스 상태에서 호버해도 포커스 유지 */
+.exclude-copy-btn:focus:hover,
+.exclude-copy-btn:focus-visible:hover {
+  border-color: var(--brand-pink) !important;
+  color: var(--brand-pink) !important;
+}
+
+.exclude-copy-btn:focus:hover svg,
+.exclude-copy-btn:focus-visible:hover svg {
+  color: var(--brand-pink) !important;
+}
+
+/* 복사됨 상태 (text-brand-pink) - 호버 효과 비활성화 */
+.exclude-copy-btn.text-brand-pink,
+.exclude-copy-btn.text-brand-pink:hover {
+  border-color: var(--brand-pink) !important;
+  color: var(--brand-pink) !important;
+}
+
+.exclude-copy-btn.text-brand-pink svg,
+.exclude-copy-btn.text-brand-pink:hover svg {
   color: var(--brand-pink) !important;
 }

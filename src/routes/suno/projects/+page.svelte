@@ -1,14 +1,115 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { Plus, Search, ChevronDown, X, Filter, ArrowUpDown, UserRound, Music, SearchX } from 'lucide-svelte';
+	import { Plus, Search, ChevronDown, X, Filter, ArrowUpDown, UserRound, Music, SearchX, Star, Trash2, Archive, CheckSquare, Square } from 'lucide-svelte';
 	import ProductionProgress from '$lib/components/suno/ProductionProgress.svelte';
 	import SUNOTabs from '$lib/components/suno/SUNOTabs.svelte';
 	import ProjectTemplates from '$lib/components/suno/ProjectTemplates.svelte';
 	import { PRODUCTION_STAGES } from '$lib/constants/suno/stages';
+	import { trashProjects, archiveProjects } from '$lib/api/suno';
 	import type { SUNOProject, ProductionStageStatus, ProjectStatus, ProductionStageId } from '$lib/types/suno';
 
 	// 템플릿 모달 상태
 	let showTemplates = $state(false);
+
+	// 즐겨찾기 상태 (프로젝트 ID 집합)
+	let favorites = $state<Set<string>>(new Set(['proj1', 'proj4']));
+
+	function toggleFavorite(e: MouseEvent, projectId: string) {
+		e.preventDefault();
+		e.stopPropagation();
+		const newFavorites = new Set(favorites);
+		if (newFavorites.has(projectId)) {
+			newFavorites.delete(projectId);
+		} else {
+			newFavorites.add(projectId);
+		}
+		favorites = newFavorites;
+	}
+
+	// 일괄 선택 상태
+	let selectionMode = $state(false);
+	let selectedIds = $state<Set<string>>(new Set());
+	let isProcessing = $state(false);
+
+	// 선택 토글
+	function toggleSelection(e: MouseEvent, projectId: string) {
+		e.preventDefault();
+		e.stopPropagation();
+		const newSelected = new Set(selectedIds);
+		if (newSelected.has(projectId)) {
+			newSelected.delete(projectId);
+		} else {
+			newSelected.add(projectId);
+		}
+		selectedIds = newSelected;
+	}
+
+	// 전체 선택/해제
+	function toggleSelectAll() {
+		if (selectedIds.size === filteredProjects.length) {
+			selectedIds = new Set();
+		} else {
+			selectedIds = new Set(filteredProjects.map(p => p.id));
+		}
+	}
+
+	// 선택 모드 종료
+	function exitSelectionMode() {
+		selectionMode = false;
+		selectedIds = new Set();
+	}
+
+	// 휴지통으로 이동
+	async function handleBatchTrash() {
+		if (selectedIds.size === 0 || isProcessing) return;
+		
+		const confirmed = confirm(`${selectedIds.size}개의 프로젝트를 휴지통으로 이동하시겠습니까?`);
+		if (!confirmed) return;
+
+		isProcessing = true;
+		try {
+			const result = await trashProjects([...selectedIds]);
+			if (result.success) {
+				// 로컬 상태에서도 업데이트
+				projects = projects.map(p => 
+					selectedIds.has(p.id) ? { ...p, status: 'trashed' as ProjectStatus } : p
+				);
+				exitSelectionMode();
+			} else {
+				alert(result.message || '휴지통 이동 중 오류가 발생했습니다.');
+			}
+		} catch (error) {
+			alert('휴지통 이동 중 오류가 발생했습니다.');
+		} finally {
+			isProcessing = false;
+		}
+	}
+
+	// 일괄 보관
+	async function handleBatchArchive() {
+		if (selectedIds.size === 0 || isProcessing) return;
+		
+		const confirmed = confirm(`${selectedIds.size}개의 프로젝트를 보관하시겠습니까?`);
+		if (!confirmed) return;
+
+		isProcessing = true;
+		try {
+			const result = await archiveProjects([...selectedIds]);
+			if (result.success) {
+				// 로컬 상태에서도 업데이트
+				projects = projects.map(p => 
+					selectedIds.has(p.id) ? { ...p, status: 'archived' as ProjectStatus } : p
+				);
+				exitSelectionMode();
+			} else {
+				alert(result.message || '보관 중 오류가 발생했습니다.');
+			}
+		} catch (error) {
+			alert('보관 중 오류가 발생했습니다.');
+		} finally {
+			isProcessing = false;
+		}
+	}
 
 	// 필터 상태
 	let searchQuery = $state('');
@@ -588,6 +689,10 @@
 	// 필터링 및 정렬
 	const filteredProjects = $derived.by(() => {
 		let result = projects.filter(project => {
+			// 휴지통 제외
+			if (project.status === 'trashed') {
+				return false;
+			}
 			// 검색어 필터
 			if (searchQuery) {
 				const query = searchQuery.toLowerCase();
@@ -612,8 +717,14 @@
 			return true;
 		});
 
-		// 정렬
+		// 정렬 (즐겨찾기 우선)
 		result.sort((a, b) => {
+			// 즐겨찾기 우선
+			const aFav = favorites.has(a.id) ? 1 : 0;
+			const bFav = favorites.has(b.id) ? 1 : 0;
+			if (aFav !== bFav) return bFav - aFav;
+
+			// 그 다음 선택된 정렬 기준
 			switch (sortBy) {
 				case 'updated_desc':
 					return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
@@ -710,7 +821,7 @@
 <div class="pt-0 pb-6 sm:pb-6 pb-20 bg-bg text-text-base">
 	<!-- 헤더 -->
 	<div class="mb-8 mt-1.5">
-		<div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+		<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
 			<div>
 				<h1 class="text-3xl font-bold text-text-strong mb-2">SUNO 제작</h1>
 				<p class="text-text-muted">SUNO AI로 제작 중인 곡들을 관리합니다</p>
@@ -888,44 +999,128 @@
 			</div>
 		</div>
 
+		<!-- 그리드 헤더 (선택 모드 토글) -->
+		<div class="flex items-center justify-between mb-4">
+			<div class="flex items-center gap-3">
+				{#if selectionMode}
+					<button
+						type="button"
+						onclick={toggleSelectAll}
+						class="select-all-btn flex items-center gap-2 text-sm text-text-base transition-colors"
+					>
+						{#if selectedIds.size === filteredProjects.length && filteredProjects.length > 0}
+							<CheckSquare size={16} class="text-brand-pink" />
+							<span>전체 해제</span>
+						{:else}
+							<Square size={16} />
+							<span>전체 선택</span>
+						{/if}
+					</button>
+					<span class="text-sm text-text-muted">
+						<span class="text-brand-pink font-medium">{selectedIds.size}</span>개 선택됨
+					</span>
+				{:else}
+					<span class="text-sm text-text-muted">
+						{filteredProjects.length}개 프로젝트
+					</span>
+				{/if}
+			</div>
+			<button
+				type="button"
+				onclick={() => { selectionMode = !selectionMode; if (!selectionMode) selectedIds = new Set(); }}
+				class="selection-toggle-btn flex items-center gap-1.5 px-2.5 py-1.5 text-xs rounded-md transition-colors {selectionMode ? 'text-brand-pink' : 'text-text-muted'}"
+			>
+				<CheckSquare size={14} />
+				{selectionMode ? '취소' : '선택'}
+			</button>
+		</div>
+
 		<!-- 프로젝트 그리드 -->
-		<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+		<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 {selectionMode ? 'pb-20' : ''}">
 			{#each filteredProjects as project}
 				{@const currentStage = getCurrentStage(project)}
-				<a 
-					href="/suno/projects/{project.id}"
-					class="project-card block bg-surface-2 rounded-lg border border-border-subtle p-5 transition-colors group"
-				>
-					<!-- 헤더 -->
-					<div class="flex items-start justify-between gap-3 mb-3">
-						<div class="flex-1 min-w-0">
-							<h3 class="text-base font-semibold text-text-strong truncate group-hover:text-brand-pink transition-colors">
-								{project.title}
-							</h3>
-							<p class="text-sm text-text-muted mt-0.5 truncate">{project.description}</p>
-						</div>
-						<span class="flex-shrink-0 px-2 py-1 rounded-md text-xs font-medium {currentStage ? getStageColor(currentStage) : 'text-text-muted'}">
-							{currentStage ? stageLabels[currentStage] : '미정'}
-						</span>
-					</div>
-
-					<!-- 진행률 -->
-					<div class="mb-4">
-						<ProductionProgress stages={project.stages} compact />
-					</div>
-
-					<!-- 푸터 -->
-					<div class="flex items-center justify-between text-xs text-text-muted">
-						<div class="flex items-center gap-2">
-							<span class="font-medium {project.createdBy === 'El' ? 'text-elotte-green' : 'text-elotte-orange'}">
-								{project.createdBy}
+				{@const currentStageName = currentStage ? stageLabels[currentStage] : '시작 전'}
+				{#if selectionMode}
+					<!-- 선택 모드: 클릭하면 선택 토글 -->
+					<div
+						role="button"
+						tabindex="0"
+						onclick={(e) => toggleSelection(e, project.id)}
+						onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') toggleSelection(e as unknown as MouseEvent, project.id); }}
+						class="project-card block bg-surface-2 rounded-lg border p-5 transition-colors group cursor-pointer {selectedIds.has(project.id) ? 'border-brand-pink bg-brand-pink/5' : 'border-border-subtle'}"
+						title="{project.title} - 클릭하여 선택"
+					>
+						<div class="flex items-start justify-between gap-2 mb-3">
+							<div class="flex items-start gap-2 flex-1 min-w-0">
+								<div class="flex-shrink-0 p-1 -ml-1 -mt-0.5">
+									{#if selectedIds.has(project.id)}
+										<CheckSquare size={16} class="text-brand-pink" />
+									{:else}
+										<Square size={16} class="text-text-muted" />
+									{/if}
+								</div>
+								<div class="flex-1 min-w-0">
+									<h3 class="text-base font-semibold text-text-strong truncate">{project.title}</h3>
+									<p class="text-sm text-text-muted mt-0.5 truncate">{project.description}</p>
+								</div>
+							</div>
+							<span class="flex-shrink-0 px-2 py-1 rounded-md text-xs font-medium {currentStage ? getStageColor(currentStage) : 'text-text-muted'}">
+								{currentStage ? stageLabels[currentStage] : '미정'}
 							</span>
-							<span>·</span>
-							<span>{getRelativeTime(project.updatedAt)}</span>
 						</div>
-						<span class="more-link text-brand-pink text-xs font-semibold px-2 py-1 rounded transition-colors">더보기</span>
+						<div class="mb-4">
+							<ProductionProgress stages={project.stages} compact />
+						</div>
+						<div class="flex items-center justify-between text-xs text-text-muted">
+							<div class="flex items-center gap-2">
+								<span class="font-medium {project.createdBy === 'El' ? 'text-elotte-green' : 'text-elotte-orange'}">{project.createdBy}</span>
+								<span>·</span>
+								<span>{getRelativeTime(project.updatedAt)}</span>
+							</div>
+						</div>
 					</div>
-				</a>
+				{:else}
+					<!-- 일반 모드: 링크 -->
+					<a 
+						href="/suno/projects/{project.id}"
+						class="project-card block bg-surface-2 rounded-lg border border-border-subtle p-5 transition-colors group"
+						title="{project.title} - {currentStageName} ({project.progressPercent}%)"
+					>
+						<div class="flex items-start justify-between gap-2 mb-3">
+							<div class="flex items-start gap-2 flex-1 min-w-0">
+								<button
+									type="button"
+									onclick={(e) => toggleFavorite(e, project.id)}
+									class="flex-shrink-0 p-1 -ml-1 -mt-0.5 rounded transition-colors hover:bg-surface-1"
+									title={favorites.has(project.id) ? '즐겨찾기 해제' : '즐겨찾기 추가'}
+								>
+									<Star 
+										size={16} 
+										class={favorites.has(project.id) ? 'fill-amber-400 text-amber-400' : 'text-text-muted'}
+									/>
+								</button>
+								<div class="flex-1 min-w-0">
+									<h3 class="text-base font-semibold text-text-strong truncate group-hover:text-brand-pink transition-colors">{project.title}</h3>
+									<p class="text-sm text-text-muted mt-0.5 truncate">{project.description}</p>
+								</div>
+							</div>
+							<span class="flex-shrink-0 px-2 py-1 rounded-md text-xs font-medium {currentStage ? getStageColor(currentStage) : 'text-text-muted'}">
+								{currentStage ? stageLabels[currentStage] : '미정'}
+							</span>
+						</div>
+						<div class="mb-4">
+							<ProductionProgress stages={project.stages} compact />
+						</div>
+						<div class="flex items-center justify-between text-xs text-text-muted">
+							<div class="flex items-center gap-2">
+								<span class="font-medium {project.createdBy === 'El' ? 'text-elotte-green' : 'text-elotte-orange'}">{project.createdBy}</span>
+								<span>·</span>
+								<span>{getRelativeTime(project.updatedAt)}</span>
+							</div>
+							<span class="more-link text-brand-pink text-xs font-semibold px-2 py-1 rounded transition-colors">더보기</span>
+						</div>
+					</a>
+				{/if}
 			{/each}
 
 			{#if filteredProjects.length === 0}
@@ -981,9 +1176,40 @@
 				</span>
 				<span class="text-border-subtle">|</span>
 				<span class="text-text-muted">
-					완료 <span class="font-medium text-green-500 dark:text-green-400">{projects.filter(p => p.status === 'completed').length}</span>개
+					완료 <span class="font-medium text-green-600 dark:text-green-400">{projects.filter(p => p.status === 'completed').length}</span>개
 				</span>
 			</div>
 		</div>
 	</SUNOTabs>
 </div>
+
+<!-- 선택 모드 하단 액션 바 -->
+{#if selectionMode && selectedIds.size > 0}
+	<div class="fixed bottom-0 left-0 right-0 z-50 p-4 bg-surface-2 border-t border-border-subtle">
+		<div class="max-w-4xl mx-auto flex items-center justify-between gap-4">
+			<span class="text-sm font-medium text-text-base">
+				<span class="text-brand-pink">{selectedIds.size}</span>개 선택됨
+			</span>
+			<div class="flex items-center gap-2">
+				<button
+					type="button"
+					onclick={handleBatchArchive}
+					disabled={isProcessing}
+					class="action-bar-btn flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed bg-surface-1 text-text-base border border-border-subtle"
+				>
+					<Archive size={16} />
+					보관
+				</button>
+				<button
+					type="button"
+					onclick={handleBatchTrash}
+					disabled={isProcessing}
+					class="action-bar-btn flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed bg-surface-1 text-red-500 dark:text-red-400 border border-border-subtle"
+				>
+					<Trash2 size={16} />
+					삭제
+				</button>
+			</div>
+		</div>
+	</div>
+{/if}

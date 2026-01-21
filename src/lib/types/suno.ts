@@ -9,6 +9,7 @@
 
 /** 워드 카테고리 */
 export type WordCategory =
+	// 콘텐츠 카테고리
 	| 'topic'      // 주제
 	| 'mood'       // 분위기
 	| 'action'     // 행동
@@ -20,6 +21,14 @@ export type WordCategory =
 	| 'time'       // 시간
 	| 'object'     // 사물
 	| 'phrase'     // 문장
+	// 음악 제작 카테고리
+	| 'genre'      // 장르 (K-Pop, EDM, Ballad 등)
+	| 'instrument' // 악기 (piano, guitar, synth 등)
+	| 'vocal'      // 보컬 스타일 (soft, powerful 등)
+	| 'tempo'      // 템포 (slow, upbeat 등)
+	| 'language'   // 언어 (Korean, English 등)
+	| 'vibe'       // 바이브 (retro, futuristic 등)
+	// SUNO 프롬프트 카테고리
 	| 'style'      // 스타일 프롬프트
 	| 'exclude';   // 제외 스타일
 
@@ -267,7 +276,8 @@ export type ProjectStatus =
 	| 'idea'        // 아이디어 단계
 	| 'in_progress' // 제작 중
 	| 'completed'   // 완료
-	| 'archived';   // 보관
+	| 'archived'    // 보관
+	| 'trashed';    // 휴지통
 
 /** SUNO 프로젝트 (곡) */
 export interface SUNOProject {

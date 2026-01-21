@@ -15,10 +15,10 @@
 	// 수정 모드
 	let isEditing = $state(false);
 	let editData = $state({
-		planType: subscription.planType,
-		billingDate: subscription.billingDate,
-		monthlyCredits: subscription.monthlyCredits,
-		remainingCredits: subscription.remainingCredits
+		planType: 'Pro' as SubscriptionPlan,
+		billingDate: 15,
+		monthlyCredits: 500,
+		remainingCredits: 320
 	});
 
 	// 플랜 정보
@@ -104,7 +104,7 @@
 <div class="pt-0 pb-6 sm:pb-6 pb-20 bg-bg text-text-base">
 	<!-- 헤더 -->
 	<div class="mb-8 mt-1.5">
-		<div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+		<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
 			<div>
 				<h1 class="text-3xl font-bold text-text-strong mb-2">SUNO 제작</h1>
 				<p class="text-text-muted">SUNO AI 구독 정보와 크레딧 사용량을 관리합니다</p>
@@ -112,7 +112,7 @@
 			<button
 				type="button"
 				onclick={() => isEditing ? isEditing = false : startEditing()}
-				class="flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors flex-shrink-0 {isEditing ? 'bg-surface-2 border-border-subtle text-text-base' : 'border-border-subtle text-text-base hover:border-brand-pink'}"
+				class="flex items-center gap-2 px-4 py-2 rounded-lg border flex-shrink-0 {isEditing ? 'bg-surface-2 border-border-subtle text-text-base' : 'btn-outline-hover border-border-subtle text-text-base'}"
 			>
 				<Edit2 size={16} />
 				{isEditing ? '취소' : '수정'}
@@ -133,8 +133,12 @@
 						<!-- 수정 모드 -->
 						<div class="space-y-4">
 							<div>
-								<label class="block text-sm font-medium text-text-strong mb-2">플랜</label>
-								<select bind:value={editData.planType} class="w-full h-10 px-4 bg-bg border border-border-subtle rounded-lg text-text-base focus:outline-none focus:border-brand-pink">
+								<label for="edit-plan" class="block text-sm font-medium text-text-strong mb-2">플랜</label>
+								<select 
+									id="edit-plan"
+									bind:value={editData.planType} 
+									class="w-full py-1.5 px-4 bg-bg border border-border-subtle rounded-md text-text-base focus:outline-none focus:border-brand-pink transition-colors"
+								>
 									<option value="Basic">Basic ($10/월)</option>
 									<option value="Pro">Pro ($30/월)</option>
 									<option value="Premier">Premier ($100/월)</option>
@@ -142,22 +146,24 @@
 							</div>
 							<div class="grid grid-cols-2 gap-4">
 								<div>
-									<label class="block text-sm font-medium text-text-strong mb-2">결제일</label>
+									<label for="edit-billing" class="block text-sm font-medium text-text-strong mb-2">결제일</label>
 									<input
 										type="number"
+										id="edit-billing"
 										min="1"
 										max="31"
 										bind:value={editData.billingDate}
-										class="w-full h-10 px-4 bg-bg border border-border-subtle rounded-lg text-text-base focus:outline-none focus:border-brand-pink"
+										class="w-full py-1.5 px-4 bg-bg border border-border-subtle rounded-md text-text-base focus:outline-none focus:border-brand-pink transition-colors"
 									/>
 								</div>
 								<div>
-									<label class="block text-sm font-medium text-text-strong mb-2">남은 크레딧</label>
+									<label for="edit-credits" class="block text-sm font-medium text-text-strong mb-2">남은 크레딧</label>
 									<input
 										type="number"
+										id="edit-credits"
 										min="0"
 										bind:value={editData.remainingCredits}
-										class="w-full h-10 px-4 bg-bg border border-border-subtle rounded-lg text-text-base focus:outline-none focus:border-brand-pink"
+										class="w-full py-1.5 px-4 bg-bg border border-border-subtle rounded-md text-text-base focus:outline-none focus:border-brand-pink transition-colors"
 									/>
 								</div>
 							</div>
@@ -172,7 +178,7 @@
 								<button
 									type="button"
 									onclick={saveChanges}
-									class="px-6 py-2 bg-brand-pink text-white rounded-lg transition-colors font-medium"
+									class="px-6 py-2 bg-brand-pink text-white rounded-lg transition-colors font-medium hover:bg-brand-pink/90"
 								>
 									저장
 								</button>
@@ -275,7 +281,7 @@
 			<h3 class="text-lg font-semibold text-text-strong mb-4">플랜 비교</h3>
 			<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 				{#each Object.entries(plans) as [planId, plan]}
-					<div class="bg-surface-2 rounded-lg border {subscription.planType === planId ? 'border-brand-pink' : 'border-border-subtle'} p-5">
+					<div class="project-card bg-surface-2 rounded-lg border {subscription.planType === planId ? 'border-brand-pink' : 'border-border-subtle'} p-5 transition-colors">
 						<div class="flex items-center justify-between mb-4">
 							<h4 class="text-lg font-semibold text-text-strong">{plan.name}</h4>
 							{#if subscription.planType === planId}
@@ -294,7 +300,7 @@
 						{#if subscription.planType !== planId}
 							<button
 								type="button"
-								class="w-full mt-4 py-2 border border-border-subtle rounded-lg text-sm text-text-base hover:border-brand-pink hover:text-brand-pink transition-colors"
+								class="btn-outline-hover w-full mt-4 py-2 border border-border-subtle rounded-lg text-sm text-text-base"
 							>
 								{plans[subscription.planType].credits < plan.credits ? '업그레이드' : '다운그레이드'}
 							</button>

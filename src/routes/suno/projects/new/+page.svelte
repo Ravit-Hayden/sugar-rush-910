@@ -179,7 +179,7 @@
 			<button
 				type="button"
 				onclick={handleCancel}
-				class="px-6 py-3 text-sm font-medium text-text-muted hover:text-text-base border border-border-subtle rounded-lg hover:border-hover-point transition-colors"
+				class="btn-outline-hover px-6 py-3 text-sm font-medium text-text-muted border border-border-subtle rounded-lg"
 			>
 				취소
 			</button>

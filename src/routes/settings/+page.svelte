@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Settings, User, Bell, Shield, Palette, Database, Music, Plus, X, Upload, Image as ImageIcon, Link as LinkIcon, Edit2, Trash2 } from 'lucide-svelte';
+	import { Settings, User, Bell, Shield, Palette, Database, Music, Plus, X, Upload, Image as ImageIcon, Link as LinkIcon, Edit2, Trash2, RotateCcw, Search, Filter, ArrowUpDown, ChevronDown, Square, CheckSquare } from 'lucide-svelte';
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import PageContent from '$lib/components/PageContent.svelte';
 	import DatePicker from '$lib/components/DatePicker.svelte';
@@ -54,10 +54,17 @@
 	let previewUrl: string | null = $state(null);
 	let isDragging = $state(false);
 	let imageInputMethod: 'file' | 'url' = $state('file');
-	let fileInput: HTMLInputElement;
+	let fileInput: HTMLInputElement | undefined = $state(undefined);
 	
 	// 입력 필드 참조
-	let artistNameInput: HTMLInputElement;
+	let artistNameInput: HTMLInputElement | undefined = $state(undefined);
+
+	// API 응답 타입
+	interface ApiResponse<T = unknown> {
+		ok: boolean;
+		data?: T;
+		error?: { message: string };
+	}
 
 	// 이미지 확대 보기
 	let enlargedImageUrl: string | null = $state(null);
@@ -67,8 +74,8 @@
 		loading = true;
 		try {
 			const response = await fetch('/api/artists');
-			const result = await response.json();
-			if (result.ok) {
+			const result = await response.json() as ApiResponse<Artist[]>;
+			if (result.ok && result.data) {
 				artists = result.data;
 			}
 		} catch (error) {
@@ -166,7 +173,7 @@
 				})
 			});
 
-			const result = await response.json();
+			const result = await response.json() as ApiResponse;
 			if (result.ok) {
 				invalidateArtistsCache();
 				await loadArtists();
@@ -228,7 +235,7 @@
 				})
 			});
 
-			const result = await response.json();
+			const result = await response.json() as ApiResponse;
 			if (result.ok) {
 				invalidateArtistsCache();
 				await loadArtists();
@@ -253,7 +260,7 @@
 				method: 'DELETE'
 			});
 
-			const result = await response.json();
+			const result = await response.json() as ApiResponse;
 			if (result.ok) {
 				invalidateArtistsCache();
 				await loadArtists();
@@ -296,8 +303,8 @@
 		usersLoading = true;
 		try {
 			const response = await fetch('/api/users');
-			const result = await response.json();
-			if (result.ok) {
+			const result = await response.json() as ApiResponse<any[]>;
+			if (result.ok && result.data) {
 				users = result.data;
 			}
 		} catch (error) {
@@ -321,7 +328,7 @@
 				})
 			});
 
-			const result = await response.json();
+			const result = await response.json() as ApiResponse;
 			if (result.ok) {
 				await loadUsers();
 				newUserEmail = '';
@@ -348,7 +355,7 @@
 				})
 			});
 
-			const result = await response.json();
+			const result = await response.json() as ApiResponse;
 			if (result.ok) {
 				await loadUsers();
 			} else {
@@ -412,8 +419,161 @@
 		{ id: 'privacy', label: '개인정보', icon: Shield },
 		{ id: 'appearance', label: '외관', icon: Palette },
 		{ id: 'users', label: '사용자 관리', icon: User },
-		{ id: 'data', label: '데이터', icon: Database }
+		{ id: 'data', label: '데이터', icon: Database },
+		{ id: 'trash', label: '휴지통', icon: Trash2 }
 	];
+
+	// 휴지통 관련 상태
+	type TrashItemType = 'suno_project' | 'album' | 'track' | 'artist';
+	interface TrashItem {
+		id: string;
+		type: TrashItemType;
+		title: string;
+		description?: string;
+		deletedAt: string;
+		deletedBy?: string;
+	}
+
+	let trashItems = $state<TrashItem[]>([
+		{ id: 'proj1', type: 'suno_project', title: '테스트 프로젝트', description: '삭제된 SUNO 프로젝트', deletedAt: '2026-01-12', deletedBy: 'El' },
+		{ id: 'proj2', type: 'suno_project', title: '봄날의 노래', description: '봄 감성 발라드', deletedAt: '2026-01-10', deletedBy: 'Otte' },
+	]);
+	let trashLoading = $state(false);
+	let trashSearchQuery = $state('');
+	let trashTypeFilter = $state<TrashItemType | 'all'>('all');
+	let trashTypeDropdownOpen = $state(false);
+	let trashSortBy = $state<'date_desc' | 'date_asc' | 'name_asc' | 'name_desc'>('date_desc');
+	let trashSortDropdownOpen = $state(false);
+	let selectedTrashIds = $state<Set<string>>(new Set());
+
+	const trashTypeLabels: Record<TrashItemType | 'all', string> = {
+		all: '전체',
+		suno_project: 'SUNO 프로젝트',
+		album: '앨범',
+		track: '트랙',
+		artist: '아티스트'
+	};
+
+	const trashSortLabels: Record<string, string> = {
+		date_desc: '최근 삭제순',
+		date_asc: '오래된 삭제순',
+		name_asc: '이름순 (ㄱ-ㅎ)',
+		name_desc: '이름순 (ㅎ-ㄱ)'
+	};
+
+	// 휴지통 필터링
+	const filteredTrashItems = $derived.by(() => {
+		let result = trashItems.filter(item => {
+			if (trashSearchQuery) {
+				const query = trashSearchQuery.toLowerCase();
+				if (!item.title.toLowerCase().includes(query) && !item.description?.toLowerCase().includes(query)) {
+					return false;
+				}
+			}
+			if (trashTypeFilter !== 'all' && item.type !== trashTypeFilter) {
+				return false;
+			}
+			return true;
+		});
+
+		result.sort((a, b) => {
+			switch (trashSortBy) {
+				case 'date_desc':
+					return new Date(b.deletedAt).getTime() - new Date(a.deletedAt).getTime();
+				case 'date_asc':
+					return new Date(a.deletedAt).getTime() - new Date(b.deletedAt).getTime();
+				case 'name_asc':
+					return a.title.localeCompare(b.title);
+				case 'name_desc':
+					return b.title.localeCompare(a.title);
+				default:
+					return 0;
+			}
+		});
+
+		return result;
+	});
+
+	// 휴지통 복원
+	async function restoreTrashItem(id: string) {
+		// TODO: API 연동
+		trashItems = trashItems.filter(item => item.id !== id);
+		selectedTrashIds.delete(id);
+		selectedTrashIds = new Set(selectedTrashIds);
+	}
+
+	// 휴지통 영구 삭제
+	async function permanentDeleteTrashItem(id: string) {
+		if (!confirm('이 항목을 영구적으로 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.')) return;
+		// TODO: API 연동
+		trashItems = trashItems.filter(item => item.id !== id);
+		selectedTrashIds.delete(id);
+		selectedTrashIds = new Set(selectedTrashIds);
+	}
+
+	// 일괄 복원
+	async function restoreSelectedTrash() {
+		if (selectedTrashIds.size === 0) return;
+		// TODO: API 연동
+		trashItems = trashItems.filter(item => !selectedTrashIds.has(item.id));
+		selectedTrashIds = new Set();
+	}
+
+	// 일괄 영구 삭제
+	async function permanentDeleteSelectedTrash() {
+		if (selectedTrashIds.size === 0) return;
+		if (!confirm(`${selectedTrashIds.size}개 항목을 영구적으로 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) return;
+		// TODO: API 연동
+		trashItems = trashItems.filter(item => !selectedTrashIds.has(item.id));
+		selectedTrashIds = new Set();
+	}
+
+	// 휴지통 비우기
+	async function emptyTrash() {
+		if (trashItems.length === 0) return;
+		if (!confirm('휴지통을 비우시겠습니까?\n모든 항목이 영구적으로 삭제됩니다.')) return;
+		// TODO: API 연동
+		trashItems = [];
+		selectedTrashIds = new Set();
+	}
+
+	function toggleTrashSelection(id: string) {
+		const newSelected = new Set(selectedTrashIds);
+		if (newSelected.has(id)) {
+			newSelected.delete(id);
+		} else {
+			newSelected.add(id);
+		}
+		selectedTrashIds = newSelected;
+	}
+
+	function toggleSelectAllTrash() {
+		if (selectedTrashIds.size === filteredTrashItems.length) {
+			selectedTrashIds = new Set();
+		} else {
+			selectedTrashIds = new Set(filteredTrashItems.map(item => item.id));
+		}
+	}
+
+	// 휴지통 드롭다운 외부 클릭 핸들러
+	function handleTrashDropdownClickOutside(e: MouseEvent) {
+		const target = e.target as HTMLElement;
+		if (!target.closest('.trash-type-dropdown')) {
+			trashTypeDropdownOpen = false;
+		}
+		if (!target.closest('.trash-sort-dropdown')) {
+			trashSortDropdownOpen = false;
+		}
+	}
+
+	$effect(() => {
+		if (activeTab === 'trash' && (trashTypeDropdownOpen || trashSortDropdownOpen)) {
+			document.addEventListener('click', handleTrashDropdownClickOutside);
+		}
+		return () => {
+			document.removeEventListener('click', handleTrashDropdownClickOutside);
+		};
+	});
 </script>
 
 <PageContent>
@@ -1271,6 +1431,200 @@
 							</div>
 						</div>
 					</div>
+				{:else if activeTab === 'trash'}
+					<div>
+						<div class="flex items-center justify-between mb-6">
+							<h3 class="text-lg font-semibold text-text-strong flex items-center gap-2">
+								<Trash2 size={20} class="text-brand-pink" />
+								휴지통
+							</h3>
+							{#if trashItems.length > 0}
+								<button
+									type="button"
+									onclick={emptyTrash}
+									class="trash-empty-btn flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-md transition-colors text-text-muted border border-border-subtle"
+								>
+									<Trash2 size={14} />
+									휴지통 비우기
+								</button>
+							{/if}
+						</div>
+
+						<!-- 검색/필터/정렬 -->
+						<div class="space-y-3 mb-6">
+							<div class="relative">
+								<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+									<Search size={16} class="text-text-muted" />
+								</div>
+								<input
+									type="text"
+									bind:value={trashSearchQuery}
+									placeholder="검색..."
+									class="w-full pl-10 pr-4 py-1.5 bg-surface-2 border border-border-subtle rounded-md text-text-base placeholder-text-muted focus:outline-none focus:border-brand-pink transition-colors"
+								/>
+							</div>
+							<div class="grid grid-cols-2 gap-3">
+								<!-- 유형 필터 드롭다운 -->
+								<div class="relative trash-type-dropdown">
+									<button
+										type="button"
+										onclick={() => trashTypeDropdownOpen = !trashTypeDropdownOpen}
+										class="status-filter-btn flex items-center pl-3 pr-8 py-[7px] w-full bg-surface-2 rounded-md text-sm text-text-base transition-colors border border-border-subtle focus:outline-none focus:border-brand-pink"
+									>
+										<span class="flex-1 text-left truncate text-sm">{trashTypeLabels[trashTypeFilter]}</span>
+										<div class="absolute inset-y-0 right-0 pr-2 flex items-center pointer-events-none">
+											<ChevronDown size={12} class="text-text-muted" />
+										</div>
+									</button>
+									{#if trashTypeDropdownOpen}
+										<ul class="absolute left-0 w-full mt-1 bg-surface-2 border border-border-subtle rounded-md z-10 overflow-hidden">
+											{#each Object.entries(trashTypeLabels) as [value, label]}
+												<li
+													role="option"
+													aria-selected={trashTypeFilter === value}
+													tabindex="0"
+													onclick={() => { trashTypeFilter = value as TrashItemType | 'all'; trashTypeDropdownOpen = false; }}
+													onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { trashTypeFilter = value as TrashItemType | 'all'; trashTypeDropdownOpen = false; } }}
+													class="dropdown-item px-3 py-2 text-sm cursor-pointer transition-colors {trashTypeFilter === value ? 'bg-brand-pink text-white' : 'text-text-base'}"
+												>
+													{label}
+												</li>
+											{/each}
+										</ul>
+									{/if}
+								</div>
+								<!-- 정렬 드롭다운 -->
+								<div class="relative trash-sort-dropdown">
+									<button
+										type="button"
+										onclick={() => trashSortDropdownOpen = !trashSortDropdownOpen}
+										class="status-filter-btn flex items-center pl-3 pr-8 py-[7px] w-full bg-surface-2 rounded-md text-sm text-text-base transition-colors border border-border-subtle focus:outline-none focus:border-brand-pink"
+									>
+										<span class="flex-1 text-left truncate text-sm">{trashSortLabels[trashSortBy]}</span>
+										<div class="absolute inset-y-0 right-0 pr-2 flex items-center pointer-events-none">
+											<ChevronDown size={12} class="text-text-muted" />
+										</div>
+									</button>
+									{#if trashSortDropdownOpen}
+										<ul class="absolute left-0 w-full mt-1 bg-surface-2 border border-border-subtle rounded-md z-10 overflow-hidden">
+											{#each Object.entries(trashSortLabels) as [value, label]}
+												<li
+													role="option"
+													aria-selected={trashSortBy === value}
+													tabindex="0"
+													onclick={() => { trashSortBy = value as 'date_desc' | 'date_asc' | 'name_asc' | 'name_desc'; trashSortDropdownOpen = false; }}
+													onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { trashSortBy = value as 'date_desc' | 'date_asc' | 'name_asc' | 'name_desc'; trashSortDropdownOpen = false; } }}
+													class="dropdown-item px-3 py-2 text-sm cursor-pointer transition-colors {trashSortBy === value ? 'bg-brand-pink text-white' : 'text-text-base'}"
+												>
+													{label}
+												</li>
+											{/each}
+										</ul>
+									{/if}
+								</div>
+							</div>
+						</div>
+
+						<!-- 일괄 선택 헤더 -->
+						{#if filteredTrashItems.length > 0}
+							<div class="flex items-center justify-between mb-3">
+								<button
+									type="button"
+									onclick={toggleSelectAllTrash}
+									class="select-all-btn flex items-center gap-2 text-sm text-text-base transition-colors"
+								>
+									{#if selectedTrashIds.size === filteredTrashItems.length}
+										<CheckSquare size={16} class="text-brand-pink" />
+										<span>전체 해제</span>
+									{:else}
+										<Square size={16} class="text-text-muted" />
+										<span>전체 선택</span>
+									{/if}
+								</button>
+								{#if selectedTrashIds.size > 0}
+									<div class="flex items-center gap-2">
+										<span class="text-sm text-text-muted"><span class="text-brand-pink font-medium">{selectedTrashIds.size}</span>개 선택됨</span>
+										<button
+											type="button"
+											onclick={restoreSelectedTrash}
+											class="action-bar-btn flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-md transition-colors bg-surface-1 text-text-base border border-border-subtle"
+										>
+											<RotateCcw size={14} />
+											복원
+										</button>
+										<button
+											type="button"
+											onclick={permanentDeleteSelectedTrash}
+											class="action-bar-btn flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-md transition-colors bg-surface-1 text-red-500 dark:text-red-400 border border-border-subtle"
+										>
+											<Trash2 size={14} />
+											삭제
+										</button>
+									</div>
+								{/if}
+							</div>
+						{/if}
+
+						<!-- 휴지통 목록 -->
+						{#if trashLoading}
+							<div class="text-sm text-text-muted text-center py-8">로딩 중...</div>
+						{:else if filteredTrashItems.length === 0}
+							<div class="text-center py-12">
+								<Trash2 size={48} class="mx-auto mb-4 text-text-muted opacity-50" />
+								<p class="text-text-muted">
+									{trashSearchQuery || trashTypeFilter !== 'all' ? '검색 결과가 없습니다.' : '휴지통이 비어 있습니다.'}
+								</p>
+							</div>
+						{:else}
+							<div class="space-y-2">
+								{#each filteredTrashItems as item (item.id)}
+									<div class="p-3 bg-surface-2 rounded-md border border-border-subtle flex items-center gap-3 {selectedTrashIds.has(item.id) ? 'border-brand-pink bg-brand-pink/5' : ''}">
+										<button
+											type="button"
+											onclick={() => toggleTrashSelection(item.id)}
+											class="flex-shrink-0 p-0.5"
+										>
+											{#if selectedTrashIds.has(item.id)}
+												<CheckSquare size={16} class="text-brand-pink" />
+											{:else}
+												<Square size={16} class="text-text-muted" />
+											{/if}
+										</button>
+										<div class="flex-1 min-w-0">
+											<div class="flex items-center gap-2 mb-0.5">
+												<span class="text-sm font-medium text-text-strong truncate">{item.title}</span>
+												<span class="text-xs px-1.5 py-0.5 rounded bg-surface-1 text-text-muted">{trashTypeLabels[item.type]}</span>
+											</div>
+											{#if item.description}
+												<p class="text-xs text-text-muted truncate">{item.description}</p>
+											{/if}
+											<p class="text-xs text-text-muted mt-1">
+												{item.deletedAt} 삭제 {#if item.deletedBy}· {item.deletedBy}{/if}
+											</p>
+										</div>
+										<div class="flex items-center gap-1 flex-shrink-0">
+											<button
+												type="button"
+												onclick={() => restoreTrashItem(item.id)}
+												class="trash-item-btn p-1.5 text-text-muted rounded-md transition-colors"
+												title="복원"
+											>
+												<RotateCcw size={14} />
+											</button>
+											<button
+												type="button"
+												onclick={() => permanentDeleteTrashItem(item.id)}
+												class="trash-item-btn p-1.5 text-text-muted rounded-md transition-colors"
+												title="영구 삭제"
+											>
+												<Trash2 size={14} />
+											</button>
+										</div>
+									</div>
+								{/each}
+							</div>
+						{/if}
+					</div>
 				{/if}
 			</div>
 		</div>
@@ -1279,9 +1633,9 @@
 
 <!-- 이미지 확대 모달 -->
 {#if enlargedImageUrl}
+	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div
 		class="fixed inset-0 z-[100] flex items-center justify-center bg-black/90"
-		onclick={() => enlargedImageUrl = null}
 		role="dialog"
 		aria-modal="true"
 		aria-label="이미지 확대 보기"
@@ -1292,7 +1646,21 @@
 		}}
 		tabindex="-1"
 	>
-		<div class="relative max-w-[90vw] max-h-[90vh] flex flex-col items-end" onclick={(e) => e.stopPropagation()}>
+		<!-- 배경 클릭 영역 (버튼으로 처리) -->
+		<button
+			type="button"
+			class="absolute inset-0 w-full h-full cursor-default"
+			onclick={() => enlargedImageUrl = null}
+			aria-label="모달 닫기"
+		></button>
+		
+		<!-- svelte-ignore a11y_no_static_element_interactions a11y_click_events_have_key_events -->
+		<div 
+			class="relative max-w-[90vw] max-h-[90vh] flex flex-col items-end" 
+			onclick={(e) => e.stopPropagation()}
+			onkeydown={(e) => e.stopPropagation()}
+			role="presentation"
+		>
 			<div class="relative">
 				<button
 					type="button"

@@ -51,6 +51,24 @@
 		if (assignedTo === 'Otte') return 'text-elotte-orange';
 		return 'text-text-muted';
 	}
+
+	// 진행률에 따른 바 색상
+	function getProgressColor(percent: number): string {
+		if (percent >= 100) return 'bg-green-500';
+		if (percent >= 75) return 'bg-emerald-500';
+		if (percent >= 50) return 'bg-brand-pink';
+		if (percent >= 25) return 'bg-amber-500';
+		return 'bg-blue-500';
+	}
+
+	// 진행률에 따른 텍스트 색상
+	function getProgressTextColor(percent: number): string {
+		if (percent >= 100) return 'text-green-500';
+		if (percent >= 75) return 'text-emerald-500';
+		if (percent >= 50) return 'text-brand-pink';
+		if (percent >= 25) return 'text-amber-500';
+		return 'text-blue-500';
+	}
 </script>
 
 {#if compact}
@@ -58,11 +76,11 @@
 	<div>
 		<div class="flex items-center justify-between text-xs mb-1.5">
 			<span class="text-text-muted">현재: {PRODUCTION_STAGES[currentIndex]?.name ?? '시작 전'}</span>
-			<span class="text-text-base font-medium">{progressPercent}%</span>
+			<span class="font-medium {getProgressTextColor(progressPercent)}">{progressPercent}%</span>
 		</div>
 		<div class="h-2 bg-bg rounded-full overflow-hidden">
 			<div 
-				class="h-full bg-brand-pink transition-all duration-300"
+				class="{getProgressColor(progressPercent)} h-full transition-all duration-300"
 				style="width: {progressPercent}%"
 			></div>
 		</div>
@@ -76,11 +94,11 @@
 			<div class="flex items-center gap-3">
 				<div class="flex-1 w-32 h-2 bg-bg rounded-full overflow-hidden">
 					<div 
-						class="h-full bg-brand-pink transition-all duration-300"
+						class="{getProgressColor(progressPercent)} h-full transition-all duration-300"
 						style="width: {progressPercent}%"
 					></div>
 				</div>
-				<span class="text-lg font-bold text-brand-pink">{progressPercent}%</span>
+				<span class="text-lg font-bold {getProgressTextColor(progressPercent)}">{progressPercent}%</span>
 			</div>
 		</div>
 

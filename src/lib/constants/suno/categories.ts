@@ -15,6 +15,7 @@ export interface CategoryInfo {
 
 /** 워드 카테고리 목록 */
 export const WORD_CATEGORIES: CategoryInfo[] = [
+	// 콘텐츠 카테고리
 	{ id: 'topic', name: '주제', description: '곡의 주제/테마', icon: 'Lightbulb', color: 'text-yellow-500' },
 	{ id: 'mood', name: '분위기', description: '곡의 분위기/무드', icon: 'Cloud', color: 'text-blue-400' },
 	{ id: 'action', name: '행동', description: '동작, 움직임', icon: 'Zap', color: 'text-orange-500' },
@@ -26,6 +27,14 @@ export const WORD_CATEGORIES: CategoryInfo[] = [
 	{ id: 'time', name: '시간', description: '시간대/시기', icon: 'Clock', color: 'text-indigo-500' },
 	{ id: 'object', name: '사물', description: '물건/사물', icon: 'Box', color: 'text-gray-500' },
 	{ id: 'phrase', name: '문장', description: '가사 문구', icon: 'Quote', color: 'text-cyan-500' },
+	// 음악 제작 카테고리
+	{ id: 'genre', name: '장르', description: 'K-Pop, EDM, 발라드 등', icon: 'Music', color: 'text-violet-500' },
+	{ id: 'instrument', name: '악기', description: '피아노, 기타, 신스 등', icon: 'Piano', color: 'text-amber-500' },
+	{ id: 'vocal', name: '보컬', description: '보컬 스타일/특성', icon: 'Mic', color: 'text-rose-500' },
+	{ id: 'tempo', name: '템포', description: '빠르기/리듬감', icon: 'Gauge', color: 'text-lime-500' },
+	{ id: 'language', name: '언어', description: '한국어, 영어 등', icon: 'Languages', color: 'text-sky-500' },
+	{ id: 'vibe', name: '바이브', description: '레트로, 미래적 등', icon: 'Sparkles', color: 'text-fuchsia-500' },
+	// SUNO 프롬프트 카테고리
 	{ id: 'style', name: '스타일', description: 'SUNO 스타일 프롬프트', icon: 'Palette', color: 'text-brand-pink' },
 	{ id: 'exclude', name: '제외', description: 'SUNO 제외 스타일', icon: 'XCircle', color: 'text-red-600' }
 ];
