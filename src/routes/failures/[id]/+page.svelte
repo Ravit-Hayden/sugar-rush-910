@@ -6,14 +6,14 @@
 
 	const id = $derived($page.params.id);
 	// 목업: 실제 연결 시 GET /api/failures/:id
-	const failure = {
+	const failure = $derived({
 		id,
 		text: 'CDN 업로드 실패',
 		retryable: true,
 		status: 'failed',
 		detail: '업로드 타임아웃으로 인한 실패. 재시도 가능.',
 		occurredAt: '2024-01-15 14:30'
-	};
+	});
 </script>
 
 <PageContent>

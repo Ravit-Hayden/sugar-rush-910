@@ -6,12 +6,12 @@
 
 	const id = $derived($page.params.id);
 	// 목업: 실제 연결 시 GET /api/changes/:id
-	const change = {
+	const change = $derived({
 		id,
 		text: '앨범 메타데이터 업데이트',
 		time: '2시간 전',
 		detail: '트랙 제목·아티스트명 일괄 수정 반영.'
-	};
+	});
 </script>
 
 <PageContent>

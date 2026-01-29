@@ -7,14 +7,14 @@
 
 	const id = $derived($page.params.id);
 	// 목업: 실제 연결 시 GET /api/calendar/:id
-	const event = {
+	const event = $derived({
 		id,
 		title: 'Sugar Rush Vol.1 발매',
 		type: 'release',
 		date: '2024-12-31',
 		time: '14:00',
 		description: '첫 번째 정규 앨범 발매 일정'
-	};
+	});
 </script>
 
 <PageContent>

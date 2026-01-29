@@ -6,14 +6,14 @@
 
 	const id = $derived($page.params.id);
 	// 목업: 실제 연결 시 GET /api/feedback/:id
-	const feedback = {
+	const feedback = $derived({
 		id,
 		title: '새로운 앨범 컨셉에 대한 피드백',
 		from: 'El',
 		time: '1시간 전',
 		content: '커버 아트 방향성과 트랙 순서에 대한 제안이 있습니다.',
 		status: 'unread'
-	};
+	});
 </script>
 
 <PageContent>

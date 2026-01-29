@@ -6,14 +6,14 @@
 
 	const id = $derived($page.params.id);
 	// 목업: 실제 연결 시 GET /api/releases/:id
-	const release = {
+	const release = $derived({
 		id,
 		title: 'Sugar Rush Vol.1',
 		when: '14:00',
 		status: 'scheduled',
 		platforms: ['Spotify', 'Apple Music', 'YouTube Music'],
 		description: '첫 번째 정규 앨범'
-	};
+	});
 </script>
 
 <PageContent>

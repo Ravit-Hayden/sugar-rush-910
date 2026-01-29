@@ -6,13 +6,13 @@
 
 	const id = $derived($page.params.id);
 	// 목업: 실제 연결 시 GET /api/logs/:id
-	const log = {
+	const log = $derived({
 		id,
 		text: '사용자 로그인: El',
 		time: '10분 전',
 		detail: 'IP 192.168.1.1, User-Agent Mozilla/5.0...',
 		level: 'info'
-	};
+	});
 </script>
 
 <PageContent>
