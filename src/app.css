@@ -574,6 +574,7 @@ html {
 }
 
 /* 통일된 메인 영역 스타일 */
+/* 2. 메인 컨텐츠 영역 (밀려나는 효과) */
 .main-content-area {
   padding-top: 5rem; /* pt-20 (80px) */
   padding-bottom: 0.375rem; /* pb-1.5 (6px) */
@@ -662,7 +663,7 @@ div[class*="panel"] {
   width: calc(100% - 250px);
 }
 
-/* 사이드바 애니메이션 통일 */
+/* 3. 사이드바 내부 텍스트 (사라지는 효과) */
 .sidebar-text-animation {
   transition: all 200ms ease-in-out;
 }
@@ -678,6 +679,7 @@ div[class*="panel"] {
   width: auto;
 }
 
+
 /* Tailwind CSS 클래스 오버라이드 */
 .bg-bg { background-color: var(--bg); }
 .bg-surface-1 { background-color: var(--surface-1); }
@@ -689,7 +691,61 @@ div[class*="panel"] {
 .text-text-muted { color: var(--text-muted); }
 .text-white { color: #FFFFFF; }
 .border-border-subtle { border-color: var(--border-subtle) !important; }
-.divide-border-subtle > :not([hidden]) ~ :not([hidden]) { border-color: var(--border-subtle) !important; }
+
+/* Divide 색상 - 다크모드에서 밝은 선 방지 */
+.divide-border-subtle > :not([hidden]) ~ :not([hidden]) { 
+  --tw-divide-opacity: 1 !important;
+  border-color: var(--border-subtle) !important;
+  border-top-color: var(--border-subtle) !important;
+  border-bottom-color: var(--border-subtle) !important;
+}
+
+/* 테이블 구분선 강제 적용 */
+table tbody tr {
+  border-color: var(--border-subtle) !important;
+}
+table tbody tr + tr {
+  border-top-color: var(--border-subtle) !important;
+}
+table thead {
+  border-bottom-color: var(--border-subtle) !important;
+}
+table thead tr {
+  border-bottom-color: var(--border-subtle) !important;
+}
+
+/* Tailwind divide 기본값 오버라이드 */
+.divide-y > :not([hidden]) ~ :not([hidden]) {
+  --tw-divide-y-reverse: 0;
+  border-top-width: calc(1px * calc(1 - var(--tw-divide-y-reverse)));
+  border-bottom-width: calc(1px * var(--tw-divide-y-reverse));
+  border-color: var(--border-subtle) !important;
+}
+
+/* 워드 테이블 스타일 */
+.word-table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.word-table thead {
+  border-bottom: 1px solid var(--border-subtle) !important;
+}
+.word-table tbody tr {
+  border-top: 1px solid var(--table-divider, var(--border-subtle));
+}
+.word-table tbody tr:first-child {
+  border-top: none;
+}
+
+/* 테이블 구분선 색상 (배경과 구분되도록) */
+[data-theme="dark"] .word-table tbody tr,
+[data-theme="dark"] .divide-y.divide-border-subtle > :not([hidden]) ~ :not([hidden]) {
+  border-color: #333333 !important;
+}
+[data-theme="light"] .word-table tbody tr,
+[data-theme="light"] .divide-y.divide-border-subtle > :not([hidden]) ~ :not([hidden]) {
+  border-color: var(--border-subtle) !important;
+}
 .text-brand-pink { color: var(--brand-pink); }
 .text-hover-cyan { color: var(--hover-point); }
 .text-danger-fg { color: var(--danger-fg); }
@@ -1200,7 +1256,7 @@ a[class*="text-brand-pink"][class*="hover:bg-hover-cyan"]:focus-visible:hover {
    1. 기본 트랜지션 설정
    -------------------------------------------------------------------------- */
 .sidebar-menu-item {
-    transition: all 200ms ease-in-out;
+    transition: background-color 200ms ease-in-out, color 200ms ease-in-out;
 }
 
 .sidebar-menu-item span {
@@ -1212,23 +1268,23 @@ a[class*="text-brand-pink"][class*="hover:bg-hover-cyan"]:focus-visible:hover {
    우선순위: 낮음 (포커스/활성화보다 낮음)
    -------------------------------------------------------------------------- */
 
-/* 2-1. 다크 모드 호버 (원본과 동일: #000000 하드코딩) */
-.sidebar-menu-item:hover:not(.active):not(:focus):not(:focus-visible) {
+/* 2-1. 다크 모드 호버 (원본과 동일: #000000 하드코딩) - 활성화 상태 제외 */
+.sidebar-menu-item:hover:not(.active):not(:focus):not(:focus-visible):not([aria-current="page"]) {
     background-color: var(--hover-point) !important;
     color: #000000 !important;
 }
 
-.sidebar-menu-item:hover:not(.active):not(:focus):not(:focus-visible) .lucide-icon {
+.sidebar-menu-item:hover:not(.active):not(:focus):not(:focus-visible):not([aria-current="page"]) .lucide-icon {
     color: #000000 !important;
 }
 
-/* 2-2. 라이트 모드 호버 (원본과 동일) */
-[data-theme="light"] .sidebar-menu-item:hover:not(.active):not(:focus):not(:focus-visible) {
+/* 2-2. 라이트 모드 호버 (원본과 동일) - 활성화 상태 제외 */
+[data-theme="light"] .sidebar-menu-item:hover:not(.active):not(:focus):not(:focus-visible):not([aria-current="page"]) {
     background-color: var(--hover-point) !important;
     color: var(--surface-2) !important;
 }
 
-[data-theme="light"] .sidebar-menu-item:hover:not(.active):not(:focus):not(:focus-visible) .lucide-icon {
+[data-theme="light"] .sidebar-menu-item:hover:not(.active):not(:focus):not(:focus-visible):not([aria-current="page"]) .lucide-icon {
     color: var(--surface-2) !important;
 }
 
@@ -1396,7 +1452,7 @@ a[class*="text-brand-pink"][class*="hover:bg-hover-cyan"]:focus-visible:hover {
    1. 기본 트랜지션 설정 (확장)
    -------------------------------------------------------------------------- */
 aside nav ul li a.sidebar-menu-item {
-    transition: all 200ms ease-in-out;
+    transition: background-color 200ms ease-in-out, color 200ms ease-in-out;
 }
 
 aside nav ul li a.sidebar-menu-item span {
@@ -1407,23 +1463,23 @@ aside nav ul li a.sidebar-menu-item span {
    2. 호버 상태 (확장)
    -------------------------------------------------------------------------- */
 
-/* 2-1. 다크 모드 호버 (확장) - 원본과 동일 */
-aside nav ul li a.sidebar-menu-item:hover:not(.active):not(:focus):not(:focus-visible) {
+/* 2-1. 다크 모드 호버 (확장) - 원본과 동일 - 활성화 상태 제외 */
+aside nav ul li a.sidebar-menu-item:hover:not(.active):not(:focus):not(:focus-visible):not([aria-current="page"]) {
     background-color: var(--hover-point) !important;
     color: var(--text-on-hover) !important;
 }
 
-aside nav ul li a.sidebar-menu-item:hover:not(.active):not(:focus):not(:focus-visible) .lucide-icon {
+aside nav ul li a.sidebar-menu-item:hover:not(.active):not(:focus):not(:focus-visible):not([aria-current="page"]) .lucide-icon {
     color: #000000 !important;
 }
 
-/* 2-2. 라이트 모드 호버 (확장) - 원본과 동일 */
-[data-theme="light"] aside nav ul li a.sidebar-menu-item:hover:not(.active):not(:focus):not(:focus-visible) {
+/* 2-2. 라이트 모드 호버 (확장) - 원본과 동일 - 활성화 상태 제외 */
+[data-theme="light"] aside nav ul li a.sidebar-menu-item:hover:not(.active):not(:focus):not(:focus-visible):not([aria-current="page"]) {
     background-color: var(--hover-point) !important;
     color: var(--surface-2) !important;
 }
 
-[data-theme="light"] aside nav ul li a.sidebar-menu-item:hover:not(.active):not(:focus):not(:focus-visible) .lucide-icon {
+[data-theme="light"] aside nav ul li a.sidebar-menu-item:hover:not(.active):not(:focus):not(:focus-visible):not([aria-current="page"]) .lucide-icon {
     color: var(--surface-2) !important;
 }
 
@@ -1590,16 +1646,40 @@ aside nav ul li a.sidebar-menu-item.active .sidebar-text-animation span.text-sm 
 
 /* 사이드바 내부 메뉴 리스트 스크롤바 제거 (모든 브라우저) */
 aside nav ul {
-    scrollbar-width: none; /* Firefox: 스크롤바 제거하되 스크롤 기능 유지 */
-    -ms-overflow-style: none; /* IE/Edge: 스크롤바 제거 */
+    scrollbar-width: none !important; /* Firefox: 스크롤바 제거하되 스크롤 기능 유지 */
+    -ms-overflow-style: none !important; /* IE/Edge: 스크롤바 제거 */
 }
 
 /* Webkit 브라우저 (Chrome, Edge, Safari) - 스크롤바 완전 제거 */
 aside nav ul::-webkit-scrollbar {
-    display: none; /* 스크롤바 완전 제거 */
-    width: 0;
-    height: 0;
-    background: transparent;
+    display: none !important; /* 스크롤바 완전 제거 */
+    width: 0 !important;
+    height: 0 !important;
+    background: transparent !important;
+}
+
+/* custom-list-scrollbar 클래스가 있어도 사이드바는 완전 투명 */
+aside nav ul.custom-list-scrollbar {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+    scrollbar-color: transparent transparent !important;
+}
+
+aside nav ul.custom-list-scrollbar::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    background: transparent !important;
+}
+
+aside nav ul.custom-list-scrollbar::-webkit-scrollbar-thumb {
+    display: none !important;
+    background: transparent !important;
+}
+
+aside nav ul.custom-list-scrollbar::-webkit-scrollbar-track {
+    display: none !important;
+    background: transparent !important;
 }
 
 /* 사이드바 전체 애니메이션 최적화 */
@@ -1862,6 +1942,31 @@ input[type="checkbox"]:checked::after {
   line-height: 1;
 }
 
+/* =========================
+   라디오 버튼 커스텀 스타일
+   ========================= */
+input[type="radio"]:checked::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: currentColor;
+}
+
+/* 라디오 버튼 선택 시 내부 점 색상 - El (녹색) */
+input[type="radio"][value="El"]:checked::after {
+  background-color: var(--elotte-green);
+}
+
+/* 라디오 버튼 선택 시 내부 점 색상 - Otte (주황색) */
+input[type="radio"][value="Otte"]:checked::after {
+  background-color: var(--elotte-orange);
+}
+
 /* 타이틀 트랙 체크박스 - 호버/포커스 분리 */
 .title-track-checkbox:hover:not(:focus) {
   border-color: var(--hover-point) !important;
@@ -1918,12 +2023,41 @@ aside.bg-surface-2:hover {
 
 /* 배지 호버 효과 제거 - 배지는 호버 효과 불필요 */
 
-/* 아이콘 호버 효과 (포커스 상태가 아닐 때만) */
-/* 포커스 상태의 요소 내부 아이콘은 호버 효과 없음 */
-/* SUNO 탭 아이콘은 제외 (부모 요소에서 관리) */
+/* ==========================================================================
+   아이콘 호버 효과 - 최신 미니멀 방식
+   우선순위: 활성화 > 포커스 > 호버
+   ========================================================================== */
+
+/* 사이드바 활성화 상태 아이콘 - 최고 우선순위 (모든 상태에서 흰색 유지) */
+.sidebar-menu-item.active .lucide-icon,
+.sidebar-menu-item.active:hover .lucide-icon,
+.sidebar-menu-item.active:focus .lucide-icon,
+.sidebar-menu-item.active:focus-visible .lucide-icon,
+.sidebar-menu-item.active:focus:hover .lucide-icon,
+.sidebar-menu-item.active:focus-visible:hover .lucide-icon,
+.sidebar-menu-item.active:active .lucide-icon,
+.sidebar-menu-item.active:active:hover .lucide-icon,
+aside nav ul li a.sidebar-menu-item.active .lucide-icon,
+aside nav ul li a.sidebar-menu-item.active:hover .lucide-icon,
+aside nav ul li a.sidebar-menu-item.active:focus .lucide-icon,
+aside nav ul li a.sidebar-menu-item.active:focus-visible .lucide-icon,
+aside nav ul li a.sidebar-menu-item.active:focus:hover .lucide-icon,
+aside nav ul li a.sidebar-menu-item.active:focus-visible:hover .lucide-icon,
+aside nav ul li a.sidebar-menu-item.active:active .lucide-icon,
+aside nav ul li a.sidebar-menu-item.active:active:hover .lucide-icon {
+  color: #FFFFFF !important;
+}
+
+/* 전역 아이콘 호버 효과 (활성화/포커스 상태 제외) */
 .lucide-icon:hover:not(:focus):not(:focus-visible):not(:focus-within):not(.combinator-header-icon) {
   color: var(--hover-point) !important;
-  transition: color 0.2s ease;
+  transition: color 200ms ease-in-out;
+}
+
+/* 활성화 상태 아이콘은 전역 호버 규칙 무시 (더 높은 특이성) */
+.sidebar-menu-item.active .lucide-icon:hover,
+aside nav ul li a.sidebar-menu-item.active .lucide-icon:hover {
+  color: #FFFFFF !important;
 }
 
 /* SUNO 탭 내 아이콘은 전역 호버 효과 무시 - 최우선 */
@@ -1962,13 +2096,6 @@ a.suno-tab-active:hover span {
   color: var(--brand-pink) !important;
 }
 
-/* 활성화 상태의 사이드바 메뉴 아이템 아이콘 호버 효과 완전 차단 (최우선 - 전역 규칙보다 높은 특이성) */
-.sidebar-menu-item.active .lucide-icon:hover,
-.sidebar-menu-item.active:hover .lucide-icon:hover,
-aside nav ul li a.sidebar-menu-item.active .lucide-icon:hover,
-aside nav ul li a.sidebar-menu-item.active:hover .lucide-icon:hover {
-  color: #FFFFFF !important;
-}
 
 /* 누르는 중(:active) 상태의 사이드바 메뉴 아이템 아이콘 호버 효과 완전 차단 (전역 규칙보다 높은 특이성) */
 .sidebar-menu-item:active .lucide-icon:hover,
@@ -5715,4 +5842,167 @@ button.preset-group-btn:hover .preset-group-icon {
 .exclude-copy-btn.text-brand-pink svg,
 .exclude-copy-btn.text-brand-pink:hover svg {
   color: var(--brand-pink) !important;
+}
+
+/* ============================================================
+   스크롤바 숨기기
+   ============================================================ */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* ============================================================
+   제외 스타일 프리셋 버튼 - 호버/포커스 효과
+   ============================================================ */
+.exclude-preset-btn {
+  transition: border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease;
+}
+
+.exclude-preset-btn:hover:not(:focus):not(:focus-visible) {
+  border-color: var(--hover-point) !important;
+  color: var(--hover-point) !important;
+  background-color: var(--hover-point)/10 !important;
+}
+
+.exclude-preset-btn:focus,
+.exclude-preset-btn:focus-visible {
+  border-color: var(--brand-pink) !important;
+  color: var(--brand-pink) !important;
+  outline: none !important;
+}
+
+/* ==========================================================================
+   사이드바 v3 - body 클래스 기반 동기화 (기존 시스템 호환)
+   ========================================================================== */
+
+:root {
+  --sidebar-width-collapsed: 72px;
+  --sidebar-width-expanded: 250px;
+  --sidebar-text-width: 160px;
+  --anim-bezier: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* 사이드바 본체 - body 클래스 기반 */
+aside {
+  transition: width 250ms var(--anim-bezier);
+  overflow: hidden;
+}
+body.sidebar-collapsed aside {
+  width: var(--sidebar-width-collapsed) !important;
+}
+body.sidebar-expanded aside {
+  width: var(--sidebar-width-expanded) !important;
+}
+
+/* 텍스트 영역 - body 클래스 기반 */
+.sidebar-text {
+  opacity: 0;
+  width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  transition: opacity 250ms var(--anim-bezier), width 250ms var(--anim-bezier), margin-left 250ms var(--anim-bezier);
+  margin-left: 0;
+}
+body.sidebar-expanded .sidebar-text {
+  opacity: 1;
+  width: var(--sidebar-text-width);
+  margin-left: 12px;
+}
+
+/* 헤더/메인 동기화 - body 클래스 기반 (인라인 스타일 대체) */
+body.sidebar-collapsed header,
+body.sidebar-collapsed .main-content-area {
+  margin-left: var(--sidebar-width-collapsed) !important;
+  transition: margin-left 250ms var(--anim-bezier), width 250ms var(--anim-bezier);
+}
+body.sidebar-expanded header, 
+body.sidebar-expanded .main-content-area {
+  margin-left: var(--sidebar-width-expanded) !important;
+  transition: margin-left 250ms var(--anim-bezier), width 250ms var(--anim-bezier);
+}
+
+/* 호버/포커스 - 기존 --hover-point 변수 사용 (활성화 상태 제외) */
+[data-theme="dark"] .sidebar-menu-item:hover:not(:focus):not(:focus-visible):not(.active):not([aria-current="page"]) {
+  background-color: var(--hover-point) !important; /* 시안 */
+  color: #000000 !important;
+}
+[data-theme="dark"] .sidebar-menu-item:hover:not(:focus):not(:focus-visible):not(.active):not([aria-current="page"]) .lucide-icon {
+  color: #000000 !important;
+}
+
+[data-theme="light"] .sidebar-menu-item:hover:not(:focus):not(:focus-visible):not(.active):not([aria-current="page"]) {
+  background-color: var(--hover-point) !important; /* 보라 */
+  color: var(--text-on-hover) !important;
+}
+[data-theme="light"] .sidebar-menu-item:hover:not(:focus):not(:focus-visible):not(.active):not([aria-current="page"]) .lucide-icon {
+  color: var(--text-on-hover) !important;
+}
+
+/* 활성화 상태 호버 완전 차단 - 최우선 (호버 규칙보다 먼저) */
+.sidebar-menu-item[aria-current="page"]:hover,
+.sidebar-menu-item[aria-current="page"]:hover .lucide-icon,
+aside nav ul li a.sidebar-menu-item[aria-current="page"]:hover,
+aside nav ul li a.sidebar-menu-item[aria-current="page"]:hover .lucide-icon {
+  background-color: var(--brand-pink) !important;
+  color: #ffffff !important;
+}
+
+/* 포커스 공통 */
+.sidebar-menu-item:focus,
+.sidebar-menu-item:focus-visible,
+.sidebar-menu-item[aria-current="page"] {
+  background-color: var(--brand-pink) !important;
+  color: #ffffff !important;
+}
+.sidebar-menu-item:focus .lucide-icon,
+.sidebar-menu-item:focus-visible .lucide-icon,
+.sidebar-menu-item[aria-current="page"] .lucide-icon {
+  color: #ffffff !important;
+}
+
+/* ==========================================================================
+   🔥 활성화 호버 완전 차단 - 핵폭탄 우선순위 (최종 보장)
+   ========================================================================== */
+.sidebar-menu-item[aria-current="page"] {
+  background-color: var(--brand-pink) !important;
+  color: #ffffff !important;
+}
+
+.sidebar-menu-item[aria-current="page"] * {
+  background-color: transparent !important;
+  color: #ffffff !important;
+}
+
+/* 호버 시에도 활성화 상태 무시 */
+.sidebar-menu-item[aria-current="page"]:hover,
+.sidebar-menu-item[aria-current="page"]:hover *,
+.sidebar-menu-item[aria-current="page"]:focus,
+.sidebar-menu-item[aria-current="page"]:focus *,
+.sidebar-menu-item[aria-current="page"]:focus:hover,
+.sidebar-menu-item[aria-current="page"]:focus:hover *,
+aside nav ul li a.sidebar-menu-item[aria-current="page"]:hover,
+aside nav ul li a.sidebar-menu-item[aria-current="page"]:hover *,
+aside nav ul li a.sidebar-menu-item[aria-current="page"]:focus,
+aside nav ul li a.sidebar-menu-item[aria-current="page"]:focus *,
+aside nav ul li a.sidebar-menu-item[aria-current="page"]:focus:hover,
+aside nav ul li a.sidebar-menu-item[aria-current="page"]:focus:hover * {
+  background-color: var(--brand-pink) !important;
+  color: #ffffff !important;
+}
+
+/* lucide 아이콘 강제 - 모든 상태에서 흰색 */
+.sidebar-menu-item[aria-current="page"] .lucide-icon,
+.sidebar-menu-item[aria-current="page"]:hover .lucide-icon,
+.sidebar-menu-item[aria-current="page"]:focus .lucide-icon,
+.sidebar-menu-item[aria-current="page"]:focus:hover .lucide-icon,
+aside nav ul li a.sidebar-menu-item[aria-current="page"] .lucide-icon,
+aside nav ul li a.sidebar-menu-item[aria-current="page"]:hover .lucide-icon,
+aside nav ul li a.sidebar-menu-item[aria-current="page"]:focus .lucide-icon,
+aside nav ul li a.sidebar-menu-item[aria-current="page"]:focus:hover .lucide-icon {
+  color: #ffffff !important;
+  transition: none !important;
 }

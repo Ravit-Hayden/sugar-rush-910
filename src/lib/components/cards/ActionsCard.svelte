@@ -15,7 +15,7 @@
 </script>
 
 <div class="card-base h-[396px] flex flex-col justify-between p-5 rounded-lg bg-surface-2 border border-border-subtle overflow-hidden pt-[24px]">
-	<div>
+	<div class="flex-1 min-h-0">
 		<!-- 상단 타이틀영역 -->
 		<div class="flex items-center justify-between mb-4">
 			<h3 class="text-lg font-bold text-text-strong truncate">빠른 액션</h3>
@@ -38,7 +38,7 @@
 		</div>
 
 		<!-- 메인 목록/컨텐츠: 줄/행 개수 무조건 동일, 남는 줄은 placeholder -->
-		<div class="grid grid-rows-4 gap-3">
+		<div class="grid grid-rows-4 gap-3 min-h-0">
 			{#if loading}
 				<Skeleton lines={2} />
 			{:else}
@@ -70,7 +70,10 @@
 	</div>
 
 	<!-- 하단 액션 -->
-	<a href="/actions" class="self-end text-brand-pink text-sm font-semibold px-2 py-1 rounded hover:bg-hover-cyan transition-colors mt-3">
-		더보기
-	</a>
+	<div class="flex items-center justify-between mt-3 flex-shrink-0">
+		<div class="flex gap-x-2 flex-wrap items-center">
+			<!-- 좌측 액션 버튼이 필요한 경우 여기에 추가 -->
+		</div>
+		<a href="/actions" class="text-brand-pink text-sm font-semibold px-2 py-1 rounded hover:bg-hover-cyan transition-colors">더보기</a>
+	</div>
 </div>

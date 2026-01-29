@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Plus, Search, Trash2, Edit2, Link, Shuffle, X, ChevronDown, Filter, UserRound, ArrowUpDown, BookOpen, SearchX, ArrowDownAZ, ListOrdered, RotateCcw } from 'lucide-svelte';
+	import { Plus, Search, Trash2, Edit2, Link, Shuffle, X, ChevronDown, Filter, UserRound, ArrowUpDown, BookOpen, SearchX, ArrowDownAZ, ListOrdered, RotateCcw, Tag, CheckSquare, Square } from 'lucide-svelte';
 	import RandomCombinator from '$lib/components/suno/RandomCombinator.svelte';
 	import SUNOTabs from '$lib/components/suno/SUNOTabs.svelte';
 	import { WORD_CATEGORIES, getCategoryName } from '$lib/constants/suno/categories';
@@ -291,6 +291,62 @@
 		Otte: 'Otte'
 	};
 
+	// 태그 필터 상태
+	let selectedTag = $state<string>('all');
+	let tagDropdownOpen = $state(false);
+
+	// 모든 태그 추출 (중복 제거, 정렬)
+	const allTags = $derived.by(() => {
+		const tagSet = new Set<string>();
+		words.forEach(word => {
+			word.tags.forEach(tag => tagSet.add(tag));
+		});
+		return Array.from(tagSet).sort();
+	});
+
+	// ========== 일괄 선택/삭제 기능 ==========
+	let selectionMode = $state(false);
+	let selectedIds = $state<Set<string>>(new Set());
+
+	// 선택 모드 토글
+	function toggleSelectionMode() {
+		selectionMode = !selectionMode;
+		if (!selectionMode) {
+			selectedIds = new Set();
+		}
+	}
+
+	// 개별 항목 선택 토글
+	function toggleSelection(id: string) {
+		const newSet = new Set(selectedIds);
+		if (newSet.has(id)) {
+			newSet.delete(id);
+		} else {
+			newSet.add(id);
+		}
+		selectedIds = newSet;
+	}
+
+	// 전체 선택
+	function selectAll() {
+		selectedIds = new Set(filteredWords.map(w => w.id));
+	}
+
+	// 전체 해제
+	function deselectAll() {
+		selectedIds = new Set();
+	}
+
+	// 선택된 항목 삭제
+	function deleteSelected() {
+		if (selectedIds.size === 0) return;
+		if (!confirm(`${selectedIds.size}개 항목을 삭제하시겠습니까?`)) return;
+		
+		words = words.filter(w => !selectedIds.has(w.id));
+		selectedIds = new Set();
+		selectionMode = false;
+	}
+
 	// 새 항목 추가 모달 상태
 	let showAddModal = $state(false);
 	let newWord = $state({
@@ -299,6 +355,8 @@
 		tags: '',
 		createdBy: 'El' as Producer
 	});
+	let modalCategoryOpen = $state(false);
+	let editModalCategoryOpen = $state(false);
 
 	// 연결된 트랙 팝업 상태
 	let linkedTracksPopup = $state<{ wordId: string; tracks: string[]; position: { x: number; y: number } } | null>(null);
@@ -377,6 +435,54 @@
 	}
 
 	// 연결된 트랙 팝업 닫기
+
+	// ========== 워드 수정 기능 ==========
+	let showEditModal = $state(false);
+	let editingWord = $state<WordEntry | null>(null);
+	let editForm = $state({
+		content: '',
+		category: 'topic' as WordCategory,
+		tags: '',
+		createdBy: 'El' as Producer
+	});
+
+	// 수정 모달 열기
+	function openEditModal(word: WordEntry) {
+		editingWord = word;
+		editForm = {
+			content: word.content,
+			category: word.category,
+			tags: word.tags.join(', '),
+			createdBy: word.createdBy
+		};
+		showEditModal = true;
+	}
+
+	// 수정 저장
+	function saveEdit() {
+		if (!editingWord || !editForm.content.trim()) return;
+
+		words = words.map(w => {
+			if (w.id === editingWord!.id) {
+				return {
+					...w,
+					content: editForm.content.trim(),
+					category: editForm.category,
+					tags: editForm.tags.split(',').map(t => t.trim()).filter(t => t),
+					createdBy: editForm.createdBy
+				};
+			}
+			return w;
+		});
+
+		closeEditModal();
+	}
+
+	// 수정 모달 닫기
+	function closeEditModal() {
+		showEditModal = false;
+		editingWord = null;
+	}
 	function closeLinkedTracksPopup() {
 		linkedTracksPopup = null;
 	}
@@ -394,6 +500,10 @@
 			}
 			// 제작자 필터
 			if (selectedCreator !== 'all' && word.createdBy !== selectedCreator) {
+				return false;
+			}
+			// 태그 필터
+			if (selectedTag !== 'all' && !word.tags.includes(selectedTag)) {
 				return false;
 			}
 			return true;
@@ -471,13 +581,24 @@
 		if (!target.closest('.sort-dropdown')) {
 			sortDropdownOpen = false;
 		}
+		if (!target.closest('.tag-dropdown')) {
+			tagDropdownOpen = false;
+		}
+		// 추가 모달 카테고리 드롭다운
+		if (!target.closest('.add-modal-category-dropdown')) {
+			modalCategoryOpen = false;
+		}
+		// 수정 모달 카테고리 드롭다운
+		if (!target.closest('.edit-modal-category-dropdown')) {
+			editModalCategoryOpen = false;
+		}
 		if (!target.closest('.linked-tracks-popup') && !target.closest('.linked-tracks-btn')) {
 			linkedTracksPopup = null;
 		}
 	}
 
 	$effect(() => {
-		if (categoryDropdownOpen || creatorDropdownOpen || sortDropdownOpen || linkedTracksPopup) {
+		if (categoryDropdownOpen || creatorDropdownOpen || sortDropdownOpen || tagDropdownOpen || modalCategoryOpen || editModalCategoryOpen || linkedTracksPopup) {
 			document.addEventListener('click', handleClickOutside);
 		}
 		return () => {
@@ -516,7 +637,7 @@
 				<button
 					type="button"
 					onclick={() => showAddModal = true}
-					class="flex items-center gap-2 px-4 py-2 bg-brand-pink text-white rounded-lg font-medium hover:bg-brand-pink/90 transition-colors"
+					class="page-header-action-button inline-flex items-center justify-center gap-2 px-4 py-2 w-full sm:w-auto rounded-lg transition-colors duration-200 font-medium page-header-primary-button bg-brand-pink text-[var(--surface-2)] hover:[&>svg]:!text-[var(--surface-2)] focus:bg-brand-pink focus:text-white focus:[&>svg]:!text-white focus-visible:bg-brand-pink focus-visible:text-white focus-visible:[&>svg]:!text-white focus:outline-none focus:ring-0 flex-shrink-0"
 				>
 					<Plus size={16} />
 					<span class="hidden sm:inline">워드 추가</span>
@@ -566,8 +687,8 @@
 				{/if}
 			</div>
 
-			<!-- 필터/정렬 (아랫줄) -->
-			<div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+			<!-- 필터/정렬 (2x2 그리드) -->
+			<div class="grid grid-cols-2 gap-3">
 				<!-- 카테고리 필터 -->
 				<div class="relative category-dropdown">
 					<button
@@ -652,6 +773,53 @@
 					{/if}
 				</div>
 
+				<!-- 태그 필터 -->
+				<div class="relative tag-dropdown">
+					<button
+						type="button"
+						onclick={() => tagDropdownOpen = !tagDropdownOpen}
+						aria-haspopup="listbox"
+						aria-expanded={tagDropdownOpen}
+						class="status-filter-btn flex items-center pl-10 pr-8 py-1.5 w-full bg-surface-2 rounded-[6px] text-text-base transition-all duration-200 cursor-pointer border border-border-subtle focus:outline-none focus:border-brand-pink"
+					>
+						<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+							<Tag size={16} class="lucide-icon text-text-muted transition-colors duration-200" />
+						</div>
+						<span class="flex-1 text-left truncate">
+							{selectedTag === 'all' ? '전체 태그' : selectedTag}
+						</span>
+						<div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+							<ChevronDown size={12} class="text-text-base transition-colors duration-200" />
+						</div>
+					</button>
+					{#if tagDropdownOpen}
+						<ul class="absolute left-0 w-full mt-[6px] bg-surface-2 border border-border-subtle rounded-[6px] z-10 overflow-hidden max-h-[200px] overflow-y-auto custom-list-scrollbar">
+							<li
+								role="option"
+								aria-selected={selectedTag === 'all'}
+								tabindex="0"
+								onclick={() => { selectedTag = 'all'; tagDropdownOpen = false; }}
+								onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { selectedTag = 'all'; tagDropdownOpen = false; } }}
+								class="dropdown-item px-4 py-2 text-sm cursor-pointer transition-colors {selectedTag === 'all' ? 'bg-brand-pink text-white' : 'text-text-base'}"
+							>
+								전체 태그
+							</li>
+							{#each allTags as tag}
+								<li
+									role="option"
+									aria-selected={selectedTag === tag}
+									tabindex="0"
+									onclick={() => { selectedTag = tag; tagDropdownOpen = false; }}
+									onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { selectedTag = tag; tagDropdownOpen = false; } }}
+									class="dropdown-item px-4 py-2 text-sm cursor-pointer transition-colors {selectedTag === tag ? 'bg-brand-pink text-white' : 'text-text-base'}"
+								>
+									{tag}
+								</li>
+							{/each}
+						</ul>
+					{/if}
+				</div>
+
 				<!-- 정렬 -->
 				<div class="relative sort-dropdown">
 					<button
@@ -691,34 +859,101 @@
 			</div>
 		</div>
 
+		<!-- 선택 모드 툴바 -->
+		<div class="flex items-center justify-between mb-3">
+			<button
+				type="button"
+				onclick={toggleSelectionMode}
+				class="flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md transition-colors {selectionMode ? 'text-brand-pink' : 'text-text-muted hover:text-hover-point'}"
+			>
+				{#if selectionMode}
+					<CheckSquare size={14} />
+					선택 모드 끄기
+				{:else}
+					<Square size={14} />
+					선택 모드
+				{/if}
+			</button>
+			
+			{#if selectionMode}
+				<div class="flex items-center gap-2">
+					<span class="text-sm text-text-muted">
+						<span class="text-brand-pink font-medium">{selectedIds.size}</span>개 선택됨
+					</span>
+					<button
+						type="button"
+						onclick={selectAll}
+						class="btn-outline-hover px-3 py-1.5 text-sm rounded-md border border-border-subtle text-text-muted"
+					>
+						전체 선택
+					</button>
+					<button
+						type="button"
+						onclick={deselectAll}
+						class="btn-outline-hover px-3 py-1.5 text-sm rounded-md border border-border-subtle text-text-muted"
+					>
+						전체 해제
+					</button>
+					<button
+						type="button"
+						onclick={deleteSelected}
+						disabled={selectedIds.size === 0}
+						class="flex items-center gap-1 px-3 py-1.5 text-sm rounded-md bg-red-500/20 text-red-400 border border-red-500/50 transition-colors hover:bg-red-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+					>
+						<Trash2 size={14} />
+						삭제
+					</button>
+				</div>
+			{/if}
+		</div>
+
 		<!-- 테이블 (데스크톱) / 카드 (모바일) -->
 		<div class="bg-surface-2 rounded-lg border border-border-subtle overflow-hidden">
 			<!-- 데스크톱 테이블 -->
 			<div class="hidden md:block overflow-x-auto">
-				<table class="w-full min-w-[640px]">
-					<thead class="bg-bg">
+				<table class="w-full min-w-[640px]" style="border-collapse: collapse;">
+					<thead class="bg-surface-2 text-xs text-text-muted pointer-events-none" style="border-bottom: 1px solid var(--border-subtle);">
 						<tr>
-							<th class="px-3 py-3 text-left text-sm font-medium text-text-strong">내용</th>
-							<th class="px-3 py-3 text-left text-sm font-medium text-text-strong whitespace-nowrap">카테고리</th>
-							<th class="px-3 py-3 text-left text-sm font-medium text-text-strong">태그</th>
-							<th class="px-3 py-3 text-center text-sm font-medium text-text-strong whitespace-nowrap">사용</th>
-							<th class="px-3 py-3 text-center text-sm font-medium text-text-strong whitespace-nowrap">제작자</th>
-							<th class="px-3 py-3 text-center text-sm font-medium text-text-strong">액션</th>
+							{#if selectionMode}
+								<th class="px-4 py-3 w-10"></th>
+							{/if}
+							<th class="px-4 py-3 text-left font-medium">내용</th>
+							<th class="px-4 py-3 text-left font-medium whitespace-nowrap">카테고리</th>
+							<th class="px-4 py-3 text-left font-medium">태그</th>
+							<th class="px-4 py-3 text-center font-medium whitespace-nowrap">사용</th>
+							<th class="px-4 py-3 text-center font-medium whitespace-nowrap">제작자</th>
+							<th class="px-4 py-3 text-center font-medium">액션</th>
 						</tr>
 					</thead>
-					<tbody class="divide-y divide-border-subtle">
-						{#each filteredWords as word}
-							<tr class="hover:bg-surface-1/50 transition-colors">
-								<td class="px-3 py-3 text-sm text-text-base">{word.content}</td>
-								<td class="px-3 py-3">
-									<span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-bg text-text-base whitespace-nowrap">
+					<tbody>
+						{#each filteredWords as word, i}
+							{@const showBorder = i < filteredWords.length - 1}
+							<tr class="word-row group {selectionMode && selectedIds.has(word.id) ? 'bg-brand-pink/10' : ''}">
+								{#if selectionMode}
+									<td class="px-4 py-3 w-10 group-hover:bg-surface-1/50 transition-colors" style={showBorder ? 'border-bottom: 1px solid var(--border-subtle);' : ''}>
+										<button
+											type="button"
+											onclick={() => toggleSelection(word.id)}
+											class="flex items-center justify-center"
+										>
+											{#if selectedIds.has(word.id)}
+												<CheckSquare size={18} class="text-brand-pink" />
+											{:else}
+												<Square size={18} class="text-text-muted hover:text-hover-point transition-colors" />
+											{/if}
+										</button>
+									</td>
+								{/if}
+								<td class="px-4 py-3 text-sm text-text-base group-hover:bg-surface-1/50 transition-colors" style={showBorder ? 'border-bottom: 1px solid var(--border-subtle);' : ''}>{word.content}</td>
+								<td class="px-4 py-3 group-hover:bg-surface-1/50 transition-colors" style={showBorder ? 'border-bottom: 1px solid var(--border-subtle);' : ''}>
+									<span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-surface-2 text-text-muted whitespace-nowrap">
 										{getCategoryName(word.category)}
 									</span>
 								</td>
-								<td class="px-3 py-3">
+								<td class="px-4 py-3 group-hover:bg-surface-1/50 transition-colors" style={showBorder ? 'border-bottom: 1px solid var(--border-subtle);' : ''}>
 									<div class="flex flex-wrap gap-1">
 										{#each word.tags.slice(0, 2) as tag}
-											<span class="px-1.5 py-0.5 rounded text-xs bg-bg text-text-muted">
+											<span class="px-1.5 py-0.5 rounded text-xs bg-surface-2 text-text-muted">
 												{tag}
 											</span>
 										{/each}
@@ -727,8 +962,8 @@
 										{/if}
 									</div>
 								</td>
-								<td class="px-3 py-3 text-center whitespace-nowrap">
-									<span class="text-sm text-text-base">{word.usageCount}</span>
+								<td class="px-4 py-3 text-center whitespace-nowrap group-hover:bg-surface-1/50 transition-colors" style={showBorder ? 'border-bottom: 1px solid var(--border-subtle);' : ''}>
+									<span class="text-sm text-text-muted">{word.usageCount}</span>
 									{#if word.linkedTracks.length > 0}
 										<button
 											type="button"
@@ -741,16 +976,17 @@
 										</button>
 									{/if}
 								</td>
-								<td class="px-3 py-3 text-center">
+								<td class="px-4 py-3 text-center group-hover:bg-surface-1/50 transition-colors" style={showBorder ? 'border-bottom: 1px solid var(--border-subtle);' : ''}>
 									<span class="text-sm font-medium {word.createdBy === 'El' ? 'text-elotte-green' : 'text-elotte-orange'}">
 										{word.createdBy}
 									</span>
 								</td>
-								<td class="px-3 py-3">
+								<td class="px-4 py-3 group-hover:bg-surface-1/50 transition-colors" style={showBorder ? 'border-bottom: 1px solid var(--border-subtle);' : ''}>
 									<div class="flex items-center justify-center gap-1">
 										<button
 											type="button"
 											class="btn-icon"
+											onclick={() => openEditModal(word)}
 											aria-label="수정"
 										>
 											<Edit2 size={14} />
@@ -769,8 +1005,8 @@
 						{/each}
 						{#if filteredWords.length === 0}
 							<tr>
-								<td colspan="6" class="px-4 py-12 text-center">
-									{#if searchQuery || selectedCategory !== 'all' || selectedCreator !== 'all'}
+								<td colspan={selectionMode ? 7 : 6} class="px-4 py-12 text-center">
+									{#if searchQuery || selectedCategory !== 'all' || selectedCreator !== 'all' || selectedTag !== 'all'}
 										<div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-bg mb-4">
 											<SearchX size={28} class="text-text-muted" />
 										</div>
@@ -778,7 +1014,7 @@
 										<p class="text-text-muted text-sm mb-4">다른 검색어나 필터를 시도해보세요</p>
 										<button
 											type="button"
-											onclick={() => { searchQuery = ''; selectedCategory = 'all'; selectedCreator = 'all'; }}
+											onclick={() => { searchQuery = ''; selectedCategory = 'all'; selectedCreator = 'all'; selectedTag = 'all'; }}
 											class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-brand-pink border border-brand-pink rounded-lg hover:bg-brand-pink hover:text-white transition-colors"
 										>
 											<X size={14} />
@@ -793,7 +1029,7 @@
 										<button
 											type="button"
 											onclick={() => showAddModal = true}
-											class="inline-flex items-center gap-2 px-4 py-2 bg-brand-pink text-white text-sm font-medium rounded-lg hover:bg-brand-pink/90 transition-colors"
+											class="page-header-action-button inline-flex items-center justify-center gap-2 px-4 py-2 w-full sm:w-auto rounded-lg transition-colors duration-200 font-medium page-header-primary-button bg-brand-pink text-[var(--surface-2)] hover:[&>svg]:!text-[var(--surface-2)] focus:bg-brand-pink focus:text-white focus:[&>svg]:!text-white focus-visible:bg-brand-pink focus-visible:text-white focus-visible:[&>svg]:!text-white focus:outline-none focus:ring-0"
 										>
 											<Plus size={16} />
 											워드 추가하기
@@ -809,8 +1045,21 @@
 			<!-- 모바일 카드 레이아웃 -->
 			<div class="md:hidden">
 				{#each filteredWords as word, i}
-					<div class="p-4 hover:bg-surface-1/50 transition-colors {i > 0 ? 'border-t border-border-subtle' : ''}">
+					<div class="p-4 hover:bg-surface-1/50 transition-colors {i > 0 ? 'border-t border-border-subtle' : ''} {selectionMode && selectedIds.has(word.id) ? 'bg-brand-pink/10' : ''}">
 						<div class="flex items-start justify-between gap-3 mb-2">
+							{#if selectionMode}
+								<button
+									type="button"
+									onclick={() => toggleSelection(word.id)}
+									class="flex-shrink-0 flex items-center justify-center mt-0.5"
+								>
+									{#if selectedIds.has(word.id)}
+										<CheckSquare size={18} class="text-brand-pink" />
+									{:else}
+										<Square size={18} class="text-text-muted" />
+									{/if}
+								</button>
+							{/if}
 							<div class="flex-1 min-w-0">
 								<p class="text-sm font-medium text-text-base">{word.content}</p>
 								<div class="flex items-center gap-2 mt-1">
@@ -823,7 +1072,7 @@
 								</div>
 							</div>
 							<div class="flex items-center gap-1 flex-shrink-0">
-								<button type="button" class="btn-icon" aria-label="수정">
+								<button type="button" class="btn-icon" onclick={() => openEditModal(word)} aria-label="수정">
 									<Edit2 size={14} />
 								</button>
 								<button type="button" class="btn-icon text-red-400" onclick={() => deleteWord(word.id)} aria-label="삭제">
@@ -858,14 +1107,14 @@
 				{/each}
 				{#if filteredWords.length === 0}
 					<div class="px-4 py-12 text-center">
-						{#if searchQuery || selectedCategory !== 'all' || selectedCreator !== 'all'}
+						{#if searchQuery || selectedCategory !== 'all' || selectedCreator !== 'all' || selectedTag !== 'all'}
 							<div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-bg mb-4">
 								<SearchX size={28} class="text-text-muted" />
 							</div>
 							<p class="text-text-base font-medium mb-2">검색 결과가 없습니다</p>
 							<button
 								type="button"
-								onclick={() => { searchQuery = ''; selectedCategory = 'all'; selectedCreator = 'all'; }}
+								onclick={() => { searchQuery = ''; selectedCategory = 'all'; selectedCreator = 'all'; selectedTag = 'all'; }}
 								class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-brand-pink border border-brand-pink rounded-lg hover:bg-brand-pink hover:text-white transition-colors"
 							>
 								<X size={14} />
@@ -876,14 +1125,14 @@
 								<BookOpen size={28} class="text-text-muted" />
 							</div>
 							<p class="text-text-base font-medium mb-2">등록된 워드가 없습니다</p>
-							<button
-								type="button"
-								onclick={() => showAddModal = true}
-								class="inline-flex items-center gap-2 px-4 py-2 bg-brand-pink text-white text-sm font-medium rounded-lg hover:bg-brand-pink/90 transition-colors"
-							>
-								<Plus size={16} />
-								워드 추가하기
-							</button>
+						<button
+							type="button"
+							onclick={() => showAddModal = true}
+							class="page-header-action-button inline-flex items-center justify-center gap-2 px-4 py-2 w-full sm:w-auto rounded-lg transition-colors duration-200 font-medium page-header-primary-button bg-brand-pink text-[var(--surface-2)] hover:[&>svg]:!text-[var(--surface-2)] focus:bg-brand-pink focus:text-white focus:[&>svg]:!text-white focus-visible:bg-brand-pink focus-visible:text-white focus-visible:[&>svg]:!text-white focus:outline-none focus:ring-0"
+						>
+							<Plus size={16} />
+							워드 추가하기
+						</button>
 						{/if}
 					</div>
 				{/if}
@@ -1023,19 +1272,32 @@
 				</div>
 
 				<!-- 카테고리 -->
-				<div>
-					<label for="word-category" class="block text-sm font-medium text-text-strong mb-2">
-						카테고리
-					</label>
-					<select
-						id="word-category"
-						bind:value={newWord.category}
-						class="w-full py-1.5 px-4 bg-surface-2 border border-border-subtle rounded-md text-text-base focus:outline-none focus:border-brand-pink transition-colors"
+				<div class="relative add-modal-category-dropdown">
+					<span class="block text-sm font-medium text-text-strong mb-2">카테고리</span>
+					<button
+						type="button"
+						onclick={() => modalCategoryOpen = !modalCategoryOpen}
+						class="modal-category-btn w-full flex items-center justify-between px-4 py-2 bg-surface-2 border border-border-subtle rounded-md text-text-base transition-colors {modalCategoryOpen ? 'border-brand-pink' : ''}"
 					>
-						{#each WORD_CATEGORIES as cat}
-							<option value={cat.id}>{cat.name}</option>
-						{/each}
-					</select>
+						<span>{getCategoryName(newWord.category)}</span>
+						<ChevronDown size={14} class="text-text-muted transition-transform {modalCategoryOpen ? 'rotate-180' : ''}" />
+					</button>
+					{#if modalCategoryOpen}
+						<ul role="listbox" class="absolute left-0 right-0 mt-1 bg-surface-2 border border-border-subtle rounded-md z-20 max-h-48 overflow-y-auto custom-list-scrollbar">
+							{#each WORD_CATEGORIES as cat}
+								<li
+									role="option"
+									aria-selected={newWord.category === cat.id}
+									tabindex="0"
+									onclick={() => { newWord.category = cat.id; modalCategoryOpen = false; }}
+									onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { newWord.category = cat.id; modalCategoryOpen = false; } }}
+									class="dropdown-item px-4 py-2 text-sm cursor-pointer transition-colors {newWord.category === cat.id ? 'bg-brand-pink text-white' : 'text-text-base'}"
+								>
+									{cat.name}
+								</li>
+							{/each}
+						</ul>
+					{/if}
 				</div>
 
 				<!-- 태그 -->
@@ -1055,21 +1317,29 @@
 				<!-- 제작자 -->
 				<div>
 					<span id="creator-label" class="block text-sm font-medium text-text-strong mb-2">제작자</span>
-					<div class="flex gap-2" role="group" aria-labelledby="creator-label">
-						<button
-							type="button"
-							onclick={() => newWord.createdBy = 'El'}
-							class="flex-1 px-4 py-2 rounded-lg border {newWord.createdBy === 'El' ? 'bg-brand-pink text-white border-brand-pink' : 'btn-outline-hover bg-surface-2 text-text-base border-border-subtle'}"
-						>
-							El
-						</button>
-						<button
-							type="button"
-							onclick={() => newWord.createdBy = 'Otte'}
-							class="flex-1 px-4 py-2 rounded-lg border {newWord.createdBy === 'Otte' ? 'bg-brand-pink text-white border-brand-pink' : 'btn-outline-hover bg-surface-2 text-text-base border-border-subtle'}"
-						>
-							Otte
-						</button>
+					<div class="flex gap-4" role="group" aria-labelledby="creator-label">
+						<label class="flex items-center gap-2 cursor-pointer group">
+							<input
+								type="radio"
+								name="creator"
+								value="El"
+								checked={newWord.createdBy === 'El'}
+								onchange={() => newWord.createdBy = 'El'}
+								class="w-4 h-4 rounded-full appearance-none bg-transparent border border-[color:var(--text-base)] checked:bg-transparent checked:border-[color:var(--elotte-green)] hover:border-[color:var(--hover-point)] focus:ring-2 focus:ring-[#FF3DAE] transition-all duration-200 cursor-pointer relative"
+							/>
+							<span class="text-sm font-medium text-text-base transition-colors group-hover:text-elotte-green {newWord.createdBy === 'El' ? 'text-elotte-green' : ''}">El</span>
+						</label>
+						<label class="flex items-center gap-2 cursor-pointer group">
+							<input
+								type="radio"
+								name="creator"
+								value="Otte"
+								checked={newWord.createdBy === 'Otte'}
+								onchange={() => newWord.createdBy = 'Otte'}
+								class="w-4 h-4 rounded-full appearance-none bg-transparent border border-[color:var(--text-base)] checked:bg-transparent checked:border-[color:var(--elotte-orange)] hover:border-[color:var(--hover-point)] focus:ring-2 focus:ring-[#FF3DAE] transition-all duration-200 cursor-pointer relative"
+							/>
+							<span class="text-sm font-medium text-text-base transition-colors group-hover:text-elotte-orange {newWord.createdBy === 'Otte' ? 'text-elotte-orange' : ''}">Otte</span>
+						</label>
 					</div>
 				</div>
 
@@ -1087,6 +1357,153 @@
 						class="px-6 py-2 bg-brand-pink text-white rounded-lg transition-colors font-medium hover:bg-brand-pink/90"
 					>
 						추가
+					</button>
+				</div>
+			</form>
+		</div>
+	</div>
+{/if}
+
+<!-- 워드 수정 모달 -->
+{#if showEditModal && editingWord}
+	<div
+		class="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4"
+		onclick={closeEditModal}
+		onkeydown={(e) => { if (e.key === 'Escape') closeEditModal(); }}
+		role="dialog"
+		aria-modal="true"
+		tabindex="-1"
+	>
+		<!-- svelte-ignore a11y_no_static_element_interactions a11y_click_events_have_key_events -->
+		<div
+			class="bg-surface-1 rounded-lg border border-border-subtle w-full max-w-md"
+			onclick={(e) => e.stopPropagation()}
+			onkeydown={(e) => e.stopPropagation()}
+			role="presentation"
+		>
+			<div class="flex items-center justify-between px-6 py-4 border-b border-border-subtle">
+				<h2 class="text-lg font-semibold text-text-strong">워드 수정</h2>
+				<button
+					type="button"
+					onclick={closeEditModal}
+					class="template-close-btn w-8 h-8 flex items-center justify-center rounded-md text-text-muted transition-colors border border-transparent"
+					aria-label="닫기"
+				>
+					<X size={20} />
+				</button>
+			</div>
+
+			<form onsubmit={(e) => { e.preventDefault(); saveEdit(); }} class="p-6 space-y-4">
+				<!-- 내용 -->
+				<div>
+					<label for="edit-word-content" class="block text-sm font-medium text-text-strong mb-2">
+						내용
+					</label>
+					<input
+						type="text"
+						id="edit-word-content"
+						bind:value={editForm.content}
+						class="w-full py-1.5 px-4 bg-surface-2 border border-border-subtle rounded-md text-text-base focus:outline-none focus:border-brand-pink transition-colors"
+						placeholder="단어 또는 문구를 입력하세요"
+						required
+					/>
+				</div>
+
+				<!-- 카테고리 -->
+				<div class="relative edit-modal-category-dropdown">
+					<span class="block text-sm font-medium text-text-strong mb-2">카테고리</span>
+					<button
+						type="button"
+						onclick={() => editModalCategoryOpen = !editModalCategoryOpen}
+						class="modal-category-btn w-full flex items-center justify-between px-4 py-2 bg-surface-2 border border-border-subtle rounded-md text-text-base transition-colors {editModalCategoryOpen ? 'border-brand-pink' : ''}"
+					>
+						<span>{getCategoryName(editForm.category)}</span>
+						<ChevronDown size={14} class="text-text-muted transition-transform {editModalCategoryOpen ? 'rotate-180' : ''}" />
+					</button>
+					{#if editModalCategoryOpen}
+						<ul role="listbox" class="absolute left-0 right-0 mt-1 bg-surface-2 border border-border-subtle rounded-md z-20 max-h-48 overflow-y-auto custom-list-scrollbar">
+							{#each WORD_CATEGORIES as cat}
+								<li
+									role="option"
+									aria-selected={editForm.category === cat.id}
+									tabindex="0"
+									onclick={() => { editForm.category = cat.id; editModalCategoryOpen = false; }}
+									onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { editForm.category = cat.id; editModalCategoryOpen = false; } }}
+									class="dropdown-item px-4 py-2 text-sm cursor-pointer transition-colors {editForm.category === cat.id ? 'bg-brand-pink text-white' : 'text-text-base'}"
+								>
+									{cat.name}
+								</li>
+							{/each}
+						</ul>
+					{/if}
+				</div>
+
+				<!-- 태그 -->
+				<div>
+					<label for="edit-word-tags" class="block text-sm font-medium text-text-strong mb-2">
+						태그 (쉼표로 구분)
+					</label>
+					<input
+						type="text"
+						id="edit-word-tags"
+						bind:value={editForm.tags}
+						class="w-full py-1.5 px-4 bg-surface-2 border border-border-subtle rounded-md text-text-base focus:outline-none focus:border-brand-pink transition-colors"
+						placeholder="tag1, tag2, tag3"
+					/>
+				</div>
+
+				<!-- 제작자 -->
+				<div>
+					<span id="edit-creator-label" class="block text-sm font-medium text-text-strong mb-2">제작자</span>
+					<div class="flex gap-4" role="group" aria-labelledby="edit-creator-label">
+						<label class="flex items-center gap-2 cursor-pointer group">
+							<input
+								type="radio"
+								name="edit-creator"
+								value="El"
+								checked={editForm.createdBy === 'El'}
+								onchange={() => editForm.createdBy = 'El'}
+								class="w-4 h-4 rounded-full appearance-none bg-transparent border border-[color:var(--text-base)] checked:bg-transparent checked:border-[color:var(--elotte-green)] hover:border-[color:var(--hover-point)] focus:ring-2 focus:ring-[#FF3DAE] transition-all duration-200 cursor-pointer relative"
+							/>
+							<span class="text-sm font-medium text-text-base transition-colors group-hover:text-elotte-green {editForm.createdBy === 'El' ? 'text-elotte-green' : ''}">El</span>
+						</label>
+						<label class="flex items-center gap-2 cursor-pointer group">
+							<input
+								type="radio"
+								name="edit-creator"
+								value="Otte"
+								checked={editForm.createdBy === 'Otte'}
+								onchange={() => editForm.createdBy = 'Otte'}
+								class="w-4 h-4 rounded-full appearance-none bg-transparent border border-[color:var(--text-base)] checked:bg-transparent checked:border-[color:var(--elotte-orange)] hover:border-[color:var(--hover-point)] focus:ring-2 focus:ring-[#FF3DAE] transition-all duration-200 cursor-pointer relative"
+							/>
+							<span class="text-sm font-medium text-text-base transition-colors group-hover:text-elotte-orange {editForm.createdBy === 'Otte' ? 'text-elotte-orange' : ''}">Otte</span>
+						</label>
+					</div>
+				</div>
+
+				<!-- 사용 정보 (읽기 전용) -->
+				<div class="pt-2 border-t border-border-subtle">
+					<div class="flex items-center justify-between text-xs text-text-muted">
+						<span>사용 횟수: {editingWord.usageCount}회</span>
+						<span>연결 트랙: {editingWord.linkedTracks.length}개</span>
+						<span>생성일: {editingWord.createdAt}</span>
+					</div>
+				</div>
+
+				<!-- 버튼 -->
+				<div class="flex justify-end gap-3 pt-4">
+					<button
+						type="button"
+						onclick={closeEditModal}
+						class="cancel-button px-6 py-2 bg-surface-2 text-text-base rounded-lg border border-border-subtle transition-colors font-medium"
+					>
+						취소
+					</button>
+					<button
+						type="submit"
+						class="px-6 py-2 bg-brand-pink text-white rounded-lg transition-colors font-medium hover:bg-brand-pink/90"
+					>
+						저장
 					</button>
 				</div>
 			</form>

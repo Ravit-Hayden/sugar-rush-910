@@ -125,7 +125,9 @@ export const GET: RequestHandler = async ({ platform, url }) => {
 				],
 				expenseByCategory: [
 					{ category: '제작비', amount: 500000 },
-					{ category: '마케팅비', amount: 200000 }
+					{ category: '마케팅비', amount: 200000 },
+					{ category: '광고비', amount: 60000 },
+					{ category: '인건비', amount: 40000 }
 				],
 				monthlyRevenue: 15000,
 				monthlyExpense: 50000,

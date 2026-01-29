@@ -304,7 +304,7 @@
 	});
 </script>
 
-<header class="h-20 px-6 fixed top-0 left-0 right-0 z-[60] bg-bg" style="margin-left: {sidebarWidth}px;">
+<header class="h-20 px-6 fixed top-0 left-0 right-0 z-[60] bg-bg">
 	<div class="flex h-full items-center justify-between">
 		<!-- 왼쪽 섹션: 페이지 제목 -->
 		<div class="flex items-center gap-4">

@@ -32,7 +32,7 @@
 </script>
 
 <div class="card-base h-[396px] flex flex-col justify-between p-5 rounded-lg bg-surface-2 border border-border-subtle overflow-hidden pt-[24px]">
-	<div>
+	<div class="flex-1 min-h-0">
 		<!-- 상단 타이틀영역 -->
 		<div class="flex items-center justify-between mb-4">
 			<h3 class="text-lg font-bold text-text-strong truncate">최근 변경</h3>
@@ -80,7 +80,11 @@
 				{/each}
 				{#if displayChanges.length < 4}
 					{#each Array.from({length: 4 - displayChanges.length}) as _, i}
-						<div class="h-12 px-4 bg-surface-1 rounded opacity-0 pointer-events-none">&nbsp;</div>
+						<div class="flex items-center h-12 px-4 bg-surface-1 rounded min-w-0" aria-hidden="true">
+							<span class="flex-shrink-0 w-5 h-5 flex items-center justify-center mr-3 text-text-muted">—</span>
+							<span class="flex-1 text-sm text-text-muted truncate text-left min-w-0">—</span>
+							<span class="flex-shrink-0 text-xs text-text-muted ml-2">—</span>
+						</div>
 					{/each}
 				{/if}
 			{/if}
@@ -88,7 +92,10 @@
 	</div>
 
 	<!-- 하단 액션 -->
-	<a href="/changes" class="self-end text-brand-pink text-sm font-semibold px-2 py-1 rounded hover:bg-hover-cyan transition-colors mt-3">
-		더보기
-	</a>
+	<div class="flex items-center justify-between mt-3 flex-shrink-0">
+		<div class="flex gap-x-2 flex-wrap items-center">
+			<!-- 좌측 액션 버튼이 필요한 경우 여기에 추가 -->
+		</div>
+		<a href="/changes" class="text-brand-pink text-sm font-semibold px-2 py-1 rounded hover:bg-hover-cyan transition-colors">더보기</a>
+	</div>
 </div>

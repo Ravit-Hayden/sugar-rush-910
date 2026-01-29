@@ -24,6 +24,7 @@
 			if (wasMobile !== isMobile) {
 				sidebarCollapsed = true;
 				sidebarOpen = false;
+				updateBodyClass(); // 모바일 전환 시에도 동기화
 				window.dispatchEvent(new CustomEvent('sidebar-collapse-change', { 
 					detail: { collapsed: true } 
 				}));
@@ -44,6 +45,12 @@
 		if (typeof window !== 'undefined') {
 			if (window.innerWidth >= 768) {
 				sidebarCollapsed = !sidebarCollapsed;
+				
+				// body 클래스 동기화 (v3)
+				document.body.classList.toggle('sidebar-expanded', !sidebarCollapsed);
+				document.body.classList.toggle('sidebar-collapsed', sidebarCollapsed);
+				
+				// 기존 이벤트 시스템 유지 (호환성)
 				window.dispatchEvent(new CustomEvent('sidebar-collapse-change', { 
 					detail: { collapsed: sidebarCollapsed } 
 				}));
@@ -90,6 +97,14 @@
 		}
 	}
 
+	// body 클래스 동기화 함수
+	function updateBodyClass() {
+		if (typeof document !== 'undefined') {
+			document.body.classList.toggle('sidebar-expanded', !sidebarCollapsed);
+			document.body.classList.toggle('sidebar-collapsed', sidebarCollapsed);
+		}
+	}
+
 	// 컴포넌트 마운트 시 초기화
 	$effect(() => {
 		if (!browser) return () => {};
@@ -97,17 +112,22 @@
 		mounted = true;
 		checkScreenSize();
 		
+		// 초기 body 클래스 설정
+		updateBodyClass();
+		
 		window.dispatchEvent(new CustomEvent('sidebar-width-change', {
 			detail: { width: sidebarCollapsed ? 72 : 250 }
 		}));
 		
 		const handleResize = () => {
 			checkScreenSize();
+			updateBodyClass(); // 리사이즈 시에도 동기화
 		};
 		
 		const handleSidebarToggleEvent = (event: CustomEvent) => {
 			const newState = event.detail.state;
 			sidebarCollapsed = newState === 'collapsed';
+			updateBodyClass(); // ui.js 이벤트 시에도 동기화
 			
 			window.dispatchEvent(new CustomEvent('sidebar-width-change', {
 				detail: { width: sidebarCollapsed ? 72 : 250 }
@@ -127,7 +147,6 @@
 <!-- 사이드바 컨테이너 -->
 <aside 
 	class="top-0 fixed left-0 h-screen bg-surface-2 sidebar-border-right z-40 overflow-hidden"
-	style="width: {sidebarCollapsed ? '72px' : '250px'}; transition: width 200ms ease-in-out, transform 200ms ease-in-out;"
 >
 	<div class="h-full w-full overflow-hidden flex flex-col">
 		<!-- 상단 토글 버튼과 로고 -->
@@ -162,7 +181,7 @@
 				{/if}
 			</button>
 			
-			<div class="sidebar-text-animation ml-3 {sidebarCollapsed ? 'collapsed' : 'expanded'}">
+			<div class="sidebar-text ml-3">
 				<img src="/logo.svg" alt="Sugar Rush" class="h-6 w-auto" />
 			</div>
 		</div>
@@ -185,7 +204,7 @@
 	<IconComponent size={20} class="lucide-icon transition-colors duration-200 ease-in-out" />
 </div>
 							
-							<div class="sidebar-text-animation ml-3 {sidebarCollapsed ? 'collapsed' : 'expanded'}">
+							<div class="sidebar-text ml-3">
 								<span class="text-sm whitespace-nowrap hidden md:inline">{item.label}</span>
 							</div>
 						</a>

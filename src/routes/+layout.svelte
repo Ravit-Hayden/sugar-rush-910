@@ -29,14 +29,26 @@
 		searchResults = { exact: [], similar: [] };
 	}
 
+	// body 클래스 동기화 함수
+	function updateBodyClass() {
+		if (typeof document !== 'undefined') {
+			document.body.classList.toggle('sidebar-expanded', !sidebarCollapsed);
+			document.body.classList.toggle('sidebar-collapsed', sidebarCollapsed);
+		}
+	}
+
 	// 사이드바 및 검색 이벤트 처리
 	$effect(() => {
 		if (typeof window === 'undefined') {
 			return () => {}; // SSR 시 빈 cleanup 함수 반환
 		}
 
+		// 초기 body 클래스 설정
+		updateBodyClass();
+
 		const handleSidebarCollapseChange = (event: CustomEvent) => {
 			sidebarCollapsed = event.detail.collapsed;
+			updateBodyClass(); // 이벤트 시에도 동기화
 		};
 
 		const handleSidebarToggle = (event: CustomEvent) => {
@@ -49,6 +61,7 @@
 		const handleUISidebarToggle = (event: CustomEvent) => {
 			const newState = event.detail.state;
 			sidebarCollapsed = newState === 'collapsed';
+			updateBodyClass(); // ui.js 이벤트 시에도 동기화
 		};
 
 		// 검색 상태 변경 이벤트 리스너

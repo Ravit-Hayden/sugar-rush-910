@@ -18,24 +18,25 @@
   function applySidebar(state) {
     const main = document.querySelector('.main-content-area');
     const aside = document.querySelector('aside');
-    const texts = document.querySelectorAll('.sidebar-text-animation');
 
     if (!main || !aside) return;
+
+    // body 클래스 동기화 (v3)
+    document.body.classList.toggle('sidebar-expanded', state === 'expanded');
+    document.body.classList.toggle('sidebar-collapsed', state === 'collapsed');
 
     // Svelte 컴포넌트의 상태와 동기화하기 위해 커스텀 이벤트 발생
     window.dispatchEvent(new CustomEvent('sidebar-toggle', { 
       detail: { state: state } 
     }));
 
-    // 메인 컨텐츠 영역 클래스 업데이트
+    // 메인 컨텐츠 영역 클래스 업데이트 (기존 호환성 유지)
     if (state === 'expanded') {
       main.classList.remove('sidebar-collapsed');
       main.classList.add('sidebar-expanded');
-      texts.forEach(el => { el.classList.remove('collapsed'); el.classList.add('expanded'); });
     } else {
       main.classList.remove('sidebar-expanded');
       main.classList.add('sidebar-collapsed');
-      texts.forEach(el => { el.classList.remove('expanded'); el.classList.add('collapsed'); });
     }
     localStorage.setItem(SIDEBAR_KEY, state);
   }

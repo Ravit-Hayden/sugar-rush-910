@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Shuffle, Copy, Check, Plus, Minus, Sparkles, ChevronDown, Layers, Music, Wrench, RotateCcw, Ban, X } from 'lucide-svelte';
+	import { Shuffle, Copy, Check, Plus, Minus, Sparkles, ChevronDown, Layers, Music, Wrench, RotateCcw, Ban, X, History, Trash2, Star, Save } from 'lucide-svelte';
 	import { WORD_CATEGORIES, getCategoryName } from '$lib/constants/suno/categories';
 	import type { WordEntry, WordCategory } from '$lib/types/suno';
 
@@ -341,8 +341,146 @@
 	// 1000자 초과 여부
 	const isOverLimit = $derived(excludeCharCount > 1000);
 
+	// ========== 제외 스타일 프리셋 ==========
+	type ExcludePreset = { id: string; name: string; description: string; items: string[] };
+	const EXCLUDE_PRESETS: ExcludePreset[] = [
+		{
+			id: 'clear_all',
+			name: '전체 해제',
+			description: '모든 제외 스타일 해제',
+			items: []
+		},
+		{
+			id: 'kpop_clean',
+			name: 'K-Pop 클린',
+			description: 'K-Pop에 어울리지 않는 스타일 제외',
+			items: ['heavy metal', 'death metal', 'screaming', 'growling', 'aggressive', 'harsh', 'distorted', 'opera', 'country twang', 'mumble rap', 'yelling', 'shouting', 'horror', 'creepy', 'lo-fi quality', 'poor recording', 'amateur']
+		},
+		{
+			id: 'ballad_soft',
+			name: '발라드 소프트',
+			description: '발라드에 방해되는 스타일 제외',
+			items: ['heavy metal', 'death metal', 'punk rock', 'industrial', 'screaming', 'growling', 'yelling', 'aggressive', 'harsh', 'chaotic', 'fast', 'very fast', 'autotune heavy', 'robotic voice', 'trap', 'drill', 'breakbeat']
+		},
+		{
+			id: 'edm_party',
+			name: 'EDM/파티',
+			description: '파티 음악에 어울리지 않는 스타일 제외',
+			items: ['slow', 'very slow', 'calm', 'peaceful', 'melancholic', 'sad', 'mournful', 'somber', 'opera', 'classical', 'ballad', 'acoustic only', 'folk', 'country', 'horror', 'creepy', 'whisper']
+		},
+		{
+			id: 'rnb_smooth',
+			name: 'R&B 스무스',
+			description: 'R&B에 어울리지 않는 스타일 제외',
+			items: ['heavy metal', 'death metal', 'punk rock', 'screaming', 'growling', 'yelling', 'country twang', 'opera', 'polka', 'march', 'very fast', 'aggressive', 'harsh', 'chaotic', 'discordant']
+		},
+		{
+			id: 'hiphop_clean',
+			name: '힙합 클린',
+			description: '클린한 힙합 스타일 (과격한 요소 제외)',
+			items: ['screaming', 'growling', 'opera', 'classical vocals', 'country twang', 'yodeling', 'children choir', 'horror', 'creepy', 'polka', 'waltz', 'lo-fi quality', 'poor recording']
+		},
+		{
+			id: 'vocal_focus',
+			name: '보컬 포커스',
+			description: '깨끗한 보컬을 위한 제외 설정',
+			items: ['autotune heavy', 'robotic voice', 'vocoder', 'screaming', 'growling', 'yelling', 'shouting', 'nasal', 'breathy', 'husky', 'off-key', 'out of tune', 'mumbling', 'slurred', 'monotone']
+		},
+		{
+			id: 'instrumental',
+			name: '인스트루멘탈',
+			description: '연주곡에 방해되는 보컬 스타일 제외',
+			items: ['screaming', 'growling', 'yelling', 'shouting', 'autotune heavy', 'robotic voice', 'children choir', 'choir', 'opera', 'classical vocals', 'mumble rap', 'rap', 'spoken word']
+		}
+	];
+
+	// 제외 스타일 프리셋 적용
+	function applyExcludePreset(preset: ExcludePreset) {
+		selectedExcludes = new Set(preset.items);
+	}
+
 	// 제외 스타일 섹션 펼침 상태
 	let excludeExpanded = $state(false);
+
+	// ========== 조합 히스토리 ==========
+	type HistoryItem = { id: string; result: string; createdAt: string };
+	let combinationHistory = $state<HistoryItem[]>([]);
+	let showHistory = $state(false);
+	const MAX_HISTORY = 20;
+
+	// 히스토리에 추가
+	function addToHistory(result: string) {
+		if (!result.trim()) return;
+		const newItem: HistoryItem = {
+			id: `history_${Date.now()}`,
+			result,
+			createdAt: new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })
+		};
+		// 중복 제거 후 앞에 추가
+		combinationHistory = [newItem, ...combinationHistory.filter(h => h.result !== result)].slice(0, MAX_HISTORY);
+	}
+
+	// 히스토리 항목 사용
+	function useHistoryItem(item: HistoryItem) {
+		combinedResult = item.result;
+		showHistory = false;
+	}
+
+	// 히스토리 항목 삭제
+	function deleteHistoryItem(id: string) {
+		combinationHistory = combinationHistory.filter(h => h.id !== id);
+	}
+
+	// 히스토리 전체 삭제
+	function clearHistory() {
+		if (confirm('히스토리를 모두 삭제하시겠습니까?')) {
+			combinationHistory = [];
+		}
+	}
+
+	// ========== 즐겨찾기 프리셋 ==========
+	type FavoritePreset = { 
+		id: string; 
+		name: string; 
+		selections: Record<WordCategory, number>;
+		createdAt: string;
+	};
+	let favoritePresets = $state<FavoritePreset[]>([]);
+	let showFavorites = $state(false);
+	let newPresetName = $state('');
+	let showSavePresetInput = $state(false);
+	const MAX_FAVORITES = 10;
+
+	// 현재 선택을 즐겨찾기로 저장
+	function saveFavoritePreset() {
+		if (!newPresetName.trim()) return;
+		if (totalSelected === 0) {
+			alert('최소 하나의 카테고리를 선택해주세요.');
+			return;
+		}
+		
+		const newPreset: FavoritePreset = {
+			id: `fav_${Date.now()}`,
+			name: newPresetName.trim(),
+			selections: { ...categorySelections },
+			createdAt: new Date().toLocaleDateString('ko-KR')
+		};
+		
+		favoritePresets = [...favoritePresets, newPreset].slice(-MAX_FAVORITES);
+		newPresetName = '';
+		showSavePresetInput = false;
+	}
+
+	// 즐겨찾기 프리셋 적용
+	function applyFavoritePreset(preset: FavoritePreset) {
+		categorySelections = { ...preset.selections };
+		showFavorites = false;
+	}
+
+	// 즐겨찾기 삭제
+	function deleteFavoritePreset(id: string) {
+		favoritePresets = favoritePresets.filter(p => p.id !== id);
+	}
 
 	// 카테고리별 워드 그룹 (제외 카테고리 제외)
 	const wordsByCategory = $derived.by(() => {
@@ -406,6 +544,7 @@
 		});
 
 		combinedResult = selected.join(', ');
+		addToHistory(combinedResult);
 	}
 
 	// 결과 복사
@@ -805,119 +944,208 @@
 
 <div class="bg-surface-1 rounded-lg border border-border-subtle overflow-hidden">
 	<!-- 헤더 -->
-	<div class="px-6 py-4 border-b border-border-subtle">
-		<div class="flex items-center justify-between mb-3">
-			<div class="flex items-center gap-2">
-				<Sparkles size={20} class="text-brand-pink combinator-header-icon" />
-				<h3 class="text-lg font-semibold text-text-strong">랜덤 조합 생성기</h3>
+	<div class="px-4 py-3 sm:px-6 sm:py-4 border-b border-border-subtle">
+		<!-- 타이틀 + 버튼 -->
+		<div class="flex items-center justify-between gap-3 mb-4">
+			<div class="flex items-center gap-2 min-w-0">
+				<Sparkles size={18} class="text-brand-pink combinator-header-icon flex-shrink-0" />
+				<h3 class="text-base sm:text-lg font-semibold text-text-strong truncate">랜덤 조합 생성기</h3>
 			</div>
-			<div class="flex items-center gap-2">
+			<div class="flex items-center gap-1.5 flex-shrink-0">
 				<button
 					type="button"
 					onclick={resetSelections}
-					class="combinator-reset-btn flex items-center gap-1 px-3 py-1.5 text-sm rounded-md text-text-muted transition-colors outline-none focus:outline-none"
+					class="combinator-reset-btn flex items-center gap-1 px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm rounded-md text-text-muted transition-colors outline-none"
 				>
 					<RotateCcw size={14} />
-					초기화
+					<span class="hidden sm:inline">초기화</span>
 				</button>
 				{#if onClose}
 					<button
 						type="button"
 						onclick={onClose}
-						class="w-8 h-8 flex items-center justify-center rounded-md text-text-muted hover:text-hover-point hover:bg-surface-2 transition-colors"
+						class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-md text-text-muted hover:text-hover-point hover:bg-surface-2 transition-colors"
 						aria-label="닫기"
 					>
-						<X size={18} />
+						<X size={16} />
 					</button>
 				{/if}
 			</div>
 		</div>
 		
-		<!-- 프리셋 그룹 탭 -->
-		<div class="flex items-center gap-3 mb-4">
-			<span class="text-xs text-text-muted flex-shrink-0">프리셋 그룹</span>
-			<div class="flex flex-wrap items-center gap-2">
+		<!-- 프리셋 그룹 탭 - 수평 스크롤 on mobile -->
+		<div class="mb-3">
+			<div class="flex items-center gap-1.5 overflow-x-auto pb-2 -mb-2 scrollbar-hide">
 				<button
 					type="button"
 					onclick={() => selectedPresetGroup = 'basic'}
-					class="preset-group-btn flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md transition-colors {selectedPresetGroup === 'basic' ? 'active border-brand-pink text-brand-pink' : 'border-border-subtle text-text-base'} bg-surface-2 border"
+					class="preset-group-btn flex items-center gap-1 px-2.5 py-1.5 text-xs sm:text-sm rounded-md transition-colors whitespace-nowrap flex-shrink-0 {selectedPresetGroup === 'basic' ? 'active border-brand-pink text-brand-pink bg-brand-pink/10' : 'border-border-subtle text-text-muted hover:text-text-base'} border"
 				>
-					<Layers size={14} class="pointer-events-none" />
+					<Layers size={13} class="pointer-events-none" />
 					기본
 				</button>
 				<button
 					type="button"
 					onclick={() => selectedPresetGroup = 'genre'}
-					class="preset-group-btn flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md transition-colors {selectedPresetGroup === 'genre' ? 'active border-brand-pink text-brand-pink' : 'border-border-subtle text-text-base'} bg-surface-2 border"
+					class="preset-group-btn flex items-center gap-1 px-2.5 py-1.5 text-xs sm:text-sm rounded-md transition-colors whitespace-nowrap flex-shrink-0 {selectedPresetGroup === 'genre' ? 'active border-brand-pink text-brand-pink bg-brand-pink/10' : 'border-border-subtle text-text-muted hover:text-text-base'} border"
 				>
-					<Music size={14} class="pointer-events-none" />
-					장르별
+					<Music size={13} class="pointer-events-none" />
+					장르
 				</button>
 				<button
 					type="button"
 					onclick={() => selectedPresetGroup = 'mood'}
-					class="preset-group-btn flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md transition-colors {selectedPresetGroup === 'mood' ? 'active border-brand-pink text-brand-pink' : 'border-border-subtle text-text-base'} bg-surface-2 border"
+					class="preset-group-btn flex items-center gap-1 px-2.5 py-1.5 text-xs sm:text-sm rounded-md transition-colors whitespace-nowrap flex-shrink-0 {selectedPresetGroup === 'mood' ? 'active border-brand-pink text-brand-pink bg-brand-pink/10' : 'border-border-subtle text-text-muted hover:text-text-base'} border"
 				>
-					<Sparkles size={14} class="pointer-events-none preset-group-icon" />
+					<Sparkles size={13} class="pointer-events-none preset-group-icon" />
 					분위기
 				</button>
 				<button
 					type="button"
 					onclick={() => selectedPresetGroup = 'production'}
-					class="preset-group-btn flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md transition-colors {selectedPresetGroup === 'production' ? 'active border-brand-pink text-brand-pink' : 'border-border-subtle text-text-base'} bg-surface-2 border"
+					class="preset-group-btn flex items-center gap-1 px-2.5 py-1.5 text-xs sm:text-sm rounded-md transition-colors whitespace-nowrap flex-shrink-0 {selectedPresetGroup === 'production' ? 'active border-brand-pink text-brand-pink bg-brand-pink/10' : 'border-border-subtle text-text-muted hover:text-text-base'} border"
 				>
-					<Wrench size={14} class="pointer-events-none" />
-					제작용
+					<Wrench size={13} class="pointer-events-none" />
+					제작
+				</button>
+				<div class="w-px h-5 bg-border-subtle flex-shrink-0"></div>
+				<button
+					type="button"
+					onclick={() => showFavorites = !showFavorites}
+					class="preset-group-btn flex items-center gap-1 px-2.5 py-1.5 text-xs sm:text-sm rounded-md transition-colors whitespace-nowrap flex-shrink-0 {showFavorites ? 'active border-brand-pink text-brand-pink bg-brand-pink/10' : 'border-border-subtle text-text-muted hover:text-text-base'} border"
+				>
+					<Star size={13} class="pointer-events-none" />
+					즐겨찾기
+					{#if favoritePresets.length > 0}
+						<span class="text-[10px] opacity-70">({favoritePresets.length})</span>
+					{/if}
 				</button>
 			</div>
 		</div>
+
+		<!-- 즐겨찾기 프리셋 영역 -->
+		{#if showFavorites}
+			<div class="mb-3 p-3 rounded-lg bg-surface-2/30 border border-border-subtle">
+				<div class="flex items-center justify-between gap-2 mb-2">
+					<span class="text-xs font-medium text-text-muted">나만의 프리셋</span>
+					{#if !showSavePresetInput}
+						<button
+							type="button"
+							onclick={() => showSavePresetInput = true}
+							class="btn-outline-hover flex items-center gap-1 px-2 py-1 text-[10px] sm:text-xs rounded border border-border-subtle text-text-muted"
+						>
+							<Save size={10} />
+							저장
+						</button>
+					{/if}
+				</div>
+
+				{#if showSavePresetInput}
+					<div class="flex items-center gap-2 mb-2">
+						<input
+							type="text"
+							bind:value={newPresetName}
+							placeholder="프리셋 이름"
+							class="flex-1 min-w-0 px-2.5 py-1.5 text-xs sm:text-sm bg-surface-1 border border-border-subtle rounded-md text-text-base focus:outline-none focus:border-brand-pink"
+							onkeydown={(e) => { if (e.key === 'Enter') saveFavoritePreset(); if (e.key === 'Escape') showSavePresetInput = false; }}
+						/>
+						<button
+							type="button"
+							onclick={saveFavoritePreset}
+							class="px-2.5 py-1.5 text-xs bg-brand-pink text-white rounded-md hover:bg-brand-pink/90 transition-colors flex-shrink-0"
+						>
+							저장
+						</button>
+						<button
+							type="button"
+							onclick={() => { showSavePresetInput = false; newPresetName = ''; }}
+							class="btn-icon w-7 h-7 flex-shrink-0"
+						>
+							<X size={12} />
+						</button>
+					</div>
+				{/if}
+
+				{#if favoritePresets.length === 0}
+					<p class="text-[10px] sm:text-xs text-text-muted text-center py-2">
+						저장된 프리셋이 없습니다
+					</p>
+				{:else}
+					<div class="flex flex-wrap gap-1.5">
+						{#each favoritePresets as preset}
+							<div class="group flex items-center gap-0.5 px-2 py-1 rounded bg-surface-1 border border-border-subtle">
+								<button
+									type="button"
+									onclick={() => applyFavoritePreset(preset)}
+									class="text-xs text-text-base hover:text-hover-point transition-colors"
+								>
+									{preset.name}
+								</button>
+								<button
+									type="button"
+									onclick={() => deleteFavoritePreset(preset.id)}
+									class="btn-icon w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity ml-0.5"
+									aria-label="삭제"
+								>
+									<X size={8} />
+								</button>
+							</div>
+						{/each}
+					</div>
+				{/if}
+			</div>
+		{/if}
 		
 		<!-- 선택된 그룹의 프리셋 버튼들 -->
-		<div class="flex items-center gap-3">
-			<span class="text-xs text-text-muted flex-shrink-0">빠른 적용</span>
-			<div class="flex flex-wrap gap-2">
-				{#each filteredPresets as preset}
-					<button
-						type="button"
-						onclick={() => applyPreset(preset.id)}
-						class="combinator-preset-btn px-3 py-1.5 text-sm rounded-md bg-surface-2 border border-border-subtle text-text-base transition-colors outline-none focus:outline-none"
-						title={preset.description}
-					>
-						{preset.name}
-					</button>
-				{/each}
-			</div>
+		<div class="flex flex-wrap gap-1.5">
+			{#each filteredPresets as preset}
+				<button
+					type="button"
+					onclick={() => applyPreset(preset.id)}
+					class="combinator-preset-btn px-2.5 py-1 text-xs sm:text-sm rounded-md bg-surface-2 border border-border-subtle text-text-base transition-colors outline-none"
+					title={preset.description}
+				>
+					{preset.name}
+				</button>
+			{/each}
 		</div>
 	</div>
 
-	<!-- 카테고리 선택 (제외 카테고리 제외) -->
-	<div class="p-6">
-		<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+	<!-- 카테고리 선택 -->
+	<div class="p-4 sm:p-6">
+		<!-- 섹션 라벨 -->
+		<div class="flex items-center justify-between mb-3">
+			<span class="text-xs text-text-muted">카테고리별 선택 개수</span>
+			<span class="text-xs text-brand-pink font-medium">{totalSelected}개 선택됨</span>
+		</div>
+		
+		<!-- 카테고리 그리드 -->
+		<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 sm:gap-3">
 			{#each RANDOM_CATEGORIES as cat}
 				{@const available = wordsByCategory[cat.id]?.length || 0}
 				{@const selected = categorySelections[cat.id]}
-				<div class="flex items-center justify-between p-3 rounded-lg bg-surface-2 {selected > 0 ? 'ring-1 ring-brand-pink' : ''}">
-					<div class="flex-1 min-w-0">
-						<div class="text-sm font-medium text-text-base truncate">{cat.name}</div>
-						<div class="text-xs text-text-muted">{available}개</div>
+				<div class="flex items-center justify-between p-2 sm:p-3 rounded-lg bg-surface-2 transition-all {selected > 0 ? 'ring-1 ring-brand-pink/50 bg-brand-pink/5' : ''}">
+					<div class="flex-1 min-w-0 mr-2">
+						<div class="text-xs sm:text-sm font-medium text-text-base truncate">{cat.name}</div>
+						<div class="text-[10px] sm:text-xs text-text-muted">{available}개</div>
 					</div>
-					<div class="flex items-center gap-1">
+					<div class="flex items-center gap-0.5 sm:gap-1 flex-shrink-0">
 						<button
 							type="button"
 							onclick={() => decrementCategory(cat.id)}
 							disabled={selected === 0}
-							class="combinator-counter-btn w-6 h-6 flex items-center justify-center rounded bg-surface-1 text-text-muted disabled:opacity-30 transition-colors outline-none focus:outline-none"
+							class="combinator-counter-btn w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center rounded bg-surface-1 text-text-muted disabled:opacity-30 transition-colors outline-none"
 						>
-							<Minus size={12} />
+							<Minus size={10} class="sm:w-3 sm:h-3" />
 						</button>
-						<span class="w-6 text-center text-sm font-medium text-text-base">{selected}</span>
+						<span class="w-5 sm:w-6 text-center text-xs sm:text-sm font-medium {selected > 0 ? 'text-brand-pink' : 'text-text-base'}">{selected}</span>
 						<button
 							type="button"
 							onclick={() => incrementCategory(cat.id)}
 							disabled={selected >= available}
-							class="combinator-counter-btn w-6 h-6 flex items-center justify-center rounded bg-surface-1 text-text-muted disabled:opacity-30 transition-colors outline-none focus:outline-none"
+							class="combinator-counter-btn w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center rounded bg-surface-1 text-text-muted disabled:opacity-30 transition-colors outline-none"
 						>
-							<Plus size={12} />
+							<Plus size={10} class="sm:w-3 sm:h-3" />
 						</button>
 					</div>
 				</div>
@@ -925,37 +1153,37 @@
 		</div>
 
 		<!-- 생성 버튼 -->
-		<div class="mt-6 flex items-center justify-center gap-4">
+		<div class="mt-4 sm:mt-6">
 			<button
 				type="button"
 				onclick={generateCombination}
 				disabled={totalSelected === 0}
-				class="flex items-center gap-2 px-6 py-3 bg-brand-pink text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed hover:bg-brand-pink/90"
+				class="w-full sm:w-auto sm:mx-auto flex items-center justify-center gap-2 px-5 py-2.5 sm:px-6 sm:py-3 bg-brand-pink text-white rounded-lg text-sm sm:text-base font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed hover:bg-brand-pink/90"
 			>
-				<Shuffle size={18} />
-				랜덤 조합 생성 ({totalSelected}개 선택)
+				<Shuffle size={16} class="sm:w-[18px] sm:h-[18px]" />
+				조합 생성
 			</button>
 		</div>
 
 		<!-- 결과 -->
 		{#if combinedResult}
-			<div class="mt-6 p-4 rounded-lg bg-surface-2 border border-border-subtle">
-				<div class="flex items-start justify-between gap-4">
-					<div class="flex-1">
-						<div class="text-xs text-text-muted mb-2">생성된 조합</div>
-						<div class="text-base text-text-strong font-medium">{combinedResult}</div>
+			<div class="mt-4 sm:mt-6 p-3 sm:p-4 rounded-lg bg-surface-2 border border-brand-pink/30">
+				<div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+					<div class="flex-1 min-w-0">
+						<div class="text-[10px] sm:text-xs text-text-muted mb-1">생성된 조합</div>
+						<div class="text-sm sm:text-base text-text-strong font-medium break-words">{combinedResult}</div>
 					</div>
 					<div class="flex items-center gap-2 flex-shrink-0">
 						<button
 							type="button"
 							onclick={copyResult}
-							class="flex items-center gap-1 px-3 py-1.5 rounded-md bg-surface-1 text-text-base text-sm hover:bg-surface-1/80 transition-colors"
+							class="flex-1 sm:flex-initial flex items-center justify-center gap-1 px-3 py-1.5 rounded-md bg-surface-1 text-text-base text-xs sm:text-sm hover:bg-surface-1/80 transition-colors"
 						>
 							{#if copied}
-								<Check size={14} class="text-green-500" />
+								<Check size={12} class="text-green-500" />
 								복사됨
 							{:else}
-								<Copy size={14} />
+								<Copy size={12} />
 								복사
 							{/if}
 						</button>
@@ -963,7 +1191,7 @@
 							<button
 								type="button"
 								onclick={useResult}
-								class="flex items-center gap-1 px-3 py-1.5 rounded-md bg-brand-pink text-white text-sm hover:bg-brand-pink/90 transition-colors"
+								class="flex-1 sm:flex-initial flex items-center justify-center gap-1 px-3 py-1.5 rounded-md bg-brand-pink text-white text-xs sm:text-sm hover:bg-brand-pink/90 transition-colors"
 							>
 								사용하기
 							</button>
@@ -973,59 +1201,128 @@
 			</div>
 		{/if}
 
+		<!-- 조합 히스토리 -->
+		{#if combinationHistory.length > 0}
+			<div class="mt-4 sm:mt-6 rounded-lg bg-surface-2/30 border border-border-subtle overflow-hidden">
+				<button
+					type="button"
+					onclick={() => showHistory = !showHistory}
+					class="w-full px-3 sm:px-4 py-2.5 flex items-center justify-between hover:bg-surface-1/30 transition-colors"
+				>
+					<div class="flex items-center gap-2">
+						<History size={14} class="text-text-muted" />
+						<span class="text-xs sm:text-sm font-medium text-text-base">히스토리</span>
+						<span class="text-[10px] sm:text-xs text-text-muted bg-surface-1 px-1.5 py-0.5 rounded">{combinationHistory.length}</span>
+					</div>
+					<ChevronDown size={12} class="text-text-muted transition-transform {showHistory ? 'rotate-180' : ''}" />
+				</button>
+
+				{#if showHistory}
+					<div class="border-t border-border-subtle">
+						<div class="p-1.5 sm:p-2 max-h-[160px] sm:max-h-[200px] overflow-y-auto custom-list-scrollbar">
+							{#each combinationHistory as item}
+								<div class="flex items-center gap-2 px-2 sm:px-3 py-1.5 sm:py-2 rounded-md hover:bg-surface-1/50 transition-colors group">
+									<button
+										type="button"
+										onclick={() => useHistoryItem(item)}
+										class="flex-1 text-left text-xs sm:text-sm text-text-base truncate hover:text-hover-point transition-colors"
+										title={item.result}
+									>
+										{item.result}
+									</button>
+									<span class="text-[10px] sm:text-xs text-text-muted flex-shrink-0 hidden sm:block">{item.createdAt}</span>
+									<button
+										type="button"
+										onclick={() => deleteHistoryItem(item.id)}
+										class="btn-icon w-5 h-5 sm:w-6 sm:h-6 opacity-50 sm:opacity-0 group-hover:opacity-100 transition-opacity"
+										aria-label="삭제"
+									>
+										<X size={10} />
+									</button>
+								</div>
+							{/each}
+						</div>
+						<div class="px-3 py-1.5 border-t border-border-subtle flex justify-end">
+							<button
+								type="button"
+								onclick={clearHistory}
+								class="flex items-center gap-1 text-[10px] sm:text-xs text-text-muted hover:text-red-400 transition-colors"
+							>
+								<Trash2 size={10} />
+								전체 삭제
+							</button>
+						</div>
+					</div>
+				{/if}
+			</div>
+		{/if}
+
 		<!-- 제외 스타일 섹션 -->
-		<div class="mt-6 rounded-lg bg-surface-2/50 border border-border-subtle overflow-hidden">
+		<div class="mt-4 sm:mt-6 rounded-lg bg-surface-2/30 border border-border-subtle overflow-hidden">
 			<!-- 헤더 -->
-			<div class="px-4 py-3 flex items-center justify-between">
+			<div class="px-3 sm:px-4 py-2.5 flex items-center justify-between gap-2">
 				<button
 					type="button"
 					onclick={() => excludeExpanded = !excludeExpanded}
-					class="flex items-center gap-2 hover:text-hover-point transition-colors"
+					class="flex items-center gap-1.5 sm:gap-2 hover:text-hover-point transition-colors min-w-0"
 				>
-					<Ban size={16} class="text-red-500" />
-					<span class="text-sm font-medium text-text-base">제외 스타일</span>
-					<span class="text-xs {isOverLimit ? 'text-red-500 font-medium' : 'text-text-muted'}">
-						({excludeCharCount}/1000자)
+					<Ban size={14} class="text-red-500 flex-shrink-0" />
+					<span class="text-xs sm:text-sm font-medium text-text-base">제외 스타일</span>
+					<span class="text-[10px] sm:text-xs px-1.5 py-0.5 rounded {isOverLimit ? 'bg-red-500/20 text-red-400' : 'bg-surface-1 text-text-muted'}">
+						{excludeCharCount}/1000
 					</span>
-					{#if isOverLimit}
-						<span class="text-xs text-red-500">초과!</span>
-					{/if}
-					<ChevronDown size={14} class="text-text-muted transition-transform {excludeExpanded ? 'rotate-180' : ''}" />
+					<ChevronDown size={12} class="text-text-muted transition-transform flex-shrink-0 {excludeExpanded ? 'rotate-180' : ''}" />
 				</button>
 				{#key excludeCopied}
 					<button
 						type="button"
 						onclick={copyExcludeStyles}
-						class="exclude-copy-btn btn-outline-hover flex items-center gap-1 px-3 py-1.5 rounded-md border border-border-subtle text-sm {excludeCopied ? 'text-brand-pink border-brand-pink' : 'text-text-base'}"
+						class="exclude-copy-btn btn-outline-hover flex items-center gap-1 px-2 py-1 sm:px-3 sm:py-1.5 rounded-md border border-border-subtle text-xs sm:text-sm flex-shrink-0 {excludeCopied ? 'text-brand-pink border-brand-pink' : 'text-text-base'}"
 					>
 						{#if excludeCopied}
-							<Check size={14} />
-							복사됨
+							<Check size={12} />
+							<span class="hidden sm:inline">복사됨</span>
 						{:else}
-							<Copy size={14} />
-							복사
+							<Copy size={12} />
+							<span class="hidden sm:inline">복사</span>
 						{/if}
 					</button>
 				{/key}
 			</div>
 
 			<!-- 선택된 스타일 미리보기 -->
-			<div class="px-4 pb-3 border-b border-border-subtle">
-				<p class="text-xs text-text-muted leading-relaxed line-clamp-2">
+			<div class="px-3 sm:px-4 pb-2.5 border-b border-border-subtle">
+				<p class="text-[10px] sm:text-xs text-text-muted leading-relaxed line-clamp-2">
 					{excludeStylesText || '선택된 제외 스타일이 없습니다'}
 				</p>
 			</div>
 
 			<!-- 펼침 시 카테고리별 선택 UI -->
 			{#if excludeExpanded}
-				<div class="p-4 space-y-4">
+				<!-- 장르별 프리셋 -->
+				<div class="px-3 sm:px-4 pt-2.5 pb-2 border-b border-border-subtle">
+					<span class="text-[10px] sm:text-xs text-text-muted mb-1.5 block">빠른 프리셋</span>
+					<div class="flex flex-wrap gap-1">
+						{#each EXCLUDE_PRESETS as preset}
+							<button
+								type="button"
+								onclick={() => applyExcludePreset(preset)}
+								class="exclude-preset-btn px-1.5 py-0.5 sm:px-2 sm:py-1 text-[10px] sm:text-xs rounded bg-surface-1 border border-border-subtle text-text-muted transition-colors"
+								title={preset.description}
+							>
+								{preset.name}
+							</button>
+						{/each}
+					</div>
+				</div>
+				<div class="p-3 sm:p-4 space-y-3 sm:space-y-4 max-h-[300px] sm:max-h-[400px] overflow-y-auto custom-list-scrollbar">
 					{#each EXCLUDE_CATEGORIES as category}
 						<div>
 							<!-- 카테고리 헤더 -->
 							<button
 								type="button"
 								onclick={() => toggleCategory(category)}
-								class="flex items-center gap-2 mb-2 text-xs font-medium text-text-muted hover:text-hover-point transition-colors"
+								class="flex items-center gap-1.5 mb-1.5 text-[10px] sm:text-xs font-medium text-text-muted hover:text-hover-point transition-colors"
 							>
 								<span>{category.name}</span>
 								<span class="text-text-muted/50">
@@ -1033,27 +1330,27 @@
 								</span>
 							</button>
 							<!-- 아이템 목록 -->
-							<div class="flex flex-wrap gap-1.5">
+							<div class="flex flex-wrap gap-1">
 								{#each category.items as item}
 									<button
 										type="button"
 										onclick={() => toggleExclude(item.en)}
-										class="exclude-item-btn px-2 py-1 text-xs rounded-md border transition-colors {selectedExcludes.has(item.en) 
+										class="exclude-item-btn px-1.5 py-0.5 sm:px-2 sm:py-1 text-[10px] sm:text-xs rounded border transition-colors {selectedExcludes.has(item.en) 
 											? 'bg-red-500/20 border-red-500/50 text-red-400' 
 											: 'bg-surface-1 border-border-subtle text-text-muted hover:border-hover-point hover:text-hover-point'}"
 										title={item.ko}
 									>
 										{item.en}
-										<span class="text-text-muted/60 ml-1">({item.ko})</span>
+										<span class="text-text-muted/50 ml-0.5 hidden sm:inline">({item.ko})</span>
 									</button>
 								{/each}
 							</div>
 						</div>
 					{/each}
 				</div>
-				<div class="px-4 py-2 border-t border-border-subtle">
-					<p class="text-xs text-text-muted/70">
-						* SUNO의 "Exclude Styles" 필드에 붙여넣으세요. 원치 않는 스타일을 방지합니다.
+				<div class="px-3 sm:px-4 py-2 border-t border-border-subtle">
+					<p class="text-[10px] sm:text-xs text-text-muted/70">
+						* SUNO의 "Exclude Styles" 필드에 붙여넣으세요
 					</p>
 				</div>
 			{/if}
