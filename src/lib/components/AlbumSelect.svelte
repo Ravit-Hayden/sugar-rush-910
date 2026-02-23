@@ -30,7 +30,7 @@
 	let inputValue = $state(value);
 	let containerElement: HTMLDivElement;
 	let focusedIndex = $state(-1); // 키보드 네비게이션용 포커스 인덱스
-	let listElement: HTMLUListElement;
+	let listElement = $state<HTMLUListElement | undefined>(undefined);
 
 	// value prop이 변경되면 inputValue도 업데이트
 	$effect(() => {

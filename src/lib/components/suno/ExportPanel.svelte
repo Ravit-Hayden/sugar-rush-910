@@ -212,7 +212,7 @@
 	<div class="p-6 space-y-6">
 		<!-- 포맷 선택 -->
 		<div>
-			<label class="block text-sm font-medium text-text-strong mb-3">내보내기 형식</label>
+			<span class="block text-sm font-medium text-text-strong mb-3">내보내기 형식</span>
 			<div class="grid grid-cols-3 gap-3">
 				<button
 					type="button"
@@ -246,7 +246,7 @@
 
 		<!-- 내용 선택 -->
 		<div>
-			<label class="block text-sm font-medium text-text-strong mb-3">포함할 내용</label>
+			<span class="block text-sm font-medium text-text-strong mb-3">포함할 내용</span>
 			<div class="space-y-2">
 				<label class="flex items-center gap-3 cursor-pointer">
 					<input type="checkbox" bind:checked={exportOptions.metadata} class="w-4 h-4 rounded" />

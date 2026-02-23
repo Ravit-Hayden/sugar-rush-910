@@ -35,8 +35,8 @@
 	let validationErrors = $state<Record<string, string>>({});
 
 	// 입력 필드 참조
-	let categoryInput: HTMLInputElement;
-	let amountInput: HTMLInputElement;
+	let categoryInput = $state<HTMLInputElement | undefined>(undefined);
+	let amountInput = $state<HTMLInputElement | undefined>(undefined);
 
 	// 카테고리 목록
 	const categories = [

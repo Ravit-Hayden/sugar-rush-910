@@ -23,7 +23,7 @@
 	let inputValue = $state(value);
 	let containerElement: HTMLDivElement;
 	let focusedIndex = $state(-1); // 키보드 네비게이션용 포커스 인덱스
-	let listElement: HTMLUListElement;
+	let listElement = $state<HTMLUListElement | undefined>(undefined);
 	let artistNames = $state<string[]>([]);
 
 	// 컴포넌트 마운트 시 아티스트 목록 로드
@@ -265,12 +265,14 @@
 	
 	<!-- 드롭다운 목록 -->
 	{#if dropdownOpen}
-		<ul 
+		<ul
 			bind:this={listElement}
-			role="listbox" 
+			role="listbox"
 			class="filter-dropdown absolute left-0 w-full mt-[6px] bg-surface-1 border border-border-subtle rounded-[6px] z-[9999] max-h-60 custom-list-scrollbar pt-0"
 			onclick={(e) => {
-				// ul 클릭도 내부 클릭으로 처리하여 외부 클릭 감지 방지
+				e.stopPropagation();
+			}}
+			onkeydown={(e) => {
 				e.stopPropagation();
 			}}
 		>

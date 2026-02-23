@@ -83,7 +83,7 @@
 	>
 		{#if Icon}
 			<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-				<svelte:component this={Icon} size={16} class="lucide-icon transition-colors duration-200" />
+				<Icon size={16} class="lucide-icon transition-colors duration-200" />
 			</div>
 		{/if}
 		<span class="flex-1 text-left truncate">

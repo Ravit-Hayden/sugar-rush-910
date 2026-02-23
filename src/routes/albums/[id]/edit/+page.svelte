@@ -2,94 +2,18 @@
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import type { PageData } from './$types';
-	import { Asterisk, ChevronUp, ChevronDown, ChevronDown as ChevronDownIcon, X, Image } from 'lucide-svelte';
+	import { Asterisk, ChevronUp, ChevronDown as ChevronDownIcon, X, Image } from 'lucide-svelte';
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import PageContent from '$lib/components/PageContent.svelte';
 	import DatePicker from '$lib/components/DatePicker.svelte';
 	import { GENRES } from '$lib/constants/genres';
 	import { MAX_FILE_SIZE_BYTES, getFileSizeErrorMessage } from '$lib/constants/upload';
 	import { toast } from '$lib/stores/toast';
+	import { mockAlbums } from '$lib/mocks/albums';
 
 	let { data }: { data: PageData } = $props();
 
-	// 샘플 데이터 (실제로는 API에서 가져올 데이터)
-	const albums = [
-		{
-			id: '1',
-			title: 'Sugar Rush Vol.1',
-			artist: 'Sugar Rush',
-			year: 2024,
-			status: 'published',
-			tracks: 12,
-			duration: '45:30',
-			cover: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=300&h=300&fit=crop',
-			plays: 1250,
-			likes: 89,
-			genres: ['Pop', 'Electronic'] as string[],
-			created_at: '2024-09-15',
-			release_date_kr: '2024-09-20',
-			release_date_global: '2024-09-25',
-			trackList: [
-				{ id: '1', title: 'Sugar Rush', duration: '3:45' },
-				{ id: '2', title: 'Sweet Dreams', duration: '4:12' },
-				{ id: '3', title: 'Candy Land', duration: '3:58' },
-				{ id: '4', title: 'Honey Moon', duration: '4:30' },
-				{ id: '5', title: 'Sugar High', duration: '3:20' },
-				{ id: '6', title: 'Sweet Escape', duration: '4:05' },
-				{ id: '7', title: 'Candy Shop', duration: '3:50' },
-				{ id: '8', title: 'Sugar Coated', duration: '4:15' },
-				{ id: '9', title: 'Sweet Surprise', duration: '3:35' },
-				{ id: '10', title: 'Candy Floss', duration: '4:00' },
-				{ id: '11', title: 'Sugar Spice', duration: '3:42' },
-				{ id: '12', title: 'Sweet Victory', duration: '4:18' }
-			]
-		},
-		{
-			id: '2',
-			title: 'Summer Night',
-			artist: 'Sugar Rush',
-			year: 2024,
-			status: 'draft',
-			tracks: 1,
-			duration: '3:45',
-			cover: '/api/placeholder/300/300',
-			plays: 890,
-			likes: 45,
-			genres: ['Pop'] as string[],
-			created_at: '2024-09-20',
-			release_date_kr: '',
-			release_date_global: '',
-			trackList: [
-				{ id: '1', title: 'Summer Night', duration: '3:45' }
-			]
-		},
-		{
-			id: '3',
-			title: 'Demo Collection',
-			artist: 'Various',
-			year: 2024,
-			status: 'archived',
-			tracks: 8,
-			duration: '28:15',
-			cover: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=300&h=300&fit=crop',
-			plays: 456,
-			likes: 23,
-			genres: [] as string[],
-			created_at: '2024-08-10',
-			release_date_kr: '',
-			release_date_global: '',
-			trackList: [
-				{ id: '1', title: 'Demo Track 1', duration: '3:30' },
-				{ id: '2', title: 'Demo Track 2', duration: '3:45' },
-				{ id: '3', title: 'Demo Track 3', duration: '3:20' },
-				{ id: '4', title: 'Demo Track 4', duration: '4:00' },
-				{ id: '5', title: 'Demo Track 5', duration: '3:15' },
-				{ id: '6', title: 'Demo Track 6', duration: '3:50' },
-				{ id: '7', title: 'Demo Track 7', duration: '3:25' },
-				{ id: '8', title: 'Demo Track 8', duration: '3:10' }
-			]
-		}
-	];
+	const albums = mockAlbums;
 
 	let albumId = $derived(data.albumId || $page.params.id || '');
 	let album = $derived(albums.find(a => a.id === albumId));

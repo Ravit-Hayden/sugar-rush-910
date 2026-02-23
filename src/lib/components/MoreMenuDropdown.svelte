@@ -132,7 +132,8 @@
 						aria-label={item.ariaLabel || item.label}
 					>
 						{#if item.icon}
-							<svelte:component this={item.icon} size={16} class="{item.danger ? 'text-red-500' : 'text-text-muted'}" />
+							{@const IconComp = item.icon}
+							<IconComp size={16} class={item.danger ? 'text-red-500' : 'text-text-muted'} />
 						{/if}
 						{item.label}
 					</button>
