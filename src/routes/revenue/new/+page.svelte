@@ -100,7 +100,7 @@
 				body: JSON.stringify(revenueData)
 			});
 
-			const result = await response.json();
+			const result = await response.json() as { ok?: boolean; error?: { message?: string }; data?: unknown };
 
 			if (!response.ok || !result.ok) {
 				const errorMessage = result.error?.message || '수익 추가에 실패했습니다.';
@@ -170,7 +170,7 @@
 						/>
 						<datalist id="platforms">
 							{#each platforms as platform}
-								<option value={platform} />
+								<option value={platform}></option>
 							{/each}
 						</datalist>
 						{#if formData.platform.trim()}

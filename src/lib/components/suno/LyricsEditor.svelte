@@ -1,6 +1,22 @@
 <script lang="ts">
-	import { Check, AlertCircle, Sparkles, Copy, Save, RotateCcw, GitCompare, X } from 'lucide-svelte';
+	import { Check, AlertCircle, Sparkles, Copy, Save, RotateCcw, GitCompare, X, Languages, ExternalLink, SpellCheck } from 'lucide-svelte';
 	import type { LyricsVersion, LyricsVersionType, WordEntry } from '$lib/types/suno';
+
+	// 외부 링크 (API 없음, 새 탭에서 열기)
+	const GOOGLE_TRANSLATE_BASE = 'https://translate.google.com/?sl=auto&tl=en&op=translate&text=';
+	const DEEPL_TRANSLATOR = 'https://www.deepl.com/translator';
+	const SPELL_CHECK_URL = 'https://nara-speller.co.kr/speller'; // 부산대 맞춤법(바른한글)
+
+	function openGoogleTranslate(text: string) {
+		if (!text.trim()) return;
+		window.open(GOOGLE_TRANSLATE_BASE + encodeURIComponent(text.trim()), '_blank', 'noopener,noreferrer');
+	}
+	function openDeepL() {
+		window.open(DEEPL_TRANSLATOR, '_blank', 'noopener,noreferrer');
+	}
+	function openSpellCheck() {
+		window.open(SPELL_CHECK_URL, '_blank', 'noopener,noreferrer');
+	}
 
 	// Props
 	interface Props {
@@ -165,6 +181,16 @@
 				{/if}
 				맞춤법 검사
 			</button>
+			<a
+				href={SPELL_CHECK_URL}
+				target="_blank"
+				rel="noopener noreferrer"
+				class="flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg border border-border-subtle text-text-base hover:bg-surface-2/50 transition-colors no-underline"
+				title="부산대 맞춤법(바른한글) 열기"
+			>
+				<SpellCheck size={14} />
+				바른한글
+			</a>
 			<button
 				type="button"
 				onclick={generateAiSuggestions}
@@ -178,7 +204,29 @@
 				{/if}
 				AI 제안
 			</button>
+			{#if !readonly}
+				<button
+					type="button"
+					onclick={() => openGoogleTranslate(content)}
+					class="btn-outline-hover flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg border border-border-subtle text-text-base transition-colors"
+					title="작성한 글을 넣어 Google 번역 열기"
+				>
+					<Languages size={14} />
+					Google 번역
+				</button>
+				<a
+					href={DEEPL_TRANSLATOR}
+					target="_blank"
+					rel="noopener noreferrer"
+					class="btn-outline-hover flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg border border-border-subtle text-text-base transition-colors no-underline"
+					title="DeepL 번역기 열기"
+				>
+					<ExternalLink size={14} />
+					DeepL
+				</a>
+			{/if}
 		</div>
+		<p class="w-full text-xs text-text-muted px-0 mt-1 order-last basis-full text-right">결과는 새 탭에서 복사한 뒤 여기 붙여넣어 주세요.</p>
 		<div class="flex items-center gap-2">
 			<button type="button" onclick={copyContent} class="btn-icon" title="복사">
 				<Copy size={16} />
@@ -262,6 +310,8 @@
 			disabled={readonly}
 			class="w-full h-64 bg-transparent text-text-base text-sm font-mono leading-relaxed resize-none focus:outline-none placeholder:text-text-muted"
 			placeholder="가사를 입력하세요..."
+			spellcheck="true"
+			lang="ko"
 		></textarea>
 	</div>
 

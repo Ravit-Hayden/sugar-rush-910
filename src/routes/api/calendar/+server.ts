@@ -102,7 +102,7 @@ export const GET: RequestHandler = async ({ platform, url }) => {
 
 export const POST: RequestHandler = async ({ request, platform }) => {
 	try {
-		const eventData = await request.json();
+		const eventData = await request.json() as Record<string, any>;
 
 		// 입력 검증
 		if (!eventData.title || !eventData.title.trim()) {
@@ -165,10 +165,10 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 					.run();
 
 				// 생성된 이벤트 정보 조회
-				const { results } = await db
+				const results = await db
 					.prepare('SELECT * FROM calendar_events WHERE id = ?')
 					.bind(eventId)
-					.first();
+					.first() as Record<string, any> | null;
 
 				createdEvent = {
 					id: eventId,

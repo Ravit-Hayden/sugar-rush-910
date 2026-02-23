@@ -388,7 +388,9 @@
     }}
     onkeydown={handleKeydown}
     class="input-base w-full h-10 px-4 {inputValue.trim() ? 'pr-[4.5rem]' : 'pr-[2.625rem]'} text-base placeholder:text-text-muted cursor-text box-border datepicker-input"
-    aria-expanded={isOpen ? 'true' : 'false'}
+    role="combobox"
+    aria-haspopup="dialog"
+    aria-autocomplete="none"
     {...Object.fromEntries(Object.entries(restProps).filter(([key]) => key !== 'tabindex' && key !== 'list'))}
     />
     
@@ -442,7 +444,8 @@
     </button>
 
   {#if isOpen}
-    <div class="calendar-dropdown absolute bottom-full {align === 'left' ? 'left-0' : 'right-0'} mb-2 w-[18rem] border border-border-subtle rounded-xl p-4 z-50" style="background-color: var(--calendar-bg);" transition:fade={{ duration: 100 }} onclick={(e) => {
+    <!-- svelte-ignore a11y_no_noninteractive_element_interactions -- 캘린더 컨테이너: 클릭 전파·년월 피커 닫기용, role="application" 사용 -->
+    <div class="calendar-dropdown absolute bottom-full {align === 'left' ? 'left-0' : 'right-0'} mb-2 w-[18rem] border border-border-subtle rounded-xl p-4 z-50" style="background-color: var(--calendar-bg);" transition:fade={{ duration: 100 }} role="application" aria-label="날짜 선택 캘린더" onclick={(e) => {
       // 년도/월 드롭다운이 열려있을 때, 드롭다운 밖의 캘린더 영역 클릭 시 드롭다운만 닫기
       if (yearMonthPickerOpen) {
         const target = e.target as Node;
@@ -452,6 +455,9 @@
         }
       }
       e.stopPropagation();
+    }} onkeydown={(e) => {
+      e.stopPropagation();
+      if (e.key === 'Escape' && yearMonthPickerOpen) yearMonthPickerOpen = false;
     }}>
       <div class="flex items-center justify-between mb-4 px-1 relative">
         <button type="button" onclick={(e) => { e.stopPropagation(); changeMonth(-1); }} class="p-1 hover:bg-surface-2 rounded-md text-text-muted"><ChevronLeft size={16} /></button>
@@ -477,7 +483,7 @@
         
         <!-- 년도/월 선택 드롭다운 -->
         {#if yearMonthPickerOpen}
-          <div class="year-month-picker absolute left-1/2 -translate-x-1/2 top-full mt-2 w-48 border border-border-subtle rounded-xl p-3 z-[60]" style="background-color: var(--calendar-picker-bg);" onclick={(e) => e.stopPropagation()}>
+          <div class="year-month-picker absolute left-1/2 -translate-x-1/2 top-full mt-2 w-48 border border-border-subtle rounded-xl p-3 z-[60]" style="background-color: var(--calendar-picker-bg);" role="group" aria-label="년도·월 선택">
             <div class="grid grid-cols-2 gap-3">
               <!-- 년도 선택 -->
               <div>
@@ -497,7 +503,6 @@
                         }
                       }}
                       class="w-full px-2 py-1.5 text-sm text-text-base hover:text-hover-point focus:text-brand-pink focus:outline-none rounded-md transition-colors duration-200 text-left {viewDate.getFullYear() === year ? 'text-brand-pink font-semibold' : ''}"
-                      aria-selected={viewDate.getFullYear() === year}
                     >
                       {year}
                     </button>
@@ -523,7 +528,6 @@
                         }
                       }}
                       class="w-full px-2 py-1.5 text-sm text-text-base hover:text-hover-point focus:text-brand-pink focus:outline-none rounded-md transition-colors duration-200 text-left {(viewDate.getMonth() + 1) === month ? 'text-brand-pink font-semibold' : ''}"
-                      aria-selected={(viewDate.getMonth() + 1) === month}
                     >
                       {month}월
                     </button>

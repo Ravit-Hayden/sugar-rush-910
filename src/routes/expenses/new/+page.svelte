@@ -100,7 +100,7 @@
 				body: JSON.stringify(expenseData)
 			});
 
-			const result = await response.json();
+			const result = await response.json() as { ok?: boolean; error?: { message?: string }; data?: unknown };
 
 			if (!response.ok || !result.ok) {
 				const errorMessage = result.error?.message || '지출 추가에 실패했습니다.';
@@ -170,7 +170,7 @@
 						/>
 						<datalist id="categories">
 							{#each categories as category}
-								<option value={category} />
+								<option value={category}></option>
 							{/each}
 						</datalist>
 						{#if formData.category.trim()}

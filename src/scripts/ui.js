@@ -1,4 +1,5 @@
 // src/scripts/ui.js
+// @ts-nocheck — 레거시 스크립트, DOM 타입 보강은 추후 정리
 (function () {
   const THEME_KEY = 'sr_theme';
   const SIDEBAR_KEY = 'sr_sidebar'; // 'collapsed' | 'expanded'

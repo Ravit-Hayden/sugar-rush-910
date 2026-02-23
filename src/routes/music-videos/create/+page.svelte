@@ -1,12 +1,16 @@
 <script lang="ts">
-	import { Video, ArrowLeft, Play, Image, Users, Palette, Settings, Wand2, Upload } from 'lucide-svelte';
+	import { page } from '$app/stores';
+	import { Video, ArrowLeft, Play, Image, Users, Palette, Settings, Wand2, Upload, Music } from 'lucide-svelte';
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import PageContent from '$lib/components/PageContent.svelte';
 
-	let selectedTrack = '';
-	let selectedCharacters: string[] = [];
-	let selectedAssets: string[] = [];
-	let aiPrompt = '';
+	// SUNO 프로젝트에서 넘어온 경우 (쿼리: ?title=곡제목)
+	const projectTitle = $derived($page.url.searchParams.get('title') || '');
+
+	let selectedTrack = $state('');
+	let selectedCharacters = $state<string[]>([]);
+	let selectedAssets = $state<string[]>([]);
+	let aiPrompt = $state('');
 	let aiSettings = {
 		model: 'runway-gen3',
 		resolution: '1080p',
@@ -33,8 +37,8 @@
 		{ id: '3', name: 'Particle Effects', type: 'effect', image: '/api/placeholder/150/100' }
 	];
 
-	let isGenerating = false;
-	let generationProgress = 0;
+	let isGenerating = $state(false);
+	let generationProgress = $state(0);
 
 	function handleBack() {
 		window.history.back();
@@ -99,15 +103,29 @@
 		]}
 	/>
 
+	{#if projectTitle}
+		<div class="mb-6 rounded-lg border border-brand-pink/30 bg-brand-pink/10 px-4 py-3 text-sm text-text-base">
+			<p class="font-medium text-text-strong mb-1">SUNO 프로젝트 «{projectTitle}» 로 뮤직비디오를 만들 예정이시군요.</p>
+			<p class="text-text-muted text-xs">곡이 완성되면 아래에서 트랙을 선택하세요. SUNO에서 기획한 곡은 발매·트랙 연동 후 여기 목록에 반영됩니다.</p>
+			<a href="/suno/projects" class="mt-2 inline-flex items-center gap-1.5 text-brand-pink hover:text-hover-point text-xs font-medium">SUNO 프로젝트 목록 →</a>
+		</div>
+	{/if}
+
 	<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 		<!-- 왼쪽: 설정 패널 -->
 		<div class="lg:col-span-1 space-y-6">
 			<!-- 트랙 선택 -->
 			<div class="bg-surface-1 rounded-lg p-6 border border-border-subtle">
-				<h3 class="text-lg font-semibold text-text-strong mb-4 flex items-center gap-2">
-					<Play size={20} class="text-brand-pink" />
-					트랙 선택
-				</h3>
+				<div class="flex items-center justify-between mb-4">
+					<h3 class="text-lg font-semibold text-text-strong flex items-center gap-2">
+						<Play size={20} class="text-brand-pink" />
+						트랙 선택
+					</h3>
+					<a href="/suno/projects/new" class="text-xs font-medium text-brand-pink hover:text-hover-point inline-flex items-center gap-1">
+						<Music size={12} />
+						SUNO에서 새 곡 기획
+					</a>
+				</div>
 				<select 
 					bind:value={selectedTrack}
 					class="w-full px-3 py-2 bg-surface-2 border border-border-subtle rounded-md text-text-strong focus:outline-none focus:ring-2 focus:ring-brand-pink focus:border-transparent transition-all duration-200"
@@ -219,6 +237,8 @@
 					bind:value={aiPrompt}
 					placeholder="뮤직비디오의 장면을 자세히 설명해주세요. 예: 달콤한 음악에 맞춰 핑크색 네온사인이 반짝이는 도시에서 춤추는 캐릭터들..."
 					class="w-full h-32 px-3 py-2 bg-surface-2 border border-border-subtle rounded-md text-text-strong focus:outline-none focus:ring-2 focus:ring-brand-pink focus:border-transparent transition-all duration-200 resize-none"
+					spellcheck="true"
+					lang="ko"
 				></textarea>
 				<div class="mt-2 text-xs text-text-muted">
 					프롬프트가 구체적일수록 더 정확한 결과를 얻을 수 있습니다.

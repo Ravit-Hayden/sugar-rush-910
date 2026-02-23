@@ -1,5 +1,6 @@
 import type { RequestHandler } from './$types';
 import type { ApiOk, ApiErr } from '$lib/types/api';
+import { MAX_FILE_SIZE_BYTES, getFileSizeErrorMessage } from '$lib/constants/upload';
 
 /**
  * 음원 파일 업로드 API
@@ -63,15 +64,14 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 			});
 		}
 
-		// 파일 크기 검증 (100MB 제한)
-		const maxSize = 100 * 1024 * 1024; // 100MB
-		if (audioFile.size > maxSize) {
+		// 파일 크기 검증 (공통 한도 1GB)
+		if (audioFile.size > MAX_FILE_SIZE_BYTES) {
 			const response: ApiErr = {
 				ok: false,
 				error: {
 					code: 'FILE_TOO_LARGE',
-					message: '파일 크기는 100MB를 초과할 수 없습니다.',
-					details: `File size: ${audioFile.size}, Max: ${maxSize}`
+					message: getFileSizeErrorMessage(),
+					details: `File size: ${audioFile.size}, Max: ${MAX_FILE_SIZE_BYTES}`
 				}
 			};
 			return new Response(JSON.stringify(response), {

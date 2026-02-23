@@ -146,7 +146,8 @@
 
 <!-- 사이드바 컨테이너 -->
 <aside 
-	class="top-0 fixed left-0 h-screen bg-surface-2 sidebar-border-right z-40 overflow-hidden"
+	class="top-0 fixed left-0 h-screen sidebar-border-right z-40 overflow-hidden"
+	style="background-color: var(--sidebar-bg);"
 >
 	<div class="h-full w-full overflow-hidden flex flex-col">
 		<!-- 상단 토글 버튼과 로고 -->

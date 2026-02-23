@@ -66,10 +66,10 @@
 			<h3 class="text-sm font-semibold text-text-base">고급 검색</h3>
 			<button
 				onclick={onClose}
-				class="w-6 h-6 flex items-center justify-center rounded hover:bg-surface-2 transition-colors"
+				class="template-close-btn w-7 h-7 flex items-center justify-end rounded-md text-text-muted transition-colors border border-transparent pl-1.5 pr-0"
 				aria-label="닫기"
 			>
-				<X size={14} class="text-text-muted" />
+				<X size={14} />
 			</button>
 		</div>
 		
@@ -77,7 +77,7 @@
 			<!-- 여러 장르 선택 -->
 			<div>
 				<div class="flex items-center justify-between mb-2">
-					<label class="block text-xs font-medium text-text-muted">장르 (여러 개 선택 가능)</label>
+					<span class="block text-xs font-medium text-text-muted">장르 (여러 개 선택 가능)</span>
 					{#if selectedGenres.size > 0}
 						<div class="flex items-center gap-3">
 							<span class="text-xs text-hover-cyan font-medium">{selectedGenres.size}개 선택됨</span>
@@ -108,10 +108,11 @@
 			<!-- 통계 범위 -->
 			<div class="grid grid-cols-2 gap-4">
 				<div>
-					<label class="block text-xs font-medium text-text-muted mb-2">재생수 범위</label>
+					<label for="advanced-plays-min" class="block text-xs font-medium text-text-muted mb-2">재생수 범위</label>
 					<div class="flex gap-2">
 						<div class="relative flex-1">
 							<input
+								id="advanced-plays-min"
 								type="number"
 								placeholder="최소"
 								value={playsMin}
@@ -194,10 +195,11 @@
 					</div>
 				</div>
 				<div>
-					<label class="block text-xs font-medium text-text-muted mb-2">좋아요 범위</label>
+					<label for="advanced-likes-min" class="block text-xs font-medium text-text-muted mb-2">좋아요 범위</label>
 					<div class="flex gap-2">
 						<div class="relative flex-1">
 							<input
+								id="advanced-likes-min"
 								type="number"
 								placeholder="최소"
 								value={likesMin}

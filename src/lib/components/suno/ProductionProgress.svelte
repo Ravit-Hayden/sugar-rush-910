@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Check, Circle, ArrowRight } from 'lucide-svelte';
-	import { PRODUCTION_STAGES, getStageName } from '$lib/constants/suno/stages';
+	import { PRODUCTION_STAGES } from '$lib/constants/suno/stages';
 	import type { ProductionStageStatus, ProductionStageId } from '$lib/types/suno';
 
 	// Props
@@ -22,20 +22,20 @@
 		return map;
 	});
 
-	// 진행률 계산
-	const progressPercent = $derived.by(() => {
-		const completed = stages.filter(s => s.isCompleted).length;
-		return Math.round((completed / PRODUCTION_STAGES.length) * 100);
-	});
+	// 진행률 계산: 18단계 기준, stageStatusMap에서 완료된 수
+	const completedCount = $derived(PRODUCTION_STAGES.filter(s => stageStatusMap[s.id]?.isCompleted).length);
+	const progressPercent = $derived(Math.round((completedCount / PRODUCTION_STAGES.length) * 100));
 
-	// 현재 단계 인덱스
+	// 현재 단계 인덱스: 순서대로 첫 번째 미완료 단계를 "현재"로 판정
 	const currentIndex = $derived.by(() => {
-		if (!currentStageId) {
-			// 완료된 단계 다음을 현재로
-			const completedCount = stages.filter(s => s.isCompleted).length;
-			return completedCount;
+		if (currentStageId) {
+			return PRODUCTION_STAGES.findIndex(s => s.id === currentStageId);
 		}
-		return PRODUCTION_STAGES.findIndex(s => s.id === currentStageId);
+		for (let i = 0; i < PRODUCTION_STAGES.length; i++) {
+			const status = stageStatusMap[PRODUCTION_STAGES[i].id];
+			if (!status || !status.isCompleted) return i;
+		}
+		return PRODUCTION_STAGES.length;
 	});
 
 	// 단계 클릭 핸들러
@@ -52,22 +52,15 @@
 		return 'text-text-muted';
 	}
 
-	// 진행률에 따른 바 색상
+	// 진행률 바/텍스트 색상: 디자인 토큰만 사용 (brand-pink, elotte-green)
 	function getProgressColor(percent: number): string {
-		if (percent >= 100) return 'bg-green-500';
-		if (percent >= 75) return 'bg-emerald-500';
-		if (percent >= 50) return 'bg-brand-pink';
-		if (percent >= 25) return 'bg-amber-500';
-		return 'bg-blue-500';
+		if (percent >= 100) return 'bg-[var(--elotte-green)]';
+		return 'bg-brand-pink';
 	}
 
-	// 진행률에 따른 텍스트 색상
 	function getProgressTextColor(percent: number): string {
-		if (percent >= 100) return 'text-green-500';
-		if (percent >= 75) return 'text-emerald-500';
-		if (percent >= 50) return 'text-brand-pink';
-		if (percent >= 25) return 'text-amber-500';
-		return 'text-blue-500';
+		if (percent >= 100) return 'text-elotte-green';
+		return 'text-brand-pink';
 	}
 </script>
 
@@ -87,18 +80,18 @@
 	</div>
 {:else}
 	<!-- 전체 뷰 -->
-	<div class="bg-surface-1 rounded-lg border border-border-subtle p-6">
+	<div class="bg-surface-2 rounded-lg border border-border-subtle p-6">
 		<!-- 헤더 -->
-		<div class="flex items-center justify-between mb-6">
-			<h3 class="text-lg font-semibold text-text-strong">제작 진행률</h3>
-			<div class="flex items-center gap-3">
-				<div class="flex-1 w-32 h-2 bg-bg rounded-full overflow-hidden">
-					<div 
-						class="{getProgressColor(progressPercent)} h-full transition-all duration-300"
-						style="width: {progressPercent}%"
-					></div>
-				</div>
-				<span class="text-lg font-bold {getProgressTextColor(progressPercent)}">{progressPercent}%</span>
+		<div class="mb-6">
+			<div class="flex items-center justify-between mb-3">
+				<h3 class="text-sm font-semibold text-text-strong">제작 진행률</h3>
+				<span class="text-sm font-bold {getProgressTextColor(progressPercent)}">{progressPercent}%</span>
+			</div>
+			<div class="w-full h-2 bg-bg rounded-full overflow-hidden">
+				<div 
+					class="{getProgressColor(progressPercent)} h-full transition-all duration-300"
+					style="width: {progressPercent}%"
+				></div>
 			</div>
 		</div>
 
@@ -108,18 +101,17 @@
 				{@const status = stageStatusMap[stage.id]}
 				{@const isCompleted = status?.isCompleted ?? false}
 				{@const isCurrent = index === currentIndex}
-				{@const isPast = index < currentIndex}
 
 				<button
 					type="button"
 					onclick={() => handleStageClick(stage.id)}
-					class="w-full flex items-center gap-3 p-3 rounded-lg transition-colors
-						{isCurrent ? 'bg-brand-pink/10 border border-brand-pink' : 'hover:bg-surface-2'}
-						{onStageClick ? 'cursor-pointer' : 'cursor-default'}"
+					class="progress-stage-item w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors
+						{onStageClick ? 'cursor-pointer' : 'cursor-default'}
+						{isCurrent ? 'bg-surface-1' : 'hover:bg-surface-1/50'}"
 				>
-					<!-- 상태 아이콘 -->
-					<div class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center
-						{isCompleted ? 'bg-green-500 text-white' : isCurrent ? 'bg-brand-pink text-white' : 'bg-surface-2 text-text-muted'}">
+					<!-- 상태 아이콘: 아이콘+색상만으로 표현 (배경 원형 없음) -->
+					<span class="flex-shrink-0 w-5 flex items-center justify-center
+						{isCompleted ? 'text-text-muted' : isCurrent ? 'text-brand-pink' : 'text-text-muted'}">
 						{#if isCompleted}
 							<Check size={16} />
 						{:else if isCurrent}
@@ -127,13 +119,13 @@
 						{:else}
 							<Circle size={14} />
 						{/if}
-					</div>
+					</span>
 
 					<!-- 단계 정보 -->
 					<div class="flex-1 text-left">
 						<div class="flex items-center gap-2">
 							<span class="text-sm font-medium 
-								{isCompleted ? 'text-text-muted line-through' : isCurrent ? 'text-text-strong' : 'text-text-base'}">
+								{isCompleted ? 'text-text-muted line-through' : isCurrent ? 'text-brand-pink' : 'text-text-base'}">
 								{stage.order}. {stage.name}
 							</span>
 							<span class="text-xs {getAssigneeColor(stage.assignedTo)}">
@@ -149,25 +141,21 @@
 							</div>
 						{/if}
 					</div>
-
-					<!-- 연결선 -->
-					{#if index < PRODUCTION_STAGES.length - 1}
-						<div class="absolute left-[1.5rem] top-[3rem] w-[2px] h-[calc(100%-1.5rem)] 
-							{isPast ? 'bg-green-500' : 'bg-surface-2'} hidden"></div>
-					{/if}
 				</button>
 			{/each}
 		</div>
 
-		<!-- 요약 -->
-		<div class="mt-6 pt-4 border-t border-border-subtle flex items-center justify-between text-sm">
+		<!-- 요약: 구분선은 양쪽 여백 없이 풀폭 -->
+		<div class="mt-6 pt-4 border-t border-border-subtle -mx-6 px-6 flex items-center justify-between text-sm">
 			<span class="text-text-muted">
-				{stages.filter(s => s.isCompleted).length} / {PRODUCTION_STAGES.length} 단계 완료
+				{completedCount} / {PRODUCTION_STAGES.length} 단계 완료
 			</span>
 			{#if currentIndex < PRODUCTION_STAGES.length}
 				<span class="text-text-base">
-					다음: <strong class="text-brand-pink">{PRODUCTION_STAGES[currentIndex + 1]?.name ?? '완료!'}</strong>
+					다음: <strong class="text-brand-pink">{PRODUCTION_STAGES[currentIndex]?.name ?? '완료!'}</strong>
 				</span>
+			{:else}
+				<span class="text-elotte-green font-medium">모든 단계 완료!</span>
 			{/if}
 		</div>
 	</div>

@@ -85,7 +85,7 @@ export const GET: RequestHandler = async ({ platform, url }) => {
 
 export const POST: RequestHandler = async ({ request, platform }) => {
 	try {
-		const trackData = await request.json();
+		const trackData = await request.json() as Record<string, any>;
 		
 		// 입력 검증
 		if (!trackData.title || !trackData.title.trim()) {
@@ -170,10 +170,10 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 					.run();
 
 				// 생성된 트랙 정보 조회
-				const { results } = await db
+				const results = await db
 					.prepare('SELECT * FROM tracks WHERE id = ?')
 					.bind(trackId)
-					.first();
+					.first() as Record<string, any> | null;
 
 				createdTrack = {
 					id: trackId,

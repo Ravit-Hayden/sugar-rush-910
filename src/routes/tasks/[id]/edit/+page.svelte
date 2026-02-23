@@ -4,12 +4,25 @@
 	import { ArrowLeft, Save } from 'lucide-svelte';
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import PageContent from '$lib/components/PageContent.svelte';
+	import { mockTasks } from '$lib/mocks/tasks';
 
 	const id = $derived($page.params.id);
-	let title = $state('앨범 커버 디자인 검토');
+	const initialTask = $derived(mockTasks.find((t) => t.id === id));
+	let title = $state('');
 	let due = $state('today');
-	let priority = $state(true);
-	let description = $state('첫 번째 정규 앨범 커버 최종 검토 및 피드백 반영.');
+	let priority = $state(false);
+	let description = $state('');
+
+	// id(페이지) 변경 시 폼 값 동기화
+	$effect(() => {
+		const next = initialTask;
+		if (next) {
+			title = next.title;
+			due = next.due;
+			priority = next.priority;
+			description = next.description;
+		}
+	});
 
 	function handleSubmit(e: Event) {
 		e.preventDefault();

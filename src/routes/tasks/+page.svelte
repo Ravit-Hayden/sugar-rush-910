@@ -3,14 +3,9 @@
 	import { CheckSquare, Plus, Calendar } from 'lucide-svelte';
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import PageContent from '$lib/components/PageContent.svelte';
+	import { mockTasks } from '$lib/mocks/tasks';
 
-	// 목업: 실제 연결 시 /api/tasks 등으로 교체
-	let tasks = $state([
-		{ id: '1', title: '앨범 커버 디자인 검토', priority: true, completed: false, due: 'today' },
-		{ id: '2', title: '트랙 마스터링 완료', priority: false, completed: false, due: 'tomorrow' },
-		{ id: '3', title: '발매 일정 확정', priority: true, completed: false, due: 'yesterday', overdue: true },
-		{ id: '4', title: '아트워크 최종 검수', priority: false, completed: false, due: 'today' }
-	]);
+	const tasks = mockTasks;
 </script>
 
 <PageContent>

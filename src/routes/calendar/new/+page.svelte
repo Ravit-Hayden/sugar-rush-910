@@ -98,7 +98,7 @@
 				body: JSON.stringify(eventData)
 			});
 
-			const result = await response.json();
+			const result = await response.json() as Record<string, any>;
 
 			if (!response.ok || !result.ok) {
 				const errorMessage = result.error?.message || '일정 추가에 실패했습니다.';

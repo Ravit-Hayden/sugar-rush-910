@@ -7,7 +7,9 @@
 	import PageContent from '$lib/components/PageContent.svelte';
 	import DatePicker from '$lib/components/DatePicker.svelte';
 	import { GENRES } from '$lib/constants/genres';
-	
+	import { MAX_FILE_SIZE_BYTES, getFileSizeErrorMessage } from '$lib/constants/upload';
+	import { toast } from '$lib/stores/toast';
+
 	let { data }: { data: PageData } = $props();
 
 	// 샘플 데이터 (실제로는 API에서 가져올 데이터)
@@ -23,6 +25,7 @@
 			cover: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=300&h=300&fit=crop',
 			plays: 1250,
 			likes: 89,
+			genres: ['Pop', 'Electronic'] as string[],
 			created_at: '2024-09-15',
 			release_date_kr: '2024-09-20',
 			release_date_global: '2024-09-25',
@@ -52,6 +55,7 @@
 			cover: '/api/placeholder/300/300',
 			plays: 890,
 			likes: 45,
+			genres: ['Pop'] as string[],
 			created_at: '2024-09-20',
 			release_date_kr: '',
 			release_date_global: '',
@@ -70,6 +74,7 @@
 			cover: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=300&h=300&fit=crop',
 			plays: 456,
 			likes: 23,
+			genres: [] as string[],
 			created_at: '2024-08-10',
 			release_date_kr: '',
 			release_date_global: '',
@@ -126,7 +131,7 @@
 	// 이미지 업로드 상태
 	let imageFile = $state<File | null>(null);
 	let previewUrl = $state<string>('');
-	let fileInput: HTMLInputElement;
+	let fileInput = $state<HTMLInputElement | null>(null);
 	let isDragging = $state(false);
 
 	// 상태 드롭다운 열림 상태
@@ -139,7 +144,7 @@
 				formData.title = album.title;
 				formData.artist = album.artist;
 				formData.status = album.status;
-				formData.genres = (album as any).genres || [];
+				formData.genres = album.genres ?? [];
 				formData.release_date_kr = album.release_date_kr || '';
 				formData.release_date_global = album.release_date_global || '';
 			// 기존 앨범 커버 이미지가 있으면 미리보기 URL 설정
@@ -216,6 +221,10 @@
 	// 파일 처리 공통 함수
 	function processFile(file: File) {
 		if (file && file.type.startsWith('image/')) {
+			if (file.size > MAX_FILE_SIZE_BYTES) {
+				toast.add(getFileSizeErrorMessage(), 'error');
+				return;
+			}
 			imageFile = file;
 			// 기존 미리보기 URL 해제
 			if (previewUrl && previewUrl.startsWith('blob:')) {
@@ -251,8 +260,8 @@
 	}
 
 	// 이미지 업로드 영역 클릭 핸들러
-	function handleImageAreaClick(event: MouseEvent) {
-		const uploadZone = event.currentTarget as HTMLElement;
+	function handleImageAreaClick(event: Event | MouseEvent) {
+		const uploadZone = (event.currentTarget ?? (event.target as HTMLElement)) as HTMLElement;
 		// 업로드 영역에 포커스 주기
 		uploadZone.focus();
 		fileInput?.click();
@@ -397,7 +406,7 @@
 							onkeydown={(e) => {
 								if (e.key === 'Enter' || e.key === ' ') {
 									e.preventDefault();
-									handleImageAreaClick();
+									handleImageAreaClick(e);
 								}
 							}}
 							aria-label="앨범 커버 업로드"

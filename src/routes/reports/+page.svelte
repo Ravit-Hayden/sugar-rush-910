@@ -90,10 +90,10 @@
 	<div class="bg-surface-1 rounded-lg border border-border-subtle overflow-hidden">
 		<div class="p-6 space-y-6">
 			<!-- 리포트 유형 -->
-			<div>
-				<label class="block text-sm font-medium text-text-strong mb-3">
+			<div role="group" aria-labelledby="report-type-label">
+				<span id="report-type-label" class="block text-sm font-medium text-text-strong mb-3">
 					리포트 유형
-				</label>
+				</span>
 				<div class="grid grid-cols-1 md:grid-cols-3 gap-3">
 					<button
 						type="button"
@@ -123,10 +123,10 @@
 			</div>
 
 			<!-- 파일 형식 -->
-			<div>
-				<label class="block text-sm font-medium text-text-strong mb-3">
+			<div role="group" aria-labelledby="report-format-label">
+				<span id="report-format-label" class="block text-sm font-medium text-text-strong mb-3">
 					파일 형식
-				</label>
+				</span>
 				<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
 					<button
 						type="button"
@@ -154,10 +154,10 @@
 			</div>
 
 			<!-- 날짜 범위 -->
-			<div>
-				<label class="block text-sm font-medium text-text-strong mb-3">
+			<div role="group" aria-labelledby="report-date-range-label">
+				<span id="report-date-range-label" class="block text-sm font-medium text-text-strong mb-3">
 					날짜 범위
-				</label>
+				</span>
 				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 					<div>
 						<label for="start-date" class="block text-xs font-medium text-text-strong mb-2">

@@ -2,8 +2,8 @@ import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ request }) => {
 	try {
-		const { id } = await request.json();
-		
+		const { id } = await request.json() as { id: string };
+
 		// 목 데이터 - 실제 구현에서는 데이터베이스에서 재시도 처리
 		console.log(`Retrying failure with id: ${id}`);
 		

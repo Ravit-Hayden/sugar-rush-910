@@ -1,4 +1,4 @@
-const SOLAR_HOLIDAYS = {
+const SOLAR_HOLIDAYS: Record<string, string> = {
   '01-01': '신정',
   '03-01': '삼일절',
   '05-05': '어린이날',
@@ -9,13 +9,9 @@ const SOLAR_HOLIDAYS = {
   '12-25': '성탄절'
 };
 
-export function getHolidayName(date) {
-  const year = date.getFullYear();
+export function getHolidayName(date: Date): string | null {
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
   const key = `${month}-${day}`;
-
-  if (SOLAR_HOLIDAYS[key]) return SOLAR_HOLIDAYS[key];
-  return null;
+  return SOLAR_HOLIDAYS[key] ?? null;
 }
-

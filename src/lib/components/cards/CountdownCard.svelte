@@ -33,7 +33,7 @@
 		<!-- 중간 요약 영역 -->
 		<div class="grid grid-cols-3 gap-2 mb-3">
 			{#each miniStats as stat (stat.label)}
-				<div class="h-8 bg-surface-1 rounded flex items-center justify-center px-2">
+				<div class="h-8 bg-surface-inner rounded flex items-center justify-center px-2">
 					<span class="text-xs text-text-muted truncate">{stat.label}: {stat.value}</span>
 				</div>
 			{/each}
@@ -47,7 +47,7 @@
 				{#each displayDeadlines.slice(0, 4) as deadline (deadline.id)}
 					<a
 						href="/calendar/{deadline.id}"
-						class="flex items-center h-12 px-4 bg-surface-1 rounded min-w-0"
+						class="flex items-center h-12 px-4 bg-surface-inner rounded min-w-0"
 					>
 						<!-- 좌측 아이콘 -->
 						<span class="flex-shrink-0 w-5 h-5 flex items-center justify-center mr-3">
@@ -69,7 +69,7 @@
 				{/each}
 				{#if displayDeadlines.length < 4}
 					{#each Array.from({length: 4 - displayDeadlines.length}) as _, i}
-						<div class="flex items-center h-12 px-4 bg-surface-1 rounded min-w-0" aria-hidden="true">
+						<div class="flex items-center h-12 px-4 bg-surface-inner rounded min-w-0" aria-hidden="true">
 							<span class="flex-shrink-0 w-5 h-5 flex items-center justify-center mr-3 text-text-muted">—</span>
 							<span class="flex-1 text-sm text-text-muted truncate text-left min-w-0">—</span>
 							<span class="flex-shrink-0 text-xs text-text-muted ml-2">—</span>

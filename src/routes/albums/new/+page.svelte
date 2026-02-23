@@ -6,6 +6,7 @@
 	import PageContent from '$lib/components/PageContent.svelte';
 	import DatePicker from '$lib/components/DatePicker.svelte';
 	import { GENRES } from '$lib/constants/genres';
+	import { MAX_FILE_SIZE_BYTES, getFileSizeErrorMessage } from '$lib/constants/upload';
 	import ArtistSelect from '$lib/components/ArtistSelect.svelte';
 	import { toast } from '$lib/stores/toast';
 	import TrackSlidePanel from '$lib/components/TrackSlidePanel.svelte';
@@ -58,7 +59,7 @@
 	// 이미지 업로드 상태
 	let imageFile = $state<File | null>(null);
 	let previewUrl = $state<string>('');
-	let fileInput: HTMLInputElement;
+	let fileInput = $state<HTMLInputElement | null>(null);
 	let isDragging = $state(false);
 
 	// 입력 필드 참조
@@ -161,8 +162,8 @@
 		(async () => {
 			try {
 				const response = await fetch('/api/tracks?limit=100');
-				const data = await response.json();
-				if (data.ok) {
+				const data = (await response.json()) as { ok: boolean; data?: string[] };
+				if (data.ok && data.data) {
 					trackNames = data.data;
 				}
 			} catch (error) {
@@ -240,7 +241,7 @@
 		// 등록된 트랙을 선택한 경우, 해당 트랙의 duration 정보 가져오기
 		try {
 			const response = await fetch(`/api/tracks?title=${encodeURIComponent(trackTitle)}`);
-			const data = await response.json();
+			const data = (await response.json()) as { ok: boolean; data?: { duration?: string }[] };
 			if (data.ok && data.data && data.data.length > 0) {
 				const selectedTrack = data.data[0];
 				// 트랙의 duration 업데이트 (duration이 없으면 undefined로 설정)
@@ -517,7 +518,7 @@
 				body: JSON.stringify(albumData)
 			});
 
-			const result = await response.json();
+			const result = (await response.json()) as { ok?: boolean; error?: { message?: string } };
 
 			if (!response.ok || !result.ok) {
 				const errorMessage = result.error?.message || '앨범 추가에 실패했습니다.';
@@ -635,6 +636,10 @@
 	// 파일 처리 공통 함수
 	function processFile(file: File) {
 		if (file && file.type.startsWith('image/')) {
+			if (file.size > MAX_FILE_SIZE_BYTES) {
+				toast.add(getFileSizeErrorMessage(), 'error');
+				return;
+			}
 			imageFile = file;
 			// 기존 미리보기 URL 해제
 			if (previewUrl) {
@@ -670,8 +675,8 @@
 	}
 
 	// 이미지 업로드 영역 클릭 핸들러
-	function handleImageAreaClick(event: MouseEvent) {
-		const uploadZone = event.currentTarget as HTMLElement;
+	function handleImageAreaClick(event: Event | MouseEvent) {
+		const uploadZone = (event.currentTarget ?? (event.target as HTMLElement)) as HTMLElement;
 		// 업로드 영역에 포커스 주기
 		uploadZone.focus();
 		fileInput?.click();
@@ -803,7 +808,7 @@
 						onkeydown={(e) => {
 							if (e.key === 'Enter' || e.key === ' ') {
 								e.preventDefault();
-								handleImageAreaClick();
+								handleImageAreaClick(e);
 							}
 						}}
 						aria-label="앨범 커버 업로드"

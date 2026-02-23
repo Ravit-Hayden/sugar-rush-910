@@ -74,7 +74,8 @@
 			defaultExclude: 'rock, metal, country, fast tempo, harsh',
 			defaultVocalGender: 'Male',
 			tags: ['R&B', '소울', '그루비'],
-			category: 'emotional'
+			category: 'emotional',
+			isFavorite: true
 		},
 		{
 			id: 'acoustic',
@@ -86,7 +87,8 @@
 			defaultExclude: 'electronic, synth, heavy bass, aggressive, dance',
 			defaultVocalGender: 'Female',
 			tags: ['어쿠스틱', '포크', '따뜻함'],
-			category: 'emotional'
+			category: 'emotional',
+			isFavorite: true
 		},
 		{
 			id: 'jazz',
@@ -892,7 +894,7 @@
 			<p class="text-sm text-text-muted mt-0.5">자주 사용하는 설정으로 빠르게 시작하세요</p>
 		</div>
 		{#if onClose}
-			<button type="button" onclick={onClose} class="template-close-btn p-2 rounded-lg text-text-muted transition-colors">
+			<button type="button" onclick={onClose} class="template-close-btn pt-2 pb-2 pl-2 pr-0 rounded-lg text-text-muted transition-colors flex items-center justify-end">
 				<X size={20} />
 			</button>
 		{/if}

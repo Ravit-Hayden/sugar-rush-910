@@ -1,6 +1,7 @@
 <script lang="ts">
-	import { X, Asterisk, Upload, Music, ChevronDown } from 'lucide-svelte';
+	import { X, Asterisk, Music, ChevronDown } from 'lucide-svelte';
 	import { GENRES } from '$lib/constants/genres';
+	import { MAX_FILE_SIZE_BYTES, getFileSizeErrorMessage } from '$lib/constants/upload';
 	import ArtistSelect from '$lib/components/ArtistSelect.svelte';
 	import DatePicker from '$lib/components/DatePicker.svelte';
 
@@ -66,7 +67,7 @@
 	let audioFile = $state<File | null>(null);
 	let audioFileUrl = $state<string | null>(null);
 	let isDraggingAudio = $state(false);
-	let audioFileInput: HTMLInputElement;
+	let audioFileInput = $state<HTMLInputElement | null>(null);
 
 	// 드롭다운 상태
 	let statusDropdownOpen = $state(false);
@@ -145,6 +146,13 @@
 		const input = event.target as HTMLInputElement;
 		const file = input.files?.[0];
 		if (file && file.type.startsWith('audio/')) {
+			if (file.size > MAX_FILE_SIZE_BYTES) {
+				validationErrors = { ...validationErrors, audioFile: getFileSizeErrorMessage() };
+				return;
+			}
+			const next = { ...validationErrors };
+			delete next.audioFile;
+			validationErrors = next;
 			audioFile = file;
 			audioFileUrl = URL.createObjectURL(file);
 		}
@@ -155,6 +163,13 @@
 		isDraggingAudio = false;
 		const file = event.dataTransfer?.files[0];
 		if (file && file.type.startsWith('audio/')) {
+			if (file.size > MAX_FILE_SIZE_BYTES) {
+				validationErrors = { ...validationErrors, audioFile: getFileSizeErrorMessage() };
+				return;
+			}
+			const next = { ...validationErrors };
+			delete next.audioFile;
+			validationErrors = next;
 			audioFile = file;
 			audioFileUrl = URL.createObjectURL(file);
 		}
@@ -222,18 +237,19 @@
 	<!-- 배경 오버레이 -->
 	<div 
 		class="fixed inset-0 bg-black/50 z-[100] slide-panel-overlay"
-		onclick={onClose}
 		role="button"
 		tabindex="-1"
 		aria-label="패널 닫기"
+		onclick={onClose}
+		onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClose(); } }}
 	></div>
 
 	<!-- 슬라이드 패널 -->
-	<aside 
-		class="fixed top-0 right-0 h-full w-full max-w-lg bg-surface-1 border-l border-border-subtle z-[101] slide-panel-enter overflow-hidden flex flex-col"
+	<div 
 		role="dialog"
 		aria-modal="true"
 		aria-labelledby="panel-title"
+		class="fixed top-0 right-0 h-full w-full max-w-lg bg-surface-1 border-l border-border-subtle z-[101] slide-panel-enter overflow-hidden flex flex-col"
 	>
 		<!-- 헤더 -->
 		<header class="flex items-center justify-between px-6 py-4 border-b border-border-subtle flex-shrink-0">
@@ -243,7 +259,7 @@
 			<button
 				type="button"
 				onclick={onClose}
-				class="btn-icon"
+				class="template-close-btn w-8 h-8 flex items-center justify-end rounded-md text-text-muted transition-colors border border-transparent pl-2 pr-0"
 				aria-label="닫기"
 			>
 				<X size={20} />
@@ -457,16 +473,18 @@
 				<!-- 발매일 -->
 				<div class="grid grid-cols-2 gap-4">
 					<div>
-						<label class="block text-sm font-medium text-text-strong mb-2">국내 발매일</label>
+						<label for="track-release-date-kr" class="block text-sm font-medium text-text-strong mb-2">국내 발매일</label>
 						<DatePicker
+							id="track-release-date-kr"
 							value={formData.release_date_kr}
 							onChange={(value: string) => formData.release_date_kr = value}
 							align="left"
 						/>
 					</div>
 					<div>
-						<label class="block text-sm font-medium text-text-strong mb-2">해외 발매일</label>
+						<label for="track-release-date-global" class="block text-sm font-medium text-text-strong mb-2">해외 발매일</label>
 						<DatePicker
+							id="track-release-date-global"
 							value={formData.release_date_global}
 							onChange={(value: string) => formData.release_date_global = value}
 							align="right"
@@ -476,7 +494,7 @@
 
 				<!-- 음원 파일 업로드 -->
 				<div>
-					<label class="block text-sm font-medium text-text-strong mb-2">음원 파일</label>
+					<label for="track-slide-audio" class="block text-sm font-medium text-text-strong mb-2">음원 파일</label>
 					
 					{#if audioFile}
 						<!-- 업로드된 파일 표시 -->
@@ -509,13 +527,13 @@
 							tabindex="0"
 							onkeydown={(e) => e.key === 'Enter' && audioFileInput?.click()}
 						>
-							<Upload size={24} class="mx-auto text-text-muted mb-2" />
 							<p class="text-sm text-text-muted">
 								클릭하거나 파일을 드래그하세요
 							</p>
 							<p class="text-xs text-text-muted mt-1">MP3, WAV, FLAC</p>
 						</div>
 						<input
+							id="track-slide-audio"
 							type="file"
 							accept="audio/*"
 							bind:this={audioFileInput}
@@ -546,5 +564,5 @@
 				{isSubmitting ? '저장 중...' : (mode === 'create' ? '트랙 추가' : '저장')}
 			</button>
 		</footer>
-	</aside>
+	</div>
 {/if}

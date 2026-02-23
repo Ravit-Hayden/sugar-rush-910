@@ -1,11 +1,27 @@
 <script lang="ts">
-	import { Plus, Search, Copy, Check, Trash2, Edit2, ChevronDown, X, Filter, ArrowUpDown, UserRound, FileText, SearchX } from 'lucide-svelte';
+	import { Plus, Search, Copy, Check, Trash2, Edit2, ChevronDown, X, Filter, ArrowUpDown, UserRound, FileText, SearchX, Languages, SpellCheck, ExternalLink, Maximize2 } from 'lucide-svelte';
 	import SUNOTabs from '$lib/components/suno/SUNOTabs.svelte';
 	import type { PromptTemplate, Producer } from '$lib/types/suno';
 
+	// 외부 링크 (API 없음, 새 탭에서 열기)
+	const GOOGLE_TRANSLATE_BASE = 'https://translate.google.com/?sl=auto&tl=en&op=translate&text=';
+	const DEEPL_TRANSLATOR = 'https://www.deepl.com/translator';
+	const SPELL_CHECK_URL = 'https://nara-speller.co.kr/speller'; // 부산대 맞춤법(바른한글)
+
+	function openGoogleTranslate(text: string) {
+		if (!text.trim()) return;
+		window.open(GOOGLE_TRANSLATE_BASE + encodeURIComponent(text.trim()), '_blank', 'noopener,noreferrer');
+	}
+	function openDeepL() {
+		window.open(DEEPL_TRANSLATOR, '_blank', 'noopener,noreferrer');
+	}
+	function openSpellCheck() {
+		window.open(SPELL_CHECK_URL, '_blank', 'noopener,noreferrer');
+	}
+
 	// 필터 상태
 	let searchQuery = $state('');
-	let categoryFilter = $state<'all' | 'style' | 'exclude' | 'full'>('all');
+	let categoryFilter = $state<'all' | 'style' | 'exclude' | 'full' | 'reference'>('all');
 	let categoryDropdownOpen = $state(false);
 	let selectedCreator = $state<Producer | 'all'>('all');
 	let creatorDropdownOpen = $state(false);
@@ -33,9 +49,15 @@
 
 	// 모달 상태
 	let showAddModal = $state(false);
+	let showEditModal = $state(false);
+	let editingPrompt = $state<PromptTemplate | null>(null);
+	let addCategoryOpen = $state(false);
+	let editCategoryOpen = $state(false);
+	let editForm = $state({ name: '', description: '', category: 'style' as 'style' | 'exclude' | 'full' | 'reference', content: '' });
 	let newPrompt = $state({
 		name: '',
-		category: 'style' as 'style' | 'exclude' | 'full',
+		description: '',
+		category: 'style' as 'style' | 'exclude' | 'full' | 'reference',
 		content: ''
 	});
 
@@ -44,6 +66,7 @@
 		{
 			id: 'p1',
 			name: '드리미 신스팝',
+			description: '몽환적인 신스팝, 에테리얼 보컬',
 			category: 'style',
 			content: 'dreamy synth-pop, ethereal vocals, soft ballad, polished but emotive, with precise phrasing and dynamic control',
 			usageCount: 15,
@@ -53,6 +76,7 @@
 		{
 			id: 'p2',
 			name: 'K-POP 업템포',
+			description: '캐치한 훅, 에너지 넘치는 댄스팝',
 			category: 'style',
 			content: 'upbeat K-pop, catchy hooks, energetic dance-pop, powerful beats, polished production',
 			usageCount: 12,
@@ -62,6 +86,7 @@
 		{
 			id: 'p3',
 			name: '멜로우 어쿠스틱',
+			description: '따뜻한 보컬, 어쿠스틱 기타',
 			category: 'style',
 			content: 'mellow acoustic, warm vocals, gentle guitar, intimate atmosphere, singer-songwriter style',
 			usageCount: 8,
@@ -71,6 +96,7 @@
 		{
 			id: 'p4',
 			name: 'R&B 소울',
+			description: '스무스 그루브, 감성 보컬',
 			category: 'style',
 			content: 'R&B soul, smooth grooves, emotional vocals, modern production, late night vibes',
 			usageCount: 6,
@@ -80,6 +106,7 @@
 		{
 			id: 'p5',
 			name: '제외 - 헤비메탈',
+			description: '금지: 메탈·비명·디스토션',
 			category: 'exclude',
 			content: 'heavy metal, screaming, aggressive, harsh, distorted, noisy',
 			usageCount: 20,
@@ -89,6 +116,7 @@
 		{
 			id: 'p6',
 			name: '제외 - 아마추어',
+			description: '금지: 부정확·로우퀄',
 			category: 'exclude',
 			content: 'off-key, amateur, monotone, robotic, low quality',
 			usageCount: 18,
@@ -98,30 +126,64 @@
 		{
 			id: 'p7',
 			name: '여름밤 발라드 풀셋',
+			description: '스타일+제외 한 번에',
 			category: 'full',
 			content: 'Style: dreamy synth-pop, ethereal vocals, soft ballad, korean, emotional, midnight vibes\nExclude: heavy metal, screaming, aggressive, harsh',
 			usageCount: 5,
 			createdAt: '2026-01-10',
 			createdBy: 'El'
+		},
+		{
+			id: 'p8',
+			name: '참고 - 80s 팝',
+			description: '80년대 팝 레퍼런스',
+			category: 'reference',
+			content: 'similar to 80s pop, synth-driven, new wave, like Duran Duran, The Cure',
+			usageCount: 3,
+			createdAt: '2026-01-12',
+			createdBy: 'Otte'
 		}
 	]);
 
+	// 이름 중복 검사 (추가 시)
+	const isDuplicateNameAdd = $derived(
+		newPrompt.name.trim().length > 0 &&
+		prompts.some(p => p.name.trim().toLowerCase() === newPrompt.name.trim().toLowerCase())
+	);
+	// 이름 중복 검사 (편집 시, 자기 자신 제외)
+	const isDuplicateNameEdit = $derived(
+		!!editingPrompt &&
+		editForm.name.trim().length > 0 &&
+		prompts.some(p => p.id !== editingPrompt!.id && p.name.trim().toLowerCase() === editForm.name.trim().toLowerCase())
+	);
+
+	// 프롬프트/제외스타일 내용 최대 길이 (띄어쓰기 포함)
+	const MAX_CONTENT_LENGTH = 1000;
+
 	// 카테고리 라벨
-	const categoryLabels: Record<'all' | 'style' | 'exclude' | 'full', string> = {
+	const categoryLabels: Record<'all' | 'style' | 'exclude' | 'full' | 'reference', string> = {
 		all: '전체',
 		style: '스타일',
 		exclude: '제외',
-		full: '풀 프롬프트'
+		full: '풀 프롬프트',
+		reference: '참고/레퍼런스'
 	};
 
-	// 카테고리 색상
-	function getCategoryColor(category: string): string {
-		switch (category) {
-			case 'style': return 'bg-brand-pink/20 text-brand-pink';
-			case 'exclude': return 'bg-red-500/20 text-red-400';
-			case 'full': return 'bg-blue-500/20 text-blue-400';
-			default: return 'bg-surface-2 text-text-muted';
-		}
+	// 카테고리 색상 (배지·필터 동일): 배경은 중립, 글자·테두리로 구분해 가독성 확보
+	function getCategoryColors(category: string): string {
+		const map: Record<string, string> = {
+			style: 'bg-surface-2 border-brand-pink text-brand-pink',
+			exclude: 'bg-surface-2 border-red-400 text-red-400',
+			full: 'bg-surface-2 border-blue-400 text-blue-400',
+			reference: 'bg-surface-2 border-amber-400 text-amber-400'
+		};
+		return map[category] ?? 'bg-surface-2 border-border-subtle text-text-muted';
+	}
+	// 카테고리 뱃지: 표시 전용(링크/버튼 아님) → 호버·포커스·transition 없음
+	function getCategoryBadgeClass(category: string): string {
+		const base =
+			'flex-shrink-0 px-2 py-0.5 rounded text-xs font-medium border outline-none focus:outline-none focus:ring-0 select-none cursor-default pointer-events-none';
+		return `${base} ${getCategoryColors(category)}`;
 	}
 
 	// 필터링 및 정렬
@@ -186,22 +248,54 @@
 		}
 	}
 
-	// 추가
+	// 추가 (내용 1000자 초과 시 저장 안 함)
 	function addPrompt() {
-		if (!newPrompt.name.trim() || !newPrompt.content.trim()) return;
+		const content = newPrompt.content.trim().slice(0, MAX_CONTENT_LENGTH);
+		if (!newPrompt.name.trim() || !content || isDuplicateNameAdd) return;
 
 		prompts = [...prompts, {
 			id: `p_${Date.now()}`,
 			name: newPrompt.name.trim(),
+			description: newPrompt.description.trim() || undefined,
 			category: newPrompt.category,
-			content: newPrompt.content.trim(),
+			content,
 			usageCount: 0,
 			createdAt: new Date().toISOString().split('T')[0],
 			createdBy: 'El'
 		}];
 
-		newPrompt = { name: '', category: 'style', content: '' };
+		newPrompt = { name: '', description: '', category: 'style', content: '' };
 		showAddModal = false;
+	}
+
+	// 편집 열기/닫기/저장
+	function openEditModal(prompt: PromptTemplate) {
+		editingPrompt = prompt;
+		editForm = { name: prompt.name, description: prompt.description ?? '', category: prompt.category, content: prompt.content.slice(0, MAX_CONTENT_LENGTH) };
+		showEditModal = true;
+	}
+	function closeEditModal() {
+		showEditModal = false;
+		editingPrompt = null;
+	}
+	function saveEdit() {
+		const content = editForm.content.trim().slice(0, MAX_CONTENT_LENGTH);
+		if (!editingPrompt || !editForm.name.trim() || !content || isDuplicateNameEdit) return;
+		prompts = prompts.map(p =>
+			p.id === editingPrompt!.id
+				? { ...p, name: editForm.name.trim(), description: editForm.description.trim() || undefined, category: editForm.category, content }
+				: p
+		);
+		closeEditModal();
+	}
+
+	// 전체 내용 보기 모달
+	let fullContentPrompt = $state<PromptTemplate | null>(null);
+	function openFullContent(prompt: PromptTemplate) {
+		fullContentPrompt = prompt;
+	}
+	function closeFullContent() {
+		fullContentPrompt = null;
 	}
 
 	// 담당자별 카운트
@@ -225,10 +319,16 @@
 		if (!target.closest('.sort-dropdown')) {
 			sortDropdownOpen = false;
 		}
+		if (!target.closest('.add-category-dropdown')) {
+			addCategoryOpen = false;
+		}
+		if (!target.closest('.edit-category-dropdown')) {
+			editCategoryOpen = false;
+		}
 	}
 
 	$effect(() => {
-		if (categoryDropdownOpen || creatorDropdownOpen || sortDropdownOpen) {
+		if (categoryDropdownOpen || creatorDropdownOpen || sortDropdownOpen || addCategoryOpen || editCategoryOpen) {
 			document.addEventListener('click', handleClickOutside);
 		}
 		return () => {
@@ -267,13 +367,13 @@
 			<!-- 검색 (윗줄) -->
 			<div class="relative group">
 				<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-					<Search size={16} class="lucide-icon lucide-search" />
+					<Search size={16} class="lucide-icon lucide-search filter-search-icon" />
 				</div>
 				<input
 					type="text"
 					bind:value={searchQuery}
 					placeholder="프롬프트 검색..."
-					class="w-full pl-10 {searchQuery.trim() ? 'pr-10' : 'pr-4'} py-1.5 bg-surface-2 border border-border-subtle border-[1px] rounded-md text-text-base placeholder-text-muted focus:outline-none focus:border-brand-pink focus:ring-0 transition-colors duration-200"
+					class="filter-search-input w-full pl-10 {searchQuery.trim() ? 'pr-10' : 'pr-4'} py-1.5 bg-surface-2 border border-border-subtle border-[1px] rounded-md text-text-base placeholder:text-text-base placeholder:opacity-100 focus:outline-none focus:border-brand-pink focus:ring-0 transition-colors duration-200"
 					aria-label="프롬프트 검색"
 					id="prompt-search"
 					autocomplete="off"
@@ -306,7 +406,7 @@
 						class="status-filter-btn flex items-center pl-10 pr-8 py-1.5 w-full bg-surface-2 rounded-[6px] text-text-base transition-all duration-200 cursor-pointer border border-border-subtle focus:outline-none focus:border-brand-pink"
 					>
 						<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-							<Filter size={16} class="lucide-icon text-text-muted transition-colors duration-200" />
+							<Filter size={16} class="lucide-icon filter-control-icon transition-colors duration-200" />
 						</div>
 						<span class="flex-1 text-left truncate">
 							{categoryLabels[categoryFilter]} ({categoryCounts[categoryFilter] || 0})
@@ -324,7 +424,7 @@
 									tabindex="0"
 									onclick={() => { categoryFilter = value as typeof categoryFilter; categoryDropdownOpen = false; }}
 									onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { categoryFilter = value as typeof categoryFilter; categoryDropdownOpen = false; } }}
-									class="dropdown-item px-4 py-2 text-sm cursor-pointer transition-colors {categoryFilter === value ? 'bg-brand-pink text-white' : 'text-text-base'}"
+									class="dropdown-item px-4 py-2 text-sm cursor-pointer transition-colors {categoryFilter === value ? 'bg-brand-pink text-white' : 'text-text-base hover:bg-surface-1'}"
 								>
 									{label} ({categoryCounts[value] || 0})
 								</li>
@@ -343,14 +443,10 @@
 						class="status-filter-btn flex items-center pl-10 pr-8 py-1.5 w-full bg-surface-2 rounded-[6px] text-text-base transition-all duration-200 cursor-pointer border border-border-subtle focus:outline-none focus:border-brand-pink"
 					>
 						<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-							<UserRound size={16} class="lucide-icon text-text-muted transition-colors duration-200" />
+							<UserRound size={16} class="lucide-icon filter-control-icon transition-colors duration-200" />
 						</div>
 						<span class="flex-1 text-left truncate">
-							{#if selectedCreator === 'all'}
-								전체 ({creatorCounts.all})
-							{:else}
-								<span class="{selectedCreator === 'El' ? 'text-elotte-green' : 'text-elotte-orange'}">{selectedCreator}</span> ({creatorCounts[selectedCreator] || 0})
-							{/if}
+							{creatorLabels[selectedCreator]} ({creatorCounts[selectedCreator] || 0})
 						</span>
 						<div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
 							<ChevronDown size={12} class="text-text-base transition-colors duration-200" />
@@ -367,11 +463,7 @@
 									onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { selectedCreator = value as typeof selectedCreator; creatorDropdownOpen = false; } }}
 									class="dropdown-item px-4 py-2 text-sm cursor-pointer transition-colors {selectedCreator === value ? 'bg-brand-pink text-white' : 'text-text-base'}"
 								>
-									{#if value === 'all'}
-										전체 ({creatorCounts.all})
-									{:else}
-										<span class="{value === 'El' ? 'text-elotte-green' : 'text-elotte-orange'}">{label}</span> ({creatorCounts[value] || 0})
-									{/if}
+									{label} ({creatorCounts[value] || 0})
 								</li>
 							{/each}
 						</ul>
@@ -388,7 +480,7 @@
 						class="status-filter-btn flex items-center pl-10 pr-8 py-1.5 w-full bg-surface-2 rounded-[6px] text-text-base transition-all duration-200 cursor-pointer border border-border-subtle focus:outline-none focus:border-brand-pink"
 					>
 						<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-							<ArrowUpDown size={16} class="lucide-icon text-text-muted transition-colors duration-200" />
+							<ArrowUpDown size={16} class="lucide-icon filter-control-icon transition-colors duration-200" />
 						</div>
 						<span class="flex-1 text-left truncate">
 							{sortLabels[sortBy]}
@@ -420,52 +512,66 @@
 		<!-- 프롬프트 그리드 -->
 		<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 			{#each filteredPrompts as prompt}
-				<div class="project-card bg-surface-2 rounded-lg border border-border-subtle p-4 transition-colors">
+				<div class="project-card flex flex-col min-h-[240px] bg-surface-2 rounded-lg border border-border-subtle p-4 transition-colors">
 					<!-- 헤더 -->
-					<div class="flex items-start justify-between gap-3 mb-3">
+					<div class="flex items-start justify-between gap-3 mb-2 flex-shrink-0">
 						<div class="flex-1 min-w-0">
 							<div class="flex items-center gap-2">
 								<h3 class="text-base font-medium text-text-strong truncate">{prompt.name}</h3>
-								<span class="flex-shrink-0 px-2 py-0.5 rounded text-xs font-medium {getCategoryColor(prompt.category)}">
+								<span class="{getCategoryBadgeClass(prompt.category)}">
 									{categoryLabels[prompt.category]}
 								</span>
 							</div>
 							<p class="text-xs text-text-muted mt-1">
 								사용 {prompt.usageCount}회 · <span class="{prompt.createdBy === 'El' ? 'text-elotte-green' : 'text-elotte-orange'}">{prompt.createdBy}</span> · {prompt.createdAt}
 							</p>
+							{#if prompt.description}
+								<p class="text-sm text-text-muted mt-1.5 line-clamp-1 truncate" title={prompt.description}>{prompt.description}</p>
+							{/if}
 						</div>
 					</div>
 
-					<!-- 내용 -->
-					<div class="bg-bg rounded-lg p-3 mb-3">
-						<p class="text-sm text-text-base whitespace-pre-wrap line-clamp-3">{prompt.content}</p>
+					<!-- 내용 (3줄만 보이고 나머지는 ...) -->
+					<div class="bg-surface-1 rounded-lg p-3 mb-3 flex-1 min-h-0 overflow-hidden">
+						<p class="text-sm text-text-base whitespace-pre-wrap line-clamp-3 break-words">{prompt.content}</p>
 					</div>
 
-					<!-- 액션 -->
-					<div class="flex items-center justify-end gap-2">
+					<!-- 카드 하단: 좌측 전체 보기, 우측 액션 (모든 카드 동일 위치) -->
+					<div class="flex items-center justify-between gap-2 flex-shrink-0 mt-auto">
 						<button
 							type="button"
-							class="btn-icon"
-							onclick={() => copyPrompt(prompt.id, prompt.content)}
-							aria-label="복사"
+							onclick={() => openFullContent(prompt)}
+							class="group/textlink text-xs inline-flex items-center gap-1 bg-transparent border-0 p-0 cursor-pointer outline-none focus:outline-none focus:ring-0 text-brand-pink hover:text-hover-cyan focus:text-hover-cyan transition-colors [&_svg]:shrink-0 [&_svg]:stroke-current [&_svg]:transition-colors"
+							aria-label="전체 내용 보기"
 						>
-							{#if copiedId === prompt.id}
-								<Check size={16} class="text-green-500" />
-							{:else}
-								<Copy size={16} />
-							{/if}
+							<Maximize2 size={12} />
+							<span class="text-inherit group-hover/textlink:text-hover-cyan group-focus/textlink:text-hover-cyan transition-colors">전체 보기</span>
 						</button>
-						<button type="button" class="btn-icon" aria-label="수정">
-							<Edit2 size={16} />
-						</button>
-						<button
-							type="button"
-							class="btn-icon text-red-400 hover:text-red-500"
-							onclick={() => deletePrompt(prompt.id)}
-							aria-label="삭제"
-						>
-							<Trash2 size={16} />
-						</button>
+						<div class="flex items-center gap-2">
+							<button
+								type="button"
+								class="btn-icon"
+								onclick={() => copyPrompt(prompt.id, prompt.content)}
+								aria-label="복사"
+							>
+								{#if copiedId === prompt.id}
+									<Check size={16} class="text-green-500" />
+								{:else}
+									<Copy size={16} />
+								{/if}
+							</button>
+							<button type="button" class="btn-icon" onclick={() => openEditModal(prompt)} aria-label="수정">
+								<Edit2 size={16} />
+							</button>
+							<button
+								type="button"
+								class="btn-icon text-red-400 hover:text-red-500"
+								onclick={() => deletePrompt(prompt.id)}
+								aria-label="삭제"
+							>
+								<Trash2 size={16} />
+							</button>
+						</div>
 					</div>
 				</div>
 			{/each}
@@ -522,34 +628,37 @@
 
 <!-- 프롬프트 추가 모달 -->
 {#if showAddModal}
+	<!-- svelte-ignore a11y_no_static_element_interactions a11y_click_events_have_key_events -->
 	<div
 		class="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4"
-		onclick={() => showAddModal = false}
-		onkeydown={(e) => { if (e.key === 'Escape') showAddModal = false; }}
 		role="dialog"
 		aria-modal="true"
+		aria-labelledby="add-modal-title"
 		tabindex="-1"
+		onclick={() => showAddModal = false}
+		onkeydown={(e) => { if (e.key === 'Escape') showAddModal = false; }}
 	>
 		<!-- svelte-ignore a11y_no_static_element_interactions a11y_click_events_have_key_events -->
 		<div
-			class="bg-surface-1 rounded-lg border border-border-subtle w-full max-w-lg"
+			class="bg-surface-1 rounded-lg border border-border-subtle w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col"
 			onclick={(e) => e.stopPropagation()}
 			onkeydown={(e) => e.stopPropagation()}
 			role="presentation"
 		>
-			<div class="flex items-center justify-between px-6 py-4 border-b border-border-subtle">
-				<h2 class="text-lg font-semibold text-text-strong">새 프롬프트 추가</h2>
+			<div class="flex items-center justify-between px-6 py-4 border-b border-border-subtle flex-shrink-0">
+				<h2 id="add-modal-title" class="text-lg font-semibold text-text-strong">새 프롬프트 추가</h2>
 				<button
 					type="button"
 					onclick={() => showAddModal = false}
-					class="template-close-btn w-8 h-8 flex items-center justify-center rounded-md text-text-muted transition-colors border border-transparent"
+					class="template-close-btn w-8 h-8 flex items-center justify-end rounded-md text-text-muted transition-colors border border-transparent pl-2 pr-0"
 					aria-label="닫기"
 				>
 					<X size={20} />
 				</button>
 			</div>
 
-			<form onsubmit={(e) => { e.preventDefault(); addPrompt(); }} class="p-6 space-y-4">
+			<form onsubmit={(e) => { e.preventDefault(); addPrompt(); }} class="flex flex-1 min-h-0 flex-col">
+				<div class="p-6 space-y-4 overflow-y-auto custom-list-scrollbar modal-scroll-body flex-1 min-h-0">
 				<!-- 이름 -->
 				<div>
 					<label for="prompt-name" class="block text-sm font-medium text-text-strong mb-2">이름</label>
@@ -557,41 +666,123 @@
 						type="text"
 						id="prompt-name"
 						bind:value={newPrompt.name}
-						class="w-full py-1.5 px-4 bg-surface-2 border border-border-subtle rounded-md text-text-base focus:outline-none focus:border-brand-pink transition-colors"
+						class="input-base w-full h-10 px-4 text-base placeholder-text-muted rounded-lg border box-border"
 						placeholder="프롬프트 이름"
+						aria-invalid={isDuplicateNameAdd}
 						required
+					/>
+					{#if isDuplicateNameAdd}
+						<p class="text-xs text-danger-fg mt-1.5">이미 같은 이름의 프롬프트가 있습니다</p>
+					{/if}
+				</div>
+
+				<!-- 설명 (선택, 그리드에서 알아보기 쉽게) -->
+				<div>
+					<label for="prompt-description" class="block text-sm font-medium text-text-strong mb-2">설명</label>
+					<input
+						type="text"
+						id="prompt-description"
+						bind:value={newPrompt.description}
+						class="input-base w-full h-10 px-4 text-base placeholder-text-muted rounded-lg border box-border"
+						placeholder="한 줄 요약 (선택)"
 					/>
 				</div>
 
-				<!-- 카테고리 -->
-				<div>
-					<label for="prompt-category" class="block text-sm font-medium text-text-strong mb-2">카테고리</label>
-					<select
-						id="prompt-category"
-						bind:value={newPrompt.category}
-						class="w-full py-1.5 px-4 bg-surface-2 border border-border-subtle rounded-md text-text-base focus:outline-none focus:border-brand-pink transition-colors"
+				<!-- 카테고리 (커스텀 드롭다운) -->
+				<div class="add-category-dropdown relative">
+					<label for="prompt-category-btn" class="block text-sm font-medium text-text-strong mb-2">카테고리</label>
+					<button
+						type="button"
+						id="prompt-category-btn"
+						onclick={() => addCategoryOpen = !addCategoryOpen}
+						aria-haspopup="listbox"
+						aria-expanded={addCategoryOpen}
+						class="input-select-trigger w-full"
 					>
-						<option value="style">스타일</option>
-						<option value="exclude">제외</option>
-						<option value="full">풀 프롬프트</option>
-					</select>
+						<span>{categoryLabels[newPrompt.category]}</span>
+						<span class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+							<ChevronDown size={16} class="text-text-muted transition-transform {addCategoryOpen ? 'rotate-180' : ''}" />
+						</span>
+					</button>
+					{#if addCategoryOpen}
+						<ul
+							class="absolute left-0 right-0 mt-1 bg-surface-2 border border-border-subtle rounded-lg z-20 overflow-hidden"
+							role="listbox"
+						>
+							{#each [['style', '스타일'], ['exclude', '제외'], ['full', '풀 프롬프트'], ['reference', '참고/레퍼런스']] as [value, label]}
+								<li
+									role="option"
+									aria-selected={newPrompt.category === value}
+									tabindex="0"
+									onclick={() => { newPrompt = { ...newPrompt, category: value as 'style' | 'exclude' | 'full' | 'reference' }; addCategoryOpen = false; }}
+									onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { newPrompt = { ...newPrompt, category: value as 'style' | 'exclude' | 'full' | 'reference' }; addCategoryOpen = false; } }}
+									class="dropdown-item px-4 py-2.5 text-sm cursor-pointer transition-colors {newPrompt.category === value ? 'bg-brand-pink text-white' : 'text-text-base hover:bg-surface-1'}"
+								>
+									{label}
+								</li>
+							{/each}
+						</ul>
+					{/if}
 				</div>
 
 				<!-- 내용 -->
 				<div>
-					<label for="prompt-content" class="block text-sm font-medium text-text-strong mb-2">내용</label>
+					<div class="flex items-center justify-between mb-2">
+						<label for="prompt-content" class="block text-sm font-medium text-text-strong">내용</label>
+						<div class="flex items-center gap-2 flex-wrap">
+							{#if newPrompt.content.trim()}
+								<button
+									type="button"
+									onclick={() => openGoogleTranslate(newPrompt.content)}
+									class="btn-outline-hover flex items-center gap-1 px-2 py-1.5 text-xs rounded-md border border-border-subtle text-text-base transition-colors"
+									title="작성한 글을 넣어 Google 번역 열기"
+								>
+									<Languages size={12} />
+									Google 번역
+								</button>
+							{/if}
+							<a
+								href={DEEPL_TRANSLATOR}
+								target="_blank"
+								rel="noopener noreferrer"
+								class="btn-outline-hover flex items-center gap-1 px-2 py-1.5 text-xs rounded-md border border-border-subtle text-text-base transition-colors no-underline"
+								title="DeepL 번역기 열기"
+							>
+								<ExternalLink size={12} />
+								DeepL
+							</a>
+							<a
+								href={SPELL_CHECK_URL}
+								target="_blank"
+								rel="noopener noreferrer"
+								class="btn-outline-hover flex items-center gap-1 px-2 py-1.5 text-xs rounded-md border border-border-subtle text-text-base transition-colors no-underline"
+								title="부산대 맞춤법(바른한글) 열기"
+							>
+								<SpellCheck size={12} />
+								맞춤법(바른한글)
+							</a>
+						</div>
+					</div>
+					<p class="text-xs text-text-muted mb-1 text-right">결과는 새 탭에서 복사한 뒤 여기 붙여넣어 주세요.</p>
 					<textarea
 						id="prompt-content"
-						bind:value={newPrompt.content}
-						class="w-full h-32 py-3 px-4 resize-none bg-surface-2 border border-border-subtle rounded-md text-text-base focus:outline-none focus:border-brand-pink transition-colors"
-						placeholder="프롬프트 내용을 입력하세요"
+						value={newPrompt.content}
+						oninput={(e) => {
+							const v = e.currentTarget.value;
+							newPrompt.content = v.length > MAX_CONTENT_LENGTH ? v.slice(0, MAX_CONTENT_LENGTH) : v;
+						}}
+						class="input-base w-full min-h-[8rem] py-3 px-4 text-base placeholder-text-muted resize-none overflow-y-auto custom-list-scrollbar"
+						placeholder="프롬프트 내용을 입력하세요 (띄어쓰기 포함 최대 1000자)"
+						spellcheck="true"
+						lang="ko"
 						required
 					></textarea>
-					<p class="text-xs text-text-muted mt-1">{newPrompt.content.length}/1000</p>
+					<p class="text-xs mt-1 {newPrompt.content.length >= MAX_CONTENT_LENGTH ? 'text-danger-fg' : 'text-text-muted'}">{newPrompt.content.length}/{MAX_CONTENT_LENGTH}</p>
 				</div>
 
+				</div>
 				<!-- 버튼 -->
-				<div class="flex justify-end gap-3 pt-4">
+				<div class="px-6 py-4 border-t border-border-subtle flex justify-end gap-3 flex-shrink-0">
 					<button
 						type="button"
 						onclick={() => showAddModal = false}
@@ -601,12 +792,219 @@
 					</button>
 					<button
 						type="submit"
-						class="px-6 py-2 bg-brand-pink text-white rounded-lg transition-colors font-medium hover:bg-brand-pink/90"
+						class="page-header-primary-button inline-flex items-center justify-center gap-2 px-6 py-2 bg-brand-pink text-white rounded-lg transition-colors font-medium focus:outline-none focus:ring-0"
 					>
 						추가
 					</button>
 				</div>
 			</form>
+		</div>
+	</div>
+{/if}
+
+<!-- 프롬프트 편집 모달 -->
+{#if showEditModal && editingPrompt}
+	<!-- svelte-ignore a11y_no_static_element_interactions a11y_click_events_have_key_events -->
+	<div
+		class="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4"
+		role="dialog"
+		aria-modal="true"
+		aria-labelledby="edit-modal-title"
+		tabindex="-1"
+		onclick={closeEditModal}
+		onkeydown={(e) => { if (e.key === 'Escape') closeEditModal(); }}
+	>
+		<!-- svelte-ignore a11y_no_static_element_interactions a11y_click_events_have_key_events -->
+		<div
+			class="bg-surface-1 rounded-lg border border-border-subtle w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col"
+			onclick={(e) => e.stopPropagation()}
+			onkeydown={(e) => e.stopPropagation()}
+			role="presentation"
+		>
+			<div class="flex items-center justify-between px-6 py-4 border-b border-border-subtle flex-shrink-0">
+				<h2 id="edit-modal-title" class="text-lg font-semibold text-text-strong">프롬프트 수정</h2>
+				<button
+					type="button"
+					onclick={closeEditModal}
+					class="template-close-btn w-8 h-8 flex items-center justify-end rounded-md text-text-muted transition-colors border border-transparent pl-2 pr-0"
+					aria-label="닫기"
+				>
+					<X size={20} />
+				</button>
+			</div>
+
+			<form onsubmit={(e) => { e.preventDefault(); saveEdit(); }} class="flex flex-1 min-h-0 flex-col">
+				<div class="p-6 space-y-4 overflow-y-auto custom-list-scrollbar modal-scroll-body flex-1 min-h-0">
+				<div>
+					<label for="edit-prompt-name" class="block text-sm font-medium text-text-strong mb-2">이름</label>
+					<input
+						type="text"
+						id="edit-prompt-name"
+						bind:value={editForm.name}
+						class="input-base w-full h-10 px-4 text-base placeholder-text-muted rounded-lg border box-border"
+						placeholder="프롬프트 이름"
+						aria-invalid={isDuplicateNameEdit}
+						required
+					/>
+					{#if isDuplicateNameEdit}
+						<p class="text-xs text-danger-fg mt-1.5">이미 같은 이름의 프롬프트가 있습니다</p>
+					{/if}
+				</div>
+				<!-- 설명 (선택) -->
+				<div>
+					<label for="edit-prompt-description" class="block text-sm font-medium text-text-strong mb-2">설명</label>
+					<input
+						type="text"
+						id="edit-prompt-description"
+						bind:value={editForm.description}
+						class="input-base w-full h-10 px-4 text-base placeholder-text-muted rounded-lg border box-border"
+						placeholder="한 줄 요약 (선택)"
+					/>
+				</div>
+				<!-- 카테고리 (커스텀 드롭다운) -->
+				<div class="edit-category-dropdown relative">
+					<label for="edit-prompt-category-btn" class="block text-sm font-medium text-text-strong mb-2">카테고리</label>
+					<button
+						type="button"
+						id="edit-prompt-category-btn"
+						onclick={() => editCategoryOpen = !editCategoryOpen}
+						aria-haspopup="listbox"
+						aria-expanded={editCategoryOpen}
+						class="input-select-trigger w-full"
+					>
+						<span>{categoryLabels[editForm.category]}</span>
+						<span class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+							<ChevronDown size={16} class="text-text-muted transition-transform {editCategoryOpen ? 'rotate-180' : ''}" />
+						</span>
+					</button>
+					{#if editCategoryOpen}
+						<ul
+							class="absolute left-0 right-0 mt-1 bg-surface-2 border border-border-subtle rounded-lg z-20 overflow-hidden"
+							role="listbox"
+						>
+							{#each [['style', '스타일'], ['exclude', '제외'], ['full', '풀 프롬프트'], ['reference', '참고/레퍼런스']] as [value, label]}
+								<li
+									role="option"
+									aria-selected={editForm.category === value}
+									tabindex="0"
+									onclick={() => { editForm = { ...editForm, category: value as 'style' | 'exclude' | 'full' | 'reference' }; editCategoryOpen = false; }}
+									onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { editForm = { ...editForm, category: value as 'style' | 'exclude' | 'full' | 'reference' }; editCategoryOpen = false; } }}
+									class="dropdown-item px-4 py-2.5 text-sm cursor-pointer transition-colors {editForm.category === value ? 'bg-brand-pink text-white' : 'text-text-base hover:bg-surface-1'}"
+								>
+									{label}
+								</li>
+							{/each}
+						</ul>
+					{/if}
+				</div>
+				<div>
+					<div class="flex items-center justify-between mb-2">
+						<label for="edit-prompt-content" class="block text-sm font-medium text-text-strong">내용</label>
+						<div class="flex items-center gap-2 flex-wrap">
+							{#if editForm.content.trim()}
+								<button
+									type="button"
+									onclick={() => openGoogleTranslate(editForm.content)}
+									class="btn-outline-hover flex items-center gap-1 px-2 py-1.5 text-xs rounded-md border border-border-subtle text-text-base transition-colors"
+									title="작성한 글을 넣어 Google 번역 열기"
+								>
+									<Languages size={12} />
+									Google 번역
+								</button>
+							{/if}
+							<a
+								href={DEEPL_TRANSLATOR}
+								target="_blank"
+								rel="noopener noreferrer"
+								class="btn-outline-hover flex items-center gap-1 px-2 py-1.5 text-xs rounded-md border border-border-subtle text-text-base transition-colors no-underline"
+								title="DeepL 번역기 열기"
+							>
+								<ExternalLink size={12} />
+								DeepL
+							</a>
+							<a
+								href={SPELL_CHECK_URL}
+								target="_blank"
+								rel="noopener noreferrer"
+								class="btn-outline-hover flex items-center gap-1 px-2 py-1.5 text-xs rounded-md border border-border-subtle text-text-base transition-colors no-underline"
+								title="부산대 맞춤법(바른한글) 열기"
+							>
+								<SpellCheck size={12} />
+								맞춤법(바른한글)
+							</a>
+						</div>
+					</div>
+					<p class="text-xs text-text-muted mb-1 text-right">결과는 새 탭에서 복사한 뒤 여기 붙여넣어 주세요.</p>
+					<textarea
+						id="edit-prompt-content"
+						value={editForm.content}
+						oninput={(e) => {
+							const v = e.currentTarget.value;
+							editForm.content = v.length > MAX_CONTENT_LENGTH ? v.slice(0, MAX_CONTENT_LENGTH) : v;
+						}}
+						class="input-base w-full min-h-[8rem] py-3 px-4 text-base placeholder-text-muted resize-none overflow-y-auto custom-list-scrollbar"
+						placeholder="프롬프트 내용 (띄어쓰기 포함 최대 1000자)"
+						spellcheck="true"
+						lang="ko"
+						required
+					></textarea>
+					<p class="text-xs mt-1 {editForm.content.length >= MAX_CONTENT_LENGTH ? 'text-danger-fg' : 'text-text-muted'}">{editForm.content.length}/{MAX_CONTENT_LENGTH}</p>
+				</div>
+				</div>
+				<div class="px-6 py-4 border-t border-border-subtle flex justify-end gap-3 flex-shrink-0">
+					<button
+						type="button"
+						onclick={closeEditModal}
+						class="cancel-button px-6 py-2 bg-surface-2 text-text-base rounded-lg border border-border-subtle transition-colors font-medium"
+					>
+						취소
+					</button>
+					<button
+						type="submit"
+						class="page-header-primary-button inline-flex items-center justify-center gap-2 px-6 py-2 bg-brand-pink text-white rounded-lg transition-colors font-medium focus:outline-none focus:ring-0"
+					>
+						저장
+					</button>
+				</div>
+			</form>
+		</div>
+	</div>
+{/if}
+
+<!-- 전체 내용 보기 모달 -->
+{#if fullContentPrompt}
+	<div
+		class="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4"
+		role="dialog"
+		aria-modal="true"
+		aria-labelledby="full-content-title"
+	>
+		<div class="bg-surface-1 rounded-lg border border-border-subtle w-full max-w-2xl max-h-[85vh] flex flex-col">
+			<div class="flex items-center justify-between gap-3 p-4 border-b border-border-subtle flex-shrink-0">
+				<h2 id="full-content-title" class="text-lg font-semibold text-text-strong truncate">{fullContentPrompt.name}</h2>
+				<div class="flex items-center gap-2 flex-shrink-0">
+					<button
+						type="button"
+						onclick={() => copyPrompt(fullContentPrompt!.id, fullContentPrompt!.content)}
+						class="btn-outline-hover flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg border border-border-subtle"
+					>
+						{#if copiedId === fullContentPrompt.id}
+							<Check size={14} class="text-green-500" />
+							복사됨
+						{:else}
+							<Copy size={14} />
+							복사
+						{/if}
+					</button>
+					<button type="button" onclick={closeFullContent} class="btn-icon" aria-label="닫기">
+						<X size={20} />
+					</button>
+				</div>
+			</div>
+			<div class="p-4 overflow-y-auto flex-1 min-h-0 custom-list-scrollbar">
+				<p class="text-sm text-text-base whitespace-pre-wrap break-words">{fullContentPrompt.content}</p>
+				<p class="text-xs text-text-muted mt-4">{fullContentPrompt.content.length}자</p>
+			</div>
 		</div>
 	</div>
 {/if}

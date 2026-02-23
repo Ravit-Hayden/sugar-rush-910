@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { DollarSign, TrendingUp, TrendingDown, BarChart3, Plus, Edit, Trash2 } from 'lucide-svelte';
+	import { DollarSign, TrendingUp, TrendingDown, BarChart3, Plus, Edit, Trash2, FileSpreadsheet } from 'lucide-svelte';
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import PageContent from '$lib/components/PageContent.svelte';
 	import MoreMenuDropdown from '$lib/components/MoreMenuDropdown.svelte';
@@ -60,9 +60,9 @@
 			try {
 				loading = true;
 				const response = await fetch('/api/revenue?limit=1000');
-				const data = await response.json();
-				if (data.ok) {
-					revenues = data.data || [];
+				const data = (await response.json()) as { ok?: boolean; data?: unknown[] };
+				if (data.ok && Array.isArray(data.data)) {
+					revenues = data.data;
 				}
 			} catch (error) {
 				console.error('Failed to load revenues:', error);
@@ -133,11 +133,10 @@
 	<PageHeader 
 		title="수익 관리" 
 		description="음악 수익을 분석하고 관리하세요."
-		action={{
-			label: '수익 추가',
-			href: '/revenue/new',
-			icon: Plus
-		}}
+		actions={[
+			{ label: '엑셀 가져오기', href: '/revenue/import', icon: FileSpreadsheet },
+			{ label: '수익 추가', href: '/revenue/new', icon: Plus }
+		]}
 	/>
 
 	{#if loading}
@@ -208,7 +207,37 @@
 					<p class="text-text-muted">수익 데이터가 없습니다.</p>
 				</div>
 			{:else}
-				<div class="overflow-x-auto">
+				<!-- 모바일/좁은 뷰: 카드 -->
+				<div class="md:hidden divide-y divide-border-subtle">
+					{#each revenues as revenue}
+						<div class="p-4 hover:bg-surface-2 transition-colors">
+							<div class="flex items-start justify-between gap-3">
+								<div class="min-w-0 flex-1">
+									<p class="text-sm font-medium text-text-strong">{revenue.platform || '-'}</p>
+									<p class="text-sm text-text-base mt-0.5" data-type="number">₩{(revenue.amount || 0).toLocaleString()}</p>
+									<p class="text-xs text-text-muted mt-1">{formatDate(revenue.date)}</p>
+									{#if revenue.description}
+										<p class="text-sm text-text-muted mt-1 break-words">{revenue.description}</p>
+									{/if}
+								</div>
+								<div class="flex-shrink-0">
+									<MoreMenuDropdown
+										itemId={revenue.id}
+										openId={moreMenuOpenId}
+										items={[
+											{ label: '수정', icon: Edit, onClick: () => handleEdit(revenue.id), ariaLabel: '수익 수정' },
+											{ label: '삭제', icon: Trash2, onClick: () => handleDelete(revenue.id), ariaLabel: '수익 삭제', danger: true, separator: true }
+										]}
+										onToggle={handleMoreMenuToggle}
+										onClose={handleMoreMenuClose}
+									/>
+								</div>
+							</div>
+						</div>
+					{/each}
+				</div>
+				<!-- 데스크톱: 테이블 (가로 스크롤 없음) -->
+				<div class="hidden md:block overflow-hidden">
 					<table class="w-full">
 						<thead>
 							<tr class="border-b border-border-subtle">

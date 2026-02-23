@@ -1,6 +1,7 @@
 <script lang="ts">
-	import { Upload, X, Music, Check, AlertCircle } from 'lucide-svelte';
+	import { Upload, X, AlertCircle } from 'lucide-svelte';
 	import type { AudioVersionType } from '$lib/types/suno';
+	import { MAX_FILE_SIZE_BYTES, getFileSizeErrorMessage } from '$lib/constants/upload';
 
 	// Props
 	interface Props {
@@ -65,9 +66,9 @@
 			return;
 		}
 
-		// 50MB 제한
-		if (file.size > 50 * 1024 * 1024) {
-			error = '파일 크기는 50MB를 초과할 수 없습니다.';
+		// 공통 한도 1GB
+		if (file.size > MAX_FILE_SIZE_BYTES) {
+			error = getFileSizeErrorMessage();
 			return;
 		}
 
@@ -119,7 +120,7 @@
 	<div class="px-4 py-3 border-b border-border-subtle flex items-center justify-between">
 		<h3 class="text-sm font-semibold text-text-strong">음원 업로드</h3>
 		{#if onClose}
-			<button type="button" onclick={onClose} class="btn-icon">
+			<button type="button" onclick={onClose} class="template-close-btn w-7 h-7 flex items-center justify-end rounded-md text-text-muted transition-colors border border-transparent pl-1.5 pr-0" aria-label="닫기">
 				<X size={16} />
 			</button>
 		{/if}
@@ -144,9 +145,6 @@
 					class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
 				/>
 				<div class="flex flex-col items-center gap-3">
-					<div class="w-12 h-12 rounded-full bg-surface-2 flex items-center justify-center">
-						<Upload size={24} class="text-text-muted" />
-					</div>
 					<div>
 						<p class="text-sm font-medium text-text-base">파일을 드래그하거나 클릭하여 선택</p>
 						<p class="text-xs text-text-muted mt-1">MP3, WAV, FLAC (최대 50MB)</p>
@@ -156,9 +154,6 @@
 		{:else}
 			<!-- 선택된 파일 -->
 			<div class="flex items-center gap-4 p-4 bg-surface-2 rounded-lg">
-				<div class="w-12 h-12 rounded-lg bg-brand-pink/20 flex items-center justify-center flex-shrink-0">
-					<Music size={24} class="text-brand-pink" />
-				</div>
 				<div class="flex-1 min-w-0">
 					<p class="text-sm font-medium text-text-strong truncate">{selectedFile.name}</p>
 					<p class="text-xs text-text-muted">{formatFileSize(selectedFile.size)}</p>

@@ -107,7 +107,7 @@ export const GET: RequestHandler = async ({ platform, url }) => {
 
 export const POST: RequestHandler = async ({ request, platform }) => {
 	try {
-		const feedbackData = await request.json();
+		const feedbackData = await request.json() as Record<string, any>;
 
 		// 입력 검증
 		if (!feedbackData.title || !feedbackData.title.trim()) {
@@ -175,10 +175,10 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 					.run();
 
 				// 생성된 피드백 정보 조회
-				const { results } = await db
+				const results = await db
 					.prepare('SELECT * FROM feedbacks WHERE id = ?')
 					.bind(feedbackId)
-					.first();
+					.first() as Record<string, any> | null;
 
 				createdFeedback = {
 					id: feedbackId,
@@ -248,7 +248,7 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 
 export const PUT: RequestHandler = async ({ request, platform }) => {
 	try {
-		const feedbackData = await request.json();
+		const feedbackData = await request.json() as Record<string, any>;
 		const { id, title, content, status, priority, tags } = feedbackData;
 
 		if (!id) {
@@ -316,10 +316,10 @@ export const PUT: RequestHandler = async ({ request, platform }) => {
 				}
 
 				// 업데이트된 피드백 정보 조회
-				const { results } = await db
+				const results = await db
 					.prepare('SELECT * FROM feedbacks WHERE id = ?')
 					.bind(id)
-					.first();
+					.first() as Record<string, any> | null;
 
 				updatedFeedback = {
 					id,
@@ -378,7 +378,7 @@ export const PUT: RequestHandler = async ({ request, platform }) => {
 
 export const DELETE: RequestHandler = async ({ request, platform }) => {
 	try {
-		const { id } = await request.json();
+		const { id } = await request.json() as { id: string };
 
 		if (!id) {
 			const response: ApiErr = {

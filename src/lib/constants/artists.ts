@@ -92,18 +92,17 @@ async function loadArtistsFromDB(): Promise<Artist[]> {
 		return loadingPromise;
 	}
 
-	loadingPromise = (async () => {
+	loadingPromise = (async (): Promise<Artist[]> => {
 		try {
 			const response = await fetch('/api/artists');
-			const result = await response.json();
+			const result = (await response.json()) as { ok?: boolean; data?: unknown };
 			if (result.ok && Array.isArray(result.data) && result.data.length > 0) {
-				cachedArtists = result.data;
+				cachedArtists = result.data as Artist[];
 				return cachedArtists;
 			}
 		} catch (error) {
 			console.warn('Failed to load artists from DB, using defaults:', error);
 		}
-		// DB 로드 실패 시 기본값 반환
 		cachedArtists = DEFAULT_ARTISTS;
 		return cachedArtists;
 	})();

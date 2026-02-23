@@ -42,6 +42,8 @@ export interface WordEntry {
 	linkedTracks: string[];    // 사용된 트랙 ID 목록
 	createdAt: string;         // ISO 날짜 문자열
 	createdBy: Producer;
+	/** 즐겨찾기 여부 (없으면 false로 간주) */
+	favorite?: boolean;
 }
 
 // ============================================
@@ -119,7 +121,7 @@ export interface LyricsVersion {
 export type SUNOMode = 'Simple' | 'Custom';
 
 /** SUNO 버전 */
-export type SUNOVersion = 'v3' | 'v3.5' | 'v4' | 'v5';
+export type SUNOVersion = 'v3' | 'v3.5' | 'v4' | 'v4.5' | 'v4.5+' | 'v4.5-all' | 'v5';
 
 /** 생성 유형 */
 export type GenerationType = 'create' | 'extend' | 'remaster' | 'cover';
@@ -175,7 +177,9 @@ export interface SUNOPromptConfig {
 export interface PromptTemplate {
 	id: string;
 	name: string;
-	category: 'style' | 'exclude' | 'full';
+	/** 한 줄 요약 (그리드에서 알아보기 쉽게) */
+	description?: string;
+	category: 'style' | 'exclude' | 'full' | 'reference';
 	content: string;
 	usageCount: number;
 	createdAt: string;
@@ -247,6 +251,10 @@ export interface VirtualVocal {
 	id: string;
 	name: string;           // 가상 보컬/팀 이름
 	description?: string;
+	/** 보컬 사진/아바타 (URL 또는 data URL) */
+	imageUrl?: string;
+	/** 보컬 데모 음원 (URL 또는 data URL) */
+	demoAudioUrl?: string;
 	linkedTracks: string[];
 	createdAt: string;
 }
@@ -258,12 +266,17 @@ export interface VirtualVocal {
 /** 구독 플랜 */
 export type SubscriptionPlan = 'Basic' | 'Pro' | 'Premier';
 
+/** 구독 상태 */
+export type SubscriptionStatus = 'active' | 'paused' | 'cancelled';
+
 /** SUNO 구독 정보 */
 export interface SUNOSubscription {
 	planType: SubscriptionPlan;
-	billingDate: number;       // 매월 결제일 (1-31)
-	monthlyCredits: number;    // 월 크레딧
-	remainingCredits: number;  // 남은 크레딧
+	status: SubscriptionStatus;  // 구독 상태 (활성/일시정지/해지)
+	billingDate: number;         // 매월 결제일 (1-31)
+	monthlyCredits: number;      // 월 크레딧
+	remainingCredits: number;    // 남은 크레딧
+	updatedBy: Producer;         // 마지막 업데이트 담당자
 	lastUpdated: string;
 }
 
@@ -284,6 +297,7 @@ export interface SUNOProject {
 	id: string;
 	title: string;
 	description?: string;
+	coverImageUrl?: string;   // 커버 아트 이미지 URL
 
 	// 진행 상태
 	status: ProjectStatus;

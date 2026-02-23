@@ -6,12 +6,12 @@
 
 	const key = $derived(decodeURIComponent($page.params.key || ''));
 	// 목업: 실제 연결 시 GET /api/status/:key
-	const status = {
+	const status = $derived({
 		key,
 		value: 'OK',
 		detail: '응답 지연 50ms 이하, 가동률 99.9%',
 		updatedAt: '2024-01-15 15:00'
-	};
+	});
 </script>
 
 <PageContent>

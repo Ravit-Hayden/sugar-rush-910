@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Film, Plus, Play, Edit, Download, Share, Image, SquareUserRound, Palette, Settings } from 'lucide-svelte';
+	import { Film, Plus, Play, Edit, Download, Share, Image, SquareUserRound, Palette, Settings, Music } from 'lucide-svelte';
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import PageContent from '$lib/components/PageContent.svelte';
 	import SearchFilterBar from '$lib/components/SearchFilterBar.svelte';
@@ -999,6 +999,11 @@
 	title="뮤직비디오 센터" 
 	description="AI로 뮤직비디오를 생성하고 캐릭터, 에셋을 관리하세요."
 		actions={[
+			{
+				href: '/suno/projects/new',
+				icon: Music,
+				label: 'SUNO에서 새 곡 기획'
+			},
 			{
 				icon: Plus,
 				label: '새 뮤직비디오',

@@ -34,9 +34,9 @@
 	// 검증 상태
 	let validationErrors = $state<Record<string, string>>({});
 
-	// 입력 필드 참조
-	let platformInput: HTMLInputElement;
-	let amountInput: HTMLInputElement;
+	// 입력 필드 참조 (bind:this로 DOM 참조만 사용, 반응성 불필요)
+	let platformInput = $state<HTMLInputElement | undefined>(undefined);
+	let amountInput = $state<HTMLInputElement | undefined>(undefined);
 
 	// 플랫폼 목록
 	const platforms = [
@@ -63,10 +63,10 @@
 			try {
 				loading = true;
 				const response = await fetch(`/api/revenue?limit=1000`);
-				const data = await response.json();
+				const data = await response.json() as { ok?: boolean; data?: { id: string; platform?: string; amount?: number; date?: string; track_id?: string; album_id?: string; description?: string }[] };
 				
 				if (data.ok && data.data) {
-					const found = data.data.find((r: any) => r.id === revenueId);
+					const found = data.data.find((r) => r.id === revenueId);
 					if (found) {
 						revenue = found;
 						formData = {
@@ -233,7 +233,7 @@
 							/>
 							<datalist id="platforms">
 								{#each platforms as platform}
-									<option value={platform} />
+									<option value={platform}></option>
 								{/each}
 							</datalist>
 							{#if formData.platform.trim()}

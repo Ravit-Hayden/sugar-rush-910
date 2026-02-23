@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { Plus, Search, Trash2, Edit2, Link, Shuffle, X, ChevronDown, Filter, UserRound, ArrowUpDown, BookOpen, SearchX, ArrowDownAZ, ListOrdered, RotateCcw, Tag, CheckSquare, Square } from 'lucide-svelte';
+	import { Plus, Search, Trash2, Edit2, Link, Shuffle, X, ChevronDown, Filter, UserRound, ArrowUpDown, BookOpen, SearchX, ArrowDownAZ, ListOrdered, RotateCcw, Tag, CheckSquare, Square, Star, Copy } from 'lucide-svelte';
 	import RandomCombinator from '$lib/components/suno/RandomCombinator.svelte';
 	import SUNOTabs from '$lib/components/suno/SUNOTabs.svelte';
-	import { WORD_CATEGORIES, getCategoryName } from '$lib/constants/suno/categories';
+	import { WORD_CATEGORIES, getCategoryName, getCategoryById } from '$lib/constants/suno/categories';
 	import type { WordEntry, WordCategory, Producer } from '$lib/types/suno';
 	
 	// 랜덤 조합기 표시 상태
@@ -295,6 +295,27 @@
 	let selectedTag = $state<string>('all');
 	let tagDropdownOpen = $state(false);
 
+	// 즐겨찾기 필터 (true면 즐겨찾기 워드만 표시)
+	let showFavoritesOnly = $state(false);
+
+	function toggleWordFavorite(id: string) {
+		words = words.map(w =>
+			w.id === id ? { ...w, favorite: !(w.favorite === true) } : w
+		);
+	}
+
+	// 워드 내용 클립보드 복사
+	let copiedWordId = $state<string | null>(null);
+	async function copyWordContent(word: WordEntry) {
+		try {
+			await navigator.clipboard.writeText(word.content);
+			copiedWordId = word.id;
+			setTimeout(() => { copiedWordId = null; }, 1500);
+		} catch (e) {
+			console.error('복사 실패:', e);
+		}
+	}
+
 	// 모든 태그 추출 (중복 제거, 정렬)
 	const allTags = $derived.by(() => {
 		const tagSet = new Set<string>();
@@ -380,6 +401,16 @@
 		'track12': { title: '마지막 춤', status: '제작 중' }
 	};
 
+	// trackId → SUNO 프로젝트 id 매핑 (연결된 트랙 클릭 시 올바른 프로젝트 상세로 이동)
+	const trackIdToProjectId: Record<string, string> = {
+		'track1': 'proj1', 'track2': 'proj2', 'track3': 'proj3', 'track4': 'proj1',
+		'track5': 'proj2', 'track6': 'proj3', 'track7': 'proj1', 'track8': 'proj2',
+		'track9': 'proj3', 'track10': 'proj1', 'track11': 'proj2', 'track12': 'proj3'
+	};
+	function getProjectIdForTrack(trackId: string): string {
+		return trackIdToProjectId[trackId] ?? 'proj1';
+	}
+
 	// 상태 우선순위 맵
 	const statusOrder: Record<string, number> = {
 		'아이디어': 0,
@@ -418,20 +449,21 @@
 		return tracks;
 	});
 
-	// 연결된 트랙 팝업 열기
+	// 연결된 트랙 팝업 열기 (레이아웃 읽기는 rAF로 미뤄서 Forced reflow 완화)
 	function openLinkedTracksPopup(wordId: string, tracks: string[], event: MouseEvent) {
 		event.stopPropagation();
-		const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
-		// 팝업을 버튼 왼쪽 정렬 (오른쪽으로 넘치지 않게)
-		const popupWidth = 220;
-		let x = rect.right - popupWidth;
-		// 화면 왼쪽 끝을 넘지 않도록
-		if (x < 8) x = 8;
-		linkedTracksPopup = {
-			wordId,
-			tracks,
-			position: { x, y: rect.bottom + 4 }
-		};
+		const target = event.currentTarget as HTMLElement;
+		requestAnimationFrame(() => {
+			const rect = target.getBoundingClientRect();
+			const popupWidth = 220;
+			let x = rect.right - popupWidth;
+			if (x < 8) x = 8;
+			linkedTracksPopup = {
+				wordId,
+				tracks,
+				position: { x, y: rect.bottom + 4 }
+			};
+		});
 	}
 
 	// 연결된 트랙 팝업 닫기
@@ -462,13 +494,21 @@
 	function saveEdit() {
 		if (!editingWord || !editForm.content.trim()) return;
 
+		const contentTrim = editForm.content.trim();
+		const contentLower = contentTrim.toLowerCase();
+		const duplicate = words.find(w => w.id !== editingWord!.id && w.content.trim().toLowerCase() === contentLower);
+		if (duplicate) {
+			alert(`다른 워드에 이미 같은 내용이 있습니다.\n"${duplicate.content}" (${getCategoryName(duplicate.category)})`);
+			return;
+		}
+
 		words = words.map(w => {
 			if (w.id === editingWord!.id) {
 				return {
 					...w,
-					content: editForm.content.trim(),
+					content: contentTrim,
 					category: editForm.category,
-					tags: editForm.tags.split(',').map(t => t.trim()).filter(t => t),
+					tags: parseTagsDedup(editForm.tags),
 					createdBy: editForm.createdBy
 				};
 			}
@@ -490,6 +530,10 @@
 	// 필터링 및 정렬된 워드 목록
 	const filteredWords = $derived.by(() => {
 		let result = words.filter(word => {
+			// 즐겨찾기 필터
+			if (showFavoritesOnly && !(word.favorite === true)) {
+				return false;
+			}
 			// 검색어 필터
 			if (searchQuery && !word.content.toLowerCase().includes(searchQuery.toLowerCase())) {
 				return false;
@@ -541,20 +585,34 @@
 		return stats;
 	});
 
+	// 태그 문자열 → 배열 (중복 제거)
+	function parseTagsDedup(tagStr: string): string[] {
+		return [...new Set(tagStr.split(',').map(t => t.trim()).filter(t => t))];
+	}
+
 	// 새 워드 추가
 	function addWord() {
-		if (!newWord.content.trim()) return;
+		const contentTrim = newWord.content.trim();
+		if (!contentTrim) return;
+
+		const contentLower = contentTrim.toLowerCase();
+		const duplicate = words.find(w => w.content.trim().toLowerCase() === contentLower);
+		if (duplicate) {
+			alert(`이미 같은 내용의 워드가 있습니다.\n"${duplicate.content}" (${getCategoryName(duplicate.category)})`);
+			return;
+		}
 
 		const id = `word_${Date.now()}`;
 		words = [...words, {
 			id,
-			content: newWord.content.trim(),
+			content: contentTrim,
 			category: newWord.category,
-			tags: newWord.tags.split(',').map(t => t.trim()).filter(t => t),
+			tags: parseTagsDedup(newWord.tags),
 			usageCount: 0,
 			linkedTracks: [],
 			createdAt: new Date().toISOString().split('T')[0],
-			createdBy: newWord.createdBy
+			createdBy: newWord.createdBy,
+			favorite: false
 		}];
 
 		// 초기화
@@ -619,28 +677,28 @@
 				<h1 class="text-3xl font-bold text-text-strong mb-2">SUNO 제작</h1>
 				<p class="text-text-muted">워드를 수집하고 조합합니다</p>
 			</div>
-			<div class="flex items-center gap-3 flex-shrink-0">
+			<div class="flex items-center gap-3 w-full sm:w-auto flex-shrink-0">
 				{#key showCombinator}
 					<button
 						type="button"
 						onclick={() => { 
 							showCombinator = !showCombinator;
 						}}
-						class="flex items-center gap-2 px-4 py-2 rounded-lg border {showCombinator 
-							? 'bg-brand-pink/10 border-brand-pink text-brand-pink' 
-							: 'btn-outline-hover border-border-subtle text-text-base'}"
+						class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-brand-pink text-brand-pink font-medium cursor-pointer transition-colors duration-200 min-w-0 flex-1 sm:flex-initial"
+						aria-label="랜덤 조합"
+						title="랜덤 조합"
 					>
-						<Shuffle size={16} />
-						<span class="hidden sm:inline">랜덤 조합</span>
+						<Shuffle size={16} class="flex-shrink-0" />
+						<span>랜덤 조합</span>
 					</button>
 				{/key}
 				<button
 					type="button"
 					onclick={() => showAddModal = true}
-					class="page-header-action-button inline-flex items-center justify-center gap-2 px-4 py-2 w-full sm:w-auto rounded-lg transition-colors duration-200 font-medium page-header-primary-button bg-brand-pink text-[var(--surface-2)] hover:[&>svg]:!text-[var(--surface-2)] focus:bg-brand-pink focus:text-white focus:[&>svg]:!text-white focus-visible:bg-brand-pink focus-visible:text-white focus-visible:[&>svg]:!text-white focus:outline-none focus:ring-0 flex-shrink-0"
+					class="page-header-action-button inline-flex items-center justify-center gap-2 px-4 py-2 min-w-0 flex-1 sm:flex-initial rounded-lg transition-colors duration-200 font-medium page-header-primary-button bg-brand-pink text-[var(--surface-2)] hover:[&>svg]:!text-[var(--surface-2)] focus:bg-brand-pink focus:text-white focus:[&>svg]:!text-white focus-visible:bg-brand-pink focus-visible:text-white focus-visible:[&>svg]:!text-white focus:outline-none focus:ring-0 flex-shrink-0"
 				>
 					<Plus size={16} />
-					<span class="hidden sm:inline">워드 추가</span>
+					<span>워드 추가</span>
 				</button>
 			</div>
 		</div>
@@ -657,34 +715,46 @@
 
 		<!-- 필터 영역 -->
 		<div class="mb-6 space-y-3">
-			<!-- 검색 (윗줄) -->
-			<div class="relative group">
-				<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-					<Search size={16} class="lucide-icon lucide-search" />
+			<!-- 검색 + 즐겨찾기만 (한 줄, 모바일에서 wrap) -->
+			<div class="flex flex-wrap items-center gap-2">
+				<div class="relative group flex-1 min-w-[200px]">
+					<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+						<Search size={16} class="lucide-icon lucide-search filter-search-icon" />
+					</div>
+					<input
+						type="text"
+						bind:value={searchQuery}
+						placeholder="워드 검색..."
+						class="filter-search-input w-full pl-10 {searchQuery.trim() ? 'pr-10' : 'pr-4'} py-1.5 bg-surface-2 border border-border-subtle border-[1px] rounded-md text-text-base placeholder:text-text-base placeholder:opacity-100 focus:outline-none focus:border-brand-pink focus:ring-0 transition-colors duration-200"
+						aria-label="워드 검색"
+						id="word-search"
+						autocomplete="off"
+					/>
+					{#if searchQuery.trim()}
+						<button
+							type="button"
+							onclick={() => {
+								searchQuery = '';
+								const input = document.getElementById('word-search') as HTMLInputElement;
+								input?.focus();
+							}}
+							class="search-clear-button absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 flex items-center justify-center bg-transparent hover:bg-transparent focus:bg-transparent focus-visible:bg-transparent"
+							aria-label="검색 초기화"
+						>
+							<X size={16} class="lucide-icon" />
+						</button>
+					{/if}
 				</div>
-				<input
-					type="text"
-					bind:value={searchQuery}
-					placeholder="워드 검색..."
-					class="w-full pl-10 {searchQuery.trim() ? 'pr-10' : 'pr-4'} py-1.5 bg-surface-2 border border-border-subtle border-[1px] rounded-md text-text-base placeholder-text-muted focus:outline-none focus:border-brand-pink focus:ring-0 transition-colors duration-200"
-					aria-label="워드 검색"
-					id="word-search"
-					autocomplete="off"
-				/>
-				{#if searchQuery.trim()}
-					<button
-						type="button"
-						onclick={() => {
-							searchQuery = '';
-							const input = document.getElementById('word-search') as HTMLInputElement;
-							input?.focus();
-						}}
-						class="search-clear-button absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 flex items-center justify-center bg-transparent hover:bg-transparent focus:bg-transparent focus-visible:bg-transparent"
-						aria-label="검색 초기화"
-					>
-						<X size={16} class="lucide-icon" />
-					</button>
-				{/if}
+				<button
+					type="button"
+					onclick={() => showFavoritesOnly = !showFavoritesOnly}
+					class="preset-group-btn btn-outline-hover flex items-center gap-1.5 px-3 py-1.5 rounded-md border text-sm font-medium transition-colors flex-shrink-0 {showFavoritesOnly ? 'active border-brand-pink text-brand-pink' : 'border-border-subtle text-text-muted'}"
+					aria-pressed={showFavoritesOnly}
+					aria-label="즐겨찾기만 보기"
+				>
+					<Star size={14} class="flex-shrink-0 {showFavoritesOnly ? 'fill-current' : ''}" />
+					즐겨찾기만 ({words.filter(w => w.favorite === true).length})
+				</button>
 			</div>
 
 			<!-- 필터/정렬 (2x2 그리드) -->
@@ -699,7 +769,7 @@
 						class="status-filter-btn flex items-center pl-10 pr-8 py-1.5 w-full bg-surface-2 rounded-[6px] text-text-base transition-all duration-200 cursor-pointer border border-border-subtle focus:outline-none focus:border-brand-pink"
 					>
 						<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-							<Filter size={16} class="lucide-icon text-text-muted transition-colors duration-200" />
+							<Filter size={16} class="lucide-icon filter-control-icon transition-colors duration-200" />
 						</div>
 						<span class="flex-1 text-left truncate">
 							{selectedCategory === 'all' ? '전체' : getCategoryName(selectedCategory)} ({categoryStats[selectedCategory] || 0})
@@ -746,7 +816,7 @@
 						class="status-filter-btn flex items-center pl-10 pr-8 py-1.5 w-full bg-surface-2 rounded-[6px] text-text-base transition-all duration-200 cursor-pointer border border-border-subtle focus:outline-none focus:border-brand-pink"
 					>
 						<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-							<UserRound size={16} class="lucide-icon text-text-muted transition-colors duration-200" />
+							<UserRound size={16} class="lucide-icon filter-control-icon transition-colors duration-200" />
 						</div>
 						<span class="flex-1 text-left truncate">
 							{creatorLabels[selectedCreator]}
@@ -783,7 +853,7 @@
 						class="status-filter-btn flex items-center pl-10 pr-8 py-1.5 w-full bg-surface-2 rounded-[6px] text-text-base transition-all duration-200 cursor-pointer border border-border-subtle focus:outline-none focus:border-brand-pink"
 					>
 						<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-							<Tag size={16} class="lucide-icon text-text-muted transition-colors duration-200" />
+							<Tag size={16} class="lucide-icon filter-control-icon transition-colors duration-200" />
 						</div>
 						<span class="flex-1 text-left truncate">
 							{selectedTag === 'all' ? '전체 태그' : selectedTag}
@@ -830,7 +900,7 @@
 						class="status-filter-btn flex items-center pl-10 pr-8 py-1.5 w-full bg-surface-2 rounded-[6px] text-text-base transition-all duration-200 cursor-pointer border border-border-subtle focus:outline-none focus:border-brand-pink"
 					>
 						<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-							<ArrowUpDown size={16} class="lucide-icon text-text-muted transition-colors duration-200" />
+							<ArrowUpDown size={16} class="lucide-icon filter-control-icon transition-colors duration-200" />
 						</div>
 						<span class="flex-1 text-left truncate">
 							{sortLabels[sortBy]}
@@ -860,11 +930,11 @@
 		</div>
 
 		<!-- 선택 모드 툴바 -->
-		<div class="flex items-center justify-between mb-3">
+		<div class="flex flex-wrap items-center justify-between gap-2 mb-3 min-w-0">
 			<button
 				type="button"
 				onclick={toggleSelectionMode}
-				class="flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md transition-colors {selectionMode ? 'text-brand-pink' : 'text-text-muted hover:text-hover-point'}"
+				class="flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md transition-colors shrink-0 {selectionMode ? 'text-brand-pink' : 'text-text-muted hover:text-hover-point'}"
 			>
 				{#if selectionMode}
 					<CheckSquare size={14} />
@@ -876,21 +946,21 @@
 			</button>
 			
 			{#if selectionMode}
-				<div class="flex items-center gap-2">
-					<span class="text-sm text-text-muted">
+				<div class="flex flex-wrap items-center gap-2 min-w-0">
+					<span class="text-sm text-text-muted shrink-0">
 						<span class="text-brand-pink font-medium">{selectedIds.size}</span>개 선택됨
 					</span>
 					<button
 						type="button"
 						onclick={selectAll}
-						class="btn-outline-hover px-3 py-1.5 text-sm rounded-md border border-border-subtle text-text-muted"
+						class="btn-outline-hover px-3 py-1.5 text-sm rounded-md border border-border-subtle text-text-muted shrink-0"
 					>
 						전체 선택
 					</button>
 					<button
 						type="button"
 						onclick={deselectAll}
-						class="btn-outline-hover px-3 py-1.5 text-sm rounded-md border border-border-subtle text-text-muted"
+						class="btn-outline-hover px-3 py-1.5 text-sm rounded-md border border-border-subtle text-text-muted shrink-0"
 					>
 						전체 해제
 					</button>
@@ -898,7 +968,7 @@
 						type="button"
 						onclick={deleteSelected}
 						disabled={selectedIds.size === 0}
-						class="flex items-center gap-1 px-3 py-1.5 text-sm rounded-md bg-red-500/20 text-red-400 border border-red-500/50 transition-colors hover:bg-red-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+						class="flex items-center gap-1 px-3 py-1.5 text-sm rounded-md bg-red-500/20 text-red-400 border border-red-500/50 transition-colors hover:bg-red-500/30 disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
 					>
 						<Trash2 size={14} />
 						삭제
@@ -907,10 +977,10 @@
 			{/if}
 		</div>
 
-		<!-- 테이블 (데스크톱) / 카드 (모바일) -->
+		<!-- 테이블 (넓은 화면) / 카드 (좁은 화면·개발자도구 등) - 가로 스크롤 없음 -->
 		<div class="bg-surface-2 rounded-lg border border-border-subtle overflow-hidden">
-			<!-- 데스크톱 테이블 -->
-			<div class="hidden md:block overflow-x-auto">
+			<!-- 데스크톱 테이블: lg(1024px) 이상에서만 표시 -->
+			<div class="hidden lg:block overflow-hidden">
 				<table class="w-full min-w-[640px]" style="border-collapse: collapse;">
 					<thead class="bg-surface-2 text-xs text-text-muted pointer-events-none" style="border-bottom: 1px solid var(--border-subtle);">
 						<tr>
@@ -934,7 +1004,7 @@
 										<button
 											type="button"
 											onclick={() => toggleSelection(word.id)}
-											class="flex items-center justify-center"
+											class="flex items-center justify-center bg-transparent hover:bg-transparent focus:bg-transparent border-0 rounded"
 										>
 											{#if selectedIds.has(word.id)}
 												<CheckSquare size={18} class="text-brand-pink" />
@@ -946,16 +1016,14 @@
 								{/if}
 								<td class="px-4 py-3 text-sm text-text-base group-hover:bg-surface-1/50 transition-colors" style={showBorder ? 'border-bottom: 1px solid var(--border-subtle);' : ''}>{word.content}</td>
 								<td class="px-4 py-3 group-hover:bg-surface-1/50 transition-colors" style={showBorder ? 'border-bottom: 1px solid var(--border-subtle);' : ''}>
-									<span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-surface-2 text-text-muted whitespace-nowrap">
+									<span class="word-category-pill inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-surface-1 border border-border-subtle whitespace-nowrap focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 {getCategoryById(word.category)?.color ?? 'text-text-muted'}" tabindex="-1">
 										{getCategoryName(word.category)}
 									</span>
 								</td>
 								<td class="px-4 py-3 group-hover:bg-surface-1/50 transition-colors" style={showBorder ? 'border-bottom: 1px solid var(--border-subtle);' : ''}>
-									<div class="flex flex-wrap gap-1">
+									<div class="flex flex-wrap gap-1.5">
 										{#each word.tags.slice(0, 2) as tag}
-											<span class="px-1.5 py-0.5 rounded text-xs bg-surface-2 text-text-muted">
-												{tag}
-											</span>
+											<span class="word-tag-pill px-1.5 py-0.5 rounded-md text-xs border border-border-subtle text-text-muted bg-transparent">#{tag}</span>
 										{/each}
 										{#if word.tags.length > 2}
 											<span class="text-xs text-text-muted">+{word.tags.length - 2}</span>
@@ -985,6 +1053,24 @@
 									<div class="flex items-center justify-center gap-1">
 										<button
 											type="button"
+											class="btn-icon {word.favorite === true ? 'text-brand-pink' : 'text-text-muted'}"
+											onclick={() => toggleWordFavorite(word.id)}
+											aria-label={word.favorite === true ? '즐겨찾기 해제' : '즐겨찾기 추가'}
+											title={word.favorite === true ? '즐겨찾기 해제' : '즐겨찾기 추가'}
+										>
+											<Star size={14} class={word.favorite === true ? 'fill-current' : ''} />
+										</button>
+										<button
+											type="button"
+											class="btn-icon {copiedWordId === word.id ? 'text-brand-pink' : ''}"
+											onclick={() => copyWordContent(word)}
+											aria-label="복사"
+											title="복사"
+										>
+											<Copy size={14} />
+										</button>
+										<button
+											type="button"
 											class="btn-icon"
 											onclick={() => openEditModal(word)}
 											aria-label="수정"
@@ -1006,22 +1092,30 @@
 						{#if filteredWords.length === 0}
 							<tr>
 								<td colspan={selectionMode ? 7 : 6} class="px-4 py-12 text-center">
-									{#if searchQuery || selectedCategory !== 'all' || selectedCreator !== 'all' || selectedTag !== 'all'}
-										<div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-bg mb-4">
+									{#if searchQuery || selectedCategory !== 'all' || selectedCreator !== 'all' || selectedTag !== 'all' || showFavoritesOnly}
+										<div class="inline-flex items-center justify-center mb-4">
 											<SearchX size={28} class="text-text-muted" />
 										</div>
-										<p class="text-text-base font-medium mb-2">검색 결과가 없습니다</p>
-										<p class="text-text-muted text-sm mb-4">다른 검색어나 필터를 시도해보세요</p>
+										<p class="text-text-base font-medium mb-2">
+											{showFavoritesOnly && !searchQuery && selectedCategory === 'all' && selectedCreator === 'all' && selectedTag === 'all'
+												? '즐겨찾기한 워드가 없습니다'
+												: '검색 결과가 없습니다'}
+										</p>
+										<p class="text-text-muted text-sm mb-4">
+											{showFavoritesOnly && !searchQuery && selectedCategory === 'all' && selectedCreator === 'all' && selectedTag === 'all'
+												? '목록에서 별을 눌러 즐겨찾기에 추가하세요'
+												: '다른 검색어나 필터를 시도해보세요'}
+										</p>
 										<button
 											type="button"
-											onclick={() => { searchQuery = ''; selectedCategory = 'all'; selectedCreator = 'all'; selectedTag = 'all'; }}
+											onclick={() => { searchQuery = ''; selectedCategory = 'all'; selectedCreator = 'all'; selectedTag = 'all'; showFavoritesOnly = false; }}
 											class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-brand-pink border border-brand-pink rounded-lg hover:bg-brand-pink hover:text-white transition-colors"
 										>
 											<X size={14} />
 											필터 초기화
 										</button>
 									{:else}
-										<div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-bg mb-4">
+										<div class="inline-flex items-center justify-center mb-4">
 											<BookOpen size={28} class="text-text-muted" />
 										</div>
 										<p class="text-text-base font-medium mb-2">등록된 워드가 없습니다</p>
@@ -1042,16 +1136,16 @@
 				</table>
 			</div>
 
-			<!-- 모바일 카드 레이아웃 -->
-			<div class="md:hidden">
+			<!-- 카드 레이아웃: lg 미만(태블릿·개발자도구 등 좁은 뷰포트) -->
+			<div class="lg:hidden">
 				{#each filteredWords as word, i}
-					<div class="p-4 hover:bg-surface-1/50 transition-colors {i > 0 ? 'border-t border-border-subtle' : ''} {selectionMode && selectedIds.has(word.id) ? 'bg-brand-pink/10' : ''}">
-						<div class="flex items-start justify-between gap-3 mb-2">
+					<div class="p-4 min-w-0 {i > 0 ? 'border-t border-border-subtle' : ''} {selectionMode && selectedIds.has(word.id) ? 'bg-brand-pink/10' : ''}">
+						<div class="flex items-start justify-between gap-3 mb-2 min-w-0">
 							{#if selectionMode}
 								<button
 									type="button"
 									onclick={() => toggleSelection(word.id)}
-									class="flex-shrink-0 flex items-center justify-center mt-0.5"
+									class="flex-shrink-0 flex items-center justify-center mt-0.5 w-9 h-9 bg-transparent hover:bg-transparent focus:bg-transparent border-0 rounded"
 								>
 									{#if selectedIds.has(word.id)}
 										<CheckSquare size={18} class="text-brand-pink" />
@@ -1063,7 +1157,7 @@
 							<div class="flex-1 min-w-0">
 								<p class="text-sm font-medium text-text-base">{word.content}</p>
 								<div class="flex items-center gap-2 mt-1">
-									<span class="px-2 py-0.5 rounded text-xs bg-bg text-text-muted">
+									<span class="word-category-pill px-2 py-0.5 rounded-md text-xs font-medium bg-surface-1 border border-border-subtle focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 {getCategoryById(word.category)?.color ?? 'text-text-muted'}" tabindex="-1">
 										{getCategoryName(word.category)}
 									</span>
 									<span class="text-xs font-medium {word.createdBy === 'El' ? 'text-elotte-green' : 'text-elotte-orange'}">
@@ -1072,6 +1166,23 @@
 								</div>
 							</div>
 							<div class="flex items-center gap-1 flex-shrink-0">
+								<button
+									type="button"
+									class="btn-icon {word.favorite === true ? 'text-brand-pink' : 'text-text-muted'}"
+									onclick={() => toggleWordFavorite(word.id)}
+									aria-label={word.favorite === true ? '즐겨찾기 해제' : '즐겨찾기 추가'}
+								>
+									<Star size={14} class={word.favorite === true ? 'fill-current' : ''} />
+								</button>
+								<button
+									type="button"
+									class="btn-icon {copiedWordId === word.id ? 'text-brand-pink' : ''}"
+									onclick={() => copyWordContent(word)}
+									aria-label="복사"
+									title="복사"
+								>
+									<Copy size={14} />
+								</button>
 								<button type="button" class="btn-icon" onclick={() => openEditModal(word)} aria-label="수정">
 									<Edit2 size={14} />
 								</button>
@@ -1080,16 +1191,16 @@
 								</button>
 							</div>
 						</div>
-						<div class="flex items-center justify-between text-xs text-text-muted">
-							<div class="flex flex-wrap gap-1">
+						<div class="flex items-center justify-between text-xs text-text-muted {selectionMode ? 'pl-12' : ''}">
+							<div class="flex flex-wrap gap-1.5 items-center">
 								{#each word.tags.slice(0, 2) as tag}
-									<span class="px-1.5 py-0.5 rounded bg-bg">{tag}</span>
+									<span class="word-tag-pill px-1.5 py-0.5 rounded-md border border-border-subtle text-text-muted bg-transparent">#{tag}</span>
 								{/each}
 								{#if word.tags.length > 2}
-									<span>+{word.tags.length - 2}</span>
+									<span class="text-text-muted">+{word.tags.length - 2}</span>
 								{/if}
 							</div>
-							<div class="flex items-center gap-1">
+							<div class="flex items-center gap-1 flex-shrink-0">
 								<span>{word.usageCount}회</span>
 								{#if word.linkedTracks.length > 0}
 									<button
@@ -1107,21 +1218,30 @@
 				{/each}
 				{#if filteredWords.length === 0}
 					<div class="px-4 py-12 text-center">
-						{#if searchQuery || selectedCategory !== 'all' || selectedCreator !== 'all' || selectedTag !== 'all'}
-							<div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-bg mb-4">
+						{#if searchQuery || selectedCategory !== 'all' || selectedCreator !== 'all' || selectedTag !== 'all' || showFavoritesOnly}
+							<div class="inline-flex items-center justify-center mb-4">
 								<SearchX size={28} class="text-text-muted" />
 							</div>
-							<p class="text-text-base font-medium mb-2">검색 결과가 없습니다</p>
+							<p class="text-text-base font-medium mb-2">
+								{showFavoritesOnly && !searchQuery && selectedCategory === 'all' && selectedCreator === 'all' && selectedTag === 'all'
+									? '즐겨찾기한 워드가 없습니다'
+									: '검색 결과가 없습니다'}
+							</p>
+							{#if showFavoritesOnly && !searchQuery && selectedCategory === 'all' && selectedCreator === 'all' && selectedTag === 'all'}
+								<p class="text-text-muted text-sm mb-4">목록에서 별을 눌러 즐겨찾기에 추가하세요</p>
+							{:else}
+								<p class="text-text-muted text-sm mb-4">다른 검색어나 필터를 시도해보세요</p>
+							{/if}
 							<button
 								type="button"
-								onclick={() => { searchQuery = ''; selectedCategory = 'all'; selectedCreator = 'all'; selectedTag = 'all'; }}
+								onclick={() => { searchQuery = ''; selectedCategory = 'all'; selectedCreator = 'all'; selectedTag = 'all'; showFavoritesOnly = false; }}
 								class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-brand-pink border border-brand-pink rounded-lg hover:bg-brand-pink hover:text-white transition-colors"
 							>
 								<X size={14} />
 								필터 초기화
 							</button>
 						{:else}
-							<div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-bg mb-4">
+							<div class="inline-flex items-center justify-center mb-4">
 								<BookOpen size={28} class="text-text-muted" />
 							</div>
 							<p class="text-text-base font-medium mb-2">등록된 워드가 없습니다</p>
@@ -1157,7 +1277,7 @@
 <!-- 연결된 트랙 팝업 -->
 {#if linkedTracksPopup}
 	<div
-		class="linked-tracks-popup fixed z-[90] bg-surface-1 border border-border-subtle rounded-lg shadow-lg min-w-[220px] max-w-[280px]"
+		class="linked-tracks-popup fixed z-[90] bg-surface-1 border border-border-subtle rounded-lg min-w-[220px] max-w-[280px]"
 		style="left: {linkedTracksPopup.position.x}px; top: {linkedTracksPopup.position.y}px;"
 	>
 		<div class="px-3 py-2.5 border-b border-border-subtle flex items-center gap-3">
@@ -1210,7 +1330,7 @@
 				{@const track = trackData[trackId]}
 				{#if track}
 					<a
-						href="/suno/projects/{trackId}"
+						href="/suno/projects/{getProjectIdForTrack(trackId)}"
 						class="linked-track-item flex items-center justify-between px-3 py-2 rounded-md border border-transparent transition-colors"
 					>
 						<span class="text-sm text-text-base">{track.title}</span>
@@ -1238,7 +1358,7 @@
 	>
 		<!-- svelte-ignore a11y_no_static_element_interactions a11y_click_events_have_key_events -->
 		<div
-			class="bg-surface-1 rounded-lg border border-border-subtle w-full max-w-md"
+			class="bg-surface-1 rounded-lg border border-border-subtle w-full max-w-md max-h-[90vh] overflow-hidden flex flex-col"
 			onclick={(e) => e.stopPropagation()}
 			onkeydown={(e) => e.stopPropagation()}
 			role="presentation"
@@ -1248,14 +1368,15 @@
 				<button
 					type="button"
 					onclick={() => showAddModal = false}
-					class="template-close-btn w-8 h-8 flex items-center justify-center rounded-md text-text-muted transition-colors border border-transparent"
+					class="template-close-btn w-8 h-8 flex items-center justify-end rounded-md text-text-muted transition-colors border border-transparent pl-2 pr-0"
 					aria-label="닫기"
 				>
 					<X size={20} />
 				</button>
 			</div>
 
-			<form onsubmit={(e) => { e.preventDefault(); addWord(); }} class="p-6 space-y-4">
+			<form onsubmit={(e) => { e.preventDefault(); addWord(); }} class="flex flex-1 min-h-0 flex-col">
+				<div class="p-6 space-y-4 overflow-y-auto custom-list-scrollbar modal-scroll-body flex-1 min-h-0">
 				<!-- 내용 -->
 				<div>
 					<label for="word-content" class="block text-sm font-medium text-text-strong mb-2">
@@ -1277,10 +1398,10 @@
 					<button
 						type="button"
 						onclick={() => modalCategoryOpen = !modalCategoryOpen}
-						class="modal-category-btn w-full flex items-center justify-between px-4 py-2 bg-surface-2 border border-border-subtle rounded-md text-text-base transition-colors {modalCategoryOpen ? 'border-brand-pink' : ''}"
+						class="modal-category-btn input-select-trigger w-full rounded-md transition-colors {modalCategoryOpen ? 'border-brand-pink' : ''}"
 					>
-						<span>{getCategoryName(newWord.category)}</span>
-						<ChevronDown size={14} class="text-text-muted transition-transform {modalCategoryOpen ? 'rotate-180' : ''}" />
+						<span class="pr-6">{getCategoryName(newWord.category)}</span>
+						<ChevronDown size={14} class="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted transition-transform {modalCategoryOpen ? 'rotate-180' : ''}" />
 					</button>
 					{#if modalCategoryOpen}
 						<ul role="listbox" class="absolute left-0 right-0 mt-1 bg-surface-2 border border-border-subtle rounded-md z-20 max-h-48 overflow-y-auto custom-list-scrollbar">
@@ -1325,7 +1446,7 @@
 								value="El"
 								checked={newWord.createdBy === 'El'}
 								onchange={() => newWord.createdBy = 'El'}
-								class="w-4 h-4 rounded-full appearance-none bg-transparent border border-[color:var(--text-base)] checked:bg-transparent checked:border-[color:var(--elotte-green)] hover:border-[color:var(--hover-point)] focus:ring-2 focus:ring-[#FF3DAE] transition-all duration-200 cursor-pointer relative"
+								class="w-4 h-4 rounded-full appearance-none bg-transparent border border-[color:var(--text-base)] checked:bg-transparent checked:border-[color:var(--elotte-green)] hover:border-[color:var(--hover-point)] focus:outline-none focus-visible:border-[color:var(--brand-pink)] transition-all duration-200 cursor-pointer relative"
 							/>
 							<span class="text-sm font-medium text-text-base transition-colors group-hover:text-elotte-green {newWord.createdBy === 'El' ? 'text-elotte-green' : ''}">El</span>
 						</label>
@@ -1336,15 +1457,16 @@
 								value="Otte"
 								checked={newWord.createdBy === 'Otte'}
 								onchange={() => newWord.createdBy = 'Otte'}
-								class="w-4 h-4 rounded-full appearance-none bg-transparent border border-[color:var(--text-base)] checked:bg-transparent checked:border-[color:var(--elotte-orange)] hover:border-[color:var(--hover-point)] focus:ring-2 focus:ring-[#FF3DAE] transition-all duration-200 cursor-pointer relative"
+								class="w-4 h-4 rounded-full appearance-none bg-transparent border border-[color:var(--text-base)] checked:bg-transparent checked:border-[color:var(--elotte-orange)] hover:border-[color:var(--hover-point)] focus:outline-none focus-visible:border-[color:var(--brand-pink)] transition-all duration-200 cursor-pointer relative"
 							/>
 							<span class="text-sm font-medium text-text-base transition-colors group-hover:text-elotte-orange {newWord.createdBy === 'Otte' ? 'text-elotte-orange' : ''}">Otte</span>
 						</label>
 					</div>
 				</div>
 
+				</div>
 				<!-- 버튼 -->
-				<div class="flex justify-end gap-3 pt-4">
+				<div class="px-6 py-4 border-t border-border-subtle flex justify-end gap-3 flex-shrink-0">
 					<button
 						type="button"
 						onclick={() => showAddModal = false}
@@ -1376,7 +1498,7 @@
 	>
 		<!-- svelte-ignore a11y_no_static_element_interactions a11y_click_events_have_key_events -->
 		<div
-			class="bg-surface-1 rounded-lg border border-border-subtle w-full max-w-md"
+			class="bg-surface-1 rounded-lg border border-border-subtle w-full max-w-md max-h-[90vh] overflow-hidden flex flex-col"
 			onclick={(e) => e.stopPropagation()}
 			onkeydown={(e) => e.stopPropagation()}
 			role="presentation"
@@ -1386,14 +1508,15 @@
 				<button
 					type="button"
 					onclick={closeEditModal}
-					class="template-close-btn w-8 h-8 flex items-center justify-center rounded-md text-text-muted transition-colors border border-transparent"
+					class="template-close-btn w-8 h-8 flex items-center justify-end rounded-md text-text-muted transition-colors border border-transparent pl-2 pr-0"
 					aria-label="닫기"
 				>
 					<X size={20} />
 				</button>
 			</div>
 
-			<form onsubmit={(e) => { e.preventDefault(); saveEdit(); }} class="p-6 space-y-4">
+			<form onsubmit={(e) => { e.preventDefault(); saveEdit(); }} class="flex flex-1 min-h-0 flex-col">
+				<div class="p-6 space-y-4 overflow-y-auto custom-list-scrollbar modal-scroll-body flex-1 min-h-0">
 				<!-- 내용 -->
 				<div>
 					<label for="edit-word-content" class="block text-sm font-medium text-text-strong mb-2">
@@ -1415,10 +1538,10 @@
 					<button
 						type="button"
 						onclick={() => editModalCategoryOpen = !editModalCategoryOpen}
-						class="modal-category-btn w-full flex items-center justify-between px-4 py-2 bg-surface-2 border border-border-subtle rounded-md text-text-base transition-colors {editModalCategoryOpen ? 'border-brand-pink' : ''}"
+						class="modal-category-btn input-select-trigger w-full rounded-md transition-colors {editModalCategoryOpen ? 'border-brand-pink' : ''}"
 					>
-						<span>{getCategoryName(editForm.category)}</span>
-						<ChevronDown size={14} class="text-text-muted transition-transform {editModalCategoryOpen ? 'rotate-180' : ''}" />
+						<span class="pr-6">{getCategoryName(editForm.category)}</span>
+						<ChevronDown size={14} class="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted transition-transform {editModalCategoryOpen ? 'rotate-180' : ''}" />
 					</button>
 					{#if editModalCategoryOpen}
 						<ul role="listbox" class="absolute left-0 right-0 mt-1 bg-surface-2 border border-border-subtle rounded-md z-20 max-h-48 overflow-y-auto custom-list-scrollbar">
@@ -1463,7 +1586,7 @@
 								value="El"
 								checked={editForm.createdBy === 'El'}
 								onchange={() => editForm.createdBy = 'El'}
-								class="w-4 h-4 rounded-full appearance-none bg-transparent border border-[color:var(--text-base)] checked:bg-transparent checked:border-[color:var(--elotte-green)] hover:border-[color:var(--hover-point)] focus:ring-2 focus:ring-[#FF3DAE] transition-all duration-200 cursor-pointer relative"
+								class="w-4 h-4 rounded-full appearance-none bg-transparent border border-[color:var(--text-base)] checked:bg-transparent checked:border-[color:var(--elotte-green)] hover:border-[color:var(--hover-point)] focus:outline-none focus-visible:border-[color:var(--brand-pink)] transition-all duration-200 cursor-pointer relative"
 							/>
 							<span class="text-sm font-medium text-text-base transition-colors group-hover:text-elotte-green {editForm.createdBy === 'El' ? 'text-elotte-green' : ''}">El</span>
 						</label>
@@ -1474,7 +1597,7 @@
 								value="Otte"
 								checked={editForm.createdBy === 'Otte'}
 								onchange={() => editForm.createdBy = 'Otte'}
-								class="w-4 h-4 rounded-full appearance-none bg-transparent border border-[color:var(--text-base)] checked:bg-transparent checked:border-[color:var(--elotte-orange)] hover:border-[color:var(--hover-point)] focus:ring-2 focus:ring-[#FF3DAE] transition-all duration-200 cursor-pointer relative"
+								class="w-4 h-4 rounded-full appearance-none bg-transparent border border-[color:var(--text-base)] checked:bg-transparent checked:border-[color:var(--elotte-orange)] hover:border-[color:var(--hover-point)] focus:outline-none focus-visible:border-[color:var(--brand-pink)] transition-all duration-200 cursor-pointer relative"
 							/>
 							<span class="text-sm font-medium text-text-base transition-colors group-hover:text-elotte-orange {editForm.createdBy === 'Otte' ? 'text-elotte-orange' : ''}">Otte</span>
 						</label>
@@ -1490,8 +1613,9 @@
 					</div>
 				</div>
 
+				</div>
 				<!-- 버튼 -->
-				<div class="flex justify-end gap-3 pt-4">
+				<div class="px-6 py-4 border-t border-border-subtle flex justify-end gap-3 flex-shrink-0">
 					<button
 						type="button"
 						onclick={closeEditModal}

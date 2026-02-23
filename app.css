@@ -65,7 +65,10 @@
   color: #000;
 }
 
-/* 기본 스타일 */
+/* 기본 스타일 - 가로 스크롤 금지 (좁은 뷰포트에서는 모바일 레이아웃으로 전환) */
+html, body {
+  overflow-x: hidden;
+}
 body {
   background-color: var(--bg);
   color: var(--text-base);
@@ -106,9 +109,10 @@ input:focus {
   border-color: var(--brand-pink) !important;
 }
 
-/* 스크롤바 스타일 */
+/* 스크롤바 스타일 (전역 + 커스텀 적용 요소) */
 ::-webkit-scrollbar {
   width: 8px;
+  height: 8px;
 }
 ::-webkit-scrollbar-track {
   background: var(--surface-2);
@@ -118,6 +122,25 @@ input:focus {
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+/* textarea 등 명시적 적용용 (동일 커스텀 디자인) */
+.scrollbar-custom::-webkit-scrollbar,
+.scrollbar-custom ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.scrollbar-custom::-webkit-scrollbar-track,
+.scrollbar-custom ::-webkit-scrollbar-track {
+  background: var(--surface-2);
+}
+.scrollbar-custom::-webkit-scrollbar-thumb,
+.scrollbar-custom ::-webkit-scrollbar-thumb {
+  background: var(--border-subtle);
+  border-radius: 4px;
+}
+.scrollbar-custom::-webkit-scrollbar-thumb:hover,
+.scrollbar-custom ::-webkit-scrollbar-thumb:hover {
   background: var(--text-muted);
 }
 

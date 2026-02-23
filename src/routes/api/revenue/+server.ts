@@ -112,7 +112,7 @@ export const GET: RequestHandler = async ({ platform, url }) => {
 
 export const POST: RequestHandler = async ({ request, platform }) => {
 	try {
-		const revenueData = await request.json();
+		const revenueData = await request.json() as Record<string, any>;
 
 		// 입력 검증
 		if (!revenueData.platform || !revenueData.platform.trim()) {
@@ -190,10 +190,10 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 					.run();
 
 				// 생성된 수익 정보 조회
-				const { results } = await db
+				const results = await db
 					.prepare('SELECT * FROM revenues WHERE id = ?')
 					.bind(revenueId)
-					.first();
+					.first() as Record<string, any> | null;
 
 				createdRevenue = {
 					id: revenueId,

@@ -9,7 +9,15 @@ export default defineConfig({
 			port: 5173
 		},
 		host: true,
-		port: 5173
+		port: 5173,
+		strictPort: true, // 5173이 사용 중이면 다른 포트로 넘어가지 않고 실패
+		watch: {
+			usePolling: false
+		}
+	},
+	// 의존성 미리 번들해서 SSR 첫 요청 부담 감소
+	optimizeDeps: {
+		include: ['lucide-svelte']
 	},
 	test: {
 		expect: { requireAssertions: true },

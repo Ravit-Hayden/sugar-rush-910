@@ -16,6 +16,7 @@
 	import MoreMenuDropdown, { type MenuItem } from '$lib/components/MoreMenuDropdown.svelte';
 	import BulkActionBar from '$lib/components/BulkActionBar.svelte';
 	import AdvancedSearchPanel from '$lib/components/AdvancedSearchPanel.svelte';
+	import { mockTracks } from '$lib/mocks/tracks';
 
 	// 필터 상태 저장 키
 	const FILTER_STORAGE_KEY = 'sr_tracks_filters';
@@ -66,253 +67,7 @@
 	// 일괄 선택 상태
 	let selectedTrackIds = $state<Set<string>>(new Set());
 	let bulkActionMenuOpen = $state(false);
-	let tracks = [
-		// 1. 작곡가/작사가 작업 (노란색 #FFD700)
-		{
-			id: '1',
-			title: 'Demo Track',
-			artist: 'Various',
-			album: 'Demo Collection',
-			genre: 'Rock',
-			duration: '4:12',
-			status: 'draft',
-			plays: 456,
-			likes: 23,
-			fileSize: '9.1MB'
-		},
-		{
-			id: '2',
-			title: 'Evening Breeze',
-			artist: 'Various',
-			album: 'Demo Collection',
-			genre: 'Classical',
-			duration: '6:15',
-			status: 'editing',
-			plays: 123,
-			likes: 8,
-			fileSize: '11.2MB'
-		},
-		{
-			id: '3',
-			title: 'Midnight Drive',
-			artist: 'Sugar Rush',
-			album: 'Sugar Rush Vol.1',
-			genre: 'Electronic',
-			duration: '4:05',
-			status: 'revision_requested',
-			plays: 678,
-			likes: 45,
-			fileSize: '8.9MB'
-		},
-		// 2. 편집자 작업 (시안/블루 #00DDFF, #45ADFF)
-		{
-			id: '4',
-			title: 'Morning Light',
-			artist: 'Sugar Rush',
-			album: 'Sugar Rush Vol.2',
-			genre: 'Jazz',
-			duration: '5:20',
-			status: 'pending_review',
-			plays: 234,
-			likes: 12,
-			fileSize: '10.5MB'
-		},
-		{
-			id: '5',
-			title: 'City Lights',
-			artist: 'Sugar Rush',
-			album: 'Sugar Rush Vol.2',
-			genre: 'Electronic',
-			duration: '4:30',
-			status: 'under_review',
-			plays: 345,
-			likes: 25,
-			fileSize: '9.8MB'
-		},
-		{
-			id: '6',
-			title: 'Ocean Wave',
-			artist: 'Sugar Rush',
-			album: 'Sugar Rush Vol.1',
-			genre: 'Pop',
-			duration: '3:55',
-			status: 'editing_complete',
-			plays: 567,
-			likes: 34,
-			fileSize: '8.5MB'
-		},
-		{
-			id: '7',
-			title: 'Mountain Peak',
-			artist: 'Various',
-			album: 'Demo Collection',
-			genre: 'Rock',
-			duration: '5:45',
-			status: 'approved',
-			plays: 890,
-			likes: 56,
-			fileSize: '12.1MB'
-		},
-		// 3. 발매업체 작업 (보라색 #D400FF → 녹색 #00FF2E)
-		{
-			id: '8',
-			title: 'Summer Night',
-			artist: 'Sugar Rush',
-			album: 'Summer Night',
-			genre: 'Pop',
-			duration: '3:30',
-			status: 'scheduled',
-			plays: 890,
-			likes: 67,
-			fileSize: '7.8MB'
-		},
-		{
-			id: '9',
-			title: 'Sugar Rush',
-			artist: 'Sugar Rush',
-			album: 'Sugar Rush Vol.1',
-			genre: 'Electronic',
-			duration: '3:45',
-			status: 'published',
-			plays: 1250,
-			likes: 89,
-			fileSize: '8.2MB'
-		},
-		{
-			id: '10',
-			title: 'Desert Storm',
-			artist: 'Sugar Rush',
-			album: 'Sugar Rush Vol.2',
-			genre: 'Electronic',
-			duration: '4:18',
-			status: 'paused',
-			plays: 0,
-			likes: 0,
-			fileSize: '9.3MB'
-		},
-		{
-			id: '11',
-			title: 'Morning Star',
-			artist: 'Various',
-			album: 'Demo Collection',
-			genre: 'Jazz',
-			duration: '5:00',
-			status: 'archived',
-			plays: 234,
-			likes: 15,
-			fileSize: '10.1MB'
-		},
-		// 4. 삭제됨 (레드 #FF1900) - 전체 단계 공통
-		{
-			id: '12',
-			title: 'Deleted Track',
-			artist: 'Sugar Rush',
-			album: 'Sugar Rush Vol.2',
-			genre: 'Electronic',
-			duration: '3:20',
-			status: 'deleted',
-			plays: 0,
-			likes: 0,
-			fileSize: '8.0MB'
-		},
-		// 추가 샘플 데이터 (2페이지 테스트용)
-		{
-			id: '13',
-			title: 'Starlight Dreams',
-			artist: 'Sugar Rush',
-			album: 'Sugar Rush Vol.1',
-			genre: 'Pop',
-			duration: '3:52',
-			status: 'published',
-			plays: 1120,
-			likes: 78,
-			fileSize: '8.5MB'
-		},
-		{
-			id: '14',
-			title: 'Neon Nights',
-			artist: 'Various',
-			album: 'Demo Collection',
-			genre: 'Electronic',
-			duration: '4:25',
-			status: 'draft',
-			plays: 234,
-			likes: 12,
-			fileSize: '9.2MB'
-		},
-		{
-			id: '15',
-			title: 'Golden Hour',
-			artist: 'Sugar Rush',
-			album: 'Sugar Rush Vol.2',
-			genre: 'Jazz',
-			duration: '5:10',
-			status: 'editing',
-			plays: 456,
-			likes: 28,
-			fileSize: '10.8MB'
-		},
-		{
-			id: '16',
-			title: 'Electric Pulse',
-			artist: 'Sugar Rush',
-			album: 'Sugar Rush Vol.1',
-			genre: 'Electronic',
-			duration: '3:38',
-			status: 'pending_review',
-			plays: 567,
-			likes: 35,
-			fileSize: '8.7MB'
-		},
-		{
-			id: '17',
-			title: 'Midnight Serenade',
-			artist: 'Various',
-			album: 'Demo Collection',
-			genre: 'Classical',
-			duration: '6:45',
-			status: 'under_review',
-			plays: 345,
-			likes: 19,
-			fileSize: '12.3MB'
-		},
-		{
-			id: '18',
-			title: 'Sunset Boulevard',
-			artist: 'Sugar Rush',
-			album: 'Sugar Rush Vol.2',
-			genre: 'Rock',
-			duration: '4:50',
-			status: 'editing_complete',
-			plays: 678,
-			likes: 42,
-			fileSize: '9.5MB'
-		},
-		{
-			id: '19',
-			title: 'Cosmic Dance',
-			artist: 'Sugar Rush',
-			album: 'Sugar Rush Vol.1',
-			genre: 'Electronic',
-			duration: '4:15',
-			status: 'approved',
-			plays: 890,
-			likes: 56,
-			fileSize: '8.9MB'
-		},
-		{
-			id: '20',
-			title: 'Rainbow Bridge',
-			artist: 'Various',
-			album: 'Demo Collection',
-			genre: 'Pop',
-			duration: '3:28',
-			status: 'scheduled',
-			plays: 0,
-			likes: 0,
-			fileSize: '7.5MB'
-		}
-	];
+	const tracks = mockTracks;
 
 	const genreFilterOptions = [
 		{ value: 'all', label: '모든 장르' },
@@ -353,7 +108,7 @@
 	];
 
 	// 검색 우선순위 계산 함수
-	function getSearchPriority(track: typeof tracks[0], query: string): number {
+	function getSearchPriority(track: (typeof tracks)[number], query: string): number {
 		if (!query) return 0;
 		
 		const title = track.title.toLowerCase();
@@ -1155,7 +910,7 @@
 
 			<!-- 데스크톱: 테이블 레이아웃 -->
 			<div class="hidden lg:block border rounded-lg overflow-visible" style="border-color: var(--border-subtle);">
-				<div class="overflow-x-auto overflow-y-visible">
+				<div class="overflow-hidden">
 					<table class="w-full border-collapse" style="table-layout: fixed; width: 100%; min-width: 800px;">
 					<caption class="sr-only">트랙 리스트</caption>
 					<thead>

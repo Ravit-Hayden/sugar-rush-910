@@ -1,15 +1,17 @@
 <script lang="ts">
 	import { Bell, X, Check, AlertCircle, Info, CreditCard, Calendar, Trash2 } from 'lucide-svelte';
+	import type { Snippet } from 'svelte';
 	import type { SUNOSubscription } from '$lib/types/suno';
 
-	// Props
+	// Props (Svelte 5: trigger는 스니펫으로 전달)
 	interface Props {
 		subscription: SUNOSubscription;
 		isOpen?: boolean;
 		onClose?: () => void;
+		trigger?: Snippet<[{ unreadCount: number }]>;
 	}
 
-	let { subscription, isOpen = false, onClose }: Props = $props();
+	let { subscription, isOpen = false, onClose, trigger }: Props = $props();
 
 	// 알림 타입
 	interface Notification {
@@ -129,11 +131,13 @@
 </script>
 
 <!-- 알림 벨 버튼 (외부에서 사용) -->
-<slot name="trigger" {unreadCount} />
+{#if trigger}
+	{@render trigger({ unreadCount })}
+{/if}
 
 <!-- 알림 패널 -->
 {#if isOpen}
-	<div class="absolute right-0 top-full mt-2 w-80 bg-surface-1 rounded-lg border border-border-subtle shadow-lg z-50 overflow-hidden">
+	<div class="absolute right-0 top-full mt-2 w-80 bg-surface-1 rounded-lg border border-border-subtle ring-1 ring-border-subtle/50 z-50 overflow-hidden">
 		<!-- 헤더 -->
 		<div class="px-4 py-3 border-b border-border-subtle flex items-center justify-between">
 			<div class="flex items-center gap-2">
@@ -170,12 +174,11 @@
 			{:else}
 				{#each notifications as notification}
 					{@const Icon = getIcon(notification.type)}
-					<div
-						class="px-4 py-3 border-b border-border-subtle last:border-b-0 hover:bg-surface-2/50 transition-colors cursor-pointer
+					<button
+						type="button"
+						class="w-full text-left px-4 py-3 border-b border-border-subtle last:border-b-0 hover:bg-surface-2/50 transition-colors cursor-pointer
 							{notification.isRead ? 'opacity-60' : ''}"
 						onclick={() => markAsRead(notification.id)}
-						role="button"
-						tabindex="0"
 					>
 						<div class="flex items-start gap-3">
 							<div class="w-8 h-8 rounded-full {getColor(notification.type)} flex items-center justify-center flex-shrink-0">
@@ -192,7 +195,7 @@
 								<span class="text-xs text-text-muted mt-1 block">{notification.date}</span>
 							</div>
 						</div>
-					</div>
+					</button>
 				{/each}
 			{/if}
 		</div>

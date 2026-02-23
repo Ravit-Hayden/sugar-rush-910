@@ -17,6 +17,8 @@ Thumbs.db
 .env.*
 !.env.example
 !.env.test
+# Cloudflare 로컬 시크릿 (DeepL 키 등)
+.dev.vars
 
 # Vite
 vite.config.js.timestamp-*

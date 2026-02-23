@@ -5,11 +5,14 @@
 import type { SUNOVersion, VocalGender, LyricsMode, GenerationType, SUNOMode } from '$lib/types/suno';
 
 /** SUNO 버전 옵션 */
-export const SUNO_VERSIONS: { value: SUNOVersion; label: string }[] = [
-	{ value: 'v3', label: 'v3' },
+export const SUNO_VERSIONS: { value: SUNOVersion; label: string; tier?: string }[] = [
+	{ value: 'v5', label: 'v5', tier: 'Pro' },
+	{ value: 'v4.5+', label: 'v4.5+', tier: 'Pro' },
+	{ value: 'v4.5', label: 'v4.5', tier: 'Pro' },
+	{ value: 'v4.5-all', label: 'v4.5-all', tier: 'Free' },
+	{ value: 'v4', label: 'v4', tier: 'Pro' },
 	{ value: 'v3.5', label: 'v3.5' },
-	{ value: 'v4', label: 'v4' },
-	{ value: 'v5', label: 'v5' }
+	{ value: 'v3', label: 'v3' }
 ];
 
 /** 모드 옵션 */

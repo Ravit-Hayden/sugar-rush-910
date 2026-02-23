@@ -77,10 +77,12 @@ export const mockProjects: SUNOProject[] = [
 
 // 목업 구독 정보
 export const mockSubscription: SUNOSubscription = {
-	planType: 'Pro',
+	planType: 'Premier',
+	status: 'active',
 	billingDate: 15,
-	monthlyCredits: 500,
-	remainingCredits: 320,
+	monthlyCredits: 10000,
+	remainingCredits: 6000,
+	updatedBy: 'El',
 	lastUpdated: '2026-01-13'
 };
 

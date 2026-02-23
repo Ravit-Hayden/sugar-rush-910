@@ -27,7 +27,7 @@
 
 	// 데이터 상태 (API에서 로드)
 	let projects = $state<SUNOProject[]>([]);
-	let subscription = $state<SUNOSubscription>({ planType: 'Pro', billingDate: 15, monthlyCredits: 500, remainingCredits: 500, lastUpdated: '' });
+	let subscription = $state<SUNOSubscription>({ planType: 'Premier', status: 'active', billingDate: 15, monthlyCredits: 10000, remainingCredits: 6000, updatedBy: 'El', lastUpdated: '' });
 	let words = $state<WordEntry[]>([]);
 	let recentActivities = $state<RecentActivity[]>([]);
 
@@ -122,13 +122,6 @@
 	<PageHeader 
 		title="SUNO 제작" 
 		description="AI 음악 제작을 관리합니다"
-		actions={[
-			{
-				icon: Plus,
-				label: '새 프로젝트',
-				onclick: () => showTemplates = true
-			}
-		]}
 	/>
 
 	<!-- 탭 + 콘텐츠 -->
@@ -241,10 +234,10 @@
 				</div>
 			</div>
 
-			<!-- 사이드 패널 -->
-			<div class="space-y-4">
+			<!-- 사이드 패널 (왼쪽 열과 같은 높이로 맞춤) -->
+			<div class="min-h-0 flex flex-col gap-4 lg:h-full">
 				<!-- 구독 정보 -->
-				<div class="bg-surface-2 rounded-lg border border-border-subtle p-4">
+				<div class="bg-surface-2 rounded-lg border border-border-subtle p-4 flex-shrink-0">
 					<div class="flex items-center justify-between mb-3">
 						<div class="flex items-center gap-2">
 							<h3 class="text-sm font-semibold text-text-strong">SUNO 구독</h3>
@@ -274,23 +267,23 @@
 					</div>
 				</div>
 
-				<!-- 최근 활동 -->
-				<div class="bg-surface-2 rounded-lg border border-border-subtle p-4">
-					<div class="flex items-center justify-between mb-3">
+				<!-- 최근 활동 (남는 높이 채워 왼쪽 카드와 하단 정렬) -->
+				<div class="bg-surface-2 rounded-lg border border-border-subtle p-4 flex-1 min-h-0 flex flex-col">
+					<div class="flex items-center justify-between mb-3 flex-shrink-0">
 						<h3 class="text-sm font-semibold text-text-strong">최근 활동</h3>
 						<a href="/feedback" class="text-brand-pink text-xs font-semibold px-2 py-1 rounded hover:bg-hover-cyan hover:text-[var(--text-on-hover)] transition-colors">
 							더보기
 						</a>
 					</div>
-					<div class="space-y-3">
+					<div class="space-y-3 min-h-0">
 						{#each recentActivities as activity}
-							<div class="flex items-start gap-2">
+							<a href="/suno/projects/{activity.projectId}" class="flex items-start gap-2 rounded-md hover:bg-surface-1 transition-colors -mx-1 px-1 py-0.5 block">
 								<Clock size={12} class="text-text-muted mt-0.5 flex-shrink-0" />
-								<div>
+								<div class="min-w-0">
 									<p class="text-xs text-text-base">{activity.projectTitle} - {activity.action}</p>
 									<p class="text-xs text-text-muted mt-0.5">{activity.timestamp} · <span class="{activity.author === 'El' ? 'text-elotte-green' : 'text-elotte-orange'}">{activity.author}</span></p>
 								</div>
-							</div>
+							</a>
 						{/each}
 						{#if recentActivities.length === 0}
 							<p class="text-xs text-text-muted text-center py-2">최근 활동이 없습니다</p>

@@ -90,7 +90,7 @@ export const GET: RequestHandler = async ({ platform, url }) => {
 
 export const POST: RequestHandler = async ({ request, platform }) => {
 	try {
-		const userData = await request.json();
+		const userData = await request.json() as Record<string, any>;
 
 		// 입력 검증
 		if (!userData.email || !userData.email.trim()) {
@@ -148,10 +148,10 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 					.run();
 
 				// 생성된 사용자 정보 조회
-				const { results } = await db
+				const results = await db
 					.prepare('SELECT * FROM users WHERE id = ?')
 					.bind(userId)
-					.first();
+					.first() as Record<string, any> | null;
 
 				createdUser = {
 					id: userId,
@@ -208,7 +208,7 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 
 export const PUT: RequestHandler = async ({ request, platform }) => {
 	try {
-		const { id, role } = await request.json();
+		const { id, role } = await request.json() as { id: string; role: string };
 
 		if (!id) {
 			const response: ApiErr = {
@@ -252,10 +252,10 @@ export const PUT: RequestHandler = async ({ request, platform }) => {
 					.run();
 
 				// 업데이트된 사용자 정보 조회
-				const { results } = await db
+				const results = await db
 					.prepare('SELECT * FROM users WHERE id = ?')
 					.bind(id)
-					.first();
+					.first() as Record<string, any> | null;
 
 				updatedUser = {
 					id,

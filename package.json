@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
+    "dev:5173": "node scripts/dev-5173.js",
+    "dev:clean": "node -e \"try{require('fs').rmSync('.svelte-kit',{recursive:true,force:true});require('fs').rmSync('node_modules/.vite',{recursive:true,force:true});}catch(e){}\" && vite dev",
     "build": "vite build",
     "preview": "svelte-kit preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
@@ -44,6 +46,7 @@
     "wrangler": "4.40.0"
   },
   "dependencies": {
-    "lucide-svelte": "^0.544.0"
+    "lucide-svelte": "^0.544.0",
+    "xlsx": "^0.18.5"
   }
 }

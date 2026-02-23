@@ -12,6 +12,7 @@
 	import { toast } from '$lib/stores/toast';
 	import type { AudioFile, AudioFolder, UploadItem } from '$lib/types/audio';
 	import { formatDuration, formatFileSize, getFormatColor, FOLDER_COLORS } from '$lib/types/audio';
+	import { MAX_FILE_SIZE_BYTES, getFileSizeErrorMessage } from '$lib/constants/upload';
 
 	// === 상태 ===
 	let searchQuery = $state('');
@@ -435,7 +436,10 @@
 				toast.add(`${file.name}: 오디오 파일만 가능`, 'error');
 				continue;
 			}
-			
+			if (file.size > MAX_FILE_SIZE_BYTES) {
+				toast.add(`${file.name}: ${getFileSizeErrorMessage()}`, 'error');
+				continue;
+			}
 			const item: UploadItem = {
 				id: `up_${Date.now()}_${Math.random()}`,
 				file,
@@ -1097,7 +1101,7 @@
 						<tr class="hover:bg-surface-2/50 transition-colors cursor-pointer" onclick={() => !selectMode && openFileModal(file)}>
 							{#if selectMode}
 								<td class="px-4 py-3">
-									<button type="button" onclick={(e) => toggleSelect(file.id, e)} class="p-1">
+									<button type="button" onclick={(e) => toggleSelect(file.id, e)} class="p-1 bg-transparent hover:bg-transparent focus:bg-transparent border-0 rounded">
 										{#if selectedIds.has(file.id)}
 											<CheckSquare size={18} class="text-brand-pink" />
 										{:else}
@@ -1182,7 +1186,7 @@
 				>
 					<div class="flex items-start gap-3">
 						{#if selectMode}
-							<button type="button" onclick={(e) => toggleSelect(file.id, e)} class="mt-1">
+							<button type="button" onclick={(e) => toggleSelect(file.id, e)} class="mt-1 bg-transparent hover:bg-transparent focus:bg-transparent border-0 rounded">
 								{#if selectedIds.has(file.id)}
 									<CheckSquare size={20} class="text-brand-pink" />
 								{:else}
@@ -1280,7 +1284,7 @@
 					<h2 class="text-base font-semibold text-text-strong">폴더 이동</h2>
 					<p class="text-xs text-text-muted mt-0.5 truncate max-w-[280px]">{moveTargetFile.fileName}</p>
 							</div>
-				<button type="button" onclick={() => { showMoveModal = false; moveTargetFile = null; }} class="text-text-muted hover:text-text-base">
+				<button type="button" onclick={() => { showMoveModal = false; moveTargetFile = null; }} class="template-close-btn w-8 h-8 flex items-center justify-end rounded-md text-text-muted transition-colors border border-transparent pl-2 pr-0" aria-label="닫기">
 					<X size={18} />
 				</button>
 			</div>
@@ -1342,7 +1346,7 @@
 					<h2 class="text-base font-semibold text-text-strong">폴더 이동</h2>
 					<p class="text-xs text-text-muted mt-0.5">{selectedIds.size}개 파일 선택됨</p>
 			</div>
-				<button type="button" onclick={() => showBulkMoveModal = false} class="text-text-muted hover:text-text-base">
+				<button type="button" onclick={() => showBulkMoveModal = false} class="template-close-btn w-8 h-8 flex items-center justify-end rounded-md text-text-muted transition-colors border border-transparent pl-2 pr-0" aria-label="닫기">
 					<X size={18} />
 				</button>
 			</div>
@@ -1391,7 +1395,7 @@
 		<div class="bg-surface-1 rounded-lg border border-border-subtle w-full max-w-sm overflow-hidden" role="document" onclick={(e) => e.stopPropagation()}>
 			<div class="flex items-center justify-between px-5 py-4 border-b border-border-subtle">
 				<h2 class="text-base font-semibold text-text-strong">{editingFolderId ? '폴더 편집' : '새 폴더'}</h2>
-				<button type="button" onclick={() => showFolderModal = false} class="text-text-muted hover:text-text-base">
+				<button type="button" onclick={() => showFolderModal = false} class="template-close-btn w-8 h-8 flex items-center justify-end rounded-md text-text-muted transition-colors border border-transparent pl-2 pr-0" aria-label="닫기">
 					<X size={18} />
 				</button>
 						</div>
@@ -1495,14 +1499,14 @@
 	>
 		<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 		<!-- svelte-ignore a11y_click_events_have_key_events -->
-		<div class="bg-surface-1 rounded-lg border border-border-subtle w-full max-w-md max-h-[85vh] overflow-y-auto custom-list-scrollbar" role="document" onclick={(e) => e.stopPropagation()}>
-			<div class="flex items-center justify-between px-5 py-4 border-b border-border-subtle sticky top-0 bg-surface-1 z-10">
+		<div class="bg-surface-1 rounded-lg border border-border-subtle w-full max-w-md max-h-[85vh] overflow-hidden flex flex-col" role="document" onclick={(e) => e.stopPropagation()}>
+			<div class="flex items-center justify-between px-5 py-4 border-b border-border-subtle flex-shrink-0">
 				<h2 class="text-base font-semibold text-text-strong">파일 정보</h2>
-				<button type="button" onclick={() => showFileModal = false} class="text-text-muted hover:text-text-base">
+				<button type="button" onclick={() => showFileModal = false} class="template-close-btn w-8 h-8 flex items-center justify-end rounded-md text-text-muted transition-colors border border-transparent pl-2 pr-0" aria-label="닫기">
 					<X size={18} />
 				</button>
 				</div>
-			<div class="p-5 space-y-5">
+			<div class="p-5 space-y-5 overflow-y-auto custom-list-scrollbar modal-scroll-body flex-1 min-h-0">
 				<div>
 					<label for="file-name" class="block text-sm font-medium text-text-base mb-2">파일명</label>
 					<input id="file-name" type="text" bind:value={editName} class="w-full h-10 px-4 bg-surface-2 border border-border-subtle rounded-lg focus:outline-none focus:border-brand-pink" />
@@ -1601,7 +1605,7 @@
 					{/if}
 				</div>
 			</div>
-			<div class="flex justify-end gap-3 px-5 py-4 border-t border-border-subtle sticky bottom-0 bg-surface-1">
+			<div class="flex justify-end gap-3 px-5 py-4 border-t border-border-subtle flex-shrink-0">
 				<button type="button" onclick={() => showFileModal = false} class="px-4 py-2 text-sm text-text-muted hover:text-text-base transition-colors">닫기</button>
 				<button type="button" onclick={saveFile} class="px-4 py-2 bg-brand-pink text-white text-sm font-medium rounded-lg hover:bg-brand-pink/90 transition-colors">저장</button>
 			</div>

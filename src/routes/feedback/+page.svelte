@@ -6,9 +6,16 @@
 	import MoreMenuDropdown from '$lib/components/MoreMenuDropdown.svelte';
 	import { toast } from '$lib/stores/toast';
 
-	let searchQuery = '';
-	let selectedFilter = 'all';
-	let selectedTab = 'feedback';
+	/** API 응답 공통 타입 */
+	interface ApiResponse<T = unknown> {
+		ok: boolean;
+		data?: T;
+		error?: { message?: string };
+	}
+
+	let searchQuery = $state('');
+	let selectedFilter = $state('all');
+	let selectedTab = $state('feedback');
 	let moreMenuOpenId = $state<string | null>(null);
 	let editingFeedbackId = $state<string | null>(null);
 	let editingTitle = $state('');
@@ -54,9 +61,9 @@
 					params.append('status', selectedFilter);
 				}
 				const response = await fetch(`/api/feedback?${params.toString()}&limit=1000`);
-				const data = await response.json();
+				const data = (await response.json()) as ApiResponse<any[]>;
 				if (data.ok) {
-					feedbacks = (data.data || []).map((fb: any) => ({
+					feedbacks = (data.data ?? []).map((fb: any) => ({
 						...fb,
 						time: formatTime(fb.created_at)
 					}));
@@ -81,9 +88,9 @@
 				try {
 					notificationsLoading = true;
 					const response = await fetch('/api/notifications?limit=1000');
-					const data = await response.json();
+					const data = (await response.json()) as ApiResponse<any[]>;
 					if (data.ok) {
-						notifications = (data.data || []).map((notif: any) => ({
+						notifications = (data.data ?? []).map((notif: any) => ({
 							...notif,
 							time: formatTime(notif.created_at)
 						}));
@@ -107,7 +114,7 @@
 				body: JSON.stringify({ id: notificationId, status: 'read' })
 			});
 
-			const data = await response.json();
+			const data = (await response.json()) as ApiResponse;
 			if (data.ok) {
 				// 로컬 상태 업데이트
 				notifications = notifications.map(n => 
@@ -184,7 +191,7 @@
 	}));
 
 	const unreadCount = $derived(feedbacks.filter(f => f.status === 'unread').length);
-	const notificationUnreadCount = notifications.filter(n => n.status === 'unread').length;
+	const notificationUnreadCount = $derived(notifications.filter(n => n.status === 'unread').length);
 
 	// 더보기 메뉴 토글
 	function handleMoreMenuToggle(id: string) {
@@ -223,9 +230,9 @@
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ id: feedbackId, title: editingTitle.trim(), content: editingContent.trim() })
 			});
-			const result = await response.json();
+			const result = (await response.json()) as ApiResponse;
 			if (!response.ok || !result.ok) {
-				throw new Error(result.error?.message || '피드백 수정에 실패했습니다.');
+				throw new Error(result.error?.message ?? '피드백 수정에 실패했습니다.');
 			}
 
 			// 로컬 상태 업데이트
@@ -259,9 +266,9 @@
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ id: feedbackId })
 			});
-			const result = await response.json();
+			const result = (await response.json()) as ApiResponse;
 			if (!response.ok || !result.ok) {
-				throw new Error(result.error?.message || '피드백 삭제에 실패했습니다.');
+				throw new Error(result.error?.message ?? '피드백 삭제에 실패했습니다.');
 			}
 
 			// 목록에서 제거
@@ -333,9 +340,9 @@
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ id: feedbackId, status: 'archived' })
 			});
-			const result = await response.json();
+			const result = (await response.json()) as ApiResponse;
 			if (!response.ok || !result.ok) {
-				throw new Error(result.error?.message || '보관 처리에 실패했습니다.');
+				throw new Error(result.error?.message ?? '보관 처리에 실패했습니다.');
 			}
 
 			// 로컬 상태 업데이트
@@ -380,14 +387,17 @@
 				})
 			});
 
-			const result = await response.json();
+			const result = (await response.json()) as ApiResponse<{ created_at?: string; [k: string]: unknown }>;
 
 			if (!response.ok || !result.ok) {
-				throw new Error(result.error?.message || '피드백 추가에 실패했습니다.');
+				throw new Error(result.error?.message ?? '피드백 추가에 실패했습니다.');
 			}
 
 			// 목록에 새 피드백 추가 (맨 앞에)
-			feedbacks = [{ ...result.data, time: formatTime(result.data.created_at) }, ...feedbacks];
+			const newItem = result.data;
+			if (newItem) {
+				feedbacks = [{ ...newItem, time: formatTime((newItem.created_at ?? '')) }, ...feedbacks];
+			}
 			newFeedbackTitle = '';
 			newFeedbackContent = '';
 			newFeedbackPriority = 'medium';
@@ -537,6 +547,8 @@
 										rows="4"
 										placeholder="피드백 내용을 입력하세요"
 										class="input-base w-full px-4 py-2 text-base placeholder:text-text-muted resize-none"
+										spellcheck="true"
+										lang="ko"
 									></textarea>
 								</div>
 
@@ -630,6 +642,8 @@
 												rows="4"
 												placeholder="피드백 내용"
 												class="input-base w-full px-4 py-2 text-base resize-none"
+												spellcheck="true"
+												lang="ko"
 											></textarea>
 											<div class="flex items-center gap-2">
 												<button
@@ -702,7 +716,7 @@
 										{#each Array(5) as _, i}
 											<Star 
 												size={14} 
-												class="{i < feedback.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'}" 
+												class={i < feedback.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'} 
 											/>
 										{/each}
 										<span class="text-sm text-text-muted ml-2">({feedback.rating}/5)</span>
@@ -728,6 +742,8 @@
 													rows="3"
 													placeholder="답변을 입력하세요"
 													class="input-base w-full px-3 py-2 text-sm resize-none mb-2"
+													spellcheck="true"
+													lang="ko"
 												></textarea>
 												<div class="flex items-center gap-2">
 													<button

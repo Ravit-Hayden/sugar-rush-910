@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { Keyboard, X } from 'lucide-svelte';
 	import { browser } from '$app/environment';
+	import { tick } from 'svelte';
 
 	// Props
 	interface Props {
@@ -10,6 +11,22 @@
 	}
 
 	let { onAction, showHelp = false, onCloseHelp }: Props = $props();
+
+	let dialogRef: HTMLDivElement | undefined = $state();
+
+	function handleOverlayKeydown(e: KeyboardEvent) {
+		if (e.key === 'Escape') {
+			e.preventDefault();
+			onCloseHelp?.();
+		}
+	}
+
+	$effect(() => {
+		if (!browser || !showHelp || !dialogRef) return;
+		tick().then(() => {
+			dialogRef?.focus();
+		});
+	});
 
 	// 단축키 정의
 	const shortcuts = [
@@ -72,21 +89,22 @@
 <!-- 단축키 도움말 모달 -->
 {#if showHelp}
 	<div
+		bind:this={dialogRef}
 		class="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4"
-		onclick={onCloseHelp}
 		role="dialog"
 		aria-modal="true"
+		aria-labelledby="keyboard-shortcuts-dialog-title"
+		tabindex="-1"
+		onclick={(e) => { if (e.target === e.currentTarget) onCloseHelp?.(); }}
+		onkeydown={handleOverlayKeydown}
 	>
-		<div
-			class="bg-surface-1 rounded-lg border border-border-subtle w-full max-w-md"
-			onclick={(e) => e.stopPropagation()}
-		>
+		<div class="bg-surface-1 rounded-lg border border-border-subtle w-full max-w-md">
 			<div class="flex items-center justify-between px-6 py-4 border-b border-border-subtle">
 				<div class="flex items-center gap-2">
 					<Keyboard size={20} class="text-brand-pink" />
-					<h2 class="text-lg font-semibold text-text-strong">키보드 단축키</h2>
+					<h2 id="keyboard-shortcuts-dialog-title" class="text-lg font-semibold text-text-strong">키보드 단축키</h2>
 				</div>
-				<button type="button" onclick={onCloseHelp} class="btn-icon">
+				<button type="button" onclick={onCloseHelp} class="btn-icon" aria-label="닫기">
 					<X size={20} />
 				</button>
 			</div>

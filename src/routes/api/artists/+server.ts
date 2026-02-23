@@ -477,7 +477,7 @@ export const GET: RequestHandler = async ({ platform }) => {
 // POST: 새 아티스트 생성
 export const POST: RequestHandler = async ({ request, platform }) => {
 	try {
-		const artistData = await request.json();
+		const artistData = await request.json() as Record<string, any>;
 
 		// 입력 검증
 		if (!artistData.name || !artistData.name.trim()) {
@@ -534,27 +534,27 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 					.run();
 
 				// 생성된 아티스트 조회
-				const { results } = await db
+				const results = await db
 					.prepare('SELECT * FROM artists WHERE id = ?')
 					.bind(artistId)
-					.first();
+					.first() as Record<string, any> | null;
 
 				const createdArtist: Artist = {
-					id: results.id,
-					name: results.name,
-					description: results.description || undefined,
-					photo_url: results.photo_url || undefined,
-					website: results.website || undefined,
-					email: results.email || undefined,
-					instagram: results.instagram || undefined,
-					twitter: results.twitter || undefined,
-					youtube: results.youtube || undefined,
-					genre: results.genre || undefined,
-					debut_date: results.debut_date || undefined,
-					agency: results.agency || undefined,
-					country: results.country || undefined,
-					created_at: results.created_at,
-					updated_at: results.updated_at
+					id: results?.id,
+					name: results?.name,
+					description: results?.description || undefined,
+					photo_url: results?.photo_url || undefined,
+					website: results?.website || undefined,
+					email: results?.email || undefined,
+					instagram: results?.instagram || undefined,
+					twitter: results?.twitter || undefined,
+					youtube: results?.youtube || undefined,
+					genre: results?.genre || undefined,
+					debut_date: results?.debut_date || undefined,
+					agency: results?.agency || undefined,
+					country: results?.country || undefined,
+					created_at: results?.created_at,
+					updated_at: results?.updated_at
 				};
 
 				const response: ApiOk<Artist> = {

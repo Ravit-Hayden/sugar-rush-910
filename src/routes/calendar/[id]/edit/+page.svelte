@@ -62,7 +62,7 @@
 			try {
 				loading = true;
 				const response = await fetch(`/api/calendar?limit=1000`);
-				const data = await response.json();
+				const data = await response.json() as Record<string, any>;
 				
 				if (data.ok && data.data) {
 					const found = data.data.find((e: any) => e.id === eventId);

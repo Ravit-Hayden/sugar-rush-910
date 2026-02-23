@@ -482,14 +482,20 @@
 		favoritePresets = favoritePresets.filter(p => p.id !== id);
 	}
 
-	// 카테고리별 워드 그룹 (제외 카테고리 제외)
+	// 즐겨찾기 워드만 사용 여부
+	let useFavoriteWordsOnly = $state(false);
+
+	// 카테고리별 워드 그룹 (제외 카테고리 제외, 즐겨찾기 필터 적용)
 	const wordsByCategory = $derived.by(() => {
+		const source = useFavoriteWordsOnly ? words.filter(w => w.favorite === true) : words;
 		const grouped: Record<WordCategory, WordEntry[]> = {} as Record<WordCategory, WordEntry[]>;
 		RANDOM_CATEGORIES.forEach(cat => {
-			grouped[cat.id] = words.filter(w => w.category === cat.id);
+			grouped[cat.id] = source.filter(w => w.category === cat.id);
 		});
 		return grouped;
 	});
+
+	const favoriteWordsCount = $derived(words.filter(w => w.favorite === true).length);
 
 	// 가중치 기반 랜덤 선택 함수 (사용 빈도가 낮은 것이 더 자주 선택됨)
 	function weightedRandomSelect(items: WordEntry[], count: number): WordEntry[] {
@@ -525,6 +531,16 @@
 		if (categorySelections[category] > 0) {
 			categorySelections[category]--;
 		}
+	}
+
+	// 카테고리 선택 전체 초기화 (프리셋 없이 모두 0)
+	function resetAllCategorySelections() {
+		categorySelections = Object.fromEntries(WORD_CATEGORIES.map(cat => [cat.id, 0])) as Record<WordCategory, number>;
+	}
+
+	// 제외 스타일 전체 초기화 (선택 없음 상태)
+	function resetExcludeStyles() {
+		selectedExcludes = new Set();
 	}
 
 	// 랜덤 조합 생성 (가중치 기반)
@@ -964,7 +980,7 @@
 					<button
 						type="button"
 						onclick={onClose}
-						class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-md text-text-muted hover:text-hover-point hover:bg-surface-2 transition-colors"
+						class="template-close-btn w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-end rounded-md text-text-muted transition-colors border border-transparent pl-2 pr-0 sm:pl-2 sm:pr-0"
 						aria-label="닫기"
 					>
 						<X size={16} />
@@ -975,11 +991,11 @@
 		
 		<!-- 프리셋 그룹 탭 - 수평 스크롤 on mobile -->
 		<div class="mb-3">
-			<div class="flex items-center gap-1.5 overflow-x-auto pb-2 -mb-2 scrollbar-hide">
+			<div class="flex items-center gap-1.5 flex-wrap">
 				<button
 					type="button"
 					onclick={() => selectedPresetGroup = 'basic'}
-					class="preset-group-btn flex items-center gap-1 px-2.5 py-1.5 text-xs sm:text-sm rounded-md transition-colors whitespace-nowrap flex-shrink-0 {selectedPresetGroup === 'basic' ? 'active border-brand-pink text-brand-pink bg-brand-pink/10' : 'border-border-subtle text-text-muted hover:text-text-base'} border"
+					class="preset-group-btn btn-outline-hover flex items-center gap-1 px-2.5 py-1.5 text-xs sm:text-sm rounded-md transition-colors whitespace-nowrap flex-shrink-0 {selectedPresetGroup === 'basic' ? 'active border-brand-pink text-brand-pink' : 'border-border-subtle text-text-muted'} border"
 				>
 					<Layers size={13} class="pointer-events-none" />
 					기본
@@ -987,7 +1003,7 @@
 				<button
 					type="button"
 					onclick={() => selectedPresetGroup = 'genre'}
-					class="preset-group-btn flex items-center gap-1 px-2.5 py-1.5 text-xs sm:text-sm rounded-md transition-colors whitespace-nowrap flex-shrink-0 {selectedPresetGroup === 'genre' ? 'active border-brand-pink text-brand-pink bg-brand-pink/10' : 'border-border-subtle text-text-muted hover:text-text-base'} border"
+					class="preset-group-btn btn-outline-hover flex items-center gap-1 px-2.5 py-1.5 text-xs sm:text-sm rounded-md transition-colors whitespace-nowrap flex-shrink-0 {selectedPresetGroup === 'genre' ? 'active border-brand-pink text-brand-pink' : 'border-border-subtle text-text-muted'} border"
 				>
 					<Music size={13} class="pointer-events-none" />
 					장르
@@ -995,7 +1011,7 @@
 				<button
 					type="button"
 					onclick={() => selectedPresetGroup = 'mood'}
-					class="preset-group-btn flex items-center gap-1 px-2.5 py-1.5 text-xs sm:text-sm rounded-md transition-colors whitespace-nowrap flex-shrink-0 {selectedPresetGroup === 'mood' ? 'active border-brand-pink text-brand-pink bg-brand-pink/10' : 'border-border-subtle text-text-muted hover:text-text-base'} border"
+					class="preset-group-btn btn-outline-hover flex items-center gap-1 px-2.5 py-1.5 text-xs sm:text-sm rounded-md transition-colors whitespace-nowrap flex-shrink-0 {selectedPresetGroup === 'mood' ? 'active border-brand-pink text-brand-pink' : 'border-border-subtle text-text-muted'} border"
 				>
 					<Sparkles size={13} class="pointer-events-none preset-group-icon" />
 					분위기
@@ -1003,7 +1019,7 @@
 				<button
 					type="button"
 					onclick={() => selectedPresetGroup = 'production'}
-					class="preset-group-btn flex items-center gap-1 px-2.5 py-1.5 text-xs sm:text-sm rounded-md transition-colors whitespace-nowrap flex-shrink-0 {selectedPresetGroup === 'production' ? 'active border-brand-pink text-brand-pink bg-brand-pink/10' : 'border-border-subtle text-text-muted hover:text-text-base'} border"
+					class="preset-group-btn btn-outline-hover flex items-center gap-1 px-2.5 py-1.5 text-xs sm:text-sm rounded-md transition-colors whitespace-nowrap flex-shrink-0 {selectedPresetGroup === 'production' ? 'active border-brand-pink text-brand-pink' : 'border-border-subtle text-text-muted'} border"
 				>
 					<Wrench size={13} class="pointer-events-none" />
 					제작
@@ -1012,7 +1028,7 @@
 				<button
 					type="button"
 					onclick={() => showFavorites = !showFavorites}
-					class="preset-group-btn flex items-center gap-1 px-2.5 py-1.5 text-xs sm:text-sm rounded-md transition-colors whitespace-nowrap flex-shrink-0 {showFavorites ? 'active border-brand-pink text-brand-pink bg-brand-pink/10' : 'border-border-subtle text-text-muted hover:text-text-base'} border"
+					class="preset-group-btn btn-outline-hover flex items-center gap-1 px-2.5 py-1.5 text-xs sm:text-sm rounded-md transition-colors whitespace-nowrap flex-shrink-0 {showFavorites ? 'active border-brand-pink text-brand-pink' : 'border-border-subtle text-text-muted'} border"
 				>
 					<Star size={13} class="pointer-events-none" />
 					즐겨찾기
@@ -1111,12 +1127,41 @@
 		</div>
 	</div>
 
+	<!-- 즐겨찾기 워드만 사용 -->
+	{#if favoriteWordsCount > 0}
+		<div class="px-4 sm:px-6 pb-2">
+			<label class="flex items-center gap-2 cursor-pointer select-none">
+				<input
+					type="checkbox"
+					bind:checked={useFavoriteWordsOnly}
+					class="rounded border-border-subtle text-brand-pink focus:ring-brand-pink"
+				/>
+				<span class="text-xs sm:text-sm text-text-base">즐겨찾기 워드만 사용</span>
+				<span class="text-[10px] sm:text-xs text-text-muted">({favoriteWordsCount}개)</span>
+			</label>
+		</div>
+	{/if}
+
 	<!-- 카테고리 선택 -->
 	<div class="p-4 sm:p-6">
-		<!-- 섹션 라벨 -->
-		<div class="flex items-center justify-between mb-3">
+		<!-- 섹션 라벨 + 선택 초기화 -->
+		<div class="flex items-center justify-between gap-2 mb-3">
 			<span class="text-xs text-text-muted">카테고리별 선택 개수</span>
-			<span class="text-xs text-brand-pink font-medium">{totalSelected}개 선택됨</span>
+			<div class="flex items-center gap-2">
+				{#if totalSelected > 0}
+					<button
+						type="button"
+						onclick={resetAllCategorySelections}
+						class="combinator-reset-btn flex items-center gap-1 px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm rounded-md border border-border-subtle text-text-muted transition-colors"
+						aria-label="선택 초기화"
+						title="카테고리 선택 모두 해제"
+					>
+						<RotateCcw size={12} />
+						선택 초기화
+					</button>
+				{/if}
+				<span class="text-xs text-brand-pink font-medium">{totalSelected}개 선택됨</span>
+			</div>
 		</div>
 		
 		<!-- 카테고리 그리드 -->
@@ -1124,7 +1169,7 @@
 			{#each RANDOM_CATEGORIES as cat}
 				{@const available = wordsByCategory[cat.id]?.length || 0}
 				{@const selected = categorySelections[cat.id]}
-				<div class="flex items-center justify-between p-2 sm:p-3 rounded-lg bg-surface-2 transition-all {selected > 0 ? 'ring-1 ring-brand-pink/50 bg-brand-pink/5' : ''}">
+				<div class="flex items-center justify-between p-2 sm:p-3 rounded-lg bg-surface-2 border border-border-subtle transition-all {selected > 0 ? 'combinator-category-selected' : ''}">
 					<div class="flex-1 min-w-0 mr-2">
 						<div class="text-xs sm:text-sm font-medium text-text-base truncate">{cat.name}</div>
 						<div class="text-[10px] sm:text-xs text-text-muted">{available}개</div>
@@ -1158,7 +1203,7 @@
 				type="button"
 				onclick={generateCombination}
 				disabled={totalSelected === 0}
-				class="w-full sm:w-auto sm:mx-auto flex items-center justify-center gap-2 px-5 py-2.5 sm:px-6 sm:py-3 bg-brand-pink text-white rounded-lg text-sm sm:text-base font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed hover:bg-brand-pink/90"
+				class="page-header-primary-button w-full sm:w-auto sm:mx-auto flex items-center justify-center gap-2 px-5 py-2.5 sm:px-6 sm:py-3 bg-brand-pink text-white rounded-lg text-sm sm:text-base font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed [&>svg]:text-white hover:[&>svg]:!text-[var(--text-on-hover)] focus:[&>svg]:!text-white focus-visible:[&>svg]:!text-white focus:outline-none focus:ring-0"
 			>
 				<Shuffle size={16} class="sm:w-[18px] sm:h-[18px]" />
 				조합 생성
@@ -1260,7 +1305,7 @@
 		<!-- 제외 스타일 섹션 -->
 		<div class="mt-4 sm:mt-6 rounded-lg bg-surface-2/30 border border-border-subtle overflow-hidden">
 			<!-- 헤더 -->
-			<div class="px-3 sm:px-4 py-2.5 flex items-center justify-between gap-2">
+			<div class="px-3 sm:px-4 py-2.5 flex items-center justify-between gap-2 flex-wrap">
 				<button
 					type="button"
 					onclick={() => excludeExpanded = !excludeExpanded}
@@ -1273,21 +1318,35 @@
 					</span>
 					<ChevronDown size={12} class="text-text-muted transition-transform flex-shrink-0 {excludeExpanded ? 'rotate-180' : ''}" />
 				</button>
-				{#key excludeCopied}
-					<button
-						type="button"
-						onclick={copyExcludeStyles}
-						class="exclude-copy-btn btn-outline-hover flex items-center gap-1 px-2 py-1 sm:px-3 sm:py-1.5 rounded-md border border-border-subtle text-xs sm:text-sm flex-shrink-0 {excludeCopied ? 'text-brand-pink border-brand-pink' : 'text-text-base'}"
-					>
-						{#if excludeCopied}
-							<Check size={12} />
-							<span class="hidden sm:inline">복사됨</span>
-						{:else}
-							<Copy size={12} />
-							<span class="hidden sm:inline">복사</span>
-						{/if}
-					</button>
-				{/key}
+				<div class="flex items-center gap-1.5 flex-shrink-0">
+					{#if selectedExcludes.size > 0}
+						<button
+							type="button"
+							onclick={resetExcludeStyles}
+							class="combinator-reset-btn flex items-center gap-1 px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm rounded-md border border-border-subtle text-text-muted transition-colors flex-shrink-0"
+							aria-label="제외 스타일 초기화"
+							title="선택된 제외 스타일 모두 해제"
+						>
+							<RotateCcw size={12} />
+							초기화
+						</button>
+					{/if}
+					{#key excludeCopied}
+						<button
+							type="button"
+							onclick={copyExcludeStyles}
+							class="exclude-copy-btn btn-outline-hover flex items-center gap-1 px-2 py-1 sm:px-3 sm:py-1.5 rounded-md border border-border-subtle text-xs sm:text-sm flex-shrink-0 {excludeCopied ? 'text-brand-pink border-brand-pink' : 'text-text-base'}"
+						>
+							{#if excludeCopied}
+								<Check size={12} />
+								<span class="hidden sm:inline">복사됨</span>
+							{:else}
+								<Copy size={12} />
+								<span class="hidden sm:inline">복사</span>
+							{/if}
+						</button>
+					{/key}
+				</div>
 			</div>
 
 			<!-- 선택된 스타일 미리보기 -->

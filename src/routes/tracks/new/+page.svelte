@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { Asterisk, ChevronDown, ChevronDown as ChevronDownIcon, X, Upload, Music } from 'lucide-svelte';
+	import { Asterisk, ChevronDown, ChevronDown as ChevronDownIcon, X, Music } from 'lucide-svelte';
 	import PageHeader from '$lib/components/PageHeader.svelte';
 	import PageContent from '$lib/components/PageContent.svelte';
 	import DatePicker from '$lib/components/DatePicker.svelte';
 	import { GENRES } from '$lib/constants/genres';
+	import { MAX_FILE_SIZE_BYTES, getFileSizeErrorMessage } from '$lib/constants/upload';
 	import ArtistSelect from '$lib/components/ArtistSelect.svelte';
 	import AlbumSelect from '$lib/components/AlbumSelect.svelte';
 	import { ALBUMS } from '$lib/constants/albums';
@@ -63,7 +64,7 @@
 	let audioFileUrl = $state<string | null>(null);
 	let uploadProgress = $state(0);
 	let isUploading = $state(false);
-	let audioFileInput: HTMLInputElement;
+	let audioFileInput = $state<HTMLInputElement | null>(null);
 	let isDraggingAudio = $state(false);
 
 	// 선택 가능한 장르 목록 (선택된 장르 제외)
@@ -166,10 +167,9 @@
 			return;
 		}
 
-		// 파일 크기 검증 (100MB)
-		const maxSize = 100 * 1024 * 1024;
-		if (file.size > maxSize) {
-			toast.add('파일 크기는 100MB를 초과할 수 없습니다.', 'error', 3000);
+		// 파일 크기 검증 (공통 한도 1GB)
+		if (file.size > MAX_FILE_SIZE_BYTES) {
+			toast.add(getFileSizeErrorMessage(), 'error', 3000);
 			return;
 		}
 
@@ -296,7 +296,7 @@
 				body: JSON.stringify(trackData)
 			});
 
-			const result = await response.json();
+			const result = (await response.json()) as { ok?: boolean; error?: { message?: string } };
 
 			if (!response.ok || !result.ok) {
 				const errorMessage = result.error?.message || '트랙 추가에 실패했습니다.';
@@ -753,6 +753,9 @@
 						{#if !audioFile && !audioFileUrl}
 							<!-- 파일 선택 영역 -->
 							<div
+								role="button"
+								tabindex="0"
+								aria-label="음원 파일 드래그 영역"
 								class="relative border-2 border-dashed border-border-subtle rounded-lg p-8 text-center transition-colors duration-200 {isDraggingAudio ? 'border-brand-pink bg-surface-2' : 'hover:border-border-base'}"
 								ondragover={handleAudioDragOver}
 								ondragleave={handleAudioDragLeave}
@@ -768,21 +771,19 @@
 									class="hidden"
 								/>
 								<div class="flex flex-col items-center gap-4">
-									<Music size={48} class="text-text-muted" />
 									<div>
 										<p class="text-sm text-text-base mb-1">
 											파일을 드래그하거나 클릭하여 업로드
 										</p>
 										<p class="text-xs text-text-muted">
-											MP3, WAV, M4A, FLAC 등 (최대 100MB)
+											MP3, WAV, M4A, FLAC 등 (최대 1GB)
 										</p>
 									</div>
 									<button
 										type="button"
 										onclick={() => audioFileInput?.click()}
-										class="inline-flex items-center gap-2 px-4 py-2 bg-surface-2 text-text-base rounded-lg border border-border-subtle transition-colors duration-200 font-medium hover:bg-surface-1 focus:outline-none focus:ring-0"
+										class="btn-outline-hover audio-upload-trigger font-medium"
 									>
-										<Upload size={16} />
 										파일 선택
 									</button>
 								</div>

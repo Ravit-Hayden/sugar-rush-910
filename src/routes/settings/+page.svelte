@@ -5,6 +5,8 @@
 	import DatePicker from '$lib/components/DatePicker.svelte';
 	import type { Artist } from '../api/artists/+server';
 	import { invalidateArtistsCache } from '$lib/constants/artists';
+	import { MAX_FILE_SIZE_BYTES, getFileSizeErrorMessage } from '$lib/constants/upload';
+	import { toast } from '$lib/stores/toast';
 
 	let activeTab = $state('general');
 	let settings = $state({
@@ -88,6 +90,10 @@
 	// 이미지 파일 처리
 	function processFile(file: File) {
 		if (file && file.type.startsWith('image/')) {
+			if (file.size > MAX_FILE_SIZE_BYTES) {
+				toast.add(getFileSizeErrorMessage(), 'error');
+				return;
+			}
 			imageFile = file;
 			if (previewUrl && previewUrl.startsWith('blob:')) {
 				URL.revokeObjectURL(previewUrl);
@@ -1582,7 +1588,7 @@
 										<button
 											type="button"
 											onclick={() => toggleTrashSelection(item.id)}
-											class="flex-shrink-0 p-0.5"
+											class="flex-shrink-0 p-0.5 bg-transparent hover:bg-transparent focus:bg-transparent border-0 rounded"
 										>
 											{#if selectedTrashIds.has(item.id)}
 												<CheckSquare size={16} class="text-brand-pink" />

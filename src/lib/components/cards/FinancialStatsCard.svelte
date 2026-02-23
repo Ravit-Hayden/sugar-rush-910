@@ -96,15 +96,15 @@
 		{:else if stats}
 			<!-- 요약 영역: 다른 카드와 동일 h-8 1행 (시스템 로그와 높이 통일) -->
 			<div class="grid grid-cols-3 gap-2 mb-3">
-				<div class="h-8 bg-surface-1 rounded flex items-center justify-center gap-1.5 px-2 min-w-0">
+				<div class="h-8 bg-surface-inner rounded flex items-center justify-center gap-1.5 px-2 min-w-0">
 					<TrendingUp size={12} class="text-green-500 flex-shrink-0" />
 					<span class="text-xs text-text-muted truncate" data-type="number" title="{stats.totalRevenue.toLocaleString()}원">{formatNumber(stats.totalRevenue)}</span>
 				</div>
-				<div class="h-8 bg-surface-1 rounded flex items-center justify-center gap-1.5 px-2 min-w-0">
+				<div class="h-8 bg-surface-inner rounded flex items-center justify-center gap-1.5 px-2 min-w-0">
 					<TrendingDown size={12} class="text-red-500 flex-shrink-0" />
 					<span class="text-xs text-text-muted truncate" data-type="number" title="{stats.totalExpense.toLocaleString()}원">{formatNumber(stats.totalExpense)}</span>
 				</div>
-				<div class="h-8 bg-surface-1 rounded flex items-center justify-center gap-1.5 px-2 min-w-0">
+				<div class="h-8 bg-surface-inner rounded flex items-center justify-center gap-1.5 px-2 min-w-0">
 					<DollarSign size={12} class="{stats.netProfit >= 0 ? 'text-green-500' : 'text-red-500'} flex-shrink-0" />
 					<span class="text-xs {stats.netProfit >= 0 ? 'text-text-muted' : 'text-red-500'} truncate" data-type="number" title="{stats.netProfit >= 0 ? '+' : ''}{stats.netProfit.toLocaleString()}원">{stats.netProfit >= 0 ? '+' : ''}{formatNumber(Math.abs(stats.netProfit))}</span>
 				</div>
@@ -118,7 +118,7 @@
 						{#if stats.revenueByPlatform && stats.revenueByPlatform[i] && stats.revenueByPlatform[i].amount !== undefined && stats.revenueByPlatform[i].amount > 0}
 							<a
 								href="/revenue"
-								class="flex items-center h-12 px-4 bg-surface-1 rounded min-w-0"
+								class="flex items-center h-12 px-4 bg-surface-inner rounded min-w-0"
 							>
 								<span class="flex-1 text-sm text-text-base truncate min-w-0">{stats.revenueByPlatform[i].platform}</span>
 								<span class="flex-shrink-0 text-sm font-semibold text-green-500 ml-2" data-type="number" title="{stats.revenueByPlatform[i].amount.toLocaleString()}원">
@@ -126,7 +126,7 @@
 								</span>
 							</a>
 						{:else}
-							<div class="flex items-center h-12 px-4 bg-surface-1 rounded min-w-0">
+							<div class="flex items-center h-12 px-4 bg-surface-inner rounded min-w-0">
 								<span class="flex-1 text-sm text-text-muted truncate min-w-0">{stats.revenueByPlatform?.[i]?.platform ?? '—'}</span>
 								<span class="flex-shrink-0 text-sm text-text-muted ml-2">—</span>
 							</div>
@@ -135,7 +135,7 @@
 						{#if stats.expenseByCategory && stats.expenseByCategory[i] && stats.expenseByCategory[i].amount !== undefined && stats.expenseByCategory[i].amount > 0}
 							<a
 								href="/revenue"
-								class="flex items-center h-12 px-4 bg-surface-1 rounded min-w-0"
+								class="flex items-center h-12 px-4 bg-surface-inner rounded min-w-0"
 							>
 								<span class="flex-1 text-sm text-text-base truncate min-w-0">{stats.expenseByCategory[i].category}</span>
 								<span class="flex-shrink-0 text-sm font-semibold text-red-500 ml-2" data-type="number" title="{stats.expenseByCategory[i].amount.toLocaleString()}원">
@@ -143,7 +143,7 @@
 								</span>
 							</a>
 						{:else}
-							<div class="flex items-center h-12 px-4 bg-surface-1 rounded min-w-0">
+							<div class="flex items-center h-12 px-4 bg-surface-inner rounded min-w-0">
 								<span class="flex-1 text-sm text-text-muted truncate min-w-0">{stats.expenseByCategory?.[i]?.category ?? '—'}</span>
 								<span class="flex-shrink-0 text-sm text-text-muted ml-2">—</span>
 							</div>

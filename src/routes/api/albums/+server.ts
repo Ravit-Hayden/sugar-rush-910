@@ -1,9 +1,20 @@
 import type { RequestHandler } from './$types';
 import type { ApiOk, ApiErr } from '$lib/types/api';
 
+type AlbumInput = {
+	title?: string;
+	artist?: string;
+	year?: number;
+	status?: string;
+	genres?: unknown[];
+	cover_url?: string | null;
+	release_date_kr?: string | null;
+	release_date_global?: string | null;
+};
+
 export const POST: RequestHandler = async ({ request, platform }) => {
 	try {
-		const albumData = await request.json();
+		const albumData = (await request.json()) as AlbumInput;
 		
 		// 입력 검증
 		if (!albumData.title || !albumData.title.trim()) {
@@ -106,15 +117,12 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 					.run();
 
 				// 생성된 앨범 정보 조회
-				const { results } = await db
+				const row = await db
 					.prepare('SELECT * FROM albums WHERE id = ?')
 					.bind(albumId)
 					.first();
 
-				createdAlbum = {
-					id: albumId,
-					...results
-				};
+				createdAlbum = row ? { id: albumId, ...row } : { id: albumId };
 			} catch (dbError) {
 				console.error('Database error:', dbError);
 				// 데이터베이스 오류 시 목 데이터 반환

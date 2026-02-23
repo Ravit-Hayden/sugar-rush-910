@@ -53,7 +53,7 @@
 			try {
 				commentsLoading = true;
 				const response = await fetch('/api/comments?limit=10');
-				const data = await response.json();
+				const data = await response.json() as Record<string, any>;
 				if (data.ok) {
 					comments = data.data || [];
 				}
@@ -196,7 +196,7 @@
 				})
 			});
 
-			const result = await response.json();
+			const result = await response.json() as Record<string, any>;
 
 			if (!response.ok || !result.ok) {
 				throw new Error(result.error?.message || '코멘트 추가에 실패했습니다.');

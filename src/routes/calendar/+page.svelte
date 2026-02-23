@@ -8,8 +8,8 @@
 	import MoreMenuDropdown from '$lib/components/MoreMenuDropdown.svelte';
 	import { toast } from '$lib/stores/toast';
 
-	let searchQuery = '';
-	let selectedFilter = 'all';
+	let searchQuery = $state('');
+	let selectedFilter = $state('all');
 
 	// 이벤트 데이터
 	let events = $state<any[]>([]);
@@ -22,9 +22,9 @@
 			try {
 				loading = true;
 				const response = await fetch('/api/calendar?limit=1000');
-				const data = await response.json();
+				const data = await response.json() as { ok?: boolean; data?: unknown[] };
 				if (data.ok) {
-					events = data.data || [];
+					events = (data.data ?? []) as any[];
 				}
 			} catch (error) {
 				console.error('Failed to load calendar events:', error);
@@ -108,11 +108,11 @@
 		{ value: 'meeting', label: '미팅' }
 	];
 
-	const filteredEvents = events.filter(event => {
+	const filteredEvents = $derived(events.filter(event => {
 		const matchesSearch = event.title.toLowerCase().includes(searchQuery.toLowerCase());
 		const matchesFilter = selectedFilter === 'all' || event.type === selectedFilter;
 		return matchesSearch && matchesFilter;
-	});
+	}));
 </script>
 
 <PageContent>

@@ -96,7 +96,7 @@
 	<Header />
 	<Sidebar />
 	
-	<main class="main-content-area {sidebarCollapsed ? 'sidebar-collapsed' : 'sidebar-expanded'}">
+	<main class="main-content-area scrollbar-custom {sidebarCollapsed ? 'sidebar-collapsed' : 'sidebar-expanded'}">
 		{#if showSearchResults}
 			<!-- 검색 결과 (모든 페이지 공통) -->
 			<SearchResultsMain

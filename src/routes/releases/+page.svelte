@@ -35,8 +35,8 @@
 		updatedAt?: string;
 	}
 
-	let searchQuery = '';
-	let selectedFilter = 'all';
+	let searchQuery = $state('');
+	let selectedFilter = $state('all');
 	let releases = $state<Release[]>([
 		{
 			id: '1',
@@ -88,7 +88,7 @@
 	// 모달 상태
 	let showCreateModal = $state(false);
 	let showEditModal = $state(false);
-	let editingRelease: Release | null = null;
+	let editingRelease = $state<Release | null>(null);
 	let moreMenuOpenId = $state<string | null>(null);
 
 	// 플랫폼 옵션
@@ -317,21 +317,25 @@
 		});
 	});
 
-	// 모달 외부 클릭 처리
-	let createModalRef: HTMLElement;
-	let editModalRef: HTMLElement;
-	useClickOutside(createModalRef, () => {
-		if (showCreateModal && !isSubmitting) {
-			showCreateModal = false;
-			resetForm();
-		}
+	// 모달 외부 클릭 처리 (셀렉터로 대상 지정, 모달 열림 시에만 활성화)
+	$effect(() => {
+		const open = showCreateModal;
+		return useClickOutside('[data-create-modal]', () => {
+			if (!isSubmitting) {
+				showCreateModal = false;
+				resetForm();
+			}
+		}, open);
 	});
-	useClickOutside(editModalRef, () => {
-		if (showEditModal && !isSubmitting) {
-			showEditModal = false;
-			editingRelease = null;
-			resetForm();
-		}
+	$effect(() => {
+		const open = showEditModal;
+		return useClickOutside('[data-edit-modal]', () => {
+			if (!isSubmitting) {
+				showEditModal = false;
+				editingRelease = null;
+				resetForm();
+			}
+		}, open);
 	});
 	useEscapeKey(() => {
 		if (showCreateModal && !isSubmitting) {
@@ -491,7 +495,7 @@
 	{#if showCreateModal}
 		<div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="create-modal-title">
 			<div 
-				bind:this={createModalRef}
+				data-create-modal
 				class="bg-surface-1 rounded-lg border border-border-subtle w-full max-w-2xl max-h-[90vh] overflow-y-auto"
 			>
 				<div class="p-6 border-b border-border-subtle">
@@ -502,11 +506,11 @@
 								showCreateModal = false;
 								resetForm();
 							}}
-							class="p-1 hover:bg-surface-2 rounded transition-colors"
+							class="template-close-btn w-8 h-8 flex items-center justify-end rounded-md text-text-muted transition-colors border border-transparent pl-2 pr-0"
 							type="button"
 							aria-label="닫기"
 						>
-							<X size={20} class="text-text-muted" />
+							<X size={20} />
 						</button>
 					</div>
 				</div>
@@ -556,7 +560,8 @@
 							발매일 <span class="text-brand-pink">*</span>
 						</label>
 						<DatePicker
-							bind:selectedDate={formData.releaseDate}
+							id="release-date"
+							bind:value={formData.releaseDate}
 							placeholder="발매일 선택"
 						/>
 						{#if validationErrors.releaseDate}
@@ -582,9 +587,9 @@
 
 					<!-- 플랫폼 -->
 					<div>
-						<label class="block text-sm font-medium text-text-strong mb-2">
+						<span class="block text-sm font-medium text-text-strong mb-2">
 							플랫폼 <span class="text-brand-pink">*</span>
-						</label>
+						</span>
 						<div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
 							{#each platformOptions as platform}
 								<label class="flex items-center gap-2 p-2 rounded border border-border-subtle cursor-pointer hover:bg-surface-2 transition-colors {formData.platforms.includes(platform) ? 'bg-brand-pink/10 border-brand-pink' : ''}">
@@ -633,7 +638,7 @@
 	{#if showEditModal && editingRelease}
 		<div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="edit-modal-title">
 			<div 
-				bind:this={editModalRef}
+				data-edit-modal
 				class="bg-surface-1 rounded-lg border border-border-subtle w-full max-w-2xl max-h-[90vh] overflow-y-auto"
 			>
 				<div class="p-6 border-b border-border-subtle">
@@ -645,11 +650,11 @@
 								editingRelease = null;
 								resetForm();
 							}}
-							class="p-1 hover:bg-surface-2 rounded transition-colors"
+							class="template-close-btn w-8 h-8 flex items-center justify-end rounded-md text-text-muted transition-colors border border-transparent pl-2 pr-0"
 							type="button"
 							aria-label="닫기"
 						>
-							<X size={20} class="text-text-muted" />
+							<X size={20} />
 						</button>
 					</div>
 				</div>
@@ -699,7 +704,8 @@
 							발매일 <span class="text-brand-pink">*</span>
 						</label>
 						<DatePicker
-							bind:selectedDate={formData.releaseDate}
+							id="edit-release-date"
+							bind:value={formData.releaseDate}
 							placeholder="발매일 선택"
 						/>
 						{#if validationErrors.releaseDate}
@@ -725,9 +731,9 @@
 
 					<!-- 플랫폼 -->
 					<div>
-						<label class="block text-sm font-medium text-text-strong mb-2">
+						<span class="block text-sm font-medium text-text-strong mb-2">
 							플랫폼 <span class="text-brand-pink">*</span>
-						</label>
+						</span>
 						<div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
 							{#each platformOptions as platform}
 								<label class="flex items-center gap-2 p-2 rounded border border-border-subtle cursor-pointer hover:bg-surface-2 transition-colors {formData.platforms.includes(platform) ? 'bg-brand-pink/10 border-brand-pink' : ''}">

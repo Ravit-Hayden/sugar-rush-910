@@ -36,12 +36,12 @@
 		{:else}
 			<!-- 요약: 이번주 수익 · 발매 건수 (아래 2칸과 동일 gap-3) -->
 			<div class="grid grid-cols-2 gap-3 mb-3 flex-shrink-0">
-				<div class="h-8 bg-surface-1 rounded flex items-center gap-2 px-3 min-w-0">
+				<div class="h-8 bg-surface-inner rounded flex items-center gap-2 px-3 min-w-0">
 					<TrendingUp size={12} class="text-ok-fg flex-shrink-0" />
 					<span class="text-xs text-text-muted truncate">이번주</span>
 					<span class="text-xs font-semibold text-text-strong truncate">₩{(totalRevenue / 10000).toFixed(0)}만</span>
 				</div>
-				<div class="h-8 bg-surface-1 rounded flex items-center gap-2 px-3 min-w-0">
+				<div class="h-8 bg-surface-inner rounded flex items-center gap-2 px-3 min-w-0">
 					<BarChart3 size={12} class="text-brand-pink flex-shrink-0" />
 					<span class="text-xs text-text-muted truncate">발매</span>
 					<span class="text-xs font-semibold text-text-strong truncate">{releaseCount}건</span>
@@ -51,7 +51,7 @@
 			<!-- 메인: 차트 · 요약 (h-[220px] 고정, 400px 카드 내 수용) -->
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-3 h-[220px] min-h-0 flex-shrink-0">
 				<!-- 차트: 단일 색상, 일관된 여백 -->
-				<div class="bg-surface-1 rounded flex flex-col min-w-0 min-h-0 p-3 overflow-hidden">
+				<div class="bg-surface-inner rounded flex flex-col min-w-0 min-h-0 p-3 overflow-hidden">
 					<div class="text-xs font-medium text-text-strong mb-3 truncate flex-shrink-0">주간 수익 추이</div>
 					<!-- 막대 + 요일: 각 칸에 막대 아래 요일 고정, 라벨 항상 보이게 -->
 					<div class="flex w-full gap-x-3 flex-1 min-h-0 flex-nowrap" style="min-height: 120px;">
@@ -71,7 +71,7 @@
 					</div>
 				</div>
 				<!-- 요약: 설명 패널 안에만 표시, 넘침 방지 -->
-				<div class="bg-surface-1 rounded flex flex-col min-w-0 min-h-0 p-3 overflow-hidden">
+				<div class="bg-surface-inner rounded flex flex-col min-w-0 min-h-0 p-3 overflow-hidden">
 					<div class="space-y-2 min-h-0 flex flex-col justify-center">
 						<div class="flex items-center gap-2 shrink-0">
 							<span class="w-2 h-2 bg-brand-pink rounded shrink-0" aria-hidden="true"></span>

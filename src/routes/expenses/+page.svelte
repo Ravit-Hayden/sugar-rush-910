@@ -56,9 +56,9 @@
 			try {
 				loading = true;
 				const response = await fetch('/api/expenses?limit=1000');
-				const data = await response.json();
-				if (data.ok) {
-					expenses = data.data || [];
+				const data = (await response.json()) as { ok?: boolean; data?: unknown[] };
+				if (data.ok && Array.isArray(data.data)) {
+					expenses = data.data;
 				}
 			} catch (error) {
 				console.error('Failed to load expenses:', error);
@@ -133,11 +133,11 @@
 	<PageHeader 
 		title="지출 관리" 
 		description="음악 제작 지출을 분석하고 관리하세요."
-		action={{
+		actions={[{
 			label: '지출 추가',
 			href: '/expenses/new',
 			icon: Plus
-		}}
+		}]}
 	/>
 
 	{#if loading}
@@ -200,7 +200,37 @@
 					<p class="text-text-muted">지출 데이터가 없습니다.</p>
 				</div>
 			{:else}
-				<div class="overflow-x-auto">
+				<!-- 모바일/좁은 뷰: 카드 -->
+				<div class="md:hidden divide-y divide-border-subtle">
+					{#each expenses as expense}
+						<div class="p-4 hover:bg-surface-2 transition-colors">
+							<div class="flex items-start justify-between gap-3">
+								<div class="min-w-0 flex-1">
+									<p class="text-sm font-medium text-text-strong">{expense.category || '-'}</p>
+									<p class="text-sm text-text-base mt-0.5" data-type="number">₩{(expense.amount || 0).toLocaleString()}</p>
+									<p class="text-xs text-text-muted mt-1">{formatDate(expense.date)}</p>
+									{#if expense.description}
+										<p class="text-sm text-text-muted mt-1 break-words">{expense.description}</p>
+									{/if}
+								</div>
+								<div class="flex-shrink-0">
+									<MoreMenuDropdown
+										itemId={expense.id}
+										openId={moreMenuOpenId}
+										items={[
+											{ label: '수정', icon: Edit, onClick: () => handleEdit(expense.id), ariaLabel: '지출 수정' },
+											{ label: '삭제', icon: Trash2, onClick: () => handleDelete(expense.id), ariaLabel: '지출 삭제', danger: true, separator: true }
+										]}
+										onToggle={handleMoreMenuToggle}
+										onClose={handleMoreMenuClose}
+									/>
+								</div>
+							</div>
+						</div>
+					{/each}
+				</div>
+				<!-- 데스크톱: 테이블 (가로 스크롤 없음) -->
+				<div class="hidden md:block overflow-hidden">
 					<table class="w-full">
 						<thead>
 							<tr class="border-b border-border-subtle">
