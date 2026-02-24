@@ -22,7 +22,7 @@
 </script>
 
 <!-- 내부 사이즈 합: pt-24 + 타이틀(mb-4) + 요약(h-8+mb-3) + 메인(220) + mt-3+더보기 + pb-5 ≈ 388px -->
-<div class="card-base h-[388px] flex flex-col justify-between p-5 rounded-lg bg-surface-2 border border-border-subtle overflow-hidden pt-[24px]">
+<div class="card-base h-auto md:h-[388px] flex flex-col justify-between p-5 rounded-lg bg-surface-2 border border-border-subtle overflow-hidden pt-[24px]">
 	<div class="flex-1 min-h-0 flex flex-col">
 		<div class="flex items-center justify-between mb-4 flex-shrink-0">
 			<h3 class="text-lg font-bold text-text-strong truncate">KPI 요약 그래프</h3>
@@ -48,10 +48,10 @@
 				</div>
 			</div>
 
-			<!-- 메인: 차트 · 요약 (h-[220px] 고정, 400px 카드 내 수용) -->
-			<div class="grid grid-cols-1 md:grid-cols-2 gap-3 h-[220px] min-h-0 flex-shrink-0">
+			<!-- 메인: 차트 · 요약 (모바일 h-auto, 데스크탑 h-[220px]) -->
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-3 h-auto md:h-[220px] min-h-0 flex-shrink-0">
 				<!-- 차트: 단일 색상, 일관된 여백 -->
-				<div class="bg-surface-inner rounded flex flex-col min-w-0 min-h-0 p-3 overflow-hidden">
+				<div class="bg-surface-inner rounded flex flex-col min-w-0 min-h-[180px] md:min-h-0 p-3 overflow-hidden">
 					<div class="text-xs font-medium text-text-strong mb-3 truncate flex-shrink-0">주간 수익 추이</div>
 					<!-- 막대 + 요일: 각 칸에 막대 아래 요일 고정, 라벨 항상 보이게 -->
 					<div class="flex w-full gap-x-3 flex-1 min-h-0 flex-nowrap" style="min-height: 120px;">
@@ -70,8 +70,8 @@
 						{/each}
 					</div>
 				</div>
-				<!-- 요약: 설명 패널 안에만 표시, 넘침 방지 -->
-				<div class="bg-surface-inner rounded flex flex-col min-w-0 min-h-0 p-3 overflow-hidden">
+				<!-- 요약: 설명 패널 — 모바일 숨김, 데스크탑만 표시 -->
+				<div class="hidden md:flex bg-surface-inner rounded flex-col min-w-0 min-h-0 p-3 overflow-hidden">
 					<div class="space-y-2 min-h-0 flex flex-col justify-center">
 						<div class="flex items-center gap-2 shrink-0">
 							<span class="w-2 h-2 bg-brand-pink rounded shrink-0" aria-hidden="true"></span>
