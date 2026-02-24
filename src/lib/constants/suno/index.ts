@@ -5,3 +5,4 @@
 export * from './stages';
 export * from './categories';
 export * from './prompts';
+export * from './projectTemplates';
