@@ -510,9 +510,9 @@
 		</div>
 
 		<!-- 프롬프트 그리드 -->
-		<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 			{#each filteredPrompts as prompt}
-				<div class="project-card flex flex-col min-h-[240px] bg-surface-2 rounded-lg border border-border-subtle p-4 transition-colors">
+				<div class="project-card flex flex-col min-h-[200px] bg-surface-2 rounded-lg border border-border-subtle p-4 transition-colors">
 					<!-- 헤더 -->
 					<div class="flex items-start justify-between gap-3 mb-2 flex-shrink-0">
 						<div class="flex-1 min-w-0">
@@ -973,13 +973,22 @@
 
 <!-- 전체 내용 보기 모달 -->
 {#if fullContentPrompt}
+	<!-- svelte-ignore a11y_no_static_element_interactions a11y_click_events_have_key_events -->
 	<div
 		class="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4"
 		role="dialog"
 		aria-modal="true"
 		aria-labelledby="full-content-title"
+		tabindex="-1"
+		onclick={closeFullContent}
+		onkeydown={(e) => { if (e.key === 'Escape') closeFullContent(); }}
 	>
-		<div class="bg-surface-1 rounded-lg border border-border-subtle w-full max-w-2xl max-h-[85vh] flex flex-col">
+		<!-- svelte-ignore a11y_no_static_element_interactions a11y_click_events_have_key_events -->
+		<div
+			class="bg-surface-1 rounded-lg border border-border-subtle w-full max-w-2xl max-h-[85vh] flex flex-col"
+			onclick={(e) => e.stopPropagation()}
+			onkeydown={(e) => e.stopPropagation()}
+		>
 			<div class="flex items-center justify-between gap-3 p-4 border-b border-border-subtle flex-shrink-0">
 				<h2 id="full-content-title" class="text-lg font-semibold text-text-strong truncate">{fullContentPrompt.name}</h2>
 				<div class="flex items-center gap-2 flex-shrink-0">

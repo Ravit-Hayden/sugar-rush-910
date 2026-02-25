@@ -681,7 +681,7 @@
 										v{selectedLyrics.versionNumber} · {lyricsTypeLabels[selectedLyrics.versionType]}
 									</h3>
 									<p class="text-xs text-text-muted mt-0.5">
-										{selectedLyrics.createdBy} · {selectedLyrics.createdAt}
+										<span class="{selectedLyrics.createdBy === 'El' ? 'text-elotte-green' : selectedLyrics.createdBy === 'Otte' ? 'text-elotte-orange' : ''}">{selectedLyrics.createdBy}</span> · {selectedLyrics.createdAt}
 									</p>
 								</div>
 								<div class="flex items-center gap-1 flex-shrink-0">
@@ -741,7 +741,7 @@
 								<span class="px-2 py-1 rounded bg-surface-1 text-xs font-medium text-text-base">{config.vocalGender}</span>
 							</div>
 							<div class="flex items-center gap-2">
-								<span class="text-xs text-text-muted">{config.createdBy} · {config.createdAt}</span>
+								<span class="text-xs text-text-muted"><span class="{config.createdBy === 'El' ? 'text-elotte-green' : config.createdBy === 'Otte' ? 'text-elotte-orange' : ''}">{config.createdBy}</span> · {config.createdAt}</span>
 								{#if isEditingThis}
 									<button type="button" class="btn-outline-hover px-3 py-1.5 text-sm border border-border-subtle rounded-lg" onclick={cancelEditPromptConfig}>
 										취소
@@ -981,7 +981,7 @@
 								<div class="flex items-center gap-2 text-sm text-text-muted">
 									<span>{audio.duration}</span>
 									<span>·</span>
-									<span>{audio.createdBy}</span>
+									<span class="{audio.createdBy === 'El' ? 'text-elotte-green' : audio.createdBy === 'Otte' ? 'text-elotte-orange' : ''}">{audio.createdBy}</span>
 									<span>·</span>
 									<span>{audio.createdAt}</span>
 								</div>

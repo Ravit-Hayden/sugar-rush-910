@@ -30,6 +30,8 @@
 	let subscription = $state<SUNOSubscription>({ planType: 'Premier', status: 'active', billingDate: 15, monthlyCredits: 10000, remainingCredits: 6000, updatedBy: 'El', lastUpdated: '' });
 	let words = $state<WordEntry[]>([]);
 	let recentActivities = $state<RecentActivity[]>([]);
+	let loading = $state(true);
+	let loadError = $state('');
 
 	// 데이터 로드
 	$effect(() => {
@@ -37,17 +39,26 @@
 	});
 
 	async function loadData() {
-		const [projectsData, subscriptionData, wordsData, activitiesData] = await Promise.all([
-			getProjects(),
-			getSubscription(),
-			getWords(),
-			getRecentActivities(3)
-		]);
-		
-		projects = projectsData;
-		subscription = subscriptionData;
-		words = wordsData;
-		recentActivities = activitiesData;
+		loading = true;
+		loadError = '';
+		try {
+			const [projectsData, subscriptionData, wordsData, activitiesData] = await Promise.all([
+				getProjects(),
+				getSubscription(),
+				getWords(),
+				getRecentActivities(3)
+			]);
+
+			projects = projectsData;
+			subscription = subscriptionData;
+			words = wordsData;
+			recentActivities = activitiesData;
+		} catch (e) {
+			loadError = '데이터를 불러오는 중 오류가 발생했습니다.';
+			console.error('SUNO 대시보드 데이터 로드 실패:', e);
+		} finally {
+			loading = false;
+		}
 	}
 
 	// 키보드 단축키 액션
@@ -138,6 +149,25 @@
 			</div>
 		{/if}
 
+		{#if loading}
+			<div class="flex items-center justify-center py-12">
+				<div class="text-center">
+					<div class="w-6 h-6 border-2 border-brand-pink border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+					<p class="text-sm text-text-muted">불러오는 중...</p>
+				</div>
+			</div>
+		{:else if loadError}
+			<div class="bg-surface-2 border border-border-subtle rounded-lg p-6 text-center mb-6">
+				<p class="text-sm text-text-muted mb-3">{loadError}</p>
+				<button
+					type="button"
+					onclick={() => loadData()}
+					class="text-sm font-medium text-brand-pink hover:text-hover-cyan transition-colors"
+				>
+					다시 시도
+				</button>
+			</div>
+		{:else}
 		<!-- 통계 카드 -->
 		<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
 			<!-- 진행 중인 곡 -->
@@ -271,7 +301,7 @@
 				<div class="bg-surface-2 rounded-lg border border-border-subtle p-4 flex-1 min-h-0 flex flex-col">
 					<div class="flex items-center justify-between mb-3 flex-shrink-0">
 						<h3 class="text-sm font-semibold text-text-strong">최근 활동</h3>
-						<a href="/feedback" class="text-brand-pink text-xs font-semibold px-2 py-1 rounded hover:bg-hover-cyan hover:text-[var(--text-on-hover)] transition-colors">
+						<a href="/suno/projects" class="text-brand-pink text-xs font-semibold px-2 py-1 rounded hover:bg-hover-cyan hover:text-[var(--text-on-hover)] transition-colors">
 							더보기
 						</a>
 					</div>
@@ -292,5 +322,6 @@
 				</div>
 			</div>
 		</div>
+		{/if}
 	</SUNOTabs>
 </div>

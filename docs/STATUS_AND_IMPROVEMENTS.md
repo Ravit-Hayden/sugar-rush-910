@@ -8,9 +8,9 @@
 
 | 구분 | 상태 |
 |------|------|
-| **pnpm run build** | ✅ 완료됨. 단, Svelte 경고 여러 건 출력(아래 §7). |
-| **svelte-check --threshold error** | ❌ API·일부 페이지에서 TypeScript 에러 다수(252건). |
-| **추가 보완(§5)** | calendar $state ✅, option ✅, reports label→span ✅, DatePicker aria/키보드 일부 ✅, tasks 편집 초기값 정리 ✅. |
+| **pnpm run build** | ✅ 완료됨. 경고 0건. |
+| **svelte-check --threshold warning** | ✅ 에러 0건, 경고 0건. |
+| **추가 보완(§5)** | calendar $state ✅, option ✅, reports label→span ✅, DatePicker aria/키보드 ✅, tasks 편집 초기값 flicker 수정 ✅. |
 | **연결성·타입** | SUNO·트랙/태스크/앨범 연결 완료. `album.genres` 정리 완료. |
 
 ---
@@ -32,11 +32,9 @@
 
 - **상태**: `album.genres` / `album.genres ?? []`로 정리 완료. albums 경로에 `as any` 없음.
 
-### 3.2 태스크 편집 폼 초기값
+### 3.2 ~~태스크 편집 폼 초기값~~ ✅ 완료
 
-- **위치**: `src/routes/tasks/[id]/edit/+page.svelte`
-- **내용**: `title`, `due`, `priority`, `description`을 빈 값/기본값으로 두고 `$effect`에서 `mockTasks.find`로 채움. 첫 렌더 직후 잠깐 잘못된 값이 보일 수 있음.
-- **보완**: (선택) 초기 렌더 전에 id로 task를 찾아서 `$state(초기값)`으로 넣거나, 상세와 동일하게 `$derived(mockTasks.find(...))` 기반으로 폼을 구성하면 깜빡임을 줄일 수 있음.
+- **상태**: `untrack()`으로 `$state` 초기화 시 즉시 태스크 데이터 반영. `$effect`는 SPA 내 id 변경 시에만 동기화. 미존재 태스크 시 안내 메시지 표시. 경고 0건.
 
 ---
 
@@ -73,9 +71,9 @@
 
 | 순서 | 내용 | 비고 |
 |------|------|------|
-| 1 | **빌드 경고 제거** | 아래 §7 표. DatePicker는 role=application 적용 후에도 div 비대화형 경고 남을 수 있음. |
-| 2 | **TypeScript 에러 제거** | API: request.json() 결과 타입 단언/인터페이스, D1 results 타입. 페이지: response.json(), album.genres 등. |
-| 3 | **선택** | 태스크 편집 폼 초기값으로 첫 렌더 깜빡임 완화(현재 $effect만 사용). |
+| ~~1~~ | ~~**빌드 경고 제거**~~ | ✅ 완료. 경고 0건. |
+| ~~2~~ | ~~**TypeScript 에러 제거**~~ | ✅ 완료. svelte-check 에러 0건, 경고 0건. |
+| ~~3~~ | ~~**태스크 편집 폼 초기값 깜빡임**~~ | ✅ 완료. untrack() 기반 초기값 캡처 + prevId 동기화. |
 | 4 | **추후** | API·스토리지·DELETE/PUT 연동, SUNO·피드백·협업 등 TODO 구현. |
 
 ---
@@ -98,16 +96,8 @@
 
 ---
 
-## 7. 빌드 시 경고 (현재 출력)
+## 7. ~~빌드 시 경고~~ ✅ 모두 해결됨
 
-`pnpm run build` 시 아래 경고 출력. 제거 시 반응성·a11y·일관성 개선.
-
-| 파일 | 내용 | 조치 |
-|------|------|------|
-| calendar/+page.svelte | searchQuery, selectedFilter 반응성 | let → $state() |
-| expenses/[id]/edit, revenue/[id]/edit | categoryInput 등 bind:this 반응성 경고 | bind:this 유지 시 경고 무시 가능 |
-| expenses/new, revenue/new, revenue/[id]/edit | `<option />` self-closing | `<option></option>` |
-| reports/+page.svelte | label 연관 control 없음 | label for + id |
-| DatePicker.svelte | aria-expanded, 클릭+키보드 | role/aria·keydown 처리 |
+`pnpm run build` 및 `svelte-check --threshold warning` 모두 **경고 0건, 에러 0건**.
 
 이 문서는 위와 같은 기준으로 “현재 상태·보완할 점·오류·코드 꼬인 부분”을 정리한 것입니다.

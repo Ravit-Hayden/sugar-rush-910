@@ -506,8 +506,8 @@
 				</button>
 			</div>
 
-			<!-- 필터/정렬 (2x2 그리드) -->
-			<div class="grid grid-cols-2 gap-3">
+			<!-- 필터/정렬 -->
+			<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
 				<!-- 카테고리 필터 -->
 				<div class="relative category-dropdown">
 					<button

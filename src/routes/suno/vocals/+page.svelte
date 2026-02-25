@@ -515,7 +515,7 @@
 		<!-- 보컬 그리드 -->
 		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 			{#each filteredVocals as vocal}
-				<div class="vocal-card bg-surface-2 rounded-lg border border-border-subtle p-4 transition-colors flex flex-col min-h-[150px]">
+				<div class="vocal-card bg-surface-2 rounded-lg border border-border-subtle p-4 transition-colors flex flex-col min-h-[200px]">
 					<!-- 상단: 아바타/이름 + 생성일(우측 상단) -->
 					<div class="flex items-start justify-between gap-3 mb-2">
 						<div class="flex items-start gap-4 min-w-0 flex-1">
@@ -556,10 +556,17 @@
 						</div>
 						<div class="text-xs text-text-muted flex-shrink-0 pt-0.5 text-right">
 							<div>생성: {vocal.createdAt}</div>
-							<div class="mt-1 inline-flex items-center justify-end gap-1.5 text-text-muted">
+							{#if vocal.linkedTracks.length > 0}
+							<a href="/suno/projects" class="mt-1 inline-flex items-center justify-end gap-1.5 text-brand-pink hover:text-hover-cyan transition-colors" title="연결된 프로젝트 보기">
 								<Link size={13} />
 								<span>{vocal.linkedTracks.length}개 트랙</span>
+							</a>
+						{:else}
+							<div class="mt-1 inline-flex items-center justify-end gap-1.5 text-text-muted">
+								<Link size={13} />
+								<span>0개 트랙</span>
 							</div>
+						{/if}
 						</div>
 					</div>
 

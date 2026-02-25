@@ -621,7 +621,7 @@
 							<div class="flex items-start gap-4">
 								<!-- 아바타 -->
 								<div class="flex-shrink-0">
-									<div class="w-10 h-10 bg-brand-pink rounded-full flex items-center justify-center text-white font-medium">
+									<div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-medium {feedback.from === 'El' ? 'bg-elotte-green' : feedback.from === 'Otte' ? 'bg-elotte-orange' : 'bg-brand-pink'}">
 										{feedback.avatar}
 									</div>
 								</div>
@@ -668,7 +668,7 @@
 										<div class="flex-1">
 											<h3 class="text-lg font-semibold text-text-strong mb-1">{feedback.title}</h3>
 											<div class="flex items-center gap-2 text-sm text-text-muted mb-2">
-												<span>{feedback.from}</span>
+												<span class="{feedback.from === 'El' ? 'text-elotte-green' : feedback.from === 'Otte' ? 'text-elotte-orange' : ''}">{feedback.from}</span>
 												<span>•</span>
 												<span class="flex items-center gap-1">
 													<Clock size={12} />

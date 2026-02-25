@@ -25,7 +25,7 @@
 	<div class="max-w-2xl space-y-4">
 		<div class="bg-surface-2 border border-border-subtle rounded-lg p-5">
 			<p class="text-text-strong">{feedback.content}</p>
-			<p class="mt-2 text-sm text-text-muted">보낸 사람: {feedback.from} · {feedback.time}</p>
+			<p class="mt-2 text-sm text-text-muted">보낸 사람: <span class="{feedback.from === 'El' ? 'text-elotte-green' : feedback.from === 'Otte' ? 'text-elotte-orange' : ''}">{feedback.from}</span> · {feedback.time}</p>
 		</div>
 	</div>
 	<p class="mt-6 text-sm text-text-muted">실제 연동 시 GET /api/feedback/:id 로 상세 조회 후 표시합니다.</p>

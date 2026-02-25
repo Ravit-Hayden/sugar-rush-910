@@ -397,20 +397,20 @@
 			</h3>
 			<div class="space-y-3">
 				<div class="flex items-center gap-3">
-					<div class="w-8 h-8 bg-brand-pink rounded-full flex items-center justify-center">
+					<div class="w-8 h-8 bg-elotte-green rounded-full flex items-center justify-center">
 						<span class="text-sm font-medium text-white">E</span>
 					</div>
 					<div>
-						<p class="text-sm font-medium text-text-strong">El</p>
+						<p class="text-sm font-medium text-elotte-green">El</p>
 						<p class="text-xs text-text-muted">프로듀서</p>
 					</div>
 				</div>
 				<div class="flex items-center gap-3">
-					<div class="w-8 h-8 bg-hover-cyan rounded-full flex items-center justify-center">
-						<span class="text-sm font-medium text-black">O</span>
+					<div class="w-8 h-8 bg-elotte-orange rounded-full flex items-center justify-center">
+						<span class="text-sm font-medium text-white">O</span>
 					</div>
 					<div>
-						<p class="text-sm font-medium text-text-strong">Otte</p>
+						<p class="text-sm font-medium text-elotte-orange">Otte</p>
 						<p class="text-xs text-text-muted">작사가</p>
 					</div>
 				</div>
